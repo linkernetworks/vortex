@@ -1,0 +1,6 @@
+# vagrant 
+.vagrant/
+**/*.vmdk
+
+# ansible
+**/*.retry
