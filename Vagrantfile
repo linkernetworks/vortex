@@ -1,183 +1,74 @@
 # -*- mode: ruby -*-
-# # vi: set ft=ruby :
+# vi:set ft=ruby sw=2 ts=2 sts=2:
+# Create vm
+# master: 192.168.26.10
+# node-1: 192.168.26.11
+# node-2: 192.168.26.12
+# ...
 
-# This Vagrantfile is almost the same as kubespray/Vagrantfile. Only modify path and directory.
-
-require 'fileutils'
-
-Vagrant.require_version ">= 2.0.0"
-
-CONFIG = File.join(File.dirname(__FILE__), "vagrant/config.rb")
-
-COREOS_URL_TEMPLATE = "https://storage.googleapis.com/%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
-
-# Uniq disk UUID for libvirt
-DISK_UUID = Time.now.utc.to_i
-
-SUPPORTED_OS = {
-  "coreos-stable" => {box: "coreos-stable",      bootstrap_os: "coreos", user: "core", box_url: COREOS_URL_TEMPLATE % ["stable"]},
-  "coreos-alpha"  => {box: "coreos-alpha",       bootstrap_os: "coreos", user: "core", box_url: COREOS_URL_TEMPLATE % ["alpha"]},
-  "coreos-beta"   => {box: "coreos-beta",        bootstrap_os: "coreos", user: "core", box_url: COREOS_URL_TEMPLATE % ["beta"]},
-  "ubuntu"        => {box: "bento/ubuntu-16.04", bootstrap_os: "ubuntu", user: "vagrant"},
-  "centos"        => {box: "centos/7",           bootstrap_os: "centos", user: "vagrant"},
-  "opensuse"      => {box: "opensuse/openSUSE-42.3-x86_64", bootstrap_os: "opensuse", use: "vagrant"},
-  "opensuse-tumbleweed" => {box: "opensuse/openSUSE-Tumbleweed-x86_64", bootstrap_os: "opensuse", use: "vagrant"},
-}
-
-# Defaults for config options defined in CONFIG
-$num_instances = 3
-$instance_name_prefix = "k8s"
-$vm_gui = false
-$vm_memory = 2048
-$vm_cpus = 1
-$shared_folders = {}
-$forwarded_ports = {}
-$subnet = "172.17.8"
-$os = "ubuntu"
-$network_plugin = "flannel"
-# The first three nodes are etcd servers
-$etcd_instances = $num_instances
-# The first two nodes are kube masters
-$kube_master_instances = $num_instances == 1 ? $num_instances : ($num_instances - 1)
-# All nodes are kube nodes
-$kube_node_instances = $num_instances
-# The following only works when using the libvirt provider
-$kube_node_instances_with_disks = false
-$kube_node_instances_with_disks_size = "20G"
-$kube_node_instances_with_disks_number = 2
-
-$local_release_dir = "/vagrant/temp"
-
-host_vars = {}
-
-if File.exist?(CONFIG)
-  require CONFIG
-end
-
-$box = SUPPORTED_OS[$os][:box]
-# if $inventory is not set, try to use example
-$inventory = File.join(File.dirname(__FILE__), "inventory", "sample") if ! $inventory
-
-# if $inventory has a hosts file use it, otherwise copy over vars etc
-# to where vagrant expects dynamic inventory to be.
-if ! File.exist?(File.join(File.dirname($inventory), "hosts"))
-  $vagrant_ansible = File.join(File.dirname(__FILE__), ".vagrant",
-                       "provisioners", "ansible")
-  FileUtils.mkdir_p($vagrant_ansible) if ! File.exist?($vagrant_ansible)
-  if ! File.exist?(File.join($vagrant_ansible,"inventory"))
-    FileUtils.ln_s($inventory, File.join($vagrant_ansible,"inventory"))
-  end
-end
-
-if Vagrant.has_plugin?("vagrant-proxyconf")
-    $no_proxy = ENV['NO_PROXY'] || ENV['no_proxy'] || "127.0.0.1,localhost"
-    (1..$num_instances).each do |i|
-        $no_proxy += ",#{$subnet}.#{i+100}"
-    end
-end
+NUM_NODE = 2
+MASTER_IP = "192.168.26.10"
+NODE_IP_NW = "192.168.26."
+DISK_SIZE = "100" # 100MB
+PRIVATE_KEY_PATH = "inventory/vagrant"
+PRIVATE_KEY = "#{PRIVATE_KEY_PATH}/id_rsa"
 
 Vagrant.configure("2") do |config|
-  # always use Vagrants insecure key
-  config.ssh.insert_key = false
-  config.vm.box = $box
-  if SUPPORTED_OS[$os].has_key? :box_url
-    config.vm.box_url = SUPPORTED_OS[$os][:box_url]
+
+  # linkernetworks/aurora-base is a virtualbox with pre-install pacakges:
+  #   docker-ce=17.12.1~ce-0~ubuntu 
+  #   pip, glusterfs
+  config.vm.box = "linkernetworks/aurora-base"
+  config.vm.box_version = "0.0.6"
+
+  config.vm.box_check_update = false
+  config.vbguest.auto_update = false
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048  # 1536 at least for kubespray
+    vb.cpus = 2
+  end #vb
+
+  # Generate ssh key at .ssh
+  unless File.exist?("#{PRIVATE_KEY}")
+    `mkdir -p #{PRIVATE_KEY_PATH} && ssh-keygen -f #{PRIVATE_KEY} -t rsa -N ''`
   end
-  config.ssh.username = SUPPORTED_OS[$os][:user]
-  # plugin conflict
-  if Vagrant.has_plugin?("vagrant-vbguest") then
-    config.vbguest.auto_update = false
-  end
-  (1..$num_instances).each do |i|
-    config.vm.define vm_name = "%s-%02d" % [$instance_name_prefix, i] do |config|
-      config.vm.hostname = vm_name
+  config.vm.provision "file", source: "#{PRIVATE_KEY}.pub", destination: "id_rsa.pub"
+  config.vm.provision "append-public-key", :type => "shell", inline: "cat id_rsa.pub >> ~/.ssh/authorized_keys"
 
-      if Vagrant.has_plugin?("vagrant-proxyconf")
-        config.proxy.http     = ENV['HTTP_PROXY'] || ENV['http_proxy'] || ""
-        config.proxy.https    = ENV['HTTPS_PROXY'] || ENV['https_proxy'] ||  ""
-        config.proxy.no_proxy = $no_proxy
+  #config.vm.provision "setup-hosts", :type => "shell", :path => "../scripts/vagrant/setup-hosts" do |s|
+  #  s.args = ["enp0s8"]
+  #end
+
+  config.vm.define "master" do |node|
+
+    node.vm.hostname = "master"
+    node.vm.network :private_network, ip: MASTER_IP
+
+    node.vm.provider "virtualbox" do |vb|
+      unless File.exist?("disk-master.vmdk")
+        vb.customize ["createhd", "--filename", "disk-master.vmdk", "--size", DISK_SIZE]
       end
-
-      if $expose_docker_tcp
-        config.vm.network "forwarded_port", guest: 2375, host: ($expose_docker_tcp + i - 1), auto_correct: true
-      end
-
-      $forwarded_ports.each do |guest, host|
-        config.vm.network "forwarded_port", guest: guest, host: host, auto_correct: true
-      end
-
-      ["vmware_fusion", "vmware_workstation"].each do |vmware|
-        config.vm.provider vmware do |v|
-          v.vmx['memsize'] = $vm_memory
-          v.vmx['numvcpus'] = $vm_cpus
-        end
-      end
-
-      config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
-
-      $shared_folders.each do |src, dst|
-        config.vm.synced_folder src, dst, type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
-      end
-
-      config.vm.provider :virtualbox do |vb|
-        vb.gui = $vm_gui
-        vb.memory = $vm_memory
-        vb.cpus = $vm_cpus
-      end
-
-     config.vm.provider :libvirt do |lv|
-       lv.memory = $vm_memory
-     end
-
-      ip = "#{$subnet}.#{i+100}"
-      host_vars[vm_name] = {
-        "ip": ip,
-        "bootstrap_os": SUPPORTED_OS[$os][:bootstrap_os],
-        "local_release_dir" => $local_release_dir,
-        "download_run_once": "False",
-        "kube_network_plugin": $network_plugin
-      }
-
-      config.vm.network :private_network, ip: ip
-
-      # Disable swap for each vm
-      config.vm.provision "shell", inline: "swapoff -a"
-
-      if $kube_node_instances_with_disks
-        # Libvirt
-        driverletters = ('a'..'z').to_a
-        config.vm.provider :libvirt do |lv|
-          # always make /dev/sd{a/b/c} so that CI can ensure that
-          # virtualbox and libvirt will have the same devices to use for OSDs
-          (1..$kube_node_instances_with_disks_number).each do |d|
-            lv.storage :file, :device => "hd#{driverletters[d]}", :path => "disk-#{i}-#{d}-#{DISK_UUID}.disk", :size => $kube_node_instances_with_disks_size, :bus => "ide"
-          end
-        end
-      end
-
-      # Only execute once the Ansible provisioner,
-      # when all the machines are up and ready.
-      if i == $num_instances
-        config.vm.provision "ansible" do |ansible|
-          ansible.playbook = "kubespray/cluster.yml"
-          if File.exist?(File.join(File.dirname($inventory), "hosts"))
-            ansible.inventory_path = $inventory
-          end
-          ansible.become = true
-          ansible.limit = "all"
-          ansible.host_key_checking = false
-          ansible.raw_arguments = ["--forks=#{$num_instances}", "--flush-cache"]
-          ansible.host_vars = host_vars
-          #ansible.tags = ['download']
-          ansible.groups = {
-            "etcd" => ["#{$instance_name_prefix}-0[1:#{$etcd_instances}]"],
-            "kube-master" => ["#{$instance_name_prefix}-0[1:#{$kube_master_instances}]"],
-            "kube-node" => ["#{$instance_name_prefix}-0[1:#{$kube_node_instances}]"],
-            "k8s-cluster:children" => ["kube-master", "kube-node"],
-          }
-        end
-      end
-
+      vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', "disk-master.vmdk"]
     end
-  end
+  end #master
+
+  (1..NUM_NODE).each do |i|
+    config.vm.define "node-#{i}" do |node|
+
+      node.vm.hostname = "node-#{i}"
+      node_ip = NODE_IP_NW + "#{10 + i}"
+      node.vm.network :private_network, ip: node_ip
+
+      # Add disk for gluster client
+      node.vm.provider "virtualbox" do |vb|
+        unless File.exist?("disk-#{i}.vmdk")
+          vb.customize ["createhd", "--filename", "disk-#{i}.vmdk", "--size", DISK_SIZE]
+        end
+        vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', "disk-#{i}.vmdk"]
+      end #vb
+
+    end #node-i
+  end #each node
+
 end

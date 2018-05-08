@@ -1,0 +1,3 @@
+- import_playbook: glusterfs/deploy.yml
+
+- import_playbook: kubespray/cluster.yml

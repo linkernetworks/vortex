@@ -1,4 +1,12 @@
+# keys
+**/id_rsa
+**/id_rsa.pub
+
+# log
+**/*.log
+
 # vagrant 
+vagrant/credentials
 .vagrant/
 **/*.vmdk
 
