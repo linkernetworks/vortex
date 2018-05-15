@@ -11,7 +11,21 @@ Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 3. Edit config files `inventory/*/host.ini`
 4. Run installer
 
-### Obtain a GCR key
+
+### Prerequsites
+
+ubuntu
+```
+apt-get install -y python3
+pip install ansible netaddr
+```
+
+Mac
+```
+pip install ansible netaddr
+```
+
+### Obtain a GCR key (needed by Aurora)
 
 Google Cloud Registry key is the access key which is required to access essential data from Google Cloud. Make sure *5g-vortex-gcr-20180508* is provided by Linkernetwork before deployment.
 
@@ -21,12 +35,12 @@ mv 5g-vortex-gcr-20180508 aurora/
 
 # Deploy with Vagrant (For test purpose only)
 
-Bring up vms
+### Bring up vms
 ```
 vagrant up
 ```
 
-Edit inventory settings
+### Edit inventory file
 ```
 vim inventory/vagrant/host.ini
 ```
@@ -41,7 +55,7 @@ Check vms status
 vagrant status
 ```
 
-Deploy
+### Deploy
 ```
 make deploy-vagrant
 ```
@@ -101,7 +115,7 @@ ssh -i 5g/id_rsa root@<server-ip>
 # Move on to next server-ip
 ```
 
-### Run deploy
+### Deploy
 
 ```
 make deploy-5g
@@ -120,10 +134,36 @@ access aurora with node ip and node port `http://ip:32363`
 
 # Deploy to GCE 
 
-TODO
+### Edit inventory file
+```
+vim inventory/gce/host.ini
+```
+
+NOTE:
+1. Make sure server(s) are up on GCP
+2. The `ansible_ssh_host` ip is peripheral and will change when restarting server 
+
+### Deploy
+
+```
+make deploy-gce
+```
+
+If the gce already has a running cluster, consider reset the cluster before installation.
+
+### Reset
+
+```
+make reset-gce
+```
 
 # Architecture
 
 ### Kubespray
 
+Forked repository: https://github.com/linkernetworks/kubespray
 version: v2.5.0
+Modification:
+- change docker edge version from `docker-ce=17.12.1~ce-0~ubuntu-{{ ansible_distribution_release|lower }}` to `docker-ce=17.12.1~ce-0~ubuntu`
+
+

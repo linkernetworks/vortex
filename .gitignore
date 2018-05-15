@@ -9,6 +9,7 @@
 vagrant/credentials
 .vagrant/
 **/*.vmdk
+**/*.creds
 
 # ansible
 **/*.retry
