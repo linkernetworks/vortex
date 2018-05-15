@@ -17,7 +17,7 @@ scale-%:
 		kubespray/scale.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-scale.log
 
 clean: 
-	rm -rf *.log **/*.vmdk 
+	rm -rf *.log **/*.vmdk **/*.retry
 
 # Vagrant
 
