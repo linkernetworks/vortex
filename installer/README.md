@@ -3,21 +3,21 @@ Votex installer
 
 Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
-# Install Steps
+# Install Life Cycle
 
 0. Obtain GCR key
 1. Bring up VMs / prepare bare metal servers
 2. Create ssh key for VMs/servers
 3. Edit config files `inventory/*/host.ini`
 4. Run installer
-
+5. Reset cluster after testing
 
 ### Prerequsites
 
 ubuntu
 ```
-apt-get install -y python3
-pip install ansible netaddr
+apt-get install -y python3 ansible
+pip install netaddr
 ```
 
 Mac
