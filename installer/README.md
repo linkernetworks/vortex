@@ -20,7 +20,7 @@ Google Cloud Registry key is the access key which is required to access essentia
 mv 5g-vortex-gcr-20180508 aurora/
 ```
 
-# Deploy with Vagrant
+# Deploy with Vagrant (for test purpose only)
 
 ```
 # bring up vms with kubespray
@@ -39,7 +39,7 @@ vagrant ssh master
 vagrant destroy
 ```
 
-# Deploy to bare metal
+# Deploy to bare metal servers
 
 ### Edit inventory settings
 
