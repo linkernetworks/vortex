@@ -1,3 +1,15 @@
+# Main
+
+deploy-%: 
+	ansible-playbook \
+		--inventory=inventory/$*/hosts.ini \
+		deploy.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-deploy.log
+
+clean: 
+	rm -rf *.log **/*.vmdk 
+
+# Vagrant
+
 vagrant-up:
 	vagrant up
 
@@ -6,12 +18,12 @@ vagrant-destroy:
 
 vagrant: vagrant-up deploy-vagrant
 
-deploy-%: 
-	ansible-playbook \
-		--inventory=inventory/$*/hosts.ini \
-		--become-user=root \
-		--private-key=inventory/$*/ssh-key \
-		deploy.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-deploy.log
+# GCE
 
-clean: 
-	rm *.log **/*.vmdk
+gce-up:
+	ansible-playbook \
+		--inventory=inventory/gce/hosts.ini \
+		gce-up.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-gce-up.log
+
+gce: gce-up deploy-gce
+

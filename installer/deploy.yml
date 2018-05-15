@@ -1,4 +1,4 @@
-- import_playbook: glusterfs/deploy.yml
+#- import_playbook: gce-up.yml
 
 - import_playbook: kubespray/cluster.yml
 

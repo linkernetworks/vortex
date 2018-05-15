@@ -1,0 +1,3 @@
+- hosts: localhost
+  debug: 
+    msg: "TODO Deploying glusterfs with aurora installer"
