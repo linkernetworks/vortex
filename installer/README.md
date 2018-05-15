@@ -46,6 +46,7 @@ vim inventory/vagrant/host.ini
 ```
 
 NOTE:
+
 1. All bare metal server(s) should be listed above with <hostname> and <ip>.
 2. All Master server(s) should be listed under [kube-master] and [etcd]. Requires at least 1 Master.
 3. All Node servers(s) should be listed under [kube-node]. Requires at least 1 Node.
@@ -83,6 +84,7 @@ vim inventory/5g/host.ini
 ```
 
 NOTE:
+
 1. All bare metal server(s) should be listed above with <hostname> and <ip>.
 2. All Master server(s) should be listed under [kube-master] and [etcd]. Requires at least 1 Master.
 3. All Node servers(s) should be listed under [kube-node]. Requires at least 1 Node.
@@ -140,6 +142,7 @@ vim inventory/gce/host.ini
 ```
 
 NOTE:
+
 1. Make sure server(s) are up on GCP
 2. The `ansible_ssh_host` ip is peripheral and will change when restarting server 
 
@@ -162,8 +165,11 @@ make reset-gce
 ### Kubespray
 
 Forked repository: https://github.com/linkernetworks/kubespray
+
 version: v2.5.0
+
 Modification:
+
 - change docker edge version from `docker-ce=17.12.1~ce-0~ubuntu-{{ ansible_distribution_release|lower }}` to `docker-ce=17.12.1~ce-0~ubuntu`
 
 
