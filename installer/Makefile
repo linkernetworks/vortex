@@ -32,7 +32,7 @@ vagrant: vagrant-up deploy-vagrant
 # GCE
 
 gce-up:
-	ansible-playbook \
+	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 		--inventory=inventory/gce/hosts.ini \
 		gce-up.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-gce-up.log
 
