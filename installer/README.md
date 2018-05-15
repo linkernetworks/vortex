@@ -96,3 +96,9 @@ kubectl get nodes
 # access aurora with node ip and node port
 
 ```
+
+# Architecture
+
+### Kubespray
+
+version: v2.5.0
