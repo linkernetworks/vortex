@@ -3,14 +3,13 @@ Votex installer
 
 Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
-# Installer
+# Install Steps
 
-- [x] Add submodule kubesrpay: tag: v2.5.0 ( change version if needed )
-- [x] Add Vagrantfile to run a local vm
-- [ ] Add baremetal ansible playbook to install GlusterFS 
-- [ ] Add install guide to README.
-
-# Prerequisites
+0. Obtain GCR key
+1. Bring up VMs / prepare bare metal servers
+2. Create ssh key for VMs/servers
+3. Edit config files `inventory/*/host.ini`
+4. Run installer
 
 ### Obtain a GCR key
 
@@ -20,29 +19,51 @@ Google Cloud Registry key is the access key which is required to access essentia
 mv 5g-vortex-gcr-20180508 aurora/
 ```
 
-# Deploy with Vagrant (for test purpose only)
+# Deploy with Vagrant (For test purpose only)
 
+Bring up vms
 ```
-# bring up vms with kubespray
 vagrant up
+```
 
-# Check status
+Edit inventory settings
+```
+vim inventory/vagrant/host.ini
+```
+
+NOTE:
+1. All bare metal server(s) should be listed above with <hostname> and <ip>.
+2. All Master server(s) should be listed under [kube-master] and [etcd]. Requires at least 1 Master.
+3. All Node servers(s) should be listed under [kube-node]. Requires at least 1 Node.
+
+Check vms status
+```
 vagrant status
+```
 
-# deploy with inventory/vagrant/*
+Deploy
+```
 make deploy-vagrant
+```
 
-# ssh with key
+ssh with key
+```
 vagrant ssh master
+```
 
-# remember to destroy vms
+Destroy vms after test
+```
 vagrant destroy
 ```
 
 # Deploy to bare metal servers
 
-### Edit inventory settings
+1. Prepare bare metal servers
+2. Create ssh key for VMs/servers
+3. Edit config files `inventory/*/host.ini`
+4. Run installer
 
+### Edit inventory settings
 ```
 vim inventory/5g/host.ini
 ```
@@ -88,14 +109,18 @@ make deploy-5g
 
 ### Test
 
+test kubernetes with kubectl 
+
 ```
-# test kubernetes with kubectl 
-vagrant ssh master
+ssh root@master-ip
 kubectl get nodes
-
-# access aurora with node ip and node port
-
 ```
+
+access aurora with node ip and node port `http://ip:32363`
+
+# Deploy to GCE 
+
+TODO
 
 # Architecture
 
