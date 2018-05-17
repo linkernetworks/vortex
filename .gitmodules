@@ -1,3 +1,3 @@
 [submodule "installer/kubespray"]
 	path = installer/kubespray
-	url = https://github.com/kubernetes-incubator/kubespray.git
+	url = https://github.com/linkernetworks/kubespray.git
