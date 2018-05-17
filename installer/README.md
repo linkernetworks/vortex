@@ -33,23 +33,31 @@ Google Cloud Registry key is the access key which is required to access essentia
 mv 5g-vortex-gcr-20180508 aurora/
 ```
 
+### Edit inventory file
+
+The `inventory/*/hosts.ini` store information about which server(s) and how to access server(s). For example, edit vagrant host configuration.
+```
+vim inventory/vagrant/hosts.ini
+```
+
+NOTE:
+
+1. Add all hostname of server(s). Ansible will modify hostname of server to match hosts.ini
+2. All bare metal server(s) should be listed above with <hostname> and <ip>.
+3. All Master server(s) should be listed under [kube-master] and [etcd]. Requires at least 1 Master.
+4. All Node servers(s) should be listed under [kube-node]. Requires at least 1 Node.
+
 # Deploy with Vagrant (For test purpose only)
+
+### Edit hosts.ini
+```
+vim inventory/vagrant/hosts.ini
+```
 
 ### Bring up vms
 ```
 vagrant up
 ```
-
-### Edit inventory file
-```
-vim inventory/vagrant/host.ini
-```
-
-NOTE:
-
-1. All bare metal server(s) should be listed above with <hostname> and <ip>.
-2. All Master server(s) should be listed under [kube-master] and [etcd]. Requires at least 1 Master.
-3. All Node servers(s) should be listed under [kube-node]. Requires at least 1 Node.
 
 Check vms status
 ```
