@@ -3,6 +3,8 @@ Votex installer
 
 Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
+[TOC]
+
 # Install Life Cycle
 
 0. Obtain GCR key
