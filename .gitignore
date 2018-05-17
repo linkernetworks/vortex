@@ -13,3 +13,6 @@ vagrant/credentials
 
 # ansible
 **/*.retry
+
+# mac
+**/.DS_Store
