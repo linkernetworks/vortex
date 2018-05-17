@@ -1,6 +1,6 @@
 # Main
 
-deploy-%: 
+deploy-%: submodule
 	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 		--inventory=inventory/$*/hosts.ini \
 		deploy.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-deploy.log
@@ -18,6 +18,9 @@ scale-%:
 
 clean: 
 	rm -rf *.log **/*.vmdk **/*.retry
+
+submodule:
+	git submodule init && git submodule update
 
 # Vagrant
 

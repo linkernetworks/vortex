@@ -94,11 +94,11 @@ NOTE:
 A root account access to SSH into all servers is required. If you don't have this key, ask your system admin for this key. Or we can also create the SSH key by the following steps:
 
 ```
-# Generate a ssh key pair under keys/ directory
-ssh-keygen -f 5g/id_rsa -t rsa -N ''
+# Generate a ssh key pair under inventory/5g directory
+ssh-keygen -f inventory/5g/id_rsa -t rsa -N ''
 
 # Scp the ssh public key to each server. You will need a valid user and password
-scp 5g/id_rsa.pub <user>@<server-ip>:.
+scp inventory/5g/id_rsa.pub <user>@<server-ip>:.
 
 # Login server, and append the ssh public key to authorized_keys under root account
 ssh <user>@<server-ip>
@@ -112,7 +112,7 @@ cat id_rsa.pub >> /root/.ssh/authorized_keys
 exit
 
 #Test your key. You should be able to login server without password promp.
-ssh -i 5g/id_rsa root@<server-ip>
+ssh -i inventory/5g/id_rsa root@<server-ip>
 
 # Move on to next server-ip
 ```
