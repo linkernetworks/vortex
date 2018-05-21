@@ -18,8 +18,9 @@ Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
 ubuntu
 ```
-apt-get install -y python3 ansible
-pip install netaddr
+apt-get install -y python3 python-pip
+pip install ansible netaddr
+# Don't use apt ansible package
 ```
 
 Mac
@@ -146,6 +147,19 @@ access aurora with node ip and node port `http://ip:32363`
 
 # Deploy to GCE 
 
+### Create engine instances
+
+Instance specification:
+
+- CPU: 2 vCPU
+- Memory: 5 GB
+- Zone: asia-east1- (for better GCR access)
+- Storage: 
+ - boot disk: 100 GB
+ - Addition disk: 100 GB (Testing) 400+ GB (Production)
+- Network:
+ - Tags: open firewall ports for services
+
 ### Edit inventory file
 ```
 vim inventory/gce/host.ini
@@ -153,8 +167,9 @@ vim inventory/gce/host.ini
 
 NOTE:
 
-1. Make sure server(s) are up on GCP
-2. The `ansible_ssh_host` ip is peripheral and will change when restarting server 
+1. Add hostname (instance name), ansible_ssh_host (public/private ip), ip (private ip) to node list
+2. The installer use `ansible_ssh_host` to connect to instance from provisioner (the server execute scripts). If the provisioner is inside private network, use private ip for better network performance.
+3. The `ansible_ssh_host` ip is peripheral. Note that it  will change when restarting server.
 
 ### Deploy
 
