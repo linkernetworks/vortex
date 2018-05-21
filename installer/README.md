@@ -18,6 +18,8 @@ Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
 ubuntu
 ```
+apt-get upgrade && apt-get update
+
 apt-get install -y python3 python-pip
 pip install ansible netaddr
 # Don't use apt ansible package
