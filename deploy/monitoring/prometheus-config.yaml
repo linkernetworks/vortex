@@ -11,11 +11,6 @@ data:
       scrape_timeout: 15s
     scrape_configs:
 
-    
-    - job_name: 'prometheus'
-      static_configs:
-        - targets: ['localhost:9090']
-
 
     - job_name: 'kubernetes-apiservers'
       kubernetes_sd_configs:
@@ -46,6 +41,24 @@ data:
         regex: (.+)
         target_label: __metrics_path__
         replacement: /api/v1/nodes/${1}/proxy/metrics
+
+        
+    - job_name: 'kubernetes-cadvisor'
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
 
 
     - job_name: 'kubernetes-service-endpoints'
@@ -79,10 +92,8 @@ data:
 
 
     - job_name: 'kubernetes-pods'
-
       kubernetes_sd_configs:
       - role: pod
-
       relabel_configs:
       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
         action: keep
