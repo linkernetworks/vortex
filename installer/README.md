@@ -138,10 +138,9 @@ make deploy-5g
 
 ### Test
 
-test kubernetes with kubectl 
+test kubernetes with kubectl on master
 
 ```
-ssh root@master-ip
 kubectl get nodes
 ```
 
