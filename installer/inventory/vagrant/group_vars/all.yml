@@ -141,4 +141,5 @@ bin_dir: /usr/local/bin
 ###############################
 
 # Docker version: edge (17.12.1~ce-0~ubuntu)
-docker_version: edge
+# Docker version: edge (17.03.1~ce-0~ubuntu)
+docker_version: stable

@@ -18,8 +18,11 @@ Vagrant.configure("2") do |config|
   # linkernetworks/aurora-base is a virtualbox with pre-install pacakges:
   #   docker-ce=17.12.1~ce-0~ubuntu 
   #   pip, glusterfs
-  config.vm.box = "linkernetworks/aurora-base"
-  config.vm.box_version = "0.0.6"
+  #config.vm.box = "linkernetworks/aurora-base"
+  #config.vm.box_version = "0.0.6"
+
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.box_version = "20180522.0.0"
 
   config.vm.box_check_update = false
   config.vbguest.auto_update = false
@@ -39,6 +42,11 @@ Vagrant.configure("2") do |config|
   #config.vm.provision "setup-hosts", :type => "shell", :path => "../scripts/vagrant/setup-hosts" do |s|
   #  s.args = ["enp0s8"]
   #end
+  
+  config.vm.provision "shell", privileged: true, inline: <<-SHELL
+    apt-get update \
+      && apt-get install -y python
+  SHELL
 
   config.vm.define "master" do |node|
 
