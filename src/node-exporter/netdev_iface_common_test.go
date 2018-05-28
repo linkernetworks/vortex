@@ -9,7 +9,9 @@ import (
 )
 
 func TestGetDefaultDev(t *testing.T) {
+	iface := ""
 	defaultInterface := ""
+
 	switch runtime.GOOS {
 	case "linux":
 		out, err := exec.Command("bash", "-c", "ip route get 8.8.8.8 | awk 'NR==1 {print $5}'").Output()
@@ -21,18 +23,14 @@ func TestGetDefaultDev(t *testing.T) {
 		if defaultInterface == "" {
 			t.Error("Parse the interface fail")
 		}
-
 	case "darwin":
-		//
+		// skip the test for osx
 		t.Skip("Skip the test when os is drawin.")
-
 	}
-
-	iface := ""
 
 	netDevDefault, err := getDefaultDev()
 	if err != nil {
-		t.Error("couldn't get default network devices: %s", err)
+		t.Error("couldn't get default network devices", err)
 	}
 
 	for key, value := range netDevDefault {
