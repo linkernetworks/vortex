@@ -30,7 +30,6 @@ func NewNetDevCollectorTest() (Collector, error) {
 }
 
 func (c *netDevCollectorTest) Update(ch chan<- prometheus.Metric) error {
-
 	netDevDefault, err := getDefaultDev()
 	if err != nil {
 		return fmt.Errorf("couldn't get default network devices: %s", err)
@@ -59,6 +58,8 @@ func Split(r rune) bool {
 }
 
 func getDefaultDev() (map[string]int, error) {
+	// /proc/net/route stores the kernel's routing table
+	// The interface whose destination is 00000000 is the interface of the default gateway
 	file, err := os.Open("/proc/net/route")
 	if err != nil {
 		log.Fatal(err)
