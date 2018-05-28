@@ -12,24 +12,24 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type netDevCollectorTest struct {
+type netDevListCollector struct {
 	subsystem   string
 	metricDescs map[string]*prometheus.Desc
 }
 
 func init() {
-	registerCollector("iface", defaultEnabled, NewNetDevCollectorTest)
+	registerCollector("iface", defaultEnabled, NewNetDevListCollector)
 }
 
-// NewNetDevCollectorTest returns a new Collector exposing network device stats.
-func NewNetDevCollectorTest() (Collector, error) {
-	return &netDevCollectorTest{
+// NewNetDevListCollector returns a new Collector exposing network device stats.
+func NewNetDevListCollector() (Collector, error) {
+	return &netDevListCollector{
 		subsystem:   "network",
 		metricDescs: map[string]*prometheus.Desc{},
 	}, nil
 }
 
-func (c *netDevCollectorTest) Update(ch chan<- prometheus.Metric) error {
+func (c *netDevListCollector) Update(ch chan<- prometheus.Metric) error {
 	netDevDefault, err := getDefaultDev()
 	if err != nil {
 		return fmt.Errorf("couldn't get default network devices: %s", err)
