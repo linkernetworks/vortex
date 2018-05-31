@@ -2,20 +2,20 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   namespace: monitoring
-  name: prom-node-exporter
+  name: node-exporter
 spec:
   template:
     metadata:
-      name:  prom-node-exporter
+      name:  node-exporter
       labels:
-        name: prom-node-exporter
+        name: node-exporter
       annotations:
         prometheus.io.scrape: "true"
     spec:
       hostPID: true
       containers:
-      - name:  prom-node-exporter
-        image: prom/node-exporter
+      - name:  node-exporter
+        image: asia.gcr.io/linker-aurora/node-exporter:develop
         securityContext:
           privileged: true
         ports:
