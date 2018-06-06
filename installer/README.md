@@ -7,7 +7,7 @@ Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
 # Install Life Cycle
 
-0. Obtain GCR key
+0. Obtain GCR key for Aurora
 1. Bring up VMs / prepare bare metal servers
 2. Create ssh key for VMs/servers
 3. Edit config files `inventory/*/host.ini`
@@ -16,18 +16,16 @@ Vortex Installer is an ansible playbook to install Vortex platform to server(s).
 
 ### Prerequsites
 
-ubuntu
-```
-apt-get upgrade && apt-get update
+Install packages:
 
-apt-get install -y python3 python-pip
-pip install ansible netaddr
-# Don't use apt ansible package
-```
+- python 
+- pip 
+- ansible: executor to run ansible-playbook
+- jq: json processor
+- yq: yaml processor
 
-Mac
 ```
-pip install ansible netaddr
+make ansible
 ```
 
 ### Obtain a GCR key (needed by Aurora)
