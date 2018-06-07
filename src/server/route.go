@@ -2,7 +2,6 @@ package server
 
 import (
 	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
-	"github.com/emicklei/go-restful"
 	"github.com/gorilla/mux"
 )
 
@@ -24,4 +23,11 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Path("/v1/versions").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/").To(VersionHandler(sp)))
 	return webService
+}
+
+func NewNetworkService(sp *serviceprovider.Container) *restful.WebService {
+	ws := new(restful.WebService)
+	ws.Path("/v1/netowrks").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	ws.Route(ws.POST("/").To(handler.RESTfulServiceHandler(sp, CreateNetworkHandler)))
+	return ws
 }
