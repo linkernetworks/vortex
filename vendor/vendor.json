@@ -1,0 +1,79 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "rOHrvKHrthEsTwdul4tdWthpkiQ=",
+			"path": "github.com/emicklei/go-restful",
+			"revision": "f02ff1af75ab7f4d6506af4e50fef11bb2d10829",
+			"revisionTime": "2018-06-05T08:31:51Z"
+		},
+		{
+			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
+			"path": "github.com/garyburd/redigo/internal",
+			"revision": "569eae59ada904ea8db7a225c2b47165af08735a",
+			"revisionTime": "2018-04-04T16:07:26Z"
+		},
+		{
+			"checksumSHA1": "w3QCCIYHgZzIXQ+xTl7oLfFrXHs=",
+			"path": "github.com/gomodule/redigo/internal",
+			"revision": "bb5990dc771ab24e169aaea90ee3b9ad50cffce9",
+			"revisionTime": "2018-06-01T13:19:09Z"
+		},
+		{
+			"checksumSHA1": "HgOVOUtWUYHcNe8aipwuEZ7YLow=",
+			"path": "github.com/gomodule/redigo/redis",
+			"revision": "9352ab68be133885e31a43661cc42a220cb8e821",
+			"revisionTime": "2018-04-01T19:18:55Z"
+		},
+		{
+			"checksumSHA1": "Aw8z8w/d+EFt8XCUYPjzSe0bPrU=",
+			"path": "github.com/gorilla/mux",
+			"revision": "cb4698366aa625048f3b815af6a0dea8aef9280a",
+			"revisionTime": "2018-06-05T21:15:56Z"
+		},
+		{
+			"checksumSHA1": "ZhjkfAPQ1hqwwB+9j6GJ87tEnic=",
+			"path": "github.com/linkernetworks/config",
+			"revision": "cbdafe0080a7c89be42fa877ffb56d4f31456461",
+			"revisionTime": "2018-05-31T09:50:42Z"
+		},
+		{
+			"checksumSHA1": "WCxdMPK7lH+ioCiLYCs7ZE7msHs=",
+			"path": "github.com/linkernetworks/gearman",
+			"revision": "00fe5cdcf5ea006ce07ee865d773cfd151b9eb4e",
+			"revisionTime": "2018-05-25T05:43:38Z"
+		},
+		{
+			"checksumSHA1": "9t3LloU9ZmgeFE1blkKyXap0jyY=",
+			"path": "github.com/linkernetworks/influxdb",
+			"revision": "ad9cd5b7d4402a0cbd0613d043d48fb6e476d8bd",
+			"revisionTime": "2018-05-25T05:46:49Z"
+		},
+		{
+			"checksumSHA1": "Ywtth3s9PIYxkXxuojeo76lGO14=",
+			"path": "github.com/linkernetworks/logger",
+			"revision": "a4819848487c62c354fa572270d013dca4882cdd",
+			"revisionTime": "2018-05-31T08:31:55Z"
+		},
+		{
+			"checksumSHA1": "d+/a/7GAX6PtYQbbFUY1R/TPfn0=",
+			"path": "github.com/linkernetworks/mongo",
+			"revision": "759fb038e917fa2c92cf1c541cd6b0063394cf75",
+			"revisionTime": "2018-05-24T10:14:37Z"
+		},
+		{
+			"checksumSHA1": "V89FgGKA+7A70mAedEvmhDSCIyQ=",
+			"path": "github.com/linkernetworks/oauth/entity",
+			"revision": "a7fe484fc0cf65696dd9479eb8bad1b2dd416ca9",
+			"revisionTime": "2018-05-31T10:18:20Z"
+		},
+		{
+			"checksumSHA1": "gPGlywe21cA6SuD6R1xbTntW1fc=",
+			"path": "github.com/linkernetworks/redis",
+			"revision": "5d54c7e9d23f75032121cf5aaa8b27e8914a5c10",
+			"revisionTime": "2018-06-04T18:46:57Z"
+		}
+	],
+	"rootPath": "bitbucket.org/linkernetworks/vortex"
+}
