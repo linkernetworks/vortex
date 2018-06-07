@@ -6,7 +6,7 @@
             "host": "localhost"
         }
     },
-   "gearman": {
+    "gearman": {
         "host": "localhost",
         "port": 4730,
         "public": {
@@ -14,23 +14,23 @@
         }
     },
     "mongo": {
-        "url": "mongodb://localhost:27017/aurora"
+        "url": "mongodb://localhost:27017/vortex"
     },
     "influxdb": {
         "url": "http://localhost:8086",
         "database": "lisa"
     },
-   "logger":{
-            "dir": "./logs",
-            "level": "debug",
-            "maxAge": "720h",
-            "suffixPattern": ".%Y%m%d",
-            "linkName": "access_log"
+    "logger": {
+        "dir": "./logs",
+        "level": "debug",
+        "maxAge": "720h",
+        "suffixPattern": ".%Y%m%d",
+        "linkName": "access_log"
     },
     "app": {
         "brand": {
-            "name": "Aurora",
-            "identifier": "aurora",
+            "name": "Vortex",
+            "identifier": "vortex",
             "companyName": "Linker Networks Inc."
         },
         "dbVersion": "v1.0.0",
