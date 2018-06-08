@@ -1,5 +1,0 @@
-{"level":"info","msg":"Starting Logger with log level: debug","time":"2018-06-07T18:38:20+08:00"}
-{"level":"info","msg":"Start writing log to logs/access_log","time":"2018-06-07T18:38:20+08:00"}
-{"level":"info","msg":"Max age of logs: 720h0m0s","time":"2018-06-07T18:38:20+08:00"}
-{"level":"info","msg":"Connecting to redis: localhost:6379","time":"2018-06-07T18:38:20+08:00"}
-{"level":"info","msg":"Connecting to mongodb: mongodb://localhost:27017/vortex_test","time":"2018-06-07T18:38:20+08:00"}
