@@ -14,7 +14,7 @@
         }
     },
     "mongo": {
-        "url": "mongodb://localhost:27017/vortex"
+        "url": "mongodb://localhost:31717/vortex_test"
     },
     "influxdb": {
         "url": "http://localhost:8086",

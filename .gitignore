@@ -4,6 +4,8 @@
 
 # log
 **/*.log
+**/logs
+/server/logs/
 
 # vagrant 
 vagrant/credentials
@@ -20,6 +22,3 @@ vagrant/credentials
 # vendors
 vendor/*
 !vendor/vendor.json
-
-#logs 
-**/logs

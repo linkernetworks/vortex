@@ -15,6 +15,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Filter(globalLogging)
 
 	container.Add(newVersionService(a.ServiceProvider))
+	container.Add(newNetworkService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
 	return router
@@ -27,9 +28,11 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	return webService
 }
 
-func NewNetworkService(sp *serviceprovider.Container) *restful.WebService {
+func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/netowrks").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Path("/v1/networks").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, CreateNetworkHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, DeleteNetworkHandler)))
+	webService.Route(webService.PUT("/{id}").To(handler.RESTfulServiceHandler(sp, UpdateNetworkHandler)))
 	return webService
 }
