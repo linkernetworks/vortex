@@ -11,20 +11,30 @@ import (
 	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
 	restful "github.com/emicklei/go-restful"
 	"github.com/influxdata/influxdb/pkg/testing/assert"
+
 	"github.com/linkernetworks/config"
 )
 
+func assertResponseCode(t *testing.T, expectedCode int, resp *httptest.ResponseRecorder) {
+	t.Helper()
+	t.Logf("code:%d", resp.Code)
+	if expectedCode != resp.Code {
+		t.Errorf("status code %d expected.", expectedCode)
+		t.Logf("Response:\n%s", resp.Body.String())
+	}
+}
+
 func TestCreateNetworkHandler(t *testing.T) {
-	cf := config.MustRead("../config/testing.json")
+	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
-	network := entity.network{
+	network := entity.Network{
 		DisplayName: "OVS Bridge",
 		BridgeName:  "obsbr1",
 		BridgeType:  "ovs",
 		Node:        "node1",
 		Interface:   "eth3",
-		Ports:       {2043, 2143, 2243},
+		Ports:       []int32{2043, 2143, 2243},
 		MTU:         1500,
 	}
 
@@ -34,6 +44,7 @@ func TestCreateNetworkHandler(t *testing.T) {
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
 	assert.NoError(t, err)
 
+	//??
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://here.com/v1/networks/", bodyReader)
 	assert.NoError(t, err)
@@ -42,7 +53,6 @@ func TestCreateNetworkHandler(t *testing.T) {
 
 	httpWriter := httptest.NewRecorder()
 	wc := restful.NewContainer()
-	wc.Add(us.NewLoginService(sp))
 	wc.Dispatch(httpWriter, httpRequest)
 
 	assertResponseCode(t, 200, httpWriter)
