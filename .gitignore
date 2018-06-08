@@ -20,3 +20,6 @@ vagrant/credentials
 # vendors
 vendor/*
 !vendor/vendor.json
+
+#logs 
+**/logs
