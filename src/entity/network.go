@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -17,4 +19,10 @@ type Network struct {
 	Interface   string        `bson:"interface" json:"interface"`
 	Ports       []int32       `bson:"ports" json:"ports"`
 	MTU         int32         `bson:"maximumTransmissionUnit" MTC:"maximumTransmissionUnit"`
+	CreatedAt   *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+}
+
+//GetCollection - get model mongo collection name.
+func (m Network) GetCollection() string {
+	return NetworkCollectionName
 }
