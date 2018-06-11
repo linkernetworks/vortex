@@ -41,6 +41,11 @@ scale-%: submodule
 		--inventory=inventory/$*/hosts.ini \
 		kubespray/scale.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-scale.log
 
+upgrade-%: submodule
+	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
+		--inventory=inventory/$*/hosts.ini \
+		kubespray/upgrade-cluster.yml 2>&1 | tee aurora-$(shell date +%F-%H%M%S)-upgrade.log
+
 # Vagrant
 
 vagrant-up:
