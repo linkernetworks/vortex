@@ -393,3 +393,51 @@ func TestWrongUpdateNetwork(t *testing.T) {
 	wcUpdate.Dispatch(httpWriterUpdate, httpRequestUpdate)
 	assertResponseCode(t, http.StatusBadRequest, httpWriterUpdate)
 }
+
+func TestGetNetwork(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	network := entity.Network{
+		DisplayName: "OVS Bridge",
+		BridgeName:  "obsbr1",
+		BridgeType:  "ovs",
+		Node:        "node1",
+		Interface:   "eth3",
+		Ports:       []int32{2043, 2143, 2243},
+		MTU:         1500,
+	}
+
+	session := sp.Mongo.NewSession()
+	defer session.RemoveAll(entity.NetworkCollectionName)
+
+	bodyBytes, err := json.MarshalIndent(network, "", "  ")
+	assert.NoError(t, err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
+	assert.NoError(t, err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newNetworkService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusOK, httpWriter)
+
+	network = entity.Network{}
+	q := bson.M{"displayName": "OVS Bridge"}
+	err = session.FindOne(entity.NetworkCollectionName, q, &network)
+	assert.NoError(t, err)
+
+	httpRequestGet, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
+	assert.NoError(t, err)
+
+	httpWriterGet := httptest.NewRecorder()
+	wcGet := restful.NewContainer()
+	serviceGet := newNetworkService(sp)
+	wcGet.Add(serviceGet)
+	wcGet.Dispatch(httpWriterGet, httpRequestGet)
+	assertResponseCode(t, http.StatusOK, httpWriterGet)
+}
