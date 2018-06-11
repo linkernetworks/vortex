@@ -2,10 +2,13 @@ package server
 
 import (
 	"fmt"
+	"math"
 	"reflect"
+	"strconv"
 
 	"bitbucket.org/linkernetworks/vortex/src/entity"
 	response "bitbucket.org/linkernetworks/vortex/src/net/http"
+	"bitbucket.org/linkernetworks/vortex/src/net/http/query"
 	"bitbucket.org/linkernetworks/vortex/src/web"
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
@@ -87,6 +90,80 @@ func CreateNetworkHandler(ctx *web.Context) {
 	})
 }
 
+func ListNetworkHandler(ctx *web.Context) {
+	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	var pageSize = 10
+	query := query.New(req.Request.URL.Query())
+
+	page, err := query.Int("page", 1)
+	if err != nil {
+		logger.Error(err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	pageSize, err = query.Int("page_size", pageSize)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	session := as.Mongo.NewSession()
+	defer session.Close()
+
+	networks := []entity.Network{}
+
+	var c = session.C(entity.NetworkCollectionName)
+	var q *mgo.Query
+
+	selector := bson.M{}
+	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
+
+	err = q.All(&networks)
+	if err != nil {
+		logger.Error(err)
+		if err == mgo.ErrNotFound {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
+	if err != nil {
+		logger.Error(err)
+	}
+	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
+	resp.AddHeader("X-Total-Count", strconv.Itoa(count))
+	resp.AddHeader("X-Total-Pages", strconv.Itoa(totalPages))
+	resp.WriteEntity(networks)
+}
+
+func GetNetworkHandler(ctx *web.Context) {
+	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	id := req.PathParameter("id")
+
+	session := as.Mongo.NewSession()
+	defer session.Close()
+	c := session.C(entity.NetworkCollectionName)
+
+	var network entity.Network
+	err := c.FindId(bson.ObjectIdHex(id)).One(&network)
+	if err != nil {
+		logger.Error(err)
+		if err == mgo.ErrNotFound {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	} else {
+		resp.WriteEntity(network)
+	}
+}
+
 func DeleteNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
@@ -155,8 +232,6 @@ func UpdateNetworkHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("only DisplayName can be changed"))
 		return
 	}
-
-	logger.Infof("Noooooooooooooooooooo")
 
 	err = session.UpdateById(entity.NetworkCollectionName, network.ID, updatedNetwork)
 	if err != nil {
