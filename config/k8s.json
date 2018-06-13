@@ -13,14 +13,6 @@
             "port": 32199
         }
     },
-    "gearman": {
-        "host": "gearman-job-server.default",
-        "port": 4730,
-        "public": {
-            "host": "gearman-job-server.default",
-            "port": 4730
-        }
-    },
     "mongo": {
         "url": "mongodb://mongo-0.mongo:27017/vortex",
         "public": {

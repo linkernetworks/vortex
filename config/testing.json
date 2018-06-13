@@ -6,13 +6,6 @@
       "host": "localhost"
     }
   },
-  "gearman": {
-    "host": "localhost",
-    "port": 4730,
-    "public": {
-      "host": "localhost"
-    }
-  },
   "mongo": {
     "url": "mongodb://localhost:31717/vortex_test"
   },
