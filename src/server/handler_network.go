@@ -156,8 +156,6 @@ func UpdateNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	logger.Infof("Noooooooooooooooooooo")
-
 	err = session.UpdateById(entity.NetworkCollectionName, network.ID, updatedNetwork)
 	if err != nil {
 		logger.Error(err)
