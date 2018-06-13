@@ -27,6 +27,16 @@ func CreateNetworkHandler(ctx *web.Context) {
 	session := as.Mongo.NewSession()
 	defer session.Close()
 
+	// Check whether vlangTag is 0~4095
+	for _, pp := range network.PhysicalPorts {
+		for _, vlangTag := range pp.VlanTags {
+			if vlangTag < 0 || vlangTag > 4095 {
+				response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("the vlangTag %v in PhysicalPort %v should between 0 and 4095", pp.Name, vlangTag))
+				return
+			}
+		}
+	}
+
 	// Check whether this displayname has been used
 	query := bson.M{"displayName": network.DisplayName}
 	existed := entity.Network{}
@@ -39,21 +49,6 @@ func CreateNetworkHandler(ctx *web.Context) {
 	}
 	if len(existed.ID) > 1 {
 		response.Conflict(req.Request, resp, fmt.Errorf("displayName: %s already existed", network.DisplayName))
-		return
-	}
-
-	// Check whether this Interface has been used
-	query = bson.M{"node": network.Node, "interface": network.Interface}
-	existed = entity.Network{}
-	if err := session.FindOne(entity.NetworkCollectionName, query, &existed); err != nil {
-		if err.Error() != mgo.ErrNotFound.Error() {
-			logger.Error(err)
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	if len(existed.ID) > 1 {
-		response.Conflict(req.Request, resp, fmt.Errorf("interface %s on the Node %s has already be used", network.Interface, network.Node))
 		return
 	}
 
