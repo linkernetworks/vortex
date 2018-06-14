@@ -13,35 +13,27 @@
             "port": 32199
         }
     },
-    "gearman": {
-        "host": "gearman-job-server.default",
-        "port": 4730,
-        "public": {
-            "host": "gearman-job-server.default",
-            "port": 4730
-        }
-    },
     "mongo": {
-        "url": "mongodb://mongo-0.mongo:27017/aurora",
+        "url": "mongodb://mongo-0.mongo:27017/vortex",
         "public": {
-            "url": "mongodb://35.189.177.37:31717/aurora"
+            "url": "mongodb://35.189.177.37:31717/votex"
         }
     },
     "influxdb": {
         "url": "http://influxdb.default:8086",
         "database": "lisa"
     },
-    "logger":{
-            "dir": "./logs",
-            "level": "debug",
-            "maxAge": "720h",
-            "suffixPattern": ".%Y%m%d",
-            "linkName": "access_log"
+    "logger": {
+        "dir": "./logs",
+        "level": "debug",
+        "maxAge": "720h",
+        "suffixPattern": ".%Y%m%d",
+        "linkName": "access_log"
     },
     "app": {
         "brand": {
-            "name": "Aurora",
-            "identifier": "aurora",
+            "name": "Vortex",
+            "identifier": "vortex",
             "companyName": "Linker Networks Inc."
         },
         "enableAuthentication": false,
