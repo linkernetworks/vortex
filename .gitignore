@@ -4,6 +4,7 @@
 
 # log
 **/*.log
+**/logs
 
 # vagrant 
 vagrant/credentials
@@ -16,3 +17,7 @@ vagrant/credentials
 
 # mac
 **/.DS_Store
+
+# vendors
+vendor/*
+!vendor/vendor.json
