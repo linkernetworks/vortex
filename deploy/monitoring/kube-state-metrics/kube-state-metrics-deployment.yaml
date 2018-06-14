@@ -15,7 +15,7 @@ spec:
       labels:
         k8s-app: kube-state-metrics
     spec:
-      serviceAccountName: kube-state-metrics
+      serviceAccountName: default
       containers:
       - name: kube-state-metrics
         image: asia.gcr.io/linker-aurora/kube-state-metrics:develop
