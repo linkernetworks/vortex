@@ -159,9 +159,8 @@ func GetNetworkHandler(ctx *web.Context) {
 		}
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
-	} else {
-		resp.WriteEntity(network)
 	}
+	resp.WriteEntity(network)
 }
 
 func DeleteNetworkHandler(ctx *web.Context) {
