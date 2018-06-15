@@ -1,28 +1,67 @@
-# go tool paths
-GO_COVER := $(shell which cover)
-GO_COBERTURA := $(shell which gocover-cobertura)
-GO_VENDOR := $(shell which govendor)
+## Folder content generated files
+BUILD_FOLDER = ./build
 
-GO_FILES := $(shell find src -type f -iname "*.go")
+## command
+GO           = go
+GO_VENDOR    = govendor
+MKDIR_P      = mkdir -p
 
-CONFIG_FILE = config/k8s.json
+################################################
 
-SHELL := /bin/bash
+.PHONY: all
+all: build test
 
-GCP_DOCKER_REGISTRY = asia.gcr.io
+.PHONY: pre-build
+pre-build:
+	$(MAKE) govendor-sync
 
-all:
+.PHONY: build
+build: pre-build
+	$(MAKE) src.build
 
-test:
+.PHONY: test
+test: build
+	$(MAKE) src.test
 
-deps:
-	go get ./...
+.PHONY: check
+check:
+	$(MAKE) check-govendor
 
-vortex:
-	go build ./src/cmd/vortex
+.PHONY: clean
+clean:
+	$(RM) -rf $(BUILD_FOLDER)
 
-run: vortex
-	./vortex -config config/local.json -port 7890
+## vendor/ #####################################
 
-image:
-	docker build -f dockerfiles/Dockerfile .
+.PHONY: govendor-sync
+govendor-sync:
+	$(GO_VENDOR) sync -v
+
+## src/ ########################################
+
+.PHONY: src.build
+src.build:
+	$(GO) build -v ./src/...
+	$(MKDIR_P) $(BUILD_FOLDER)/src/cmd/vortex/
+	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortext/vortex ./src/cmd/vortex/...
+
+.PHONY: src.test
+src.test:
+	$(GO) test -v -race ./src/...
+
+.PHONY: src.install
+src.install:
+	$(GO) install -v ./src/...
+
+.PHONY: src.test-coverage
+src.test-coverage:
+	$(MKDIR_P) $(BUILD_FOLDER)/src/
+	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
+	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
+
+## check build env #############################
+
+.PHONY: check-govendor
+check-govendor:
+	$(info check govendor)
+	@[ "`which $(GO_VENDOR)`" != "" ] || (echo "$(GO_VENDOR) is missing"; false)
