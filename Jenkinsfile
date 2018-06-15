@@ -40,18 +40,7 @@ pipeline {
             steps {
                 withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
-                        script {
-                            sh "ps aux"
-                            sh "whoami"
-                            sh "ls -l /home"
-                            sh "ls -l /home/jenkins"
-                            // sh "mkdir -p /home/jenkins/data/mongo"
-                            //sh "mongod --dbpath=/home/jenkins/data/mongo"
-                            //sh "mongod"
-                            // docker.image('mongo').withRun('-p 27017:27017') { c ->
-                                sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
-                            // }
-                        }
+                        sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
                         junit "report.xml"
                         publishHTML (target: [
                             allowMissing: true,
