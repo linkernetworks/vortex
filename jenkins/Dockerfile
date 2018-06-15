@@ -25,7 +25,7 @@ RUN add-apt-repository ppa:longsleep/golang-backports
 RUN apt-get update
 RUN apt-get install -y golang-go
 ENV GOPATH=$HOME/go
-ENV PATH=$HOME/go/bin
+ENV PATH=$PATH:$HOME/go/bin
 
 ##
 ## Go tools
