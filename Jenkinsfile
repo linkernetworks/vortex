@@ -27,10 +27,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                withEnv([
-                    "GOPATH=${env.WORKSPACE}",
-                    "PATH+GO=${env.WORKSPACE}/bin",
-                ]) {
+                withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
                         sh "make build"
                     }
@@ -39,12 +36,11 @@ pipeline {
         }
         stage('Test') {
             steps {
-                withEnv([
-                    "GOPATH=${env.WORKSPACE}",
-                    "PATH+GO=${env.WORKSPACE}/bin",
-                ]) {
+                withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
-                        sh "make src.test-coverage"
+                        docker.image('mongo').withRun('-p 27017:27017') { c ->
+                            sh "make src.test-coverage"
+                        }
                     }
                 }
             }
