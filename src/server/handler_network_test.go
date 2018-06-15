@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"bitbucket.org/linkernetworks/vortex/src/entity"
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
 	restful "github.com/emicklei/go-restful"
 	"github.com/influxdata/influxdb/pkg/testing/assert"
 	"github.com/linkernetworks/config"
+	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
