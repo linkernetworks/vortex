@@ -1,7 +1,7 @@
 pipeline {
     agent {
         dockerfile {
-            dir "jenkins"
+            dir "src/github.com/linkernetworks/vortex/jenkins"
             args "--privileged --group-add docker"
         }
     }
@@ -13,11 +13,14 @@ pipeline {
     options {
         timestamps()
         timeout(time: 1, unit: 'HOURS')
+        checkoutToSubdirectory('src/github.com/linkernetworks/vortex')
     }
     stages {
         stage('Prepare') {
             steps {
-                sh "make pre-build"
+                dir ("src/github.com/linkernetworks/vortex") {
+                    sh "make pre-build"
+                }
             }
         }
         stage('Build') {
