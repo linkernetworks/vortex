@@ -1,9 +1,9 @@
-Vortex
+Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=master)](https://travis-ci.org/linkernetworks/vortex)
 ===
 
 # Package sharing between Aurora
 
-Define what package can and can't be shared between aurora, vortex, and 5g-vortex. Since the ownership of vortex source code will be transfered to ITRI or open source. 
+Define what package can and can't be shared between aurora, vortex, and 5g-vortex. Since the ownership of vortex source code will be transfered to ITRI or open source.
 
 Stay private:
 1. Core aurora service packages like jobserver, jobupdater, ...
@@ -22,7 +22,7 @@ Vortex share the same config and dependent services with aurora. Make sure depen
 - Redis
 - Gearmand
 
-### GoBuild 
+### GoBuild
 
 Build
 ```
