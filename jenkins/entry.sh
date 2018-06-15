@@ -10,5 +10,7 @@ sudo service docker start
 nohup mongod 2>&1 > /dev/null &
 
 sudo chown -R jenkins:jenkins /home/jenkins
+mkdir /home/jenkins/.cache/
+chmod -R +rw /home/jenkins/.cache/
 
 bash
