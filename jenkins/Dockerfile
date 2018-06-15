@@ -13,6 +13,7 @@ RUN chmod a+rw /etc/group
 RUN chmod a+rw /etc/passwd
 RUN echo 'jenkins:!::' >> /etc/gshadow
 COPY home /home
+RUN chmod -R +rw /home
 ENV HOME=/home/jenkins
 COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
