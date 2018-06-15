@@ -7,7 +7,9 @@ pipeline {
     }
     post {
         always {
-            sh "make clean"
+            dir ("src/github.com/linkernetworks/vortex") {
+                sh "make clean"
+            }
         }
     }
     options {
