@@ -397,16 +397,18 @@ func TestGetNetwork(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
-	network := entity.Network{
-		DisplayName: "OVS Bridge",
-		BridgeName:  "obsbr1",
-		BridgeType:  "ovs",
-		Node:        "node1",
-		Interface:   "eth3",
-		Ports:       []int32{2043, 2143, 2243},
-		MTU:         1500,
+	eth1 := entity.PhysicalPort{
+		Name:     "eth1",
+		MTU:      1500,
+		VlanTags: []int{2043, 2143, 2243},
 	}
-
+	network := entity.Network{
+		DisplayName:   "OVS Bridge",
+		BridgeName:    "obsbr1",
+		BridgeType:    "ovs",
+		Node:          "node1",
+		PhysicalPorts: []entity.PhysicalPort{eth1},
+	}
 	session := sp.Mongo.NewSession()
 	defer session.RemoveAll(entity.NetworkCollectionName)
 
