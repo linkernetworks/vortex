@@ -44,18 +44,8 @@ pipeline {
                             docker.image('mongo').withRun('-p 27017:27017') { c ->
                                 sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
                             }
-
-                            xunit tools: [
-                                JUnit(
-                                    pattern: 'report.xml',
-                                    skipNoTestFiles: true,
-                                    failIfNotNew: true,
-                                    deleteOutputFiles: true,
-                                )
-                            ], thresholds: [
-                                failed( failureThreshold: '0')
-                            ]
                         }
+                        junit "report.xml"
                         publishHTML (target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
