@@ -1,9 +1,8 @@
 pipeline {
     agent {
-        docker {
-            image "linkernetworks/jenkins-docker-builder:ubuntu16.04"
+        dockerfile {
+            dir "jenkins"
             args "--privileged --group-add docker"
-            alwaysPull true
         }
     }
     post {
