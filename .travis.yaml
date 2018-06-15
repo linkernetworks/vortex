@@ -1,0 +1,16 @@
+language: go
+
+go:
+  - "1.10.x"
+
+install:
+  - make pre-build
+
+script:
+  - make build
+  - make test
+  - make src.test-coverage
+
+after_success:
+  - cp build/src/coverage.txt coverage.txt
+  - bash <(curl -s https://codecov.io/bash)
