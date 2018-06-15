@@ -4,6 +4,7 @@ go:
   - "1.10.x"
 
 install:
+  - go get -u github.com/kardianos/govendor
   - make pre-build
 
 script:
