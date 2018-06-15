@@ -23,14 +23,11 @@ pipeline {
                         withEnv([
                             "PATH=${env.WORKSPACE}",
                             "GOPATH=${env.WORKSPACE}",
+                            "AAAAAA=aaaaaa",
                         ]) {
 
                             sh "go get -u github.com/kardianos/govendor"
-                            sh "ls"
-                            sh "pwd"
-                            sh 'echo GOPATH=$GOPATH'
-                            sh 'echo PATH=$PATH'
-                            sh 'ls $GOPATH/bin'
+                            sh "env"
                             sh "make pre-build"
                             sh "docker run -itd -p 27017:27017 --name mongo mongo"
                         }
