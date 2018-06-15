@@ -21,7 +21,7 @@ pipeline {
                 script {
                     dir ("src/github.com/linkernetworks/vortex") {
                         withEnv([
-                            "PATH+GO=${env.WORKSPACE}aaaa/bin",
+                            "PATH=${env.WORKSPACE}/bin",
                             "GOPATH=${env.WORKSPACE}",
                         ]) {
 
