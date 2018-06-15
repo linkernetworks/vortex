@@ -42,9 +42,19 @@ pipeline {
                     dir ("src/github.com/linkernetworks/vortex") {
                         script {
                             docker.image('mongo').withRun('-p 27017:27017') { c ->
-                                sh "make src.test-coverage"
+                                sh "make src.test-coverage 2>&1 | tee | go-junit-report > report.xml"
                             }
                         }
+                        xunit tools: [
+                            JUnit(
+                                pattern: 'report.xml',
+                                skipNoTestFiles: true,
+                                failIfNotNew: true,
+                                deleteOutputFiles: true,
+                            )
+                        ], thresholds: [
+                            failed( failureThreshold: '0')
+                        ]
                         publishHTML (target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,

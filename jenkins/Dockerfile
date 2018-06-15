@@ -31,3 +31,4 @@ ENV PATH=$PATH:$HOME/go/bin
 ## Go tools
 ##
 RUN go get -u github.com/kardianos/govendor
+RUN go get -u github.com/jstemmer/go-junit-report
