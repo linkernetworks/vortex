@@ -6,12 +6,12 @@ import (
 	"reflect"
 	"strconv"
 
-	"bitbucket.org/linkernetworks/vortex/src/entity"
-	response "bitbucket.org/linkernetworks/vortex/src/net/http"
-	"bitbucket.org/linkernetworks/vortex/src/net/http/query"
-	"bitbucket.org/linkernetworks/vortex/src/web"
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
+	"github.com/linkernetworks/vortex/src/entity"
+	response "github.com/linkernetworks/vortex/src/net/http"
+	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
