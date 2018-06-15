@@ -20,7 +20,7 @@ pipeline {
             steps {
                 withEnv([
                     "GOPATH=${env.WORKSPACE}",
-                    "PATH+GO=${WORKSPACE}/bin",
+                    "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
                     sh "go get -u github.com/kardianos/govendor"
                     sh "make pre-build"
@@ -32,7 +32,7 @@ pipeline {
             steps {
                 withEnv([
                     "GOPATH=${env.WORKSPACE}",
-                    "PATH+GO=${WORKSPACE}/bin",
+                    "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
                     sh "make build"
                 }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 withEnv([
                     "GOPATH=${env.WORKSPACE}",
-                    "PATH+GO=${WORKSPACE}/bin",
+                    "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
                     sh "make src.test-coverage"
                 }
