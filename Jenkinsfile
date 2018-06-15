@@ -42,6 +42,8 @@ pipeline {
                     dir ("src/github.com/linkernetworks/vortex") {
                         sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
                         junit "report.xml"
+                        sh 'gocover-cobertura < build/src/coverage.txt > cobertura.xml'
+                        cobertura coberturaReportFile: "cobertura.xml", failNoReports: true, failUnstable: true
                         publishHTML (target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
