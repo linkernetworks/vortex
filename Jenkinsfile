@@ -1,7 +1,7 @@
 pipeline {
     agent {
         dockerfile {
-            dir "src/github.com/linkernetworks/vortex/jenkins"
+            dir "jenkins"
             args "--privileged --group-add docker"
         }
     }
@@ -13,26 +13,11 @@ pipeline {
     options {
         timestamps()
         timeout(time: 1, unit: 'HOURS')
-        checkoutToSubdirectory('src/github.com/linkernetworks/vortex')
     }
     stages {
         stage('Prepare') {
             steps {
-                script {
-                    dir ("src/github.com/linkernetworks/vortex") {
-                        withEnv([
-                            "PATH=${env.WORKSPACE}",
-                            "GOPATH=${env.WORKSPACE}",
-                            "AAAAAA=aaaaaa",
-                        ]) {
-
-                            sh "go get -u github.com/kardianos/govendor"
-                            sh "env"
-                            sh "make pre-build"
-                            sh "docker run -itd -p 27017:27017 --name mongo mongo"
-                        }
-                    }
-                }
+                sh "make pre-build"
             }
         }
         stage('Build') {
