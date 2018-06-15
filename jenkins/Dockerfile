@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get update
-RUN apt-get install -y curl
+RUN apt-get install -y curl software-properties-common git
 RUN curl -fsSL get.docker.com | sh
 
 RUN apt-get install -y sudo
@@ -23,7 +23,6 @@ ENTRYPOINT /entry.sh
 ##
 ## Go
 ##
-RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:longsleep/golang-backports
 RUN apt-get update
 RUN apt-get install -y golang-go
