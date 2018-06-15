@@ -22,11 +22,15 @@ pipeline {
                     "GOPATH=${env.WORKSPACE}",
                     "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
-                    sh "go get -u github.com/kardianos/govendor"
-                    sh "ls"
-                    sh "pwd"
-                    sh "make pre-build"
-                    sh "docker run -itd -p 27017:27017 --name mongo mongo"
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        sh "go get -u github.com/kardianos/govendor"
+                        sh "ls"
+                        sh "pwd"
+                        sh 'echo $GOPATH'
+                        sh 'ls $GOPATH/bin'
+                        sh "make pre-build"
+                        sh "docker run -itd -p 27017:27017 --name mongo mongo"
+                    }
                 }
             }
         }
@@ -36,7 +40,9 @@ pipeline {
                     "GOPATH=${env.WORKSPACE}",
                     "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
-                    sh "make build"
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        sh "make build"
+                    }
                 }
             }
         }
@@ -46,7 +52,9 @@ pipeline {
                     "GOPATH=${env.WORKSPACE}",
                     "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
-                    sh "make src.test-coverage"
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        sh "make src.test-coverage"
+                    }
                 }
             }
         }
