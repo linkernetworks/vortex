@@ -18,20 +18,22 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir ("src/github.com/linkernetworks/vortex") {
-                    withEnv([
-                        "PATH+GO=${env.WORKSPACE}aaaa/bin",
-                        "GOPATH=${env.WORKSPACE}",
-                    ]) {
+                script {
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        withEnv([
+                            "PATH+GO=${env.WORKSPACE}aaaa/bin",
+                            "GOPATH=${env.WORKSPACE}",
+                        ]) {
 
-                        sh "go get -u github.com/kardianos/govendor"
-                        sh "ls"
-                        sh "pwd"
-                        sh 'echo GOPATH=$GOPATH'
-                        sh 'echo PATH=$PATH'
-                        sh 'ls $GOPATH/bin'
-                        sh "make pre-build"
-                        sh "docker run -itd -p 27017:27017 --name mongo mongo"
+                            sh "go get -u github.com/kardianos/govendor"
+                            sh "ls"
+                            sh "pwd"
+                            sh 'echo GOPATH=$GOPATH'
+                            sh 'echo PATH=$PATH'
+                            sh 'ls $GOPATH/bin'
+                            sh "make pre-build"
+                            sh "docker run -itd -p 27017:27017 --name mongo mongo"
+                        }
                     }
                 }
             }
