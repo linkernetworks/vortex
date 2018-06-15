@@ -20,7 +20,7 @@ pipeline {
             steps {
                 withEnv([
                     "GOPATH=${env.WORKSPACE}",
-                    "PATH+GOPATH=${env.WORKSPACE}/bin",
+                    "PATH+GOPATH=${env.WORKSPACE}aaaa/bin",
                 ]) {
                     dir ("src/github.com/linkernetworks/vortex") {
                         sh "go get -u github.com/kardianos/govendor"
