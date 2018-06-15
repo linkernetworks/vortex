@@ -41,6 +41,7 @@ pipeline {
                 withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
                         script {
+                            sh "ps aux"
                             // docker.image('mongo').withRun('-p 27017:27017') { c ->
                                 sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
                             // }
