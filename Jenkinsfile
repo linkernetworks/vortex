@@ -18,8 +18,10 @@ pipeline {
     stages {
         stage('Prepare') {
             steps {
-                dir ("src/github.com/linkernetworks/vortex") {
-                    sh "make pre-build"
+                withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        sh "make pre-build"
+                    }
                 }
             }
         }
