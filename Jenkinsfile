@@ -49,8 +49,8 @@ pipeline {
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
                             keepAll: true,
-                            reportDir: '.',
-                            reportFiles: 'build/src/coverage.html',
+                            reportDir: 'build/src',
+                            reportFiles: 'coverage.html',
                             reportName: "GO cover report",
                             reportTitles: "GO cover report",
                             includes: "coverage.html"
