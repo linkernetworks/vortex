@@ -45,7 +45,7 @@ pipeline {
                             sh "whoami"
                             sh "ls -l /home"
                             sh "ls -l /home/jenkins"
-                            sh "mkdir -p /home/jenkins/data/mongo"
+                            // sh "mkdir -p /home/jenkins/data/mongo"
                             sh "mongod --dbpath=/home/jenkins/data/mongo"
                             //sh "mongod"
                             // docker.image('mongo').withRun('-p 27017:27017') { c ->
