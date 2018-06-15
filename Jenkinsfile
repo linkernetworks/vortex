@@ -23,6 +23,8 @@ pipeline {
                     "PATH+GO=${env.WORKSPACE}/bin",
                 ]) {
                     sh "go get -u github.com/kardianos/govendor"
+                    sh "ls"
+                    sh "pwd"
                     sh "make pre-build"
                     sh "docker run -itd -p 27017:27017 --name mongo mongo"
                 }
