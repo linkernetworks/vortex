@@ -143,8 +143,8 @@
 		{
 			"checksumSHA1": "HgOVOUtWUYHcNe8aipwuEZ7YLow=",
 			"path": "github.com/gomodule/redigo/redis",
-			"revision": "9352ab68be133885e31a43661cc42a220cb8e821",
-			"revisionTime": "2018-04-01T19:18:55Z"
+			"revision": "bb5990dc771ab24e169aaea90ee3b9ad50cffce9",
+			"revisionTime": "2018-06-01T13:19:09Z"
 		},
 		{
 			"checksumSHA1": "PKVjAJ/e0p/jWtGpZycgoZBLdb4=",
@@ -175,6 +175,12 @@
 			"path": "github.com/googleapis/gnostic/extensions",
 			"revision": "48a0ecefe2e4190c7a2d63b477875854a2f993b3",
 			"revisionTime": "2018-05-20T01:50:35Z"
+		},
+		{
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
 			"checksumSHA1": "Aw8z8w/d+EFt8XCUYPjzSe0bPrU=",
@@ -253,6 +259,18 @@
 			"path": "github.com/lestrrat/go-strftime",
 			"revision": "ba3bf9c1d0421aa146564a632931730344f1f9f1",
 			"revisionTime": "2018-02-20T04:22:22Z"
+		},
+		{
+			"path": "github.com/linkernetworks/aurora-debug",
+			"revision": ""
+		},
+		{
+			"path": "github.com/linkernetworks/aurora-debug/github.com/emicklei/go-restful",
+			"revision": ""
+		},
+		{
+			"path": "github.com/linkernetworks/aurora/src/net/http",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "ZhjkfAPQ1hqwwB+9j6GJ87tEnic=",
@@ -1449,5 +1467,5 @@
 			"revisionTime": "2018-06-14T22:41:26Z"
 		}
 	],
-	"rootPath": "bitbucket.org/linkernetworks/vortex"
+	"rootPath": "github.com/linkernetworks/vortex"
 }

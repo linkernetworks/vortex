@@ -1,12 +1,13 @@
 package server
 
 import (
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
-	"github.com/linkernetworks/config"
-	"github.com/linkernetworks/logger"
 	"log"
 	"net"
 	"net/http"
+
+	"github.com/linkernetworks/config"
+	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
 type App struct {

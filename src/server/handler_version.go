@@ -1,8 +1,8 @@
 package server
 
 import (
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
 	"github.com/emicklei/go-restful"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
 func VersionHandler(sp *serviceprovider.Container) restful.RouteFunction {

@@ -3,10 +3,10 @@ package http
 import (
 	"net/http"
 
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
-	"bitbucket.org/linkernetworks/vortex/src/web"
 	"github.com/emicklei/go-restful"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/linkernetworks/vortex/src/web"
 )
 
 type NativeContextHandler func(*web.NativeContext)

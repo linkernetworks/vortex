@@ -1,9 +1,20 @@
 language: go
 
+services:
+  - mongodb
+
 go:
   - "1.10.x"
 
+cache:
+  directories:
+  - vendor/github.com
+  - vendor/golang.org
+  - vendor/gopkg.in
+  - vendor/k8s.io
+
 install:
+  - go get -u github.com/kardianos/govendor
   - make pre-build
 
 script:
