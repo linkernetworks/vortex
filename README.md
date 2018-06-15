@@ -1,4 +1,4 @@
-Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=master)](https://travis-ci.org/linkernetworks/vortex)
+Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=master)](https://travis-ci.org/linkernetworks/vortex) [![Go Report Card](https://goreportcard.com/badge/github.com/linkernetworks/vortex)](https://goreportcard.com/report/github.com/linkernetworks/vortex)
 ===
 
 # Package sharing between Aurora
