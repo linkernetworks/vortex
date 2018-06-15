@@ -18,6 +18,7 @@ ENV PATH=$PATH:$HOME/go/bin
 ##
 RUN go get -u github.com/kardianos/govendor
 RUN go get -u github.com/jstemmer/go-junit-report
+RUN go get -u github.com/t-yuki/gocover-cobertura
 
 ##
 ## MongoDB
