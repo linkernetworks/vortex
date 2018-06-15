@@ -1,10 +1,10 @@
 package server
 
 import (
-	handler "bitbucket.org/linkernetworks/vortex/src/net/http"
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
 	"github.com/emicklei/go-restful"
 	"github.com/gorilla/mux"
+	handler "github.com/linkernetworks/vortex/src/net/http"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
 func (a *App) AppRoute() *mux.Router {

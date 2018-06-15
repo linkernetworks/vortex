@@ -3,8 +3,8 @@ package web
 import (
 	"net/http"
 
-	"bitbucket.org/linkernetworks/vortex/src/serviceprovider"
 	restful "github.com/emicklei/go-restful"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
 type Context struct {

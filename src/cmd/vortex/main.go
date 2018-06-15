@@ -1,8 +1,9 @@
 package main
 
 import (
-	"bitbucket.org/linkernetworks/vortex/src/server"
 	"flag"
+
+	"github.com/linkernetworks/vortex/src/server"
 )
 
 func main() {
