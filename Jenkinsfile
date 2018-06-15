@@ -1,7 +1,7 @@
 pipeline {
     agent {
         dockerfile {
-            dir "jenkins"
+            dir "src/github.com/linkernetworks/vortex/jenkins"
             args "--privileged --group-add docker"
         }
     }
