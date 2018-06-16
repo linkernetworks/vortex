@@ -48,5 +48,5 @@ cp tmpconfig ~/.kube/config
 ```
 If there're any error in the step(2), please copy the `config.bk` to restor your kubernets config.
 
-Now, you can use `kubectl config get-contexts` to see the `kubernetes-admin@kubernetes` in the list and then use the `kuubectl config use-context kubernetes-admin@kubernetes` to manipulate the VM's kubernetes.
+Now, you can use `kubectl config get-contexts` to see the `kubernetes-admin@kubernetes` in the list and then use the `kubectl config use-context kubernetes-admin@kubernetes` to manipulate the VM's kubernetes.
 
