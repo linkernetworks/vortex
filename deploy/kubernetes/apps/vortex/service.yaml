@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: vortex-server
+  labels:
+    app: vortex-server
+spec:
+  selector:
+    app: vortex-server
+  ports:
+    - protocol: TCP
+      port: 7890
+      targetPort: 7890
+      name: vortex-server
+  clusterIP: None
