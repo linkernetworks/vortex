@@ -11,6 +11,30 @@ pipeline {
                 sh "make clean"
             }
         }
+        failure {
+            script {
+                def message =   "<https://jenkins.linkernetworks.co/job/vortex/job/vortex/|vortex> » " +
+                                "<${env.JOB_URL}|${env.BRANCH_NAME}> » " +
+                                "<${env.BUILD_URL}|#${env.BUILD_NUMBER}> failed."
+
+                slackSend channel: '#09_jenkins', color: 'danger', message: message
+
+                switch (env.BRANCH_NAME) {
+                    case ~/(.+-)?rc(-.+)?/:
+                    case ~/develop/:
+                    case ~/master/:
+                        message += " <!here>"
+                        slackSend channel: '#01_vortex', color: 'danger', message: message
+                        break
+                }
+            }
+        }
+        fixed {
+            slackSend channel: '#09_jenkins', color: 'good',
+                message:    "<https://jenkins.linkernetworks.co/job/vortex/job/vortex/|vortex> » " +
+                            "<${env.JOB_URL}|${env.BRANCH_NAME}> » " +
+                            "<${env.BUILD_URL}|#${env.BUILD_NUMBER}> is fixed."
+        }
     }
     options {
         timestamps()
