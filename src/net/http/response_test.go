@@ -2,12 +2,10 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"encoding/json"
-	"encoding/xml"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,52 +39,87 @@ func ExampleJsonEncoding() {
 	InternalServerError(request, recorder, errors.New("Failed to do something"))
 }
 
-func TestDefaultErrorXmlEncode(t *testing.T) {
-	recorder := httptest.NewRecorder()
+func TestEncodeErrorPayload(t *testing.T) {
+	testCases := []struct {
+		cases       string
+		contentType string
+		expType     string
+		expMessage  string
+	}{
+		{"json", "text/json", "text/json", `{"error":false,"message":""}`},
+		{"xml", "text/xml", "text/xml", `<response><error>false</error><message></message></response>`},
+		{"default", "", "application/json", `{"error":false,"message":""}`},
+	}
 
-	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
-	request.Header.Set("content-type", "application/xml")
-	assert.NoError(t, err)
+	for _, tc := range testCases {
+		t.Run(tc.cases, func(t *testing.T) {
+			errPayload := ErrorPayload{}
 
-	msg := "Failed to do something"
+			request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
+			assert.NoError(t, err)
 
-	wl, err := InternalServerError(request, recorder, errors.New(msg))
-	assert.NoError(t, err)
-	assert.True(t, wl > 0)
-
-	contentType := recorder.Header().Get("content-type")
-	assert.Equal(t, "application/xml", contentType)
-
-	payload := ErrorPayload{}
-	out := recorder.Body.Bytes()
-	err = xml.Unmarshal(out, &payload)
-	assert.NoError(t, err)
-
-	t.Logf("XML response: %s", out)
-
-	assert.True(t, payload.Error)
-	assert.Len(t, payload.Message, len(msg))
+			request.Header.Set("Content-Type", tc.contentType)
+			out, cType, err := EncodeErrorPayload(request, errPayload)
+			assert.Equal(t, tc.expType, cType)
+			assert.NoError(t, err)
+			fmt.Printf("%s", out)
+			assert.Equal(t, tc.expMessage, string(out[:len(out)]))
+		})
+	}
 }
 
-func TestDefaultErrorJsonEncode(t *testing.T) {
+func TestNewErrorPayload(t *testing.T) {
+	errs := []error{
+		fmt.Errorf("Error One"),
+		fmt.Errorf("Error Two"),
+	}
+
+	err := NewErrorPayload(errs[0], errs[1])
+	assert.Equal(t, errs[0].Error(), err.Message)
+	assert.Equal(t, errs[1].Error(), err.PreviousMessage)
+}
+
+func TestWriteStatusAndError(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
 	assert.NoError(t, err)
-	wl, err := InternalServerError(request, recorder, errors.New("Failed to do something"))
+	wl, err := WriteStatusAndError(request, recorder, http.StatusForbidden, errors.New("Error one"))
 	assert.NoError(t, err)
 	assert.True(t, wl > 0)
 
-	msg := "Failed to do something"
+	//Default type is application/json
+	assert.Equal(t, http.StatusForbidden, recorder.Result().StatusCode)
+	assert.Equal(t, "application/json", recorder.Header().Get("Content-Type"))
+}
 
-	contentType := recorder.Header().Get("content-type")
-	assert.Equal(t, "application/json", contentType)
+func TestSetStatus(t *testing.T) {
+	testCases := []struct {
+		cases      string
+		handler    func(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error)
+		statusCode int
+	}{
+		{"Forbidden", Forbidden, http.StatusForbidden},
+		{"BadRequest", BadRequest, http.StatusBadRequest},
+		{"OK", OK, http.StatusOK},
+		{"NotFound", NotFound, http.StatusNotFound},
+		{"Unauthorized", Unauthorized, http.StatusUnauthorized},
+		{"InternalServerError", InternalServerError, http.StatusInternalServerError},
+		{"Conflict", Conflict, http.StatusConflict},
+		{"UnprocessableEntity", UnprocessableEntity, http.StatusUnprocessableEntity},
+	}
 
-	payload := ErrorPayload{}
-	out := recorder.Body.Bytes()
-	err = json.Unmarshal(out, &payload)
-	assert.NoError(t, err)
+	for _, tc := range testCases {
+		t.Run(tc.cases, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
 
-	assert.True(t, payload.Error)
-	assert.Len(t, payload.Message, len(msg))
+			request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
+			assert.NoError(t, err)
+			wl, err := tc.handler(request, recorder, errors.New("Failed to do something"))
+			assert.NoError(t, err)
+			assert.True(t, wl > 0)
+			assert.Equal(t, tc.statusCode, recorder.Result().StatusCode)
+
+		})
+	}
 }
