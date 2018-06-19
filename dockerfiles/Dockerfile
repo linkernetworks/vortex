@@ -6,7 +6,6 @@ WORKDIR /go/src/bitbucket.org/linkernetworks/vortex
 
 RUN apk add --no-cache protobuf ca-certificates git
 
-COPY config /cv-tracker/config
 # TODO fix path after move out
 COPY . /go/src/bitbucket.org/linkernetworks/vortex/src
 COPY Makefile /go/src/bitbucket.org/linkernetworks/vortex
@@ -37,7 +36,7 @@ COPY config /vortex/config
 ARG BRAND=aurora
 
 # select the config file for deployment
-ARG CONFIG=config/k8s-develop.json
+ARG CONFIG=config/k8s.json
 COPY ${CONFIG} config/k8s.json
 
 EXPOSE 7890
