@@ -6,6 +6,10 @@ GO           = go
 GO_VENDOR    = govendor
 MKDIR_P      = mkdir -p
 
+## For docker
+DOCKER_REGISTRY = sdnvortex
+IMAGE_TAG = latest
+PROJECT = vortex
 ################################################
 
 .PHONY: all
@@ -43,7 +47,7 @@ govendor-sync:
 src.build:
 	$(GO) build -v ./src/...
 	$(MKDIR_P) $(BUILD_FOLDER)/src/cmd/vortex/
-	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortext/vortex ./src/cmd/vortex/...
+	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortex/vortex ./src/cmd/vortex/...
 
 .PHONY: src.test
 src.test:
@@ -65,3 +69,7 @@ src.test-coverage:
 check-govendor:
 	$(info check govendor)
 	@[ "`which $(GO_VENDOR)`" != "" ] || (echo "$(GO_VENDOR) is missing"; false)
+
+## dockerfiles/ ########################################
+docker.build:
+	docker build --tag $(DOCKER_REGISTRY)/$(PROJECT):$(IMAGE_TAG) -f ./dockerfiles/Dockerfile .
