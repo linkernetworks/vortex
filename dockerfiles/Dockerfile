@@ -12,7 +12,7 @@ COPY Makefile /go/src/github.com/linkernetworks/vortex
 
 ENV CGO_ENABLED 0
 ENV GOOS linux
-ENV TIMEZONE "Asia/Shanghai"
+ENV TIMEZONE "Asia/Taipei"
 RUN apk add --no-cache tzdata && \
     cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     echo $TIMEZONE > /etc/timezone && \
