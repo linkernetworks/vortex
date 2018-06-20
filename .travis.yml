@@ -28,6 +28,7 @@ install:
   - make pre-build
 
 script:
+  - sudo -E env PATH=$$PATH TEST_K8S=1
   - make build
   - make test
   - make src.test-coverage

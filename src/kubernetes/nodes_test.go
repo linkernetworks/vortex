@@ -34,6 +34,6 @@ func TestGetNodes(t *testing.T) {
 	clientset, err := kubernetes.NewClientset()
 	assert.NoError(t, err)
 
-	nodes, err := GetNodes(clientset)
+	_, err = GetNodes(clientset)
 	assert.NoError(t, err)
 }
