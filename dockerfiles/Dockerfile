@@ -18,6 +18,8 @@ RUN apk add --no-cache tzdata && \
     echo $TIMEZONE > /etc/timezone && \
     apk del tzdata
 # TODO test go install
+RUN go get -x -u github.com/kardianos/govendor
+RUN govendor sync
 RUN go install ./src/cmd/...
 
 # the final image: vortex
@@ -36,4 +38,4 @@ ARG CONFIG=config/k8s.json
 COPY ${CONFIG} config/k8s.json
 
 EXPOSE 7890
-ENTRYPOINT ["/go/bin/vortex", "-port", "7890", "-config", "/vortex/config/k8s.json"]
+# ENTRYPOINT ["/go/bin/vortex", "-port", "7890", "-config", "/vortex/config/k8s.json"]
