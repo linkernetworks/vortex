@@ -237,6 +237,18 @@
 			"revisionTime": "2018-05-31T09:50:42Z"
 		},
 		{
+			"checksumSHA1": "WCxdMPK7lH+ioCiLYCs7ZE7msHs=",
+			"path": "github.com/linkernetworks/gearman",
+			"revision": "00fe5cdcf5ea006ce07ee865d773cfd151b9eb4e",
+			"revisionTime": "2018-05-25T05:43:38Z"
+		},
+		{
+			"checksumSHA1": "9t3LloU9ZmgeFE1blkKyXap0jyY=",
+			"path": "github.com/linkernetworks/influxdb",
+			"revision": "ad9cd5b7d4402a0cbd0613d043d48fb6e476d8bd",
+			"revisionTime": "2018-05-25T05:46:49Z"
+		},
+		{
 			"checksumSHA1": "Ywtth3s9PIYxkXxuojeo76lGO14=",
 			"path": "github.com/linkernetworks/logger",
 			"revision": "a4819848487c62c354fa572270d013dca4882cdd",
