@@ -1,8 +1,8 @@
 package serviceprovider
 
 import (
-	"github.com/linkernetworks/config"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/config"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
