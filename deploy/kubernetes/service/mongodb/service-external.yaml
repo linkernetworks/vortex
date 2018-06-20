@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: testing
+  name: mongo-external
+  namespace: default
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: mongo
+    nodePort: 31717
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    podindex: "0"
+    service: mongo
+  sessionAffinity: None
+  type: NodePort
