@@ -1,21 +1,17 @@
 package serviceprovider
 
 import (
-	"github.com/linkernetworks/config"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/config"
 
-	"github.com/linkernetworks/gearman"
-	"github.com/linkernetworks/influxdb"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
 )
 
 type Container struct {
-	Config   config.Config
-	Redis    *redis.Service
-	Mongo    *mongo.Service
-	Gearman  *gearman.Service
-	Influxdb *influxdb.InfluxdbService
+	Config config.Config
+	Redis  *redis.Service
+	Mongo  *mongo.Service
 }
 
 type ServiceDiscoverResponse struct {
@@ -23,11 +19,6 @@ type ServiceDiscoverResponse struct {
 }
 
 type Service interface{}
-
-func NewInfluxdbService(cf *influxdb.InfluxdbConfig) *influxdb.InfluxdbService {
-	logger.Infof("Connecting to influxdb: %s", cf.Url)
-	return &influxdb.InfluxdbService{Url: cf.Url}
-}
 
 func New(cf config.Config) *Container {
 	// setup logger configuration
@@ -39,14 +30,10 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	logger.Infof("Connecting to influxdb: %s", cf.Influxdb.Url)
-	influx := &influxdb.InfluxdbService{Url: cf.Influxdb.Url}
-
 	sp := &Container{
-		Config:   cf,
-		Redis:    redisService,
-		Mongo:    mongo,
-		Influxdb: influx,
+		Config: cf,
+		Redis:  redisService,
+		Mongo:  mongo,
 	}
 
 	return sp

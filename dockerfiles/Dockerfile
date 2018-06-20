@@ -25,7 +25,7 @@ RUN go install ./src/cmd/...
 
 # the final image: vortex
 FROM alpine:3.7
-RUN apk add --no-cache ca-certificates rsync
+RUN apk add --no-cache ca-certificates
 WORKDIR /vortex
 
 # copy the go binaries from the build image

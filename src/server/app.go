@@ -5,8 +5,8 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/linkernetworks/config"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 

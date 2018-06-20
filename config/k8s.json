@@ -19,10 +19,6 @@
             "url": "mongodb://35.189.177.37:31717/votex"
         }
     },
-    "influxdb": {
-        "url": "http://influxdb.default:8086",
-        "database": "lisa"
-    },
     "logger": {
         "dir": "./logs",
         "level": "debug",
