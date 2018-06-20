@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	restful "github.com/emicklei/go-restful"
-	"github.com/influxdata/influxdb/pkg/testing/assert"
 	"github.com/linkernetworks/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
