@@ -207,36 +207,6 @@
 			"revisionTime": "2018-03-05T23:10:24Z"
 		},
 		{
-			"checksumSHA1": "OUzCEucDbeVwgno7zJyewECEP8U=",
-			"path": "github.com/influxdata/influxdb",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "t06GpE7X4olsyp2d26RuKCDzC7w=",
-			"path": "github.com/influxdata/influxdb/client/v2",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "CY8B/OcEr0wPuocuJ6lek0XmMys=",
-			"path": "github.com/influxdata/influxdb/models",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "Z0Bb5PWa5WL/j5Dm2KJCLGn1l7U=",
-			"path": "github.com/influxdata/influxdb/pkg/escape",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "FeDHPB6MLEx2dZAGDeCt2tf9Y+w=",
-			"path": "github.com/influxdata/influxdb/pkg/testing/assert",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
 			"checksumSHA1": "NY84PNFBfNvxJgNEMVKUOJhcVsY=",
 			"path": "github.com/json-iterator/go",
 			"revision": "f2b4162afba35581b6d4a50d3b8f34e33c144682",
