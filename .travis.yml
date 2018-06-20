@@ -1,7 +1,10 @@
 language: go
 
+sudo: required
+
 services:
   - mongodb
+  - docker
 
 go:
   - "1.10.x"
@@ -18,14 +21,28 @@ cache:
   - vendor/gopkg.in
   - vendor/k8s.io
 
-install:
+before_install:
   - go get -u github.com/kardianos/govendor
+
+install:
   - make pre-build
 
 script:
   - make build
   - make test
   - make src.test-coverage
+  - docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile .
+
+before_deploy:
+  - echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin
+
+deploy:
+  provider: script
+  script:
+    docker tag sdnvortex/vortex sdnvortex/vortex:master
+    docker push sdnvortex/vortex:master
+  on:
+    branch: master
 
 after_success:
   - cp build/src/coverage.txt coverage.txt
