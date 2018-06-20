@@ -38,9 +38,7 @@ before_deploy:
 
 deploy:
   provider: script
-  script:
-    docker tag sdnvortex/vortex sdnvortex/vortex:develop
-    docker push sdnvortex/vortex:develop
+  script: docker tag sdnvortex/vortex sdnvortex/vortex:develop && docker push sdnvortex/vortex:develop
   on:
     branch: develop
 
