@@ -32,7 +32,7 @@ to setup your `docker` and `kubectl`.
 ### Docker
 ```
 export DOCKER_HOST="tcp://172.17.8.100:2376"
-export DOCKER_TLS_VERIFY=`
+export DOCKER_TLS_VERIFY=
 ```
 Now, type the `docker images` and you will see the docker images in that ubuntu VM.
 
