@@ -34,14 +34,27 @@ func ExampleAssertErrorMessage() {
 }
 
 func TestAssertError(t *testing.T) {
-	recorder := httptest.NewRecorder()
-	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
-	assert.NoError(t, err)
+	testCases := []struct {
+		cases       string
+		contentType string
+	}{
+		{"json", "text/json"},
+		{"xml", "text/xml"},
+	}
 
-	wl, err := response.InternalServerError(request, recorder, errors.New("Failed to do something"))
-	assert.NoError(t, err)
-	assert.True(t, wl > 0)
-	AssertError(t, recorder)
+	for _, tc := range testCases {
+		t.Run(tc.cases, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
+			assert.NoError(t, err)
+
+			request.Header.Set("Content-Type", tc.contentType)
+			wl, err := response.InternalServerError(request, recorder, errors.New("Failed to do something"))
+			assert.NoError(t, err)
+			assert.True(t, wl > 0)
+			AssertError(t, recorder)
+		})
+	}
 }
 
 func TestAssertStatusEqual(t *testing.T) {
@@ -56,13 +69,26 @@ func TestAssertStatusEqual(t *testing.T) {
 }
 
 func TestAssertErrorMessage(t *testing.T) {
-	recorder := httptest.NewRecorder()
-	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
-	assert.NoError(t, err)
+	testCases := []struct {
+		cases       string
+		contentType string
+	}{
+		{"json", "text/json"},
+		{"xml", "text/xml"},
+	}
 
-	msg := "Failed to do something"
-	wl, err := response.InternalServerError(request, recorder, errors.New(msg))
-	assert.NoError(t, err)
-	assert.True(t, wl > 0)
-	AssertErrorMessage(t, recorder, msg)
+	for _, tc := range testCases {
+		t.Run(tc.cases, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
+			assert.NoError(t, err)
+			request.Header.Set("Content-Type", tc.contentType)
+
+			msg := "Failed to do something"
+			wl, err := response.InternalServerError(request, recorder, errors.New(msg))
+			assert.NoError(t, err)
+			assert.True(t, wl > 0)
+			AssertErrorMessage(t, recorder, msg)
+		})
+	}
 }
