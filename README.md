@@ -25,7 +25,7 @@ make run
 ### Docker build
 
 ```
-make image
+make docker.build
 ```
 
 ### Test vortex image
