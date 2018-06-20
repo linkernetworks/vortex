@@ -231,28 +231,10 @@
 			"revisionTime": "2018-02-20T04:22:22Z"
 		},
 		{
-			"path": "github.com/linkernetworks/aurora-debug",
-			"revision": ""
-		},
-		{
-			"path": "github.com/linkernetworks/aurora-debug/github.com/emicklei/go-restful",
-			"revision": ""
-		},
-		{
-			"path": "github.com/linkernetworks/aurora/src/net/http",
-			"revision": ""
-		},
-		{
 			"checksumSHA1": "ZhjkfAPQ1hqwwB+9j6GJ87tEnic=",
 			"path": "github.com/linkernetworks/config",
 			"revision": "cbdafe0080a7c89be42fa877ffb56d4f31456461",
 			"revisionTime": "2018-05-31T09:50:42Z"
-		},
-		{
-			"checksumSHA1": "WCxdMPK7lH+ioCiLYCs7ZE7msHs=",
-			"path": "github.com/linkernetworks/gearman",
-			"revision": "00fe5cdcf5ea006ce07ee865d773cfd151b9eb4e",
-			"revisionTime": "2018-05-25T05:43:38Z"
 		},
 		{
 			"checksumSHA1": "Ywtth3s9PIYxkXxuojeo76lGO14=",
