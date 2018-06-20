@@ -93,7 +93,7 @@ pipeline {
         }
         stage("Push Image"){
             when {
-                branch 'master'
+                branch 'develop'
             }
             steps {
                 script {
@@ -106,7 +106,7 @@ pipeline {
                     ]) {
                         sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                     }
-                    docker.image("sdnvortex/vortex").push("master")
+                    docker.image("sdnvortex/vortex").push("develop")
                 }
             }
         }

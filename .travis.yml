@@ -39,10 +39,10 @@ before_deploy:
 deploy:
   provider: script
   script:
-    docker tag sdnvortex/vortex sdnvortex/vortex:master
-    docker push sdnvortex/vortex:master
+    docker tag sdnvortex/vortex sdnvortex/vortex:develop
+    docker push sdnvortex/vortex:develop
   on:
-    branch: master
+    branch: develop
 
 after_success:
   - cp build/src/coverage.txt coverage.txt
