@@ -7,8 +7,9 @@ WORKDIR /go/src/github.com/linkernetworks/vortex
 RUN apk add --no-cache protobuf ca-certificates git
 
 # TODO fix path after move out
-COPY . /go/src/github.com/linkernetworks/vortex/src
+COPY src /go/src/github.com/linkernetworks/vortex/src
 COPY Makefile /go/src/github.com/linkernetworks/vortex
+COPY vendor /go/src/github.com/linkernetworks/vortex/vendor
 
 ENV CGO_ENABLED 0
 ENV GOOS linux
@@ -38,4 +39,4 @@ ARG CONFIG=config/k8s.json
 COPY ${CONFIG} config/k8s.json
 
 EXPOSE 7890
-# ENTRYPOINT ["/go/bin/vortex", "-port", "7890", "-config", "/vortex/config/k8s.json"]
+ENTRYPOINT ["/go/bin/vortex", "-port", "7890", "-config", "/vortex/config/k8s.json"]
