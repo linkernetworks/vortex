@@ -207,36 +207,6 @@
 			"revisionTime": "2018-03-05T23:10:24Z"
 		},
 		{
-			"checksumSHA1": "OUzCEucDbeVwgno7zJyewECEP8U=",
-			"path": "github.com/influxdata/influxdb",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "t06GpE7X4olsyp2d26RuKCDzC7w=",
-			"path": "github.com/influxdata/influxdb/client/v2",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "CY8B/OcEr0wPuocuJ6lek0XmMys=",
-			"path": "github.com/influxdata/influxdb/models",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "Z0Bb5PWa5WL/j5Dm2KJCLGn1l7U=",
-			"path": "github.com/influxdata/influxdb/pkg/escape",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
-			"checksumSHA1": "FeDHPB6MLEx2dZAGDeCt2tf9Y+w=",
-			"path": "github.com/influxdata/influxdb/pkg/testing/assert",
-			"revision": "968a3906213bba5c129fd9a4c1062874db60a611",
-			"revisionTime": "2018-06-14T00:50:14Z"
-		},
-		{
 			"checksumSHA1": "NY84PNFBfNvxJgNEMVKUOJhcVsY=",
 			"path": "github.com/json-iterator/go",
 			"revision": "f2b4162afba35581b6d4a50d3b8f34e33c144682",
@@ -259,36 +229,6 @@
 			"path": "github.com/lestrrat/go-strftime",
 			"revision": "ba3bf9c1d0421aa146564a632931730344f1f9f1",
 			"revisionTime": "2018-02-20T04:22:22Z"
-		},
-		{
-			"path": "github.com/linkernetworks/aurora-debug",
-			"revision": ""
-		},
-		{
-			"path": "github.com/linkernetworks/aurora-debug/github.com/emicklei/go-restful",
-			"revision": ""
-		},
-		{
-			"path": "github.com/linkernetworks/aurora/src/net/http",
-			"revision": ""
-		},
-		{
-			"checksumSHA1": "ZhjkfAPQ1hqwwB+9j6GJ87tEnic=",
-			"path": "github.com/linkernetworks/config",
-			"revision": "cbdafe0080a7c89be42fa877ffb56d4f31456461",
-			"revisionTime": "2018-05-31T09:50:42Z"
-		},
-		{
-			"checksumSHA1": "WCxdMPK7lH+ioCiLYCs7ZE7msHs=",
-			"path": "github.com/linkernetworks/gearman",
-			"revision": "00fe5cdcf5ea006ce07ee865d773cfd151b9eb4e",
-			"revisionTime": "2018-05-25T05:43:38Z"
-		},
-		{
-			"checksumSHA1": "9t3LloU9ZmgeFE1blkKyXap0jyY=",
-			"path": "github.com/linkernetworks/influxdb",
-			"revision": "ad9cd5b7d4402a0cbd0613d043d48fb6e476d8bd",
-			"revisionTime": "2018-05-25T05:46:49Z"
 		},
 		{
 			"checksumSHA1": "Ywtth3s9PIYxkXxuojeo76lGO14=",
