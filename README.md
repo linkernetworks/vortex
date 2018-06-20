@@ -6,9 +6,6 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 Vortex share the same config and dependent services with aurora. Make sure dependent services are available before start vortex server.
 
 - MongoDB
-- InfluxDB
-- Redis
-- Gearmand
 
 ### GoBuild
 
