@@ -6,10 +6,6 @@ GO           = go
 GO_VENDOR    = govendor
 MKDIR_P      = mkdir -p
 
-## For docker
-DOCKER_REGISTRY = sdnvortex
-IMAGE_TAG = latest
-PROJECT = vortex
 ################################################
 
 .PHONY: all
@@ -71,5 +67,7 @@ check-govendor:
 	@[ "`which $(GO_VENDOR)`" != "" ] || (echo "$(GO_VENDOR) is missing"; false)
 
 ## dockerfiles/ ########################################
-docker.build:
-	docker build --tag $(DOCKER_REGISTRY)/$(PROJECT):$(IMAGE_TAG) -f ./dockerfiles/Dockerfile .
+
+.PHONY: dockerfiles.build
+dockerfiles.build:
+	docker build --tag sdnvortex/vortex:latest --file ./dockerfiles/Dockerfile .
