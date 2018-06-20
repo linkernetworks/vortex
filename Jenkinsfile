@@ -82,5 +82,33 @@ pipeline {
                 }
             }
         }
+        stage("Build Image"){
+            steps {
+                script {
+                    dir ("src/github.com/linkernetworks/vortex") {
+                        docker.build("sdnvortex/vortex" , "--file ./dockerfiles/Dockerfile .")
+                    }
+                }
+            }
+        }
+        stage("Push Image"){
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'eb1d8dd2-afd2-49d3-bbef-605de4f664d2',
+                            usernameVariable: 'DOCKER_USER',
+                            passwordVariable: 'DOCKER_PASS'
+                        )
+                    ]) {
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    }
+                    docker.image("sdnvortex/vortex").push("master")
+                }
+            }
+        }
     }
 }
