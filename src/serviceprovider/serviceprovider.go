@@ -6,12 +6,14 @@ import (
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
+	"github.com/linkernetworks/service/kubernetes"
 )
 
 type Container struct {
-	Config config.Config
-	Redis  *redis.Service
-	Mongo  *mongo.Service
+	Config     config.Config
+	Redis      *redis.Service
+	Mongo      *mongo.Service
+	Kubernetes *kubernetes.Service
 }
 
 type ServiceDiscoverResponse struct {
@@ -30,10 +32,13 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
+	kubernetes := kubernetes.NewFromConfig(cf.Kubernetes)
+
 	sp := &Container{
-		Config: cf,
-		Redis:  redisService,
-		Mongo:  mongo,
+		Config:     cf,
+		Redis:      redisService,
+		Mongo:      mongo,
+		Kubernetes: kubernetes,
 	}
 
 	return sp

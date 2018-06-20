@@ -36,5 +36,8 @@
         "dbVersion": "v1.0.0",
         "version": "<GIT_COMMIT>",
         "logFileName": "access_log"
-    }
+    },
+    "kubernetes": {
+         "namespace": "default"
+     }
 }
