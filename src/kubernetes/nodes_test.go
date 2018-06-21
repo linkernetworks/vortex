@@ -1,22 +1,17 @@
 package kubernetes
 
 import (
-	"github.com/linkernetworks/config"
-	"github.com/linkernetworks/service/kubernetes"
+	"github.com/linkernetworks/kubeconfig"
 	"github.com/stretchr/testify/assert"
-	"os"
+	"k8s.io/client-go/kubernetes"
 	"testing"
 )
 
 func TestGetNodeFail(t *testing.T) {
-	if _, ok := os.LookupEnv("TEST_K8S"); !ok {
-		t.SkipNow()
-	}
+	config, err := kubeconfig.Load("")
+	assert.NoError(t, err)
 
-	kubernetes := kubernetes.NewFromConfig(&config.KubernetesConfig{
-		Namespace: "default",
-	})
-	clientset, err := kubernetes.NewClientset()
+	clientset, err := kubernetes.NewForConfig(config)
 	assert.NoError(t, err)
 
 	_, err = GetNode(clientset, "UnKnown_Name")
@@ -24,14 +19,10 @@ func TestGetNodeFail(t *testing.T) {
 }
 
 func TestGetNodes(t *testing.T) {
-	if _, ok := os.LookupEnv("TEST_K8S"); !ok {
-		t.SkipNow()
-	}
+	config, err := kubeconfig.Load("")
+	assert.NoError(t, err)
 
-	kubernetes := kubernetes.NewFromConfig(&config.KubernetesConfig{
-		Namespace: "default",
-	})
-	clientset, err := kubernetes.NewClientset()
+	clientset, err := kubernetes.NewForConfig(config)
 	assert.NoError(t, err)
 
 	_, err = GetNodes(clientset)
