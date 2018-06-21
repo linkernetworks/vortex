@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -18,6 +20,7 @@ type StorageProvider struct {
 	Type        string        `bson:"type" json:"type"`
 	DisplayName string        `bson:"displayName" json:"displayName"`
 	NFSStorageProvider
+	CreatedAt *time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 }
 
 //GetCollection - get model mongo collection name.
