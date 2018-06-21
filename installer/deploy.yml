@@ -1,5 +1,0 @@
-#- import_playbook: gce-up.yml
-
-- import_playbook: kubespray/cluster.yml
-
-#- import_playbook: network-customized-script.yml
