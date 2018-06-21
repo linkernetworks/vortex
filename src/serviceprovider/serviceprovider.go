@@ -33,17 +33,13 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	sp := &Container{
-		Config: cf,
-		Redis:  redisService,
-		Mongo:  mongo,
-	}
+	k8sConfig, _ := kubeconfig.Load(cf.Kubernetes)
 
-	if cf.Kubernetes == nil {
-		logger.Warnln("kubernetes service is not loaded: kubernetes config is not defined.")
-	} else {
-		config, _ := kubeconfig.Load(cf.Kubernetes)
-		sp.Kubernetes = config
+	sp := &Container{
+		Config:     cf,
+		Redis:      redisService,
+		Mongo:      mongo,
+		Kubernetes: k8sConfig,
 	}
 
 	return sp

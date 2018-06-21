@@ -1,30 +1,56 @@
 package kubernetes
 
 import (
-	"github.com/linkernetworks/kubeconfig"
 	"github.com/stretchr/testify/assert"
-	"k8s.io/client-go/kubernetes"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	fakeclientset "k8s.io/client-go/kubernetes/fake"
 	"testing"
 )
 
+func TestGetNode(t *testing.T) {
+	clientset := fakeclientset.NewSimpleClientset()
+
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node",
+		},
+	}
+	_, err := clientset.CoreV1().Nodes().Create(&node)
+	assert.NoError(t, err)
+
+	result, err := GetNode(clientset, "K8S-Node")
+	assert.NoError(t, err)
+	assert.Equal(t, node.GetName(), result.GetName())
+}
+
 func TestGetNodeFail(t *testing.T) {
-	config, err := kubeconfig.Load("")
-	assert.NoError(t, err)
+	clientset := fakeclientset.NewSimpleClientset()
 
-	clientset, err := kubernetes.NewForConfig(config)
-	assert.NoError(t, err)
-
-	_, err = GetNode(clientset, "UnKnown_Name")
+	_, err := GetNode(clientset, "UnKnown_Name")
 	assert.Error(t, err)
 }
 
 func TestGetNodes(t *testing.T) {
-	config, err := kubeconfig.Load("")
+	clientset := fakeclientset.NewSimpleClientset()
+
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node1",
+		},
+	}
+	_, err := clientset.CoreV1().Nodes().Create(&node)
 	assert.NoError(t, err)
 
-	clientset, err := kubernetes.NewForConfig(config)
+	node = corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node2",
+		},
+	}
+	_, err = clientset.CoreV1().Nodes().Create(&node)
 	assert.NoError(t, err)
 
-	_, err = GetNodes(clientset)
+	nodes, err := GetNodes(clientset)
 	assert.NoError(t, err)
+	assert.Equal(t, 2, len(nodes))
 }
