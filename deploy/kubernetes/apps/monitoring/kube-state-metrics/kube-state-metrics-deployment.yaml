@@ -18,7 +18,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: kube-state-metrics
-        image: asia.gcr.io/linker-aurora/kube-state-metrics:develop
+        image: sdnvortex/kube-state-metrics:develop
         ports:
         - name: http-metrics
           containerPort: 8080
