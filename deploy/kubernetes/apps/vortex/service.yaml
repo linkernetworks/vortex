@@ -11,5 +11,6 @@ spec:
     - protocol: TCP
       port: 7890
       targetPort: 7890
+      nodePort: 32326
       name: vortex-server
-  clusterIP: None
+  type: NodePort
