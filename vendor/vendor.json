@@ -225,6 +225,12 @@
 			"revisionTime": "2018-03-05T23:10:24Z"
 		},
 		{
+			"checksumSHA1": "HMoZ70PrmL9dN5Kxs0dyZa/Z5k4=",
+			"path": "github.com/imdario/mergo",
+			"revision": "9316a62528ac99aaecb4e47eadd6dc8aa6533d58",
+			"revisionTime": "2018-06-08T14:01:56Z"
+		},
+		{
 			"checksumSHA1": "NY84PNFBfNvxJgNEMVKUOJhcVsY=",
 			"path": "github.com/json-iterator/go",
 			"revision": "f2b4162afba35581b6d4a50d3b8f34e33c144682",
@@ -247,6 +253,12 @@
 			"path": "github.com/lestrrat/go-strftime",
 			"revision": "ba3bf9c1d0421aa146564a632931730344f1f9f1",
 			"revisionTime": "2018-02-20T04:22:22Z"
+		},
+		{
+			"checksumSHA1": "POHgiZdxkhHLgWoZ3KqslnKNwGU=",
+			"path": "github.com/linkernetworks/kubeconfig",
+			"revision": "41ca5e7a4f9782177bccc862d461bafc7b9f559b",
+			"revisionTime": "2018-04-23T23:52:05Z"
 		},
 		{
 			"checksumSHA1": "Ywtth3s9PIYxkXxuojeo76lGO14=",
