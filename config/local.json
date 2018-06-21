@@ -7,7 +7,7 @@
         }
     },
     "mongo": {
-        "url": "mongodb://localhost:31717/vortex_test"
+        "url": "mongodb://localhost:27017/vortex_test"
     },
     "logger": {
         "dir": "./logs",
