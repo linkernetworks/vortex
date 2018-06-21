@@ -42,7 +42,7 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 
 func newStorageProviderService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/provisioner").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Path("/v1/storageprovider").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, CreateStorageProvider)))
 	return webService
 }

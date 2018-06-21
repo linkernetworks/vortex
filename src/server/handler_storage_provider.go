@@ -16,7 +16,6 @@ func CreateStorageProvider(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	storageProvider := entity.StorageProvider{}
-
 	if err := req.ReadEntity(&storageProvider); err != nil {
 		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
@@ -25,7 +24,6 @@ func CreateStorageProvider(ctx *web.Context) {
 
 	session := as.Mongo.NewSession()
 	defer session.Close()
-
 	// Check whether this displayname has been used
 	query := bson.M{"displayName": storageProvider.DisplayName}
 	count, err := session.Count(entity.NetworkCollectionName, query)
@@ -34,7 +32,6 @@ func CreateStorageProvider(ctx *web.Context) {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
-
 	if count > 0 {
 		response.Conflict(req.Request, resp, fmt.Errorf("displayName: %s already existed", storageProvider.DisplayName))
 		return
