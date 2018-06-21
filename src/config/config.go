@@ -17,6 +17,8 @@ type Config struct {
 
 	// the version settings of the current application
 	Version string `json:"version"`
+
+	Kubernetes string `json:"kubernetes"`
 }
 
 func Read(path string) (c Config, err error) {
