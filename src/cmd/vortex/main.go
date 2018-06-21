@@ -17,6 +17,8 @@ func main() {
 	flag.StringVar(&host, "host", "0.0.0.0", "hostname")
 	flag.StringVar(&port, "port", "7890", "port")
 
+	flag.Parse()
+
 	a := server.App{}
 	a.LoadConfig(configPath).Start(host, port)
 }

@@ -31,7 +31,6 @@ func (a *App) Start(host, port string) error {
 	a.InitilizeService()
 
 	bind := net.JoinHostPort(host, port)
-	logger.Debugf("Starting LISA on host: %s port: %s", host, port)
 
 	return http.ListenAndServe(bind, a.AppRoute())
 }
