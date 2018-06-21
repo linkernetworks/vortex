@@ -6,7 +6,7 @@ import (
 )
 
 type QueryUrl struct {
-	Url    url.Values    `json:"url"`
+	Url url.Values `json:"url"`
 }
 
 func New(url url.Values) *QueryUrl {
