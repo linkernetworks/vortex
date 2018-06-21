@@ -25,8 +25,5 @@
         "dbVersion": "v1.0.0",
         "version": "local",
         "logFileName": "access_log"
-    },
-    "kubernetes": {
-        "namespace": "default"
     }
 }
