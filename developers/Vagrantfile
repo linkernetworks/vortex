@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
     PROTOC_TARGET="${HOME}/protoc"
 
     # Install ntp
-    sudo apt-get install ntp
+    sudo apt-get install -y ntp
 
     # Install Docker
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -52,6 +52,7 @@ Vagrant.configure("2") do |config|
     # setup golang dir
     mkdir -p /home/$USER/go/src
     rm -rf /home/$USER/go1.10.2.linux-amd64.tar.gz
+    
     # install protoc
     if [ ! -d "${PROTOC_TARGET}" ]; then curl -fsSL "$PROTOC_RELEASE" > "${PROTOC_TARGET}.zip"; fi
     if [ -f "${PROTOC_TARGET}.zip" ]; then unzip "${PROTOC_TARGET}.zip" -d "${PROTOC_TARGET}"; fi
