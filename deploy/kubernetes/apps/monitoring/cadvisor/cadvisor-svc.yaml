@@ -8,12 +8,11 @@ metadata:
   annotations:
     prometheus.io/scrape: 'true'
 spec:
-  type: NodePort
   ports:
   - name: http-metrics
     port: 8080
-    nodePort: 31194
     targetPort: http-metrics
+    protocol: TCP
   selector:
     name: cadvisor
 
