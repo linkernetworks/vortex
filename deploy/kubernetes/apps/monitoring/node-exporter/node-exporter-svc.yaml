@@ -5,6 +5,8 @@ metadata:
   name: node-exporter
   labels:
     app: node-exporter
+  annotations:
+    prometheus.io/scrape: 'true'
 spec:
   type: NodePort
   ports:
