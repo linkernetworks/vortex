@@ -23,23 +23,20 @@ func CreateStorageProvider(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
+	session.C(entity.StorageProviderCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"displayName"},
+		Unique: true,
+	})
 	defer session.Close()
 	// Check whether this displayname has been used
-	query := bson.M{"displayName": storageProvider.DisplayName}
-	count, err := session.Count(entity.StorageProviderCollectionName, query)
-	if err != nil && err.Error() != mgo.ErrNotFound.Error() {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-	if count > 0 {
-		response.Conflict(req.Request, resp, fmt.Errorf("displayName: %s already existed", storageProvider.DisplayName))
-		return
-	}
-
 	storageProvider.ID = bson.NewObjectId()
 	storageProvider.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.StorageProviderCollectionName, &storageProvider); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storageProvider.DisplayName))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
