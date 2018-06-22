@@ -8,6 +8,7 @@ import (
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
+	"k8s.io/client-go/rest"
 )
 
 type Config struct {
@@ -18,7 +19,7 @@ type Config struct {
 	// the version settings of the current application
 	Version string `json:"version"`
 
-	Kubernetes string `json:"kubernetes"`
+	Kubernetes *rest.Config `json:"kubernetes"`
 }
 
 func Read(path string) (c Config, err error) {
