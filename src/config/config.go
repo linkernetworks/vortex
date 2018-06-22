@@ -8,12 +8,14 @@ import (
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
+	"github.com/linkernetworks/vortex/src/prometheus"
 )
 
 type Config struct {
-	Redis  *redis.RedisConfig  `json:"redis"`
-	Mongo  *mongo.MongoConfig  `json:"mongo"`
-	Logger logger.LoggerConfig `json:"logger"`
+	Redis      *redis.RedisConfig           `json:"redis"`
+	Mongo      *mongo.MongoConfig           `json:"mongo"`
+	Prometheus *prometheus.PrometheusConfig `json:"prometheus"`
+	Logger     logger.LoggerConfig          `json:"logger"`
 
 	// the version settings of the current application
 	Version string `json:"version"`

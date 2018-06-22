@@ -2,10 +2,11 @@ package serviceprovider
 
 import (
 	"fmt"
-	"github.com/linkernetworks/logger"
-	"github.com/linkernetworks/vortex/src/config"
 	"os"
 	"path/filepath"
+
+	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/config"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
