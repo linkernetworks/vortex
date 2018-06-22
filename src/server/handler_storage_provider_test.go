@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -19,7 +20,7 @@ func TestCreateStorageProvider(t *testing.T) {
 	sp := serviceprovider.New(cf)
 
 	//Testing parameter
-	tName := "hello world"
+	tName := namesgenerator.GetRandomName(0)
 	tType := "nfs"
 	tIP := "1.2.3.4"
 	tPath := "/exports"
