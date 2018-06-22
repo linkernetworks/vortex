@@ -19,8 +19,8 @@ type StorageProvider struct {
 	ID          bson.ObjectId `bson:"_id,omitempty" json:"id"`
 	Type        string        `bson:"type" json:"type"`
 	DisplayName string        `bson:"displayName" json:"displayName"`
+	CreatedAt   *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	NFSStorageProvider
-	CreatedAt *time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 }
 
 //GetCollection - get model mongo collection name.

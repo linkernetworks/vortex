@@ -13,7 +13,7 @@ import (
 )
 
 func CreateStorageProvider(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	storageProvider := entity.StorageProvider{}
 	if err := req.ReadEntity(&storageProvider); err != nil {
@@ -22,11 +22,11 @@ func CreateStorageProvider(ctx *web.Context) {
 		return
 	}
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 	// Check whether this displayname has been used
 	query := bson.M{"displayName": storageProvider.DisplayName}
-	count, err := session.Count(entity.NetworkCollectionName, query)
+	count, err := session.Count(entity.StorageProviderCollectionName, query)
 	if err != nil && err.Error() != mgo.ErrNotFound.Error() {
 		logger.Error(err)
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
