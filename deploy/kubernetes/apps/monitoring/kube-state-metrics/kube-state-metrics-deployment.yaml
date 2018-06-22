@@ -14,8 +14,6 @@ spec:
     metadata:
       labels:
         k8s-app: kube-state-metrics
-      annotations:
-        prometheus.io.scrape: "true"
     spec:
       serviceAccountName: default
       containers:
