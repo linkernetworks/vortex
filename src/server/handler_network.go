@@ -28,6 +28,10 @@ func CreateNetworkHandler(ctx *web.Context) {
 	}
 
 	session := as.Mongo.NewSession()
+	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"Name", "Node"},
+		Unique: true,
+	})
 	defer session.Close()
 
 	// Check whether vlangTag is 0~4095
@@ -40,42 +44,14 @@ func CreateNetworkHandler(ctx *web.Context) {
 		}
 	}
 
-	// Check whether this displayname has been used
-	query := bson.M{"displayName": network.DisplayName}
-	existed := entity.Network{}
-	if err := session.FindOne(entity.NetworkCollectionName, query, &existed); err != nil {
-		if err.Error() != mgo.ErrNotFound.Error() {
-			logger.Error(err)
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	if len(existed.ID) > 1 {
-		response.Conflict(req.Request, resp, fmt.Errorf("displayName: %s already existed", network.DisplayName))
-		return
-	}
-
-	// Check whether this bridge has been used
-	query = bson.M{"bridgeName": network.BridgeName}
-	existed = entity.Network{}
-	if err := session.FindOne(entity.NetworkCollectionName, query, &existed); err != nil {
-		if err.Error() != mgo.ErrNotFound.Error() {
-			logger.Error(err)
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	if len(existed.ID) > 1 {
-		response.Conflict(req.Request, resp, fmt.Errorf("bridgeName: %s already existed", network.BridgeName))
-		return
-	}
-
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
-
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
-		logger.Error(err)
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
@@ -114,14 +90,12 @@ func ListNetworkHandler(ctx *web.Context) {
 	selector := bson.M{}
 	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
 
-	err = q.All(&networks)
-	if err != nil {
-		logger.Error(err)
+	if err := q.All(&networks); err != nil {
 		if err == mgo.ErrNotFound {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-			return
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -145,14 +119,12 @@ func GetNetworkHandler(ctx *web.Context) {
 	c := session.C(entity.NetworkCollectionName)
 
 	var network entity.Network
-	err := c.FindId(bson.ObjectIdHex(id)).One(&network)
-	if err != nil {
-		logger.Error(err)
+	if err := c.FindId(bson.ObjectIdHex(id)).One(&network); err != nil {
 		if err == mgo.ErrNotFound {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-			return
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	resp.WriteEntity(network)
@@ -171,7 +143,6 @@ func DeleteNetworkHandler(ctx *web.Context) {
 
 	if err := session.FindOne(entity.NetworkCollectionName, q, &network); err != nil {
 		if err.Error() == mgo.ErrNotFound.Error() {
-			logger.Error(err)
 			response.NotFound(req.Request, resp.ResponseWriter, fmt.Errorf("the network: %v doesn't exist", id))
 			return
 		}
@@ -180,7 +151,6 @@ func DeleteNetworkHandler(ctx *web.Context) {
 	}
 
 	if err := session.Remove(entity.NetworkCollectionName, "_id", network.ID); err != nil {
-		logger.Error(err)
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -201,10 +171,8 @@ func UpdateNetworkHandler(ctx *web.Context) {
 
 	network := entity.Network{}
 	q := bson.M{"_id": bson.ObjectIdHex(id)}
-
 	if err := session.FindOne(entity.NetworkCollectionName, q, &network); err != nil {
 		if err.Error() == mgo.ErrNotFound.Error() {
-			logger.Error(err)
 			response.NotFound(req.Request, resp.ResponseWriter, fmt.Errorf("the network: %v doesn't exist", id))
 			return
 		}
@@ -213,28 +181,24 @@ func UpdateNetworkHandler(ctx *web.Context) {
 	}
 
 	updatedNetwork := entity.Network{}
-	err := req.ReadEntity(&updatedNetwork)
-	if err != nil {
-		logger.Error(err)
+	if err := req.ReadEntity(&updatedNetwork); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
 	checkNetwork := entity.Network{}
-	checkNetwork.DisplayName = updatedNetwork.DisplayName
+	checkNetwork.Name = updatedNetwork.Name
 	if !reflect.DeepEqual(updatedNetwork, checkNetwork) {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("only DisplayName can be changed"))
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("only Network Namea can be changed"))
 		return
 	}
 
-	err = session.UpdateById(entity.NetworkCollectionName, network.ID, updatedNetwork)
-	if err != nil {
-		logger.Error(err)
+	if err := session.UpdateById(entity.NetworkCollectionName, network.ID, updatedNetwork); err != nil {
 		if err == mgo.ErrNotFound {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-			return
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	resp.WriteEntity(updatedNetwork)
