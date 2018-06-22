@@ -28,7 +28,6 @@ func CreateStorageProvider(ctx *web.Context) {
 	query := bson.M{"displayName": storageProvider.DisplayName}
 	count, err := session.Count(entity.StorageProviderCollectionName, query)
 	if err != nil && err.Error() != mgo.ErrNotFound.Error() {
-		logger.Error(err)
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -40,7 +39,6 @@ func CreateStorageProvider(ctx *web.Context) {
 	storageProvider.ID = bson.NewObjectId()
 	storageProvider.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.StorageProviderCollectionName, &storageProvider); err != nil {
-		logger.Error(err)
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}

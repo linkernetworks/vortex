@@ -46,6 +46,19 @@ func TestCreateStorageProvider(t *testing.T) {
 	service := newStorageProviderService(sp)
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
-	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
 	assertResponseCode(t, http.StatusOK, httpWriter)
+	//Empty data
+	//We use the new write but empty input
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	//Create again and it should fail since the name exist
+	bodyReader = strings.NewReader(string(bodyBytes))
+	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
+	assert.NoError(t, err)
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusConflict, httpWriter)
+	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
 }
