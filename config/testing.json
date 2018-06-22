@@ -10,7 +10,11 @@
     "url": "mongodb://localhost:27017/vortex_test"
   },
   "prometheus": {
+<<<<<<< HEAD
     "url": "http://localhost:9090"
+=======
+    "url": "http://localhost:30003"
+>>>>>>> prometheus service provider
   },
   "logger": {
     "dir": "./logs",
