@@ -41,14 +41,13 @@ func New(cf config.Config) *Container {
 
 	k8sConfig, err := kubeconfig.Load(cf.Kubernetes)
 	if err != nil {
-		logger.Warnln("kubernetes service is not loaded: kubernetes config is not defined.")
-	} else {
-		clientset, err := kubernetes.NewForConfig(k8sConfig)
-		if err != nil {
-			logger.Warnln("kubernetes service is not loaded: clientset creates fail.")
-		}
-		sp.Kubernetes = clientset
+		log.Fatalf("did not load kubernetes config: %v", err)
 	}
+	clientset, err := kubernetes.NewForConfig(k8sConfig)
+	if err != nil {
+		log.Fatalf("did not connect kubernetes: %v", err)
+	}
+	sp.Kubernetes = clientset
 
 	return sp
 }
