@@ -4,7 +4,6 @@ import (
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/config"
 
-	"github.com/linkernetworks/kubeconfig"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
 	"k8s.io/client-go/kubernetes"
@@ -39,15 +38,15 @@ func New(cf config.Config) *Container {
 		Mongo:  mongo,
 	}
 
-	k8sConfig, err := kubeconfig.Load(cf.Kubernetes)
-	if err != nil {
-		log.Fatalf("did not load kubernetes config: %v", err)
+	if cf.Kubernetes == nil {
+		logger.Warnln("kubernetes service is not loaded: kubernetes config is not defined.")
+	} else {
+		clientset, err := kubernetes.NewForConfig(cf.Kubernetes)
+		if err != nil {
+			logger.Fatalf("did not connect kubernetes: %v", err)
+		}
+		sp.Kubernetes = clientset
 	}
-	clientset, err := kubernetes.NewForConfig(k8sConfig)
-	if err != nil {
-		log.Fatalf("did not connect kubernetes: %v", err)
-	}
-	sp.Kubernetes = clientset
 
 	return sp
 }
