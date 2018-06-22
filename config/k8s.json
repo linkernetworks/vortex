@@ -19,6 +19,9 @@
             "url": "mongodb://35.189.177.37:31717/votex"
         }
     },
+    "prometheus": {
+        "url": "http://prometheus.monitoring.svc.cluster.local:30003"
+    },
     "logger": {
         "dir": "./logs",
         "level": "debug",
