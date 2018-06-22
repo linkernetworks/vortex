@@ -18,7 +18,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageProviderService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
-	container.Add(newMonirotingService(a.ServiceProvider))
+	container.Add(newMonitoringService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
 	return router
@@ -57,7 +57,7 @@ func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 	return webService
 }
 
-func newMonirotingService(sp *serviceprovider.Container) *restful.WebService {
+func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/monitoring").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/query").To(handler.RESTfulServiceHandler(sp, QueryMetrics)))
