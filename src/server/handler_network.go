@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -40,6 +41,19 @@ func createNetworkHandler(ctx *web.Context) {
 				return
 			}
 		}
+	}
+
+	nc, err := networkcontroller.New(as.Kubernetes, network)
+	if err != nil {
+		logger.Error(err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := nc.CreateNetwork(); err != nil {
+		logger.Error(err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
 	}
 
 	network.ID = bson.NewObjectId()
