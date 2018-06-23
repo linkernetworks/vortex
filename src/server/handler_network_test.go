@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -25,15 +26,16 @@ func TestCreateNetwork(t *testing.T) {
 		MTU:      1500,
 		VlanTags: []int{2043, 2143, 2243},
 	}
+
+	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name:          "ovsbr1",
+		Name:          tName,
 		BridgeType:    "ovs",
 		Node:          "node1",
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
 
 	session := sp.Mongo.NewSession()
-	defer session.RemoveAll(entity.NetworkCollectionName)
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
 	assert.NoError(t, err)
@@ -48,7 +50,20 @@ func TestCreateNetwork(t *testing.T) {
 	service := newNetworkService(sp)
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
+	defer session.Remove(entity.StorageProviderCollectionName, "name", tName)
+
+	//We use the new write but empty input
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	//Create again and it should fail since the name exist
+	bodyReader = strings.NewReader(string(bodyBytes))
+	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
+	assert.NoError(t, err)
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusConflict, httpWriter)
 }
 
 func TestWrongVlangTag(t *testing.T) {
@@ -65,8 +80,9 @@ func TestWrongVlangTag(t *testing.T) {
 		MTU:      1500,
 		VlanTags: []int{1234, 2143, 50000},
 	}
+	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name:          "ovsbr1",
+		Name:          tName,
 		BridgeType:    "ovs",
 		Node:          "node1",
 		PhysicalPorts: []entity.PhysicalPort{eth1, eth2},
@@ -89,60 +105,6 @@ func TestWrongVlangTag(t *testing.T) {
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(t, http.StatusBadRequest, httpWriter)
-}
-
-func TestConflictDisplayName(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
-	eth1 := entity.PhysicalPort{
-		Name:     "eth1",
-		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
-	}
-	network := entity.Network{
-		Name:          "ovsbr1",
-		BridgeType:    "ovs",
-		Node:          "node1",
-		PhysicalPorts: []entity.PhysicalPort{eth1},
-	}
-
-	session := sp.Mongo.NewSession()
-	defer session.RemoveAll(entity.NetworkCollectionName)
-
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
-
-	networkWithSameInterface := entity.Network{
-		Name:          "ovsbr1",
-		BridgeType:    "ovs",
-		Node:          "node1",
-		PhysicalPorts: []entity.PhysicalPort{eth1},
-	}
-
-	bodyBytesConflict, err := json.MarshalIndent(networkWithSameInterface, "", "  ")
-	assert.NoError(t, err)
-
-	bodyReaderConflict := strings.NewReader(string(bodyBytesConflict))
-	httpRequestConflict, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReaderConflict)
-	assert.NoError(t, err)
-
-	httpRequestConflict.Header.Add("Content-Type", "application/json")
-	httpWriterConflict := httptest.NewRecorder()
-	wc.Dispatch(httpWriterConflict, httpRequestConflict)
-	assertResponseCode(t, http.StatusConflict, httpWriterConflict)
 }
 
 func TestConflictName(t *testing.T) {
