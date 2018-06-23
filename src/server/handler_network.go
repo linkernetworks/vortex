@@ -29,7 +29,7 @@ func CreateNetworkHandler(ctx *web.Context) {
 	session := as.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"name", "node"},
+		Key:    []string{"bridgeName", "nodeName"},
 		Unique: true,
 	})
 
@@ -47,7 +47,7 @@ func CreateNetworkHandler(ctx *web.Context) {
 	network.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
+			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.BridgeName))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}

@@ -18,9 +18,9 @@ type PhysicalPort struct {
 
 type Network struct {
 	ID            bson.ObjectId  `bson:"_id,omitempty" json:"id"`
-	Name          string         `bson:"name" json:"name"`
+	BridgeName    string         `bson:"bridgeName" json:"bridgeName"`
 	BridgeType    string         `bson:"bridgeType" json:"bridgeType"`
-	Node          string         `bson:"node" json:"node"`
+	NodeName      string         `bson:"nodeName" json:"nodeName"`
 	PhysicalPorts []PhysicalPort `bson:"physicalPorts" json:"physicalPorts"`
 	CreatedAt     *time.Time     `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 }
