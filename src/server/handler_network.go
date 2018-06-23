@@ -138,20 +138,12 @@ func DeleteNetworkHandler(ctx *web.Context) {
 	session := as.Mongo.NewSession()
 	defer session.Close()
 
-	network := entity.Network{}
-	q := bson.M{"_id": bson.ObjectIdHex(id)}
-
-	if err := session.FindOne(entity.NetworkCollectionName, q, &network); err != nil {
-		if err.Error() == mgo.ErrNotFound.Error() {
-			response.NotFound(req.Request, resp.ResponseWriter, fmt.Errorf("the network: %v doesn't exist", id))
-			return
+	if err := session.Remove(entity.NetworkCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
+		if mgo.ErrNotFound == err {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	if err := session.Remove(entity.NetworkCollectionName, "_id", network.ID); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
