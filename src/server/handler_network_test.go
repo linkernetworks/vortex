@@ -35,9 +35,9 @@ func TestCreateNetwork(t *testing.T) {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name:          tName,
+		BridgeName:    tName,
 		BridgeType:    "ovs",
-		Node:          "node1",
+		NodeName:      "node1",
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
 
@@ -57,7 +57,7 @@ func TestCreateNetwork(t *testing.T) {
 	service := newNetworkService(sp)
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
-	defer session.Remove(entity.NetworkCollectionName, "name", tName)
+	defer session.Remove(entity.NetworkCollectionName, "bridegName", tName)
 
 	//We use the new write but empty input
 	httpWriter = httptest.NewRecorder()
@@ -79,9 +79,9 @@ func TestWrongVlangTag(t *testing.T) {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name:       tName,
+		BridgeName: tName,
 		BridgeType: "ovs",
-		Node:       "node1",
+		NodeName:   "node1",
 		PhysicalPorts: []entity.PhysicalPort{
 			{
 				Name:     "eth1",
@@ -120,9 +120,9 @@ func TestDeleteNetwork(t *testing.T) {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name:          tName,
+		BridgeName:    tName,
 		BridgeType:    "ovs",
-		Node:          "node1",
+		NodeName:      "node1",
 		PhysicalPorts: []entity.PhysicalPort{},
 	}
 
@@ -130,12 +130,11 @@ func TestDeleteNetwork(t *testing.T) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).Insert(network)
-	defer session.Remove(entity.NetworkCollectionName, "name", tName)
+	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
 	//Reload the data to get the objectID
-
 	network = entity.Network{}
-	q := bson.M{"name": tName}
+	q := bson.M{"bridgeName": tName}
 	err := session.FindOne(entity.NetworkCollectionName, q, &network)
 	assert.NoError(t, err)
 
@@ -178,9 +177,9 @@ func TestGetNetwork(t *testing.T) {
 		VlanTags: []int{2043, 2143, 2243},
 	}
 	network := entity.Network{
-		Name:          "ovsbr1",
+		BridgeName:    "ovsbr1",
 		BridgeType:    "ovs",
-		Node:          "node1",
+		NodeName:      "node1",
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
 	session := sp.Mongo.NewSession()
@@ -202,7 +201,7 @@ func TestGetNetwork(t *testing.T) {
 	assertResponseCode(t, http.StatusOK, httpWriter)
 
 	network = entity.Network{}
-	q := bson.M{"name": "ovsbr1"}
+	q := bson.M{"bridgeName": "ovsbr1"}
 	err = session.FindOne(entity.NetworkCollectionName, q, &network)
 	assert.NoError(t, err)
 
