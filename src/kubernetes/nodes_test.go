@@ -11,45 +11,45 @@ import (
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
-type KubeCtlTestSuite struct {
+type KubeCtlNodeTestSuite struct {
 	suite.Suite
 	kubectl    *KubeCtl
-	fakeclient fakeclientset.Clientset
+	fakeclient *fakeclientset.Clientset
 }
 
-func (suite *KubeCtlTestSuite) SetupTest() {
-	clientset := fakeclientset.NewSimpleClientset()
+func (suite *KubeCtlNodeTestSuite) SetupTest() {
+	suite.fakeclient = fakeclientset.NewSimpleClientset()
 	namespace := "default"
-	suite.kubectl = New(clientset, namespace)
+	suite.kubectl = New(suite.fakeclient, namespace)
 }
 
-func (suite *KubeCtlTestSuite) TestGetNode(t *testing.T) {
+func (suite *KubeCtlNodeTestSuite) TestGetNode() {
 	node := corev1.Node{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "K8S-Node",
 		},
 	}
 	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	result, err := suite.kubectl.GetNode("K8S-Node")
-	assert.NoError(t, err)
-	assert.Equal(t, node.GetName(), result.GetName())
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), node.GetName(), result.GetName())
 }
 
-func (suite *KubeCtlTestSuite) TestGetNodeFail(t *testing.T) {
-	_, err := suite.kubectl.GetNode("UnKnown_Name")
-	assert.Error(t, err)
+func (suite *KubeCtlNodeTestSuite) TestGetNodeFail() {
+	_, err := suite.kubectl.GetNode("Unknown_Name")
+	assert.Error(suite.T(), err)
 }
 
-func (suite *KubeCtlTestSuite) TestGetNodes(t *testing.T) {
+func (suite *KubeCtlNodeTestSuite) TestGetNodes() {
 	node := corev1.Node{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "K8S-Node1",
 		},
 	}
 	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	node = corev1.Node{
 		ObjectMeta: metav1.ObjectMeta{
@@ -57,14 +57,14 @@ func (suite *KubeCtlTestSuite) TestGetNodes(t *testing.T) {
 		},
 	}
 	_, err = suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	nodes, err := suite.kubectl.GetNodes()
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(nodes))
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), 2, len(nodes))
 }
 
-func (suite *KubeCtlTestSuite) TestGetNodeExternalIP(t *testing.T) {
+func (suite *KubeCtlNodeTestSuite) TestGetNodeExternalIP() {
 	nodeAddr := corev1.NodeAddress{
 		Type:    "ExternalIP",
 		Address: "192.168.0.100",
@@ -78,14 +78,14 @@ func (suite *KubeCtlTestSuite) TestGetNodeExternalIP(t *testing.T) {
 		},
 	}
 	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	nodeIP, err := suite.kubectl.GetNodeExternalIP("K8S-Node")
-	assert.NoError(t, err)
-	assert.Equal(t, nodeAddr.Address, nodeIP)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), nodeAddr.Address, nodeIP)
 }
 
-func (suite *KubeCtlTestSuite) TestGetInvalidNodeExternalIP(t *testing.T) {
+func (suite *KubeCtlNodeTestSuite) TestGetInvalidNodeExternalIP() {
 	nodeAddr := corev1.NodeAddress{
 		Type:    "ExternalIP",
 		Address: "192.168.0.100",
@@ -99,9 +99,15 @@ func (suite *KubeCtlTestSuite) TestGetInvalidNodeExternalIP(t *testing.T) {
 		},
 	}
 	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	nodeIP, err := suite.kubectl.GetNodeExternalIP("K8S-Node-0")
-	assert.Error(t, err)
-	assert.Equal(t, "", nodeIP)
+	assert.Error(suite.T(), err)
+	assert.Equal(suite.T(), "", nodeIP)
+}
+
+func (suite *KubeCtlNodeTestSuite) TearDownTest() {}
+
+func TestKubeNodeTestSuite(t *testing.T) {
+	suite.Run(t, new(KubeCtlNodeTestSuite))
 }
