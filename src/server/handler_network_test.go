@@ -37,7 +37,7 @@ func TestCreateNetwork(t *testing.T) {
 	network := entity.Network{
 		BridgeName:    tName,
 		BridgeType:    "ovs",
-		NodeName:      "node1",
+		NodeName:      "create-network-node",
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
 
@@ -57,7 +57,7 @@ func TestCreateNetwork(t *testing.T) {
 	service := newNetworkService(sp)
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
-	defer session.Remove(entity.NetworkCollectionName, "bridegName", tName)
+	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
 	//We use the new write but empty input
 	httpWriter = httptest.NewRecorder()
@@ -81,7 +81,7 @@ func TestWrongVlangTag(t *testing.T) {
 	network := entity.Network{
 		BridgeName: tName,
 		BridgeType: "ovs",
-		NodeName:   "node1",
+		NodeName:   "wron-vlan-node3",
 		PhysicalPorts: []entity.PhysicalPort{
 			{
 				Name:     "eth1",
@@ -122,7 +122,7 @@ func TestDeleteNetwork(t *testing.T) {
 	network := entity.Network{
 		BridgeName:    tName,
 		BridgeType:    "ovs",
-		NodeName:      "node1",
+		NodeName:      "delete-network-node",
 		PhysicalPorts: []entity.PhysicalPort{},
 	}
 
@@ -230,4 +230,112 @@ func TestGetNetworkWithInvalidID(t *testing.T) {
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(t, http.StatusNotFound, httpWriter)
+}
+
+func TestListNetwork(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	networks := []entity.Network{}
+
+	for i := 0; i < 3; i++ {
+		networks = append(networks, entity.Network{
+			BridgeName: namesgenerator.GetRandomName(0),
+			BridgeType: "ovs",
+			NodeName:   namesgenerator.GetRandomName(0),
+			PhysicalPorts: []entity.PhysicalPort{
+				{namesgenerator.GetRandomName(0), 1500, []int{1234, 123, 432}},
+			}})
+	}
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+	for _, v := range networks {
+		session.C(entity.NetworkCollectionName).Insert(v)
+		defer session.Remove(entity.NetworkCollectionName, "bridgeName", v.BridgeName)
+	}
+
+	//list data by default page and page_size
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/", nil)
+	assert.NoError(t, err)
+
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newNetworkService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusOK, httpWriter)
+
+	retNetworks := []entity.Network{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
+	assert.NoError(t, err)
+	assert.Equal(t, len(networks), len(retNetworks))
+	for i, v := range retNetworks {
+		assert.Equal(t, networks[i].BridgeName, v.BridgeName)
+		assert.Equal(t, networks[i].BridgeType, v.BridgeType)
+		assert.Equal(t, networks[i].NodeName, v.NodeName)
+		assert.Equal(t, networks[i].PhysicalPorts, v.PhysicalPorts)
+	}
+
+	//list data by different page and page_size
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=3", nil)
+	assert.NoError(t, err)
+
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusOK, httpWriter)
+
+	retNetworks = []entity.Network{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
+	assert.NoError(t, err)
+	assert.Equal(t, len(networks), len(retNetworks))
+	for i, v := range retNetworks {
+		assert.Equal(t, networks[i].BridgeName, v.BridgeName)
+		assert.Equal(t, networks[i].BridgeType, v.BridgeType)
+		assert.Equal(t, networks[i].NodeName, v.NodeName)
+		assert.Equal(t, networks[i].PhysicalPorts, v.PhysicalPorts)
+	}
+
+	//list data by different page and page_size
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=1", nil)
+	assert.NoError(t, err)
+
+	httpWriter = httptest.NewRecorder()
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusOK, httpWriter)
+
+	retNetworks = []entity.Network{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(retNetworks))
+	for i, v := range retNetworks {
+		assert.Equal(t, networks[i].BridgeName, v.BridgeName)
+		assert.Equal(t, networks[i].BridgeType, v.BridgeType)
+		assert.Equal(t, networks[i].NodeName, v.NodeName)
+		assert.Equal(t, networks[i].PhysicalPorts, v.PhysicalPorts)
+	}
+}
+
+func TestListNetworkWithInvalidPage(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	//Get data with non-exits ID
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks?page=asdd", nil)
+	assert.NoError(t, err)
+
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newNetworkService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page_size=asdd", nil)
+	assert.NoError(t, err)
+
+	httpWriter = httptest.NewRecorder()
+	service = newNetworkService(sp)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusBadRequest, httpWriter)
 }

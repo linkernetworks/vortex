@@ -67,7 +67,6 @@ func ListNetworkHandler(ctx *web.Context) {
 
 	page, err := query.Int("page", 1)
 	if err != nil {
-		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -81,7 +80,6 @@ func ListNetworkHandler(ctx *web.Context) {
 	defer session.Close()
 
 	networks := []entity.Network{}
-
 	var c = session.C(entity.NetworkCollectionName)
 	var q *mgo.Query
 
