@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"math"
-	"reflect"
 	"strconv"
 
 	"github.com/linkernetworks/logger"
@@ -28,11 +27,11 @@ func CreateNetworkHandler(ctx *web.Context) {
 	}
 
 	session := as.Mongo.NewSession()
+	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"Name", "Node"},
+		Key:    []string{"name", "node"},
 		Unique: true,
 	})
-	defer session.Close()
 
 	// Check whether vlangTag is 0~4095
 	for _, pp := range network.PhysicalPorts {
@@ -151,47 +150,4 @@ func DeleteNetworkHandler(ctx *web.Context) {
 		Error:   false,
 		Message: "Delete success",
 	})
-}
-
-func UpdateNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	id := req.PathParameter("id")
-
-	session := as.Mongo.NewSession()
-	defer session.Close()
-
-	network := entity.Network{}
-	q := bson.M{"_id": bson.ObjectIdHex(id)}
-	if err := session.FindOne(entity.NetworkCollectionName, q, &network); err != nil {
-		if err.Error() == mgo.ErrNotFound.Error() {
-			response.NotFound(req.Request, resp.ResponseWriter, fmt.Errorf("the network: %v doesn't exist", id))
-			return
-		}
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	updatedNetwork := entity.Network{}
-	if err := req.ReadEntity(&updatedNetwork); err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	checkNetwork := entity.Network{}
-	checkNetwork.Name = updatedNetwork.Name
-	if !reflect.DeepEqual(updatedNetwork, checkNetwork) {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("only Network Namea can be changed"))
-		return
-	}
-
-	if err := session.UpdateById(entity.NetworkCollectionName, network.ID, updatedNetwork); err != nil {
-		if err == mgo.ErrNotFound {
-			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		}
-		return
-	}
-	resp.WriteEntity(updatedNetwork)
 }

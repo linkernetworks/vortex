@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
@@ -11,6 +13,10 @@ import (
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func CreateStorageProvider(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response

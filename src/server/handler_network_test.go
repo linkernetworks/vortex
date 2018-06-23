@@ -2,10 +2,12 @@ package server
 
 import (
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
@@ -16,6 +18,10 @@ import (
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func TestCreateNetwork(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
@@ -159,126 +165,6 @@ func TestDeleteEmptyNetwork(t *testing.T) {
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(t, http.StatusNotFound, httpWriter)
-}
-
-func TestUpdateNetwork(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
-	t.Skip()
-	eth1 := entity.PhysicalPort{
-		Name:     "eth1",
-		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
-	}
-	network := entity.Network{
-		Name:          "ovsbr1",
-		BridgeType:    "ovs",
-		Node:          "node1",
-		PhysicalPorts: []entity.PhysicalPort{eth1},
-	}
-
-	session := sp.Mongo.NewSession()
-	defer session.RemoveAll(entity.NetworkCollectionName)
-
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
-
-	updatedNetwork := entity.Network{
-		Name: "Test",
-	}
-
-	bodyBytesUpdate, err := json.MarshalIndent(updatedNetwork, "", "  ")
-	assert.NoError(t, err)
-
-	network = entity.Network{}
-	q := bson.M{"name": "ovsbr1"}
-	err = session.FindOne(entity.NetworkCollectionName, q, &network)
-	assert.NoError(t, err)
-
-	bodyReaderUpdate := strings.NewReader(string(bodyBytesUpdate))
-	httpRequestUpdate, err := http.NewRequest("PUT", "http://localhost:7890/v1/networks/"+network.ID.Hex(), bodyReaderUpdate)
-	assert.NoError(t, err)
-
-	httpRequestUpdate.Header.Add("Content-Type", "application/json")
-	httpWriterUpdate := httptest.NewRecorder()
-	wcUpdate := restful.NewContainer()
-	serviceUpdate := newNetworkService(sp)
-	wcUpdate.Add(serviceUpdate)
-	wcUpdate.Dispatch(httpWriterUpdate, httpRequestUpdate)
-	assertResponseCode(t, http.StatusOK, httpWriterUpdate)
-}
-
-func TestWrongUpdateNetwork(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
-	t.Skip()
-	eth1 := entity.PhysicalPort{
-		Name:     "eth1",
-		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
-	}
-	network := entity.Network{
-		Name:          "ovsbr1",
-		BridgeType:    "ovs",
-		Node:          "node1",
-		PhysicalPorts: []entity.PhysicalPort{eth1},
-	}
-
-	session := sp.Mongo.NewSession()
-	defer session.RemoveAll(entity.NetworkCollectionName)
-
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
-
-	updatedNetwork := entity.Network{
-		Name: "obsbr2",
-	}
-
-	bodyBytesUpdate, err := json.MarshalIndent(updatedNetwork, "", "  ")
-	assert.NoError(t, err)
-
-	network = entity.Network{}
-	q := bson.M{"name": "ovsbr1"}
-	err = session.FindOne(entity.NetworkCollectionName, q, &network)
-	assert.NoError(t, err)
-
-	bodyReaderUpdate := strings.NewReader(string(bodyBytesUpdate))
-	httpRequestUpdate, err := http.NewRequest("PUT", "http://localhost:7890/v1/networks/"+network.ID.Hex(), bodyReaderUpdate)
-	assert.NoError(t, err)
-
-	httpRequestUpdate.Header.Add("Content-Type", "application/json")
-	httpWriterUpdate := httptest.NewRecorder()
-	wcUpdate := restful.NewContainer()
-	serviceUpdate := newNetworkService(sp)
-	wcUpdate.Add(serviceUpdate)
-	wcUpdate.Dispatch(httpWriterUpdate, httpRequestUpdate)
-	assertResponseCode(t, http.StatusBadRequest, httpWriterUpdate)
 }
 
 func TestGetNetwork(t *testing.T) {
