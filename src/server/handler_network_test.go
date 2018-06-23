@@ -120,6 +120,7 @@ func TestDeleteNetwork(t *testing.T) {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
+		ID:            bson.NewObjectId(),
 		BridgeName:    tName,
 		BridgeType:    "ovs",
 		NodeName:      "delete-network-node",
@@ -132,12 +133,6 @@ func TestDeleteNetwork(t *testing.T) {
 	session.C(entity.NetworkCollectionName).Insert(network)
 	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
-	//Reload the data to get the objectID
-	network = entity.Network{}
-	q := bson.M{"bridgeName": tName}
-	err := session.FindOne(entity.NetworkCollectionName, q, &network)
-	assert.NoError(t, err)
-
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	httpWriterDelete := httptest.NewRecorder()
 	wcDelete := restful.NewContainer()
@@ -146,7 +141,7 @@ func TestDeleteNetwork(t *testing.T) {
 	wcDelete.Dispatch(httpWriterDelete, httpRequestDelete)
 	assertResponseCode(t, http.StatusOK, httpWriterDelete)
 
-	err = session.FindOne(entity.NetworkCollectionName, q, &network)
+	err = session.FindOne(entity.NetworkCollectionName, bson.M{"_id": network.ID}, &network)
 	assert.Equal(t, err.Error(), mgo.ErrNotFound.Error())
 }
 
@@ -179,6 +174,7 @@ func TestGetNetwork(t *testing.T) {
 		VlanTags: []int{2043, 2143, 2243},
 	}
 	network := entity.Network{
+		ID:            bson.NewObjectId(),
 		BridgeName:    tName,
 		BridgeType:    tType,
 		NodeName:      tNodeName,
@@ -190,12 +186,6 @@ func TestGetNetwork(t *testing.T) {
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).Insert(network)
 	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
-
-	//Reload the data to get the objectID
-	network = entity.Network{}
-	q := bson.M{"bridgeName": tName}
-	err := session.FindOne(entity.NetworkCollectionName, q, &network)
-	assert.NoError(t, err)
 
 	httpRequestGet, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	assert.NoError(t, err)
