@@ -16,10 +16,24 @@ func GetNodes(clientset kubernetes.Interface) ([]*corev1.Node, error) {
 	if err != nil {
 		return nodes, err
 	}
-
 	for _, n := range nodesList.Items {
 		nodes = append(nodes, &n)
 	}
-
 	return nodes, nil
+}
+
+func GetNodeExternalIP(clientset kubernetes.Interface, name string) (string, error) {
+	node, err := GetNode(clientset, name)
+	if err != nil {
+		return "", err
+	}
+
+	var nodeIP string
+	for _, addr := range node.Status.Addresses {
+		if addr.Type == "ExternalIP" {
+			nodeIP = addr.Address
+			break
+		}
+	}
+	return nodeIP, nil
 }
