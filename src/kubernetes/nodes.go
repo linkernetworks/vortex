@@ -27,7 +27,6 @@ func GetNodeExternalIP(clientset kubernetes.Interface, name string) (string, err
 	if err != nil {
 		return "", err
 	}
-
 	var nodeIP string
 	for _, addr := range node.Status.Addresses {
 		if addr.Type == "ExternalIP" {
