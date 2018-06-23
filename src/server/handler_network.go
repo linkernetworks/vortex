@@ -19,7 +19,6 @@ func CreateNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	network := entity.Network{}
-
 	if err := req.ReadEntity(&network); err != nil {
 		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
