@@ -84,3 +84,24 @@ func (suite *KubeCtlTestSuite) TestGetNodeExternalIP(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, nodeAddr.Address, nodeIP)
 }
+
+func (suite *KubeCtlTestSuite) TestGetInvalidNodeExternalIP(t *testing.T) {
+	nodeAddr := corev1.NodeAddress{
+		Type:    "ExternalIP",
+		Address: "192.168.0.100",
+	}
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node",
+		},
+		Status: corev1.NodeStatus{
+			Addresses: []corev1.NodeAddress{nodeAddr},
+		},
+	}
+	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
+	assert.NoError(t, err)
+
+	nodeIP, err := suite.kubectl.GetNodeExternalIP("K8S-Node-0")
+	assert.Error(t, err)
+	assert.Equal(t, "", nodeIP)
+}
