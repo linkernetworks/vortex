@@ -154,7 +154,7 @@ func TestDeleteEmptyNetwork(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
-	//Remove non-exist network id
+	//Remove with non-exist network id
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
 	assert.NoError(t, err)
 
@@ -170,39 +170,31 @@ func TestGetNetwork(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
-	t.Skip()
+	tName := namesgenerator.GetRandomName(0)
+	tType := "ovs"
+	tNodeName := namesgenerator.GetRandomName(0)
 	eth1 := entity.PhysicalPort{
 		Name:     "eth1",
 		MTU:      1500,
 		VlanTags: []int{2043, 2143, 2243},
 	}
 	network := entity.Network{
-		BridgeName:    "ovsbr1",
-		BridgeType:    "ovs",
-		NodeName:      "node1",
+		BridgeName:    tName,
+		BridgeType:    tType,
+		NodeName:      tNodeName,
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
+
+	//Create data into mongo manually
 	session := sp.Mongo.NewSession()
-	defer session.RemoveAll(entity.NetworkCollectionName)
+	defer session.Close()
+	session.C(entity.NetworkCollectionName).Insert(network)
+	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
-
+	//Reload the data to get the objectID
 	network = entity.Network{}
-	q := bson.M{"bridgeName": "ovsbr1"}
-	err = session.FindOne(entity.NetworkCollectionName, q, &network)
+	q := bson.M{"bridgeName": tName}
+	err := session.FindOne(entity.NetworkCollectionName, q, &network)
 	assert.NoError(t, err)
 
 	httpRequestGet, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
@@ -214,4 +206,28 @@ func TestGetNetwork(t *testing.T) {
 	wcGet.Add(serviceGet)
 	wcGet.Dispatch(httpWriterGet, httpRequestGet)
 	assertResponseCode(t, http.StatusOK, httpWriterGet)
+
+	network = entity.Network{}
+	err = json.Unmarshal(httpWriterGet.Body.Bytes(), &network)
+	assert.NoError(t, err)
+	assert.Equal(t, tName, network.BridgeName)
+	assert.Equal(t, eth1, network.PhysicalPorts[0])
+	assert.Equal(t, tType, network.BridgeType)
+	assert.Equal(t, tNodeName, network.NodeName)
+}
+
+func TestGetNetworkWithInvalidID(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	//Get data with non-exits ID
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
+	assert.NoError(t, err)
+
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newNetworkService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusNotFound, httpWriter)
 }
