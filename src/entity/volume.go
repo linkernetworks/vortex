@@ -31,6 +31,7 @@ func (m Volume) GetCollection() string {
 	return VolumeCollectionName
 }
 
+//GenerateMetaName - Generate a metaname for kubernetes PVC object
 func (m Volume) GenerateMetaName() string {
 	return "PVC-" + m.ID.Hex()
 }
