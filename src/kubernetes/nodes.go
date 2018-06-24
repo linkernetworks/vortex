@@ -5,10 +5,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+//Get the Node object by the node name
 func (kc *KubeCtl) GetNode(name string) (*corev1.Node, error) {
 	return kc.Clientset.CoreV1().Nodes().Get(name, metav1.GetOptions{})
 }
 
+//Get all nodes from the k8s cluster
 func (kc *KubeCtl) GetNodes() ([]*corev1.Node, error) {
 	nodes := []*corev1.Node{}
 	nodesList, err := kc.Clientset.CoreV1().Nodes().List(metav1.ListOptions{})
@@ -21,6 +23,7 @@ func (kc *KubeCtl) GetNodes() ([]*corev1.Node, error) {
 	return nodes, nil
 }
 
+//Get the external IP address of node
 func (kc *KubeCtl) GetNodeExternalIP(name string) (string, error) {
 	node, err := kc.GetNode(name)
 	if err != nil {
