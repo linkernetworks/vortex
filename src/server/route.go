@@ -35,7 +35,6 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, ListNetworkHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, GetNetworkHandler)))
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, CreateNetworkHandler)))
-	webService.Route(webService.PUT("/{id}").To(handler.RESTfulServiceHandler(sp, UpdateNetworkHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, DeleteNetworkHandler)))
 	return webService
 }
