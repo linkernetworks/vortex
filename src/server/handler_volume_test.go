@@ -95,8 +95,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	assert.Equal(suite.T(), volume.Capacity, retVolume.Capacity)
 	assert.NotEqual(suite.T(), "", retVolume.MetaName)
 
-	//Empty daa
-	//We use the new write but empty input
+	//We use the new write but empty input which will cause the readEntity Error
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
