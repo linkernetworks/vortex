@@ -328,4 +328,13 @@ func TestListNetworkWithInvalidPage(t *testing.T) {
 	service = newNetworkService(sp)
 	wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=-1", nil)
+	assert.NoError(t, err)
+
+	httpWriter = httptest.NewRecorder()
+	service = newNetworkService(sp)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusInternalServerError, httpWriter)
+
 }

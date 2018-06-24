@@ -15,7 +15,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func CreateNetworkHandler(ctx *web.Context) {
+func createNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	network := entity.Network{}
@@ -59,7 +59,7 @@ func CreateNetworkHandler(ctx *web.Context) {
 	})
 }
 
-func ListNetworkHandler(ctx *web.Context) {
+func listNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
@@ -105,7 +105,7 @@ func ListNetworkHandler(ctx *web.Context) {
 	resp.WriteEntity(networks)
 }
 
-func GetNetworkHandler(ctx *web.Context) {
+func getNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
@@ -126,7 +126,7 @@ func GetNetworkHandler(ctx *web.Context) {
 	resp.WriteEntity(network)
 }
 
-func DeleteNetworkHandler(ctx *web.Context) {
+func deleteNetworkHandler(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
