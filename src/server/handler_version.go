@@ -5,7 +5,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
-func VersionHandler(sp *serviceprovider.Container) restful.RouteFunction {
+func versionHandler(sp *serviceprovider.Container) restful.RouteFunction {
 	return func(req *restful.Request, resp *restful.Response) {
 	}
 }

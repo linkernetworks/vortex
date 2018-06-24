@@ -19,26 +19,6 @@ func ExampleWriteStatusAndError() {
 	WriteStatusAndError(request, recorder, http.StatusBadRequest, errors.New("bad request"))
 }
 
-func ExampleDefaultEncoding() {
-	recorder := httptest.NewRecorder()
-	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
-	if err != nil {
-		panic(err)
-	}
-	InternalServerError(request, recorder, errors.New("Failed to do something"))
-}
-
-func ExampleJsonEncoding() {
-	recorder := httptest.NewRecorder()
-	request, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
-	if err != nil {
-		panic(err)
-	}
-
-	request.Header.Set("content-type", "application/json")
-	InternalServerError(request, recorder, errors.New("Failed to do something"))
-}
-
 func TestEncodeErrorPayload(t *testing.T) {
 	testCases := []struct {
 		cases       string
