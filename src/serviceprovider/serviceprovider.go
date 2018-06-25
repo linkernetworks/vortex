@@ -6,14 +6,15 @@ import (
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
+	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
 	"k8s.io/client-go/kubernetes"
 )
 
 type Container struct {
-	Config     config.Config
-	Redis      *redis.Service
-	Mongo      *mongo.Service
-	Kubernetes kubernetes.Interface
+	Config  config.Config
+	Redis   *redis.Service
+	Mongo   *mongo.Service
+	KubeCtl *kubeCtl.KubeCtl
 }
 
 type ServiceDiscoverResponse struct {
@@ -32,20 +33,13 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	sp := &Container{
-		Config: cf,
-		Redis:  redisService,
-		Mongo:  mongo,
-	}
+	clientset := kubernetes.NewForConfigOrDie(cf.Kubernetes)
 
-	if cf.Kubernetes == nil {
-		logger.Warnln("kubernetes service is not loaded: kubernetes config is not defined.")
-	} else {
-		clientset, err := kubernetes.NewForConfig(cf.Kubernetes)
-		if err != nil {
-			logger.Fatalf("did not connect kubernetes: %v", err)
-		}
-		sp.Kubernetes = clientset
+	sp := &Container{
+		Config:  cf,
+		Redis:   redisService,
+		Mongo:   mongo,
+		KubeCtl: kubeCtl.New(clientset, "default"),
 	}
 
 	return sp
