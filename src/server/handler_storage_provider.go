@@ -15,7 +15,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func CreateStorageProvider(ctx *web.Context) {
+func createStorageProvider(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	storageProvider := entity.StorageProvider{}
@@ -49,7 +49,7 @@ func CreateStorageProvider(ctx *web.Context) {
 	})
 }
 
-func ListStorageProvider(ctx *web.Context) {
+func listStorageProvider(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
