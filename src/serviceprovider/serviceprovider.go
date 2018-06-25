@@ -53,6 +53,14 @@ func New(cf config.Config) *Container {
 
 	clientset := kubernetes.NewForConfigOrDie(k8s)
 
+	var clientset kubernetes.Interface
+
+	if cf.Kubernetes != nil {
+		clientset = kubernetes.NewForConfigOrDie(cf.Kubernetes)
+	} else {
+		clientset = fakeclientset.NewSimpleClientset()
+	}
+
 	sp := &Container{
 		Config:  cf,
 		Redis:   redisService,
