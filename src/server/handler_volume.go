@@ -40,7 +40,7 @@ func createVolume(ctx *web.Context) {
 	// Check whether this displayname has been used
 	volume.ID = bson.NewObjectId()
 	volume.CreatedAt = timeutils.Now()
-	//Generate the metaName for furture use
+	//Generate the metaName for PVC meta name and we will use it future
 	volume.MetaName = volume.GenerateMetaName()
 	if err := session.Insert(entity.VolumeCollectionName, &volume); err != nil {
 		if mgo.IsDup(err) {
