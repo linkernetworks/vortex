@@ -151,92 +151,63 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
-func TestWrongVlangTag(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
+func (suite *NetworkTestSuite) TestWrongVlangTag() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		BridgeName: tName,
 		BridgeType: "ovs",
-		NodeName:   "wron-vlan-node3",
+		NodeName:   suite.nodeName,
 		PhysicalPorts: []entity.PhysicalPort{
 			{
-				Name:     "eth1",
-				MTU:      1500,
-				VlanTags: []int{1234, 2143, 2243},
-			},
-			{
-				Name:     "eth1",
+				Name:     suite.ifName,
 				MTU:      1500,
 				VlanTags: []int{1234, 2143, 50000},
 			},
 		}}
 
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
 
-func TestDeleteNetwork(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
+func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		ID:            bson.NewObjectId(),
 		BridgeName:    tName,
 		BridgeType:    "ovs",
-		NodeName:      "delete-network-node",
+		NodeName:      suite.nodeName,
 		PhysicalPorts: []entity.PhysicalPort{},
 	}
 
 	//Create data into mongo manually
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-	session.C(entity.NetworkCollectionName).Insert(network)
-	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	suite.session.C(entity.NetworkCollectionName).Insert(network)
+	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	httpWriterDelete := httptest.NewRecorder()
-	wcDelete := restful.NewContainer()
-	serviceDelete := newNetworkService(sp)
-	wcDelete.Add(serviceDelete)
-	wcDelete.Dispatch(httpWriterDelete, httpRequestDelete)
-	assertResponseCode(t, http.StatusOK, httpWriterDelete)
-
-	err = session.FindOne(entity.NetworkCollectionName, bson.M{"_id": network.ID}, &network)
-	assert.Equal(t, err.Error(), mgo.ErrNotFound.Error())
+	suite.wc.Dispatch(httpWriterDelete, httpRequestDelete)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriterDelete)
+	err = suite.session.FindOne(entity.NetworkCollectionName, bson.M{"_id": network.ID}, &network)
+	assert.Equal(suite.T(), err.Error(), mgo.ErrNotFound.Error())
 }
 
-func TestDeleteEmptyNetwork(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
-
+func (suite *NetworkTestSuite) TestDeleteEmptyNetwork() {
 	//Remove with non-exist network id
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusNotFound, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
 func TestGetNetwork(t *testing.T) {
