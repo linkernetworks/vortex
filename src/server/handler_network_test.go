@@ -2,33 +2,114 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
+	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
+	kc "github.com/linkernetworks/vortex/src/kubernetes"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	fakeclientset "k8s.io/client-go/kubernetes/fake"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func TestCreateNetwork(t *testing.T) {
+type NetworkTestSuite struct {
+	suite.Suite
+	kubectl    *kc.KubeCtl
+	fakeclient *fakeclientset.Clientset
+	wc         *restful.Container
+	session    *mongo.Session
+	ifName     string
+	nodeName   string
+}
+
+func (suite *NetworkTestSuite) SetupTest() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
+	//init session
+	suite.session = sp.Mongo.NewSession()
+	//init restful container
+	suite.wc = restful.NewContainer()
+	service := newNetworkService(sp)
+	suite.wc.Add(service)
+
+	//init fakeclient
+	suite.fakeclient = fakeclientset.NewSimpleClientset()
+	namespace := "default"
+	suite.kubectl = kc.New(suite.fakeclient, namespace)
+
+	sp.KubeCtl = suite.kubectl
+	//Create a fake clinet
+	//Init
+	nodeAddr := corev1.NodeAddress{
+		Type:    "ExternalIP",
+		Address: "127.0.0.1",
+	}
+
+	suite.nodeName = namesgenerator.GetRandomName(0)
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: suite.nodeName,
+		},
+		Status: corev1.NodeStatus{
+			Addresses: []corev1.NodeAddress{nodeAddr},
+		},
+	}
+	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
+	assert.NoError(suite.T(), err)
+
+	//There's a length limit of link name
+	suite.ifName = namesgenerator.GetRandomName(0)[0:8]
+	pName := namesgenerator.GetRandomName(0)[0:8]
+	//Create a veth for testing
+	err = exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName).Run()
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *NetworkTestSuite) TearDownTest() {
+	err := exec.Command("ip", "link", "del", suite.ifName).Run()
+	assert.NoError(suite.T(), err)
+}
+
+func TestNetworkSuite(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		fmt.Println("We only testing the ovs function on Linux Host")
+		t.Skip()
+		return
+	}
+	if _, defined := os.LookupEnv("TEST_GRPC"); !defined {
+		t.SkipNow()
+		return
+	}
+	suite.Run(t, new(NetworkTestSuite))
+}
+
+func (suite *NetworkTestSuite) TestCreateNetwork() {
+	//Parameters
 	eth1 := entity.PhysicalPort{
-		Name:     "eth1",
+		Name:     suite.ifName,
 		MTU:      1500,
 		VlanTags: []int{2043, 2143, 2243},
 	}
@@ -37,45 +118,37 @@ func TestCreateNetwork(t *testing.T) {
 	network := entity.Network{
 		BridgeName:    tName,
 		BridgeType:    "ovs",
-		NodeName:      "create-network-node",
+		NodeName:      suite.nodeName,
 		PhysicalPorts: []entity.PhysicalPort{eth1},
 	}
 
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newNetworkService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	// TODO: Fix testing
+	suite.wc.Dispatch(httpWriter, httpRequest)
 	//assertResponseCode(t, http.StatusOK, httpWriter)
-	assertResponseCode(t, http.StatusInternalServerError, httpWriter)
-	defer session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 
 	//We use the new write but empty input
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(t, err)
+	assert.NoError(suite.T(), err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	// TODO: Fix testing
-	//assertResponseCode(t, http.StatusConflict, httpWriter)
-	assertResponseCode(t, http.StatusInternalServerError, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
 func TestWrongVlangTag(t *testing.T) {
