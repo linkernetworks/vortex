@@ -3,21 +3,21 @@ package networkcontroller
 import (
 	pb "github.com/linkernetworks/network-controller/messages"
 	"github.com/linkernetworks/vortex/src/entity"
-	k8sCtl "github.com/linkernetworks/vortex/src/kubernetes"
+	"github.com/linkernetworks/vortex/src/kubernetes"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"k8s.io/client-go/kubernetes"
 	"time"
 )
 
 type NetworkController struct {
-	Clientset  kubernetes.Interface
-	ClientConn *grpc.ClientConn
-	Network    entity.Network
+	KubeCtl   *kubernetes.KubeCtl
+	ClientCtl pb.NetworkControlClient
+	Network   entity.Network
+	Context   context.Context
 }
 
-func New(clientset kubernetes.Interface, network entity.Network) (*NetworkController, error) {
-	node, err := k8sCtl.GetNode(clientset, network.Node)
+func New(kubeCtl *kubernetes.KubeCtl, network entity.Network) (*NetworkController, error) {
+	node, err := kubeCtl.GetNode(network.NodeName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,20 +37,20 @@ func New(clientset kubernetes.Interface, network entity.Network) (*NetworkContro
 	}
 	defer conn.Close()
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
 	return &NetworkController{
-		Clientset:  clientset,
-		ClientConn: conn,
-		Network:    network,
+		KubeCtl:   kubeCtl,
+		ClientCtl: pb.NewNetworkControlClient(conn),
+		Network:   network,
+		Context:   ctx,
 	}, nil
 }
 
 func (nc *NetworkController) CreateNetwork() error {
-	clientControl := pb.NewNetworkControlClient(nc.ClientConn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
 	for _, port := range nc.Network.PhysicalPorts {
-		_, err := clientControl.AddPort(ctx, &pb.AddPortRequest{
+		_, err := nc.ClientCtl.AddPort(nc.Context, &pb.AddPortRequest{
 			BridgeName: nc.Network.BridgeName,
 			IfaceName:  port.Name})
 		if err != nil {
