@@ -43,7 +43,7 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 	}
 
-	nc, err := networkcontroller.New(as.Kubernetes, network)
+	nc, err := networkcontroller.New(as.KubeCtl, network)
 	if err != nil {
 		logger.Error(err)
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)

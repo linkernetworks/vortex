@@ -291,6 +291,10 @@
 			"revisionTime": "2018-05-25T06:14:58Z"
 		},
 		{
+			"path": "github.com/linkernetworks/vortex/src/kubernetes",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "IdBAvtVSv0sbi8sEsLovnZubims=",
 			"path": "github.com/lufia/iostat",
 			"revision": "9f7362b77ad333b26c01c99de52a11bdb650ded2",
@@ -615,8 +619,6 @@
 			"revisionTime": "2018-06-11T16:35:41Z"
 		},
 		{
-<<<<<<< 253e7e40213f87ea2d63837d4b82a64a0cf24285
-=======
 			"checksumSHA1": "rJn3m/27kO+2IU6KCCZ74Miby+8=",
 			"path": "golang.org/x/net/trace",
 			"revision": "afe8f62b1d6bbd81f31868121a50b06d8188e1f9",
@@ -653,7 +655,6 @@
 			"revisionTime": "2018-05-04T20:45:12Z"
 		},
 		{
->>>>>>> Add network controller
 			"checksumSHA1": "g0ElG8ZOLLoSol7KoLtx9o7WFgg=",
 			"path": "golang.org/x/sys/unix",
 			"revision": "8883426083c04a2627e6e59d84d5f6fb63d16c91",
