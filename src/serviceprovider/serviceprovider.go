@@ -8,6 +8,7 @@ import (
 	"github.com/linkernetworks/redis"
 	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
 	"k8s.io/client-go/kubernetes"
+	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
 type Container struct {
@@ -33,7 +34,13 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	clientset := kubernetes.NewForConfigOrDie(cf.Kubernetes)
+	var clientset kubernetes.Interface
+
+	if cf.Kubernetes != nil {
+		clientset = kubernetes.NewForConfigOrDie(cf.Kubernetes)
+	} else {
+		clientset = fakeclientset.NewSimpleClientset()
+	}
 
 	sp := &Container{
 		Config:  cf,
