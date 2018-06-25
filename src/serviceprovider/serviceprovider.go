@@ -7,11 +7,11 @@ import (
 
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/config"
+	"github.com/linkernetworks/vortex/src/prometheus"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
 	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
-
 	"k8s.io/client-go/kubernetes"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
@@ -19,10 +19,11 @@ import (
 )
 
 type Container struct {
-	Config  config.Config
-	Redis   *redis.Service
-	Mongo   *mongo.Service
-	KubeCtl *kubeCtl.KubeCtl
+	Config     config.Config
+	Redis      *redis.Service
+	Mongo      *mongo.Service
+	Prometheus *prometheus.Service
+	KubeCtl    *kubeCtl.KubeCtl
 }
 
 type ServiceDiscoverResponse struct {

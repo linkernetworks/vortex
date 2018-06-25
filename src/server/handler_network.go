@@ -43,7 +43,11 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 	}
 
+<<<<<<< HEAD
 	nc, err := networkcontroller.New(sp.KubeCtl, network)
+=======
+	nc, err := networkcontroller.New(as.KubeCtl, network)
+>>>>>>> Update networkcontrol for kubectl
 	if err != nil {
 		logger.Errorf("Failed to new network controller: %s", err.Error())
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
