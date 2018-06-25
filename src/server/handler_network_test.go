@@ -15,19 +15,21 @@ import (
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
+
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	kc "github.com/linkernetworks/vortex/src/kubernetes"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/stretchr/testify/suite"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	fakeclientset "k8s.io/client-go/kubernetes/fake"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
 func init() {
@@ -36,15 +38,13 @@ func init() {
 
 type NetworkTestSuite struct {
 	suite.Suite
-	kubectl    *kc.KubeCtl
-	fakeclient *fakeclientset.Clientset
-	wc         *restful.Container
-	session    *mongo.Session
-	ifName     string
-	nodeName   string
+	wc       *restful.Container
+	session  *mongo.Session
+	ifName   string
+	nodeName string
 }
 
-func (suite *NetworkTestSuite) SetupTest() {
+func (suite *NetworkTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
@@ -56,11 +56,10 @@ func (suite *NetworkTestSuite) SetupTest() {
 	suite.wc.Add(service)
 
 	//init fakeclient
-	suite.fakeclient = fakeclientset.NewSimpleClientset()
+	fakeclient := fakeclientset.NewSimpleClientset()
 	namespace := "default"
-	suite.kubectl = kc.New(suite.fakeclient, namespace)
+	sp.KubeCtl = kc.New(fakeclient, namespace)
 
-	sp.KubeCtl = suite.kubectl
 	//Create a fake clinet
 	//Init
 	nodeAddr := corev1.NodeAddress{
@@ -77,20 +76,20 @@ func (suite *NetworkTestSuite) SetupTest() {
 			Addresses: []corev1.NodeAddress{nodeAddr},
 		},
 	}
-	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
-	assert.NoError(suite.T(), err)
+	_, err := sp.KubeCtl.Clientset.CoreV1().Nodes().Create(&node)
+	suite.NoError(err)
 
 	//There's a length limit of link name
 	suite.ifName = namesgenerator.GetRandomName(0)[0:8]
 	pName := namesgenerator.GetRandomName(0)[0:8]
 	//Create a veth for testing
 	err = exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName).Run()
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 }
 
-func (suite *NetworkTestSuite) TearDownTest() {
+func (suite *NetworkTestSuite) TearDownSuite() {
 	err := exec.Command("ip", "link", "del", suite.ifName).Run()
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 }
 
 func TestNetworkSuite(t *testing.T) {
@@ -123,11 +122,11 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
@@ -144,7 +143,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -166,11 +165,11 @@ func (suite *NetworkTestSuite) TestWrongVlangTag() {
 		}}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
@@ -191,21 +190,23 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	//Create data into mongo manually
 	suite.session.C(entity.NetworkCollectionName).Insert(network)
 	err := exec.Command("ovs-vsctl", "add-br", tName).Run()
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	//TODO we don't need to delete-br here, the restful should help us to delete it
+	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	httpWriterDelete := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriterDelete, httpRequestDelete)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriterDelete)
 	err = suite.session.FindOne(entity.NetworkCollectionName, bson.M{"_id": network.ID}, &network)
-	assert.Equal(suite.T(), err.Error(), mgo.ErrNotFound.Error())
+	suite.Equal(err.Error(), mgo.ErrNotFound.Error())
 }
 
 func (suite *NetworkTestSuite) TestDeleteEmptyNetwork() {
 	//Remove with non-exist network id
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -234,7 +235,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -242,18 +243,18 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 
 	network = entity.Network{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &network)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), tName, network.BridgeName)
-	assert.Equal(suite.T(), eth1, network.PhysicalPorts[0])
-	assert.Equal(suite.T(), tType, network.BridgeType)
-	assert.Equal(suite.T(), suite.nodeName, network.NodeName)
+	suite.NoError(err)
+	suite.Equal(tName, network.BridgeName)
+	suite.Equal(eth1, network.PhysicalPorts[0])
+	suite.Equal(tType, network.BridgeType)
+	suite.Equal(suite.nodeName, network.NodeName)
 }
 
 func (suite *NetworkTestSuite) TestGetNetworkWithInvalidID() {
 
 	//Get data with non-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -277,7 +278,7 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 
 	//list data by default page and page_size
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -285,18 +286,18 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 
 	retNetworks := []entity.Network{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), len(networks), len(retNetworks))
+	suite.NoError(err)
+	suite.Equal(len(networks), len(retNetworks))
 	for i, v := range retNetworks {
-		assert.Equal(suite.T(), networks[i].BridgeName, v.BridgeName)
-		assert.Equal(suite.T(), networks[i].BridgeType, v.BridgeType)
-		assert.Equal(suite.T(), networks[i].NodeName, v.NodeName)
-		assert.Equal(suite.T(), networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].BridgeName, v.BridgeName)
+		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].NodeName, v.NodeName)
+		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
 	}
 
 	//list data by different page and page_size
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=3", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -304,18 +305,18 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 
 	retNetworks = []entity.Network{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), len(networks), len(retNetworks))
+	suite.NoError(err)
+	suite.Equal(len(networks), len(retNetworks))
 	for i, v := range retNetworks {
-		assert.Equal(suite.T(), networks[i].BridgeName, v.BridgeName)
-		assert.Equal(suite.T(), networks[i].BridgeType, v.BridgeType)
-		assert.Equal(suite.T(), networks[i].NodeName, v.NodeName)
-		assert.Equal(suite.T(), networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].BridgeName, v.BridgeName)
+		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].NodeName, v.NodeName)
+		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
 	}
 
 	//list data by different page and page_size
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=1", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -323,34 +324,34 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 
 	retNetworks = []entity.Network{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), 1, len(retNetworks))
+	suite.NoError(err)
+	suite.Equal(1, len(retNetworks))
 	for i, v := range retNetworks {
-		assert.Equal(suite.T(), networks[i].BridgeName, v.BridgeName)
-		assert.Equal(suite.T(), networks[i].BridgeType, v.BridgeType)
-		assert.Equal(suite.T(), networks[i].NodeName, v.NodeName)
-		assert.Equal(suite.T(), networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].BridgeName, v.BridgeName)
+		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].NodeName, v.NodeName)
+		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
 	}
 }
 
 func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 	//Get data with non-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks?page=asdd", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page_size=asdd", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=-1", nil)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
