@@ -37,7 +37,10 @@ func Read(path string) (c Config, err error) {
 	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	c.Kubernetes, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		return c, fmt.Errorf("Failed to open the kubernetes config file: %v\n", err)
+		c.Kubernetes, err = rest.InClusterConfig()
+		if err != nil {
+			return c, fmt.Errorf("Failed to open the kubernetes config file: %v\n", err)
+		}
 	}
 	return c, nil
 }
