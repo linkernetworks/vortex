@@ -15,14 +15,15 @@ notifications:
 
 before_install:
   - go get -u github.com/kardianos/govendor
+  - sudo apt-get install -y git build-essential openvswitch-switch
+  - docker run -d -v /run/openvswitch/db.sock:/var/run/openvswitch/db.sock -p 50051:50051 sdnvortex/network-controller:v0.1.1 /go/bin/server -tcp=0.0.0.0:50051
 
 install:
   - make pre-build
 
 script:
   - make build
-  - make test
-  - make src.test-coverage
+  - sudo -E PATH=$PATH TEST_GRPC=1 make src.test-coverage
   - docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile .
 
 before_deploy:

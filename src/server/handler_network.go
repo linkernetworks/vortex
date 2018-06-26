@@ -10,13 +10,14 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 func createNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
@@ -25,7 +26,7 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"bridgeName", "nodeName"},
@@ -40,6 +41,19 @@ func createNetworkHandler(ctx *web.Context) {
 				return
 			}
 		}
+	}
+
+	nc, err := networkcontroller.New(sp.KubeCtl, network)
+	if err != nil {
+		logger.Errorf("Failed to new network controller: %s", err.Error())
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := nc.CreateNetwork(); err != nil {
+		logger.Errorf("Failed to create network: %s", err.Error())
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
 	}
 
 	network.ID = bson.NewObjectId()
