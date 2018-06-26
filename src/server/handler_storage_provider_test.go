@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/mgo.v2/bson"
 )
