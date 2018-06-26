@@ -31,8 +31,8 @@ spec:
   - metadata:
       name: mongodb
     spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "manual"
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: "slow-many"
       resources:
         requests:
           storage: 10Gi
