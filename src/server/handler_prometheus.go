@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"bitbucket.org/linkernetworks/vortex/src/net/http/query"
 	restful "github.com/emicklei/go-restful"
+	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/web"
 	"golang.org/x/net/context"
 )
