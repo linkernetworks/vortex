@@ -56,3 +56,27 @@ func createVolume(ctx *web.Context) {
 		Message: "Create success",
 	})
 }
+
+func deleteVolume(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	id := req.PathParameter("id")
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	fmt.Println(id)
+	if err := session.Remove(entity.VolumeCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
+		if mgo.ErrNotFound == err {
+			response.BadRequest(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	resp.WriteEntity(ActionResponse{
+		Error:   false,
+		Message: "Delete success",
+	})
+}
