@@ -1,6 +1,7 @@
 package networkcontroller
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/kubernetes"
@@ -16,10 +17,20 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+}
+
+func execute(suite *suite.Suite, cmd *exec.Cmd) {
+	w := bytes.NewBuffer(nil)
+	cmd.Stderr = w
+	err := cmd.Run()
+	suite.NoError(err)
+	fmt.Printf("Stderr: %s\n", string(w.Bytes()))
 }
 
 type NetworkControllerTestSuite struct {
@@ -55,11 +66,17 @@ func (suite *NetworkControllerTestSuite) SetupSuite() {
 	suite.NoError(err)
 
 	//There's a length limit of link name
-	suite.ifName = namesgenerator.GetRandomName(0)[0:8]
-	pName := namesgenerator.GetRandomName(0)[0:8]
+	suite.ifName = bson.NewObjectId().Hex()[12:24]
+	pName := bson.NewObjectId().Hex()[12:24]
 	//Create a veth for testing
-	err = exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName).Run()
-	suite.NoError(err)
+	fmt.Println("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName)
+	cmd := exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName)
+	execute(&suite.Suite, cmd)
+}
+
+func (suite *NetworkControllerTestSuite) TearDownSuite() {
+	cmd := exec.Command("ip", "link", "del", suite.ifName)
+	execute(&suite.Suite, cmd)
 }
 
 func TestNetworkControllerSuite(t *testing.T) {
