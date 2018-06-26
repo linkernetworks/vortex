@@ -95,3 +95,26 @@ func listStorageProvider(ctx *web.Context) {
 	resp.AddHeader("X-Total-Pages", strconv.Itoa(totalPages))
 	resp.WriteEntity(storageProviders)
 }
+
+func deleteStorageProvider(ctx *web.Context) {
+	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	id := req.PathParameter("id")
+
+	session := as.Mongo.NewSession()
+	defer session.Close()
+
+	if err := session.Remove(entity.StorageProviderCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
+		if mgo.ErrNotFound == err {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	resp.WriteEntity(ActionResponse{
+		Error:   false,
+		Message: "Delete success",
+	})
+}

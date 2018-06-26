@@ -48,6 +48,7 @@ func TestCreateStorageProvider(t *testing.T) {
 	service := newStorageProviderService(sp)
 	wc.Add(service)
 	wc.Dispatch(httpWriter, httpRequest)
+	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
 	assertResponseCode(t, http.StatusOK, httpWriter)
 	//Empty data
 	//We use the new write but empty input
@@ -62,7 +63,60 @@ func TestCreateStorageProvider(t *testing.T) {
 	httpWriter = httptest.NewRecorder()
 	wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(t, http.StatusConflict, httpWriter)
+}
+
+func TestDeleteStorageProvider(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	//Testing parameter
+	tName := namesgenerator.GetRandomName(0)
+	tType := "nfs"
+	tIP := "1.2.3.4"
+	tPath := "/exports"
+	storageProvider := entity.StorageProvider{
+		ID:          bson.NewObjectId(),
+		Type:        tType,
+		DisplayName: tName,
+		NFSStorageProvider: entity.NFSStorageProvider{
+			IP:   tIP,
+			PATH: tPath,
+		},
+	}
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+	session.C(entity.StorageProviderCollectionName).Insert(storageProvider)
 	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
+
+	bodyBytes, err := json.MarshalIndent(storageProvider, "", "  ")
+	assert.NoError(t, err)
+
+	//Create again and it should fail since the name exist
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+storageProvider.ID.Hex(), bodyReader)
+	assert.NoError(t, err)
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newStorageProviderService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusOK, httpWriter)
+}
+
+func TestInValidDeleteStorageProvider(t *testing.T) {
+	cf := config.MustRead("../../config/testing.json")
+	sp := serviceprovider.New(cf)
+
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
+	assert.NoError(t, err)
+	httpWriter := httptest.NewRecorder()
+	wc := restful.NewContainer()
+	service := newStorageProviderService(sp)
+	wc.Add(service)
+	wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(t, http.StatusNotFound, httpWriter)
 }
 
 func TestListStorageProvider(t *testing.T) {
