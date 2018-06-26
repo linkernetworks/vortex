@@ -18,7 +18,7 @@ import (
 
 func TestCreateStorageProvider(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
@@ -67,7 +67,7 @@ func TestCreateStorageProvider(t *testing.T) {
 
 func TestDeleteStorageProvider(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
@@ -107,7 +107,7 @@ func TestDeleteStorageProvider(t *testing.T) {
 
 func TestInValidDeleteStorageProvider(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
 	assert.NoError(t, err)
@@ -121,7 +121,7 @@ func TestInValidDeleteStorageProvider(t *testing.T) {
 
 func TestListStorageProvider(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -189,7 +189,7 @@ func TestListStorageProvider(t *testing.T) {
 
 func TestListInvalidStorageProvider(t *testing.T) {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	//Invliad page size
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=0", nil)

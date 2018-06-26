@@ -2,15 +2,16 @@ package networkcontroller
 
 import (
 	"fmt"
-	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/kubernetes"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -33,7 +33,7 @@ type VolumeTestSuite struct {
 
 func (suite *VolumeTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	//init session
 	suite.session = sp.Mongo.NewSession()
