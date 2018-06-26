@@ -37,6 +37,6 @@ deploy:
     branch: develop
 
 after_success:
-  - docker stop prometheus && docker rm prometheus
+  - docker rm -f prometheus
   - cp build/src/coverage.txt coverage.txt
   - bash <(curl -s https://codecov.io/bash)
