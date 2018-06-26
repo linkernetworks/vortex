@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func QueryMetrics(ctx *web.Context) {
+func queryMetrics(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	query := query.New(req.Request.URL.Query())
