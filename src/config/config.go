@@ -10,7 +10,6 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
 	"github.com/linkernetworks/vortex/src/prometheus"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -20,7 +19,6 @@ type Config struct {
 	Prometheus *prometheus.PrometheusConfig `json:"prometheus"`
 	Logger     logger.LoggerConfig          `json:"logger"`
 
-	Kubernetes *rest.Config `json:"kubernetes"`
 	// the version settings of the current application
 	Version string `json:"version"`
 }
