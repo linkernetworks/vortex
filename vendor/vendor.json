@@ -63,12 +63,6 @@
 			"revisionTime": "2018-03-08T23:13:08Z"
 		},
 		{
-			"checksumSHA1": "mgmkUpfdKCjiPfSjUXE7Tg2HvBw=",
-			"path": "github.com/docker/docker/pkg/namesgenerator",
-			"revision": "af626ba08a4e11b0e140e7512ac2740b09833c29",
-			"revisionTime": "2018-06-22T02:08:08Z"
-		},
-		{
 			"checksumSHA1": "wPbKObbGzS/43nrskRaJVFVEW/A=",
 			"path": "github.com/ema/qdisc",
 			"revision": "b307c22d3ce761d351b6e6270b50195b44ee9248",
@@ -337,6 +331,12 @@
 			"path": "github.com/mgutz/ansi",
 			"revision": "9520e82c474b0a04dd04f8a40959027271bab992",
 			"revisionTime": "2017-02-06T15:57:36Z"
+		},
+		{
+			"checksumSHA1": "V014kTJJ4zUYgCOYkq/aKBW1bDA=",
+			"path": "github.com/moby/moby/pkg/namesgenerator",
+			"revision": "8e610b2b55bfd1bfa9436ab110d311f5e8a74dcb",
+			"revisionTime": "2018-06-25T18:44:42Z"
 		},
 		{
 			"checksumSHA1": "ZTcgWKWHsrX0RXYVXn5Xeb8Q0go=",

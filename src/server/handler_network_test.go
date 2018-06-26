@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/assert"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
