@@ -15,7 +15,6 @@ import (
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
 	corev1 "k8s.io/api/core/v1"
@@ -32,7 +31,7 @@ type VolumeTestSuite struct {
 	storageProvider entity.StorageProvider
 }
 
-func (suite *VolumeTestSuite) SetupTest() {
+func (suite *VolumeTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.New(cf)
 
@@ -49,10 +48,10 @@ func (suite *VolumeTestSuite) SetupTest() {
 		DisplayName: namesgenerator.GetRandomName(0),
 	}
 	err := suite.session.Insert(entity.StorageProviderCollectionName, suite.storageProvider)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 }
 
-func (suite *VolumeTestSuite) TearDownTest() {
+func (suite *VolumeTestSuite) TearDownSuite() {
 	suite.session.Remove(entity.StorageProviderCollectionName, "_id", suite.storageProvider.ID)
 }
 
@@ -72,11 +71,11 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	}
 
 	bodyBytes, err := json.MarshalIndent(volume, "", "  ")
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/volume", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
@@ -87,13 +86,13 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	//load data to check
 	retVolume := entity.Volume{}
 	err = suite.session.FindOne(entity.VolumeCollectionName, bson.M{"name": volume.Name}, &retVolume)
-	assert.NoError(suite.T(), err)
-	assert.NotEqual(suite.T(), "", retVolume.ID)
-	assert.Equal(suite.T(), volume.Name, retVolume.Name)
-	assert.Equal(suite.T(), volume.StorageProviderName, retVolume.StorageProviderName)
-	assert.Equal(suite.T(), volume.AccessMode, retVolume.AccessMode)
-	assert.Equal(suite.T(), volume.Capacity, retVolume.Capacity)
-	assert.NotEqual(suite.T(), "", retVolume.MetaName)
+	suite.NoError(err)
+	suite.NotEqual("", retVolume.ID)
+	suite.Equal(volume.Name, retVolume.Name)
+	suite.Equal(volume.StorageProviderName, retVolume.StorageProviderName)
+	suite.Equal(volume.AccessMode, retVolume.AccessMode)
+	suite.Equal(volume.Capacity, retVolume.Capacity)
+	suite.NotEqual("", retVolume.MetaName)
 
 	//We use the new write but empty input which will cause the readEntity Error
 	httpWriter = httptest.NewRecorder()
@@ -102,7 +101,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/volume", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -121,11 +120,11 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	}
 
 	bodyBytes, err := json.MarshalIndent(volume, "", "  ")
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/volume", bodyReader)
-	assert.NoError(suite.T(), err)
+	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
