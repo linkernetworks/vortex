@@ -1,12 +1,13 @@
 package networkcontroller
 
 import (
+	"time"
+
 	pb "github.com/linkernetworks/network-controller/messages"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/kubernetes"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"time"
 )
 
 type NetworkController struct {
@@ -39,16 +40,22 @@ func New(kubeCtl *kubernetes.KubeCtl, network entity.Network) (*NetworkControlle
 }
 
 func (nc *NetworkController) CreateNetwork() error {
-	_, err := nc.ClientCtl.CreateBridge(nc.Context, &pb.CreateBridgeRequest{
-		BridgeName: nc.Network.BridgeName})
+	_, err := nc.ClientCtl.CreateBridge(
+		nc.Context,
+		&pb.CreateBridgeRequest{
+			BridgeName: nc.Network.BridgeName,
+		})
 	if err != nil {
 		return err
 	}
 
 	for _, port := range nc.Network.PhysicalPorts {
-		_, err := nc.ClientCtl.AddPort(nc.Context, &pb.AddPortRequest{
-			BridgeName: nc.Network.BridgeName,
-			IfaceName:  port.Name})
+		_, err := nc.ClientCtl.AddPort(
+			nc.Context,
+			&pb.AddPortRequest{
+				BridgeName: nc.Network.BridgeName,
+				IfaceName:  port.Name,
+			})
 		if err != nil {
 			return err
 		}

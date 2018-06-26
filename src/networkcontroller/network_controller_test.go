@@ -6,6 +6,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/kubernetes"
 	"github.com/stretchr/testify/suite"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
@@ -15,6 +16,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type NetworkControllerTestSuite struct {
 	suite.Suite

@@ -17,7 +17,7 @@ import (
 )
 
 func createNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
@@ -26,7 +26,7 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"bridgeName", "nodeName"},
@@ -43,15 +43,15 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 	}
 
-	nc, err := networkcontroller.New(as.KubeCtl, network)
+	nc, err := networkcontroller.New(sp.KubeCtl, network)
 	if err != nil {
-		logger.Error(err)
+		logger.Errorf("Failed to new network controller: %s", err.Error())
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
 	if err := nc.CreateNetwork(); err != nil {
-		logger.Error(err)
+		logger.Errorf("Failed to create network: %s", err.Error())
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
