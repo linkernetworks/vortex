@@ -13,7 +13,7 @@ import (
 )
 
 func queryMetrics(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	query := query.New(req.Request.URL.Query())
 
@@ -22,7 +22,7 @@ func queryMetrics(ctx *web.Context) {
 		query_str = q
 	}
 
-	api := as.Prometheus.API
+	api := sp.Prometheus.API
 
 	testTime := time.Now()
 	result, err := api.Query(context.Background(), query_str, testTime)
