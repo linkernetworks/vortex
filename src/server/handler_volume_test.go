@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/pkg/namesgenerator"
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
 	corev1 "k8s.io/api/core/v1"
