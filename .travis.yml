@@ -22,6 +22,7 @@ install:
   - make pre-build
 
 script:
+  - docker run -d -p 9090:9090 prom/prometheus
   - make build
   - sudo -E PATH=$PATH TEST_GRPC=1 make src.test-coverage
   - docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile .
