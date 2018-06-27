@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -33,6 +34,14 @@ import (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+}
+
+func execute(suite *suite.Suite, cmd *exec.Cmd) {
+	w := bytes.NewBuffer(nil)
+	cmd.Stderr = w
+	err := cmd.Run()
+	suite.NoError(err)
+	fmt.Printf("Stderr: %s\n", string(w.Bytes()))
 }
 
 type NetworkTestSuite struct {
@@ -79,16 +88,17 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	suite.NoError(err)
 
 	//There's a length limit of link name
-	suite.ifName = namesgenerator.GetRandomName(0)[0:8]
-	pName := namesgenerator.GetRandomName(0)[0:8]
+	suite.ifName = bson.NewObjectId().Hex()[12:24]
+	pName := bson.NewObjectId().Hex()[12:24]
 	//Create a veth for testing
-	err = exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName).Run()
-	suite.NoError(err)
+	fmt.Println("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName)
+	cmd := exec.Command("ip", "link", "add", suite.ifName, "type", "veth", "peer", "name", pName)
+	execute(&suite.Suite, cmd)
 }
 
 func (suite *NetworkTestSuite) TearDownSuite() {
-	err := exec.Command("ip", "link", "del", suite.ifName).Run()
-	suite.NoError(err)
+	cmd := exec.Command("ip", "link", "del", suite.ifName)
+	execute(&suite.Suite, cmd)
 }
 
 func TestNetworkSuite(t *testing.T) {
