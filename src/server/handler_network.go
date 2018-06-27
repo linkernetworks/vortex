@@ -74,7 +74,7 @@ func createNetworkHandler(ctx *web.Context) {
 }
 
 func listNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
 	query := query.New(req.Request.URL.Query())
@@ -90,7 +90,7 @@ func listNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 
 	networks := []entity.Network{}
@@ -120,11 +120,11 @@ func listNetworkHandler(ctx *web.Context) {
 }
 
 func getNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 	c := session.C(entity.NetworkCollectionName)
 
@@ -141,11 +141,11 @@ func getNetworkHandler(ctx *web.Context) {
 }
 
 func deleteNetworkHandler(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
 
 	if err := session.Remove(entity.NetworkCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
