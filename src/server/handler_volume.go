@@ -28,12 +28,12 @@ func createVolume(ctx *web.Context) {
 	defer session.Close()
 
 	// Check the storageClass is existed
-	couunt, err := session.Count(entity.StorageProviderCollectionName, bson.M{"displayName": volume.StorageProviderName})
+	couunt, err := session.Count(entity.StorageCollectionName, bson.M{"displayName": volume.StorageName})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	} else if couunt < 1 {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The reference storage provider %s doesn't exist", volume.StorageProviderName))
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The reference storage provider %s doesn't exist", volume.StorageName))
 		return
 	}
 

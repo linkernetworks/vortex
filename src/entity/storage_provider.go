@@ -7,23 +7,23 @@ import (
 )
 
 const (
-	StorageProviderCollectionName string = "storage_provider"
+	StorageCollectionName string = "storage"
 )
 
-type NFSStorageProvider struct {
+type NFSStorageSetting struct {
 	IP   string `bson:"ip" json:"ip"`
 	PATH string `bson:"path" json:"path"`
 }
 
-type StorageProvider struct {
-	ID          bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	Type        string        `bson:"type" json:"type"`
-	DisplayName string        `bson:"displayName" json:"displayName"`
-	CreatedAt   *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	NFSStorageProvider
+type Storage struct {
+	ID                bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	Type              string        `bson:"type" json:"type"`
+	DisplayName       string        `bson:"displayName" json:"displayName"`
+	CreatedAt         *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	NFSStorageSetting `bson:"nfs" json:"nfs"`
 }
 
 //GetCollection - get model mongo collection name.
-func (m StorageProvider) GetCollection() string {
-	return StorageProviderCollectionName
+func (m Storage) GetCollection() string {
+	return StorageCollectionName
 }
