@@ -15,10 +15,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createStorageProvider(ctx *web.Context) {
+func createStorage(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	storageProvider := entity.StorageProvider{}
+	storageProvider := entity.Storage{}
 	if err := req.ReadEntity(&storageProvider); err != nil {
 		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
@@ -26,7 +26,7 @@ func createStorageProvider(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	session.C(entity.StorageProviderCollectionName).EnsureIndex(mgo.Index{
+	session.C(entity.StorageCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"displayName"},
 		Unique: true,
 	})
@@ -34,7 +34,7 @@ func createStorageProvider(ctx *web.Context) {
 	// Check whether this displayname has been used
 	storageProvider.ID = bson.NewObjectId()
 	storageProvider.CreatedAt = timeutils.Now()
-	if err := session.Insert(entity.StorageProviderCollectionName, &storageProvider); err != nil {
+	if err := session.Insert(entity.StorageCollectionName, &storageProvider); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storageProvider.DisplayName))
 		} else {
@@ -49,7 +49,7 @@ func createStorageProvider(ctx *web.Context) {
 	})
 }
 
-func listStorageProvider(ctx *web.Context) {
+func listStorage(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
@@ -69,9 +69,9 @@ func listStorageProvider(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	storageProviders := []entity.StorageProvider{}
+	storageProviders := []entity.Storage{}
 
-	var c = session.C(entity.StorageProviderCollectionName)
+	var c = session.C(entity.StorageCollectionName)
 	var q *mgo.Query
 
 	selector := bson.M{}
@@ -86,7 +86,7 @@ func listStorageProvider(ctx *web.Context) {
 		return
 	}
 
-	count, err := session.Count(entity.StorageProviderCollectionName, bson.M{})
+	count, err := session.Count(entity.StorageCollectionName, bson.M{})
 	if err != nil {
 		logger.Error(err)
 	}
@@ -96,7 +96,7 @@ func listStorageProvider(ctx *web.Context) {
 	resp.WriteEntity(storageProviders)
 }
 
-func deleteStorageProvider(ctx *web.Context) {
+func deleteStorage(ctx *web.Context) {
 	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
@@ -104,7 +104,7 @@ func deleteStorageProvider(ctx *web.Context) {
 	session := as.Mongo.NewSession()
 	defer session.Close()
 
-	if err := session.Remove(entity.StorageProviderCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
+	if err := session.Remove(entity.StorageCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
 		} else {

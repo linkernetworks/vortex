@@ -16,7 +16,7 @@ func (a *App) AppRoute() *mux.Router {
 
 	container.Add(newVersionService(a.ServiceProvider))
 	container.Add(newNetworkService(a.ServiceProvider))
-	container.Add(newStorageProviderService(a.ServiceProvider))
+	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
 
@@ -41,12 +41,12 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	return webService
 }
 
-func newStorageProviderService(sp *serviceprovider.Container) *restful.WebService {
+func newStorageService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/storageprovider").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createStorageProvider)))
-	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listStorageProvider)))
-	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteStorageProvider)))
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createStorage)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listStorage)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteStorage)))
 	return webService
 }
 
