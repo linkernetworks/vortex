@@ -174,3 +174,85 @@ func (suite *VolumeTestSuite) TestDeleteVolumeWithInvalidID() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
+
+func (suite *VolumeTestSuite) TestListVolume() {
+	volumes := []entity.Volume{}
+	count := 3
+	for i := 0; i < count; i++ {
+		volumes = append(volumes, entity.Volume{
+			ID:                  bson.NewObjectId(),
+			Name:                namesgenerator.GetRandomName(0),
+			StorageProviderName: namesgenerator.GetRandomName(0),
+			AccessMode:          corev1.PersistentVolumeAccessMode("ReadOnlyMany"),
+			Capacity:            "250",
+		})
+	}
+
+	for _, v := range volumes {
+		suite.session.C(entity.VolumeCollectionName).Insert(v)
+		defer suite.session.Remove(entity.VolumeCollectionName, "_id", v.ID)
+	}
+
+	testCases := []struct {
+		page       string
+		pageSize   string
+		expectSize int
+	}{
+		{"", "", count},
+		{"1", "1", count},
+		{"1", "3", count},
+	}
+
+	for _, tc := range testCases {
+		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
+		suite.T().Run(caseName, func(t *testing.T) {
+			//list data by default page and page_size
+			url := "http://localhost:7890/v1/volume/"
+			if tc.page != "" || tc.pageSize != "" {
+				url = "http://localhost:7890/v1/volume?"
+				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
+			}
+			httpRequest, err := http.NewRequest("GET", url, nil)
+			suite.NoError(err)
+
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+			retVolumes := []entity.Volume{}
+			err = json.Unmarshal(httpWriter.Body.Bytes(), &retVolumes)
+			suite.NoError(err)
+			suite.Equal(tc.expectSize, len(retVolumes))
+			for i, v := range retVolumes {
+				suite.Equal(volumes[i].Name, v.Name)
+				suite.Equal(volumes[i].MetaName, v.MetaName)
+				suite.Equal(volumes[i].StorageProviderName, v.StorageProviderName)
+				suite.Equal(volumes[i].AccessMode, v.AccessMode)
+			}
+		})
+	}
+}
+
+func (suite *VolumeTestSuite) TestListVolumeWithInvalidPage() {
+	//Get data with non-exits ID
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/volume?page=asdd", nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/volume?page_size=asdd", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/volume?page=-1", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+}
