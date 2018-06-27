@@ -86,6 +86,9 @@ func NewForTesting(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
+	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
+	prometheus := prometheus.New(cf.Prometheus.Url)
+
 	clientset := fakeclientset.NewSimpleClientset()
 
 	sp := &Container{

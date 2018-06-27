@@ -19,9 +19,9 @@ type PrometheusTestSuite struct {
 	api prometheus.API
 }
 
-func (suite *PrometheusTestSuite) SetupTest() {
+func (suite *PrometheusTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.New(cf)
+	sp := serviceprovider.NewForTesting(cf)
 
 	//init session
 	suite.api = sp.Prometheus.API
@@ -36,7 +36,7 @@ func TestPrometheusTestSuite(t *testing.T) {
 	suite.Run(t, new(PrometheusTestSuite))
 }
 
-func (suite *PrometheusTestSuite) TearDownTest() {
+func (suite *PrometheusTestSuite) TearDownSuite() {
 }
 
 func (suite *PrometheusTestSuite) TestQueryMetrics() {
