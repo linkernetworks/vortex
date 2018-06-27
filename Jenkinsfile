@@ -62,7 +62,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                withEnv(["GOPATH+AA=${env.WORKSPACE}"]) {
+                withEnv(["GOPATH+AA=${env.WORKSPACE}", "TEST_PROMETHEUS=1"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
                         sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
                         junit "report.xml"
