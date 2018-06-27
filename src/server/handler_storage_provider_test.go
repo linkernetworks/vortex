@@ -2,24 +2,55 @@ package server
 
 import (
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	restful "github.com/emicklei/go-restful"
+	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
 )
 
-func TestCreateStorageProvider(t *testing.T) {
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+type StorageProviderTestSuite struct {
+	suite.Suite
+	wc              *restful.Container
+	storageProvider entity.NFSStorageProvider
+	session         *mongo.Session
+}
+
+func (suite *StorageProviderTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
+	//init restful container
+	suite.wc = restful.NewContainer()
+	service := newStorageProviderService(sp)
+	suite.wc.Add(service)
+
+	//init session
+	suite.session = sp.Mongo.NewSession()
+}
+
+func (suite *StorageProviderTestSuite) TearDownSuite() {
+}
+
+func TestStorageProviderSuite(t *testing.T) {
+	suite.Run(t, new(StorageProviderTestSuite))
+}
+
+func (suite *StorageProviderTestSuite) TestCreateStorageProvider() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	tType := "nfs"
@@ -33,42 +64,35 @@ func TestCreateStorageProvider(t *testing.T) {
 			PATH: tPath,
 		},
 	}
-	session := sp.Mongo.NewSession()
 
 	bodyBytes, err := json.MarshalIndent(storageProvider, "", "  ")
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newStorageProviderService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
-	assertResponseCode(t, http.StatusOK, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	defer suite.session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 	//Empty data
 	//We use the new write but empty input
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
-	assert.NoError(t, err)
+	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusConflict, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
-func TestDeleteStorageProvider(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.NewForTesting(cf)
-
+func (suite *StorageProviderTestSuite) TestDeleteStorageProvider() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	tType := "nfs"
@@ -84,47 +108,31 @@ func TestDeleteStorageProvider(t *testing.T) {
 		},
 	}
 
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-	session.C(entity.StorageProviderCollectionName).Insert(storageProvider)
-	defer session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
+	suite.session.C(entity.StorageProviderCollectionName).Insert(storageProvider)
+	defer suite.session.Remove(entity.StorageProviderCollectionName, "displayName", tName)
 
-	bodyBytes, err := json.MarshalIndent(storageProvider, "", "  ")
-	assert.NoError(t, err)
+	bodyBytes, err := json.MarshalIndent(suite.storageProvider, "", "  ")
+	suite.NoError(err)
 
 	//Create again and it should fail since the name exist
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+storageProvider.ID.Hex(), bodyReader)
-	assert.NoError(t, err)
+	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newStorageProviderService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func TestInValidDeleteStorageProvider(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.NewForTesting(cf)
-
+func (suite *StorageProviderTestSuite) TestInValidDeleteStorageProvider() {
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newStorageProviderService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusNotFound, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
-func TestListStorageProvider(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.NewForTesting(cf)
-
-	session := sp.Mongo.NewSession()
-	defer session.Close()
+func (suite *StorageProviderTestSuite) TestListStorageProvider() {
 	storageProviders := []entity.StorageProvider{}
 	for i := 0; i < 3; i++ {
 		storageProviders = append(storageProviders, entity.StorageProvider{
@@ -139,83 +147,73 @@ func TestListStorageProvider(t *testing.T) {
 	}
 
 	for _, v := range storageProviders {
-		err := session.C(entity.StorageProviderCollectionName).Insert(v)
-		assert.NoError(t, err)
-		defer session.Remove(entity.StorageProviderCollectionName, "_id", v.ID)
+		err := suite.session.C(entity.StorageProviderCollectionName).Insert(v)
+		suite.NoError(err)
+		defer suite.session.Remove(entity.StorageProviderCollectionName, "_id", v.ID)
 	}
 
 	//default page & page_size
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storageprovider/", nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newStorageProviderService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
 	retStorageProviders := []entity.StorageProvider{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retStorageProviders)
-	assert.NoError(t, err)
-	assert.Equal(t, len(storageProviders), len(retStorageProviders))
+	suite.NoError(err)
+	suite.Equal(len(storageProviders), len(retStorageProviders))
 	for i, v := range retStorageProviders {
-		assert.Equal(t, storageProviders[i].ID, v.ID)
-		assert.Equal(t, storageProviders[i].DisplayName, v.DisplayName)
-		assert.Equal(t, storageProviders[i].Type, v.Type)
-		assert.Equal(t, storageProviders[i].IP, v.IP)
-		assert.Equal(t, storageProviders[i].PATH, v.PATH)
+		suite.Equal(storageProviders[i].ID, v.ID)
+		suite.Equal(storageProviders[i].DisplayName, v.DisplayName)
+		suite.Equal(storageProviders[i].Type, v.Type)
+		suite.Equal(storageProviders[i].IP, v.IP)
+		suite.Equal(storageProviders[i].PATH, v.PATH)
 	}
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=1&page_size=30", nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusOK, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
 	retStorageProviders = []entity.StorageProvider{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retStorageProviders)
-	assert.NoError(t, err)
-	assert.Equal(t, len(storageProviders), len(retStorageProviders))
+	suite.NoError(err)
+	suite.Equal(len(storageProviders), len(retStorageProviders))
 	for i, v := range retStorageProviders {
-		assert.Equal(t, storageProviders[i].ID, v.ID)
-		assert.Equal(t, storageProviders[i].DisplayName, v.DisplayName)
-		assert.Equal(t, storageProviders[i].Type, v.Type)
-		assert.Equal(t, storageProviders[i].IP, v.IP)
-		assert.Equal(t, storageProviders[i].PATH, v.PATH)
+		suite.Equal(storageProviders[i].ID, v.ID)
+		suite.Equal(storageProviders[i].DisplayName, v.DisplayName)
+		suite.Equal(storageProviders[i].Type, v.Type)
+		suite.Equal(storageProviders[i].IP, v.IP)
+		suite.Equal(storageProviders[i].PATH, v.PATH)
 	}
 }
 
-func TestListInvalidStorageProvider(t *testing.T) {
-	cf := config.MustRead("../../config/testing.json")
-	sp := serviceprovider.NewForTesting(cf)
-
+func (suite *StorageProviderTestSuite) TestListInvalidStorageProvider() {
 	//Invliad page size
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=0", nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
-	wc := restful.NewContainer()
-	service := newStorageProviderService(sp)
-	wc.Add(service)
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusInternalServerError, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 
 	//Invliad page type
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=asd", nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusBadRequest, httpWriter)
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	//Invliad page_size type
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page_size=asd", nil)
-	assert.NoError(t, err)
+	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
-	wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(t, http.StatusBadRequest, httpWriter)
-
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
