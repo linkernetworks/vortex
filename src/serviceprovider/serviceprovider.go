@@ -2,10 +2,12 @@ package serviceprovider
 
 import (
 	"fmt"
-	"github.com/linkernetworks/logger"
-	"github.com/linkernetworks/vortex/src/config"
 	"os"
 	"path/filepath"
+
+	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/config"
+	"github.com/linkernetworks/vortex/src/prometheus"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
@@ -18,10 +20,11 @@ import (
 )
 
 type Container struct {
-	Config  config.Config
-	Redis   *redis.Service
-	Mongo   *mongo.Service
-	KubeCtl *kubeCtl.KubeCtl
+	Config     config.Config
+	Redis      *redis.Service
+	Mongo      *mongo.Service
+	Prometheus *prometheus.Service
+	KubeCtl    *kubeCtl.KubeCtl
 }
 
 type ServiceDiscoverResponse struct {
@@ -40,6 +43,9 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
+	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
+	prometheus := prometheus.New(cf.Prometheus.Url)
+
 	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	k8s, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -52,10 +58,11 @@ func New(cf config.Config) *Container {
 	clientset := kubernetes.NewForConfigOrDie(k8s)
 
 	sp := &Container{
-		Config:  cf,
-		Redis:   redisService,
-		Mongo:   mongo,
-		KubeCtl: kubeCtl.New(clientset, "default"),
+		Config:     cf,
+		Redis:      redisService,
+		Mongo:      mongo,
+		Prometheus: prometheus,
+		KubeCtl:    kubeCtl.New(clientset, "default"),
 	}
 
 	return sp
@@ -71,13 +78,17 @@ func NewForTesting(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
+	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
+	prometheus := prometheus.New(cf.Prometheus.Url)
+
 	clientset := fakeclientset.NewSimpleClientset()
 
 	sp := &Container{
-		Config:  cf,
-		Redis:   redisService,
-		Mongo:   mongo,
-		KubeCtl: kubeCtl.New(clientset, "default"),
+		Config:     cf,
+		Redis:      redisService,
+		Mongo:      mongo,
+		Prometheus: prometheus,
+		KubeCtl:    kubeCtl.New(clientset, "default"),
 	}
 
 	return sp
