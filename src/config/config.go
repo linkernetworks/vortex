@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
 	"github.com/linkernetworks/vortex/src/prometheus"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Config struct {
@@ -32,13 +30,6 @@ func Read(path string) (c Config, err error) {
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&c); err != nil {
 		return c, fmt.Errorf("Failed to load the config file: %v\n", err)
-	}
-
-	// FIXME, we need to find a way to test the fakeclient evne if we don't install the k8s
-	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-	c.Kubernetes, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		return c, fmt.Errorf("Failed to open the kubernetes config file: %v\n", err)
 	}
 
 	return c, nil
