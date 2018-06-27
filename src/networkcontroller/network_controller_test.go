@@ -124,3 +124,28 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 }
+
+func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
+	//Parameters
+	eth1 := entity.PhysicalPort{
+		Name:     suite.ifName,
+		MTU:      1500,
+		VlanTags: []int{2043, 2143, 2243},
+	}
+
+	tName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		BridgeName:    tName,
+		BridgeType:    "ovs",
+		NodeName:      suite.nodeName,
+		PhysicalPorts: []entity.PhysicalPort{eth1},
+	}
+
+	nc, err := New(suite.kubectl, network)
+	suite.NoError(err)
+	err = nc.CreateNetwork()
+	suite.NoError(err)
+
+	err = nc.DeleteNetwork()
+	suite.NoError(err)
+}
