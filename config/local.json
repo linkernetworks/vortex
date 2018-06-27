@@ -9,6 +9,9 @@
     "mongo": {
         "url": "mongodb://localhost:27017/vortex_test"
     },
+    "prometheus": {
+        "url": "http://localhost:30003"
+    },
     "logger": {
         "dir": "./logs",
         "level": "debug",

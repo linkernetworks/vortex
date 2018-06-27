@@ -22,6 +22,7 @@ install:
   - make pre-build
 
 script:
+  - docker run --name prometheus -d -p 9090:9090 prom/prometheus
   - make build
   - sudo -E PATH=$PATH TEST_GRPC=1 make src.test-coverage
   - docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile .
@@ -36,5 +37,6 @@ deploy:
     branch: develop
 
 after_success:
+  - docker rm -f prometheus
   - cp build/src/coverage.txt coverage.txt
   - bash <(curl -s https://codecov.io/bash)
