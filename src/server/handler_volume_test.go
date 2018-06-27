@@ -131,5 +131,46 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 	defer suite.session.Remove(entity.VolumeCollectionName, "name", volume.Name)
+}
 
+func (suite *VolumeTestSuite) TestDeleteVolume() {
+	tName := namesgenerator.GetRandomName(0)
+	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
+	tCapacity := "250"
+	volume := entity.Volume{
+		ID:                  bson.NewObjectId(),
+		Name:                tName,
+		StorageProviderName: namesgenerator.GetRandomName(0),
+		Capacity:            tCapacity,
+		AccessMode:          tAccessMode,
+	}
+
+	err := suite.session.Insert(entity.VolumeCollectionName, &volume)
+	suite.NoError(err)
+
+	bodyBytes, err := json.MarshalIndent(volume, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/volume/"+volume.ID.Hex(), bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	n, err := suite.session.Count(entity.VolumeCollectionName, bson.M{"_id": volume.ID})
+	suite.NoError(err)
+	suite.Equal(0, n)
+}
+
+func (suite *VolumeTestSuite) TestDeleteVolumeWithInvalidID() {
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/volume/"+bson.NewObjectId().Hex(), nil)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
