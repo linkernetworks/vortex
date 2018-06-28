@@ -9,6 +9,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const DEFAULT_CONTROLLER_PORT = "50051"
+
 type NetworkController struct {
 	ClientCtl pb.NetworkControlClient
 	Context   context.Context
@@ -52,11 +54,11 @@ func (nc *NetworkController) CreateOVSNetwork(bridgeName string, ports []entity.
 	return nil
 }
 
-func (nc *NetworkController) DeleteNetwork() error {
+func (nc *NetworkController) DeleteOVSNetwork(bridgeName string) error {
 	_, err := nc.ClientCtl.DeleteBridge(
 		nc.Context,
 		&pb.DeleteBridgeRequest{
-			BridgeName: nc.Network.BridgeName,
+			BridgeName: bridgeName,
 		})
 	if err != nil {
 		return err

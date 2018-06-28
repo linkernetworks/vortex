@@ -2,6 +2,7 @@ package networkprovider
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/networkcontroller"
@@ -14,7 +15,7 @@ type OVSNetworkProvider struct {
 	entity.OVSNetwork
 }
 
-func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net entity.Network) error {
+func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network entity.Network) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	//Check whether vlangTag is 0~4095
@@ -26,25 +27,26 @@ func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 		}
 	}
 
-	q := bson.M{"nodeName": net.NodeName, "ovs.bridgeName": ovs.BridgeName}
+	q := bson.M{"nodeName": network.NodeName, "ovs.bridgeName": ovs.BridgeName}
 	fmt.Println(q)
 	//Check the bridge name, we can't have the same bridge name in the same node
 	n, err := session.Count(entity.NetworkCollectionName, q)
 	if n >= 1 {
-		return fmt.Errorf("The bridge name %s is exist on the node %s\n, please use another bridge name", ovs.BridgeName, net.NodeName)
+		return fmt.Errorf("The bridge name %s is exist on the node %s\n, please use another bridge name", ovs.BridgeName, network.NodeName)
 	} else if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net entity.Network) error {
-	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(net.NodeName)
+func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network entity.Network) error {
+	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(network.NodeName)
 	if err != nil {
 		return err
 	}
 
-	nc, err := networkcontroller.New(nodeIP + ":50051")
+	target := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
+	nc, err := networkcontroller.New(target)
 	if err != nil {
 		return err
 	}
