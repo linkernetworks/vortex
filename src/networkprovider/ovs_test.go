@@ -159,6 +159,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	//create a mongo-document to test duplicated name
 	session := suite.sp.Mongo.NewSession()
 	err := session.C(entity.NetworkCollectionName).Insert(suite.network)
+	defer session.C(entity.NetworkCollectionName).Remove(suite.network)
 	suite.NoError(err)
 	err = ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
 	suite.Error(err)
