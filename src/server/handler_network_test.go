@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -90,51 +89,53 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
-func (suite *NetworkTestSuite) TestCreateWithInvalidParameter() {
-	tName := namesgenerator.GetRandomName(0)
-	network := entity.Network{
-		Name: tName,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "",
-		},
-		Type: "fake",
+func (suite *NetworkTestSuite) TestCreateNetworkFail() {
+	testCases := []struct {
+		cases     string
+		network   entity.Network
+		errorCode int
+	}{
+		{"InvalidParameter", entity.Network{
+			Name: namesgenerator.GetRandomName(0),
+			Type: "fake",
+			Fake: entity.FakeNetwork{
+				FakeParameter: "",
+			}},
+			http.StatusBadRequest},
+		{"CreateFail", entity.Network{
+			Name: namesgenerator.GetRandomName(0),
+			Type: "fake",
+			Fake: entity.FakeNetwork{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusInternalServerError},
+		{"NetworkTypeError", entity.Network{
+			Name: namesgenerator.GetRandomName(0),
+			Type: "non-exist",
+			Fake: entity.FakeNetwork{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusBadRequest},
 	}
 
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	suite.NoError(err)
+	for _, tc := range testCases {
+		suite.T().Run(tc.cases, func(t *testing.T) {
+			bodyBytes, err := json.MarshalIndent(tc.network, "", "  ")
+			suite.NoError(err)
 
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	suite.NoError(err)
+			bodyReader := strings.NewReader(string(bodyBytes))
+			httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
+			suite.NoError(err)
 
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
-}
-
-func (suite *NetworkTestSuite) TestCreateWithCreteFail() {
-	tName := namesgenerator.GetRandomName(0)
-	network := entity.Network{
-		Name: tName,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "Yo",
-			IWantFail:     true,
-		},
-		Type: "fake",
+			httpRequest.Header.Add("Content-Type", "application/json")
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
+		})
 	}
 
-	bodyBytes, err := json.MarshalIndent(network, "", "  ")
-	suite.NoError(err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
-	suite.NoError(err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 }
 
 func (suite *NetworkTestSuite) TestDeleteNetwork() {
@@ -238,8 +239,6 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
 	suite.NoError(err)
 	suite.Equal(len(networks), len(retNetworks))
-	fmt.Println(len(networks))
-	fmt.Println(len(retNetworks))
 	for i, v := range retNetworks {
 		suite.Equal(networks[i].Name, v.Name)
 		suite.Equal(networks[i].Type, v.Type)
