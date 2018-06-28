@@ -25,11 +25,7 @@ func (kc *KubeCtl) GetPVCs(namespace string) ([]*corev1.PersistentVolumeClaim, e
 
 //Create the PVC by the PVC object
 func (kc *KubeCtl) CreatePVC(pvc *corev1.PersistentVolumeClaim, namespace string) (*corev1.PersistentVolumeClaim, error) {
-	pvc, err := kc.Clientset.CoreV1().PersistentVolumeClaims(namespace).Create(pvc)
-	if err != nil {
-		return nil, err
-	}
-	return pvc, nil
+	return kc.Clientset.CoreV1().PersistentVolumeClaims(namespace).Create(pvc)
 }
 
 //Delete the PVC by the PVC name

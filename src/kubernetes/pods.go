@@ -25,11 +25,7 @@ func (kc *KubeCtl) GetPods(namespace string) ([]*corev1.Pod, error) {
 
 //Create the pod by the pod object
 func (kc *KubeCtl) CreatePod(pod *corev1.Pod, namespace string) (*corev1.Pod, error) {
-	pod, err := kc.Clientset.CoreV1().Pods(namespace).Create(pod)
-	if err != nil {
-		return nil, err
-	}
-	return pod, nil
+	return kc.Clientset.CoreV1().Pods(namespace).Create(pod)
 }
 
 //Delete the pod by the pod name
