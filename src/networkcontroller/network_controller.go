@@ -32,7 +32,9 @@ func New(serverAddress string) (*NetworkController, error) {
 func (nc *NetworkController) CreateOVSNetwork(bridgeName string, ports []entity.PhysicalPort) error {
 	if _, err := nc.ClientCtl.CreateBridge(
 		nc.Context,
-		&pb.CreateBridgeRequest{}); err != nil {
+		&pb.CreateBridgeRequest{
+			BridgeName: bridgeName,
+		}); err != nil {
 		return err
 	}
 
