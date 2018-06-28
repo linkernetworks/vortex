@@ -17,7 +17,7 @@ type Network struct {
 	NodeName  string        `bson:"nodeName" json:"nodeName"`
 	CreatedAt *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	OVS       OVSNetwork    `bson:"ovs,omitempty" json:"ovs"`
-	Fake      FakeNetwork   `bson:"fake, omitempty" json:"fake"` //FakeNetwork, for restful testing.
+	Fake      FakeNetwork   `bson:"fake,omitempty" json:"fake"` //FakeNetwork, for restful testing.
 }
 
 //GetCollection - get model mongo collection name.
