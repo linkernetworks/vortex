@@ -28,7 +28,7 @@ type VolumeTestSuite struct {
 	suite.Suite
 	wc              *restful.Container
 	session         *mongo.Session
-	storageProvider entity.StorageProvider
+	storageProvider entity.Storage
 }
 
 func (suite *VolumeTestSuite) SetupSuite() {
@@ -41,18 +41,18 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 	service := newVolumeService(sp)
 	suite.wc.Add(service)
-	//init a StorageProvider
-	suite.storageProvider = entity.StorageProvider{
+	//init a Storage
+	suite.storageProvider = entity.Storage{
 		ID:          bson.NewObjectId(),
 		Type:        "nfs",
 		DisplayName: namesgenerator.GetRandomName(0),
 	}
-	err := suite.session.Insert(entity.StorageProviderCollectionName, suite.storageProvider)
+	err := suite.session.Insert(entity.StorageCollectionName, suite.storageProvider)
 	suite.NoError(err)
 }
 
 func (suite *VolumeTestSuite) TearDownSuite() {
-	suite.session.Remove(entity.StorageProviderCollectionName, "_id", suite.storageProvider.ID)
+	suite.session.Remove(entity.StorageCollectionName, "_id", suite.storageProvider.ID)
 }
 
 func TestVolumeSuite(t *testing.T) {
@@ -64,10 +64,10 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
 	volume := entity.Volume{
-		Name:                tName,
-		StorageProviderName: suite.storageProvider.DisplayName,
-		Capacity:            tCapacity,
-		AccessMode:          tAccessMode,
+		Name:        tName,
+		StorageName: suite.storageProvider.DisplayName,
+		Capacity:    tCapacity,
+		AccessMode:  tAccessMode,
 	}
 
 	bodyBytes, err := json.MarshalIndent(volume, "", "  ")
@@ -89,7 +89,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	suite.NoError(err)
 	suite.NotEqual("", retVolume.ID)
 	suite.Equal(volume.Name, retVolume.Name)
-	suite.Equal(volume.StorageProviderName, retVolume.StorageProviderName)
+	suite.Equal(volume.StorageName, retVolume.StorageName)
 	suite.Equal(volume.AccessMode, retVolume.AccessMode)
 	suite.Equal(volume.Capacity, retVolume.Capacity)
 	suite.NotEqual("", retVolume.MetaName)
@@ -113,10 +113,10 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
 	volume := entity.Volume{
-		Name:                tName,
-		StorageProviderName: namesgenerator.GetRandomName(0),
-		Capacity:            tCapacity,
-		AccessMode:          tAccessMode,
+		Name:        tName,
+		StorageName: namesgenerator.GetRandomName(0),
+		Capacity:    tCapacity,
+		AccessMode:  tAccessMode,
 	}
 
 	bodyBytes, err := json.MarshalIndent(volume, "", "  ")
@@ -138,11 +138,11 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "250"
 	volume := entity.Volume{
-		ID:                  bson.NewObjectId(),
-		Name:                tName,
-		StorageProviderName: namesgenerator.GetRandomName(0),
-		Capacity:            tCapacity,
-		AccessMode:          tAccessMode,
+		ID:          bson.NewObjectId(),
+		Name:        tName,
+		StorageName: namesgenerator.GetRandomName(0),
+		Capacity:    tCapacity,
+		AccessMode:  tAccessMode,
 	}
 
 	err := suite.session.Insert(entity.VolumeCollectionName, &volume)
