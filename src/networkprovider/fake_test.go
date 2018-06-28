@@ -16,7 +16,7 @@ func TestFakeNetworkValidateBeforeCreating(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateNetwork(nil, entity.Network{})
+	err = fake.ValidateBeforeCreating(nil, entity.Network{})
 	assert.NoError(t, err)
 }
 
