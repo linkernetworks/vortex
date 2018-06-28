@@ -201,8 +201,6 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	err := exec.Command("ovs-vsctl", "add-br", tName).Run()
 	suite.NoError(err)
 	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
-	//TODO we don't need to delete-br here, the restful should help us to delete it
-	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	httpWriterDelete := httptest.NewRecorder()

@@ -148,6 +148,30 @@ func deleteNetworkHandler(ctx *web.Context) {
 
 	session := sp.Mongo.NewSession()
 	defer session.Close()
+	c := session.C(entity.NetworkCollectionName)
+
+	var network entity.Network
+	if err := c.FindId(bson.ObjectIdHex(id)).One(&network); err != nil {
+		if err == mgo.ErrNotFound {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	nc, err := networkcontroller.New(sp.KubeCtl, network)
+	if err != nil {
+		logger.Errorf("Failed to new network controller: %s", err.Error())
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := nc.DeleteNetwork(); err != nil {
+		logger.Errorf("Failed to delete network: %s", err.Error())
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
 
 	if err := session.Remove(entity.NetworkCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {
