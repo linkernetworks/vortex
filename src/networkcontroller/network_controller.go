@@ -63,3 +63,16 @@ func (nc *NetworkController) CreateNetwork() error {
 
 	return nil
 }
+
+func (nc *NetworkController) DeleteNetwork() error {
+	_, err := nc.ClientCtl.DeleteBridge(
+		nc.Context,
+		&pb.DeleteBridgeRequest{
+			BridgeName: nc.Network.BridgeName,
+		})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
