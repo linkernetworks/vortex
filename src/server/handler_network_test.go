@@ -365,5 +365,4 @@ func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
-
 }
