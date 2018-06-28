@@ -5,7 +5,6 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
@@ -124,7 +123,8 @@ func listVolume(ctx *web.Context) {
 
 	count, err := session.Count(entity.VolumeCollectionName, bson.M{})
 	if err != nil {
-		logger.Error(err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
 	}
 	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
 	resp.AddHeader("X-Total-Count", strconv.Itoa(count))

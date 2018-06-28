@@ -88,7 +88,8 @@ func listStorageProvider(ctx *web.Context) {
 
 	count, err := session.Count(entity.StorageProviderCollectionName, bson.M{})
 	if err != nil {
-		logger.Error(err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
 	}
 	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
 	resp.AddHeader("X-Total-Count", strconv.Itoa(count))
