@@ -37,6 +37,7 @@ func createNetworkHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
+
 	if err := networkProvider.ValidateBeforeCreating(sp, network); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
