@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
@@ -10,7 +11,7 @@ type OVSNetworkProvider struct {
 	entity.OVSNetwork
 }
 
-func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container) error {
+func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net entity.Network) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	// Check whether vlangTag is 0~4095
@@ -22,4 +23,18 @@ func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 		}
 	}
 	return nil
+}
+
+func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net entity.Network) error {
+	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(net.NodeName)
+	if err != nil {
+		return err
+	}
+
+	nc, err := networkcontroller.New(nodeIP + ":50051")
+	if err != nil {
+		return err
+	}
+
+	return nc.CreateOVSNetwork(ovs.BridgeName, ovs.PhysicalPorts)
 }

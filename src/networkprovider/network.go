@@ -7,7 +7,8 @@ import (
 )
 
 type NetworkProvider interface {
-	ValidateBeforeCreating(sp *serviceprovider.Container) error
+	ValidateBeforeCreating(sp *serviceprovider.Container, net entity.Network) error
+	CreateNetwork(sp *serviceprovider.Container, net entity.Network) error
 }
 
 func GetNetworkProvider(net *entity.Network) (NetworkProvider, error) {

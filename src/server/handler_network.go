@@ -37,25 +37,15 @@ func createNetworkHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-	if err := networkProvider.ValidateBeforeCreating(sp); err != nil {
+	if err := networkProvider.ValidateBeforeCreating(sp, network); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	/*
-		nc, err := networkcontroller.New(sp.KubeCtl, network)
-		if err != nil {
-			logger.Errorf("Failed to new network controller: %s", err.Error())
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-
-		if err := nc.CreateNetwork(); err != nil {
-			logger.Errorf("Failed to create network: %s", err.Error())
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	*/
+	if err := networkProvider.CreateNetwork(sp, network); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
