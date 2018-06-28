@@ -25,11 +25,7 @@ func (kc *KubeCtl) GetServices(namespace string) ([]*corev1.Service, error) {
 
 //Create the service by the service object
 func (kc *KubeCtl) CreateService(service *corev1.Service, namespace string) (*corev1.Service, error) {
-	service, err := kc.Clientset.CoreV1().Services(namespace).Create(service)
-	if err != nil {
-		return nil, err
-	}
-	return service, nil
+	return kc.Clientset.CoreV1().Services(namespace).Create(service)
 }
 
 //Delete the service by the service name
