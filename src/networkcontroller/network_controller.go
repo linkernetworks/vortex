@@ -40,27 +40,29 @@ func New(kubeCtl *kubernetes.KubeCtl, network entity.Network) (*NetworkControlle
 }
 
 func (nc *NetworkController) CreateNetwork() error {
-	_, err := nc.ClientCtl.CreateBridge(
-		nc.Context,
-		&pb.CreateBridgeRequest{
-			BridgeName: nc.Network.BridgeName,
-		})
-	if err != nil {
-		return err
-	}
-
-	for _, port := range nc.Network.PhysicalPorts {
-		_, err := nc.ClientCtl.AddPort(
+	/*
+		_, err := nc.ClientCtl.CreateBridge(
 			nc.Context,
-			&pb.AddPortRequest{
+			&pb.CreateBridgeRequest{
 				BridgeName: nc.Network.BridgeName,
-				IfaceName:  port.Name,
 			})
 		if err != nil {
 			return err
 		}
-	}
 
+		for _, port := range nc.Network.PhysicalPorts {
+			_, err := nc.ClientCtl.AddPort(
+				nc.Context,
+				&pb.AddPortRequest{
+					BridgeName: nc.Network.BridgeName,
+					IfaceName:  port.Name,
+				})
+			if err != nil {
+				return err
+			}
+		}
+
+	*/
 	return nil
 }
 
