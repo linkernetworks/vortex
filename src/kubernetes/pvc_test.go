@@ -38,7 +38,7 @@ func (suite *KubeCtlPVCTestSuite) TestGetPVC() {
 }
 
 func (suite *KubeCtlPVCTestSuite) TestGetPVCFail() {
-	namespace := "default"
+	namespace := "Unknown_Namespace"
 	_, err := suite.kubectl.GetPVC("Unknown_Name", namespace)
 	suite.Error(err)
 }
@@ -64,6 +64,19 @@ func (suite *KubeCtlPVCTestSuite) TestGetPVCs() {
 	pvcs, err := suite.kubectl.GetPVCs(namespace)
 	suite.NoError(err)
 	suite.NotEqual(0, len(pvcs))
+}
+
+func (suite *KubeCtlPVCTestSuite) TestCreateDeletePVC() {
+	namespace := "default"
+	pvc := corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-PVC-4",
+		},
+	}
+	_, err := suite.kubectl.CreatePVC(&pvc, namespace)
+	suite.NoError(err)
+	err = suite.kubectl.DeletePVC("K8S-PVC-4", namespace)
+	suite.NoError(err)
 }
 
 func (suite *KubeCtlPVCTestSuite) TearDownSuite() {}
