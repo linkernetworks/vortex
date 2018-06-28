@@ -124,10 +124,13 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		BridgeName:    tName,
-		BridgeType:    "ovs",
-		NodeName:      suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{eth1},
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type:     "ovs",
+		NodeName: suite.nodeName,
 	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
@@ -142,7 +145,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	//assertResponseCode(t, http.StatusOK, httpWriter)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
-	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 
 	//We use the new write but empty input
@@ -162,16 +165,20 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 func (suite *NetworkTestSuite) TestWrongVlangTag() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		BridgeName: tName,
-		BridgeType: "ovs",
-		NodeName:   suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{
-			{
-				Name:     suite.ifName,
-				MTU:      1500,
-				VlanTags: []int{1234, 2143, 50000},
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName: tName,
+			PhysicalPorts: []entity.PhysicalPort{
+				{
+					Name:     suite.ifName,
+					MTU:      1500,
+					VlanTags: []int{1234, 2143, 50000},
+				},
 			},
-		}}
+		},
+		Type:     "ovs",
+		NodeName: suite.nodeName,
+	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
 	suite.NoError(err)
@@ -189,18 +196,21 @@ func (suite *NetworkTestSuite) TestWrongVlangTag() {
 func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		ID:            bson.NewObjectId(),
-		BridgeName:    tName,
-		BridgeType:    "ovs",
-		NodeName:      suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{},
+		ID:   bson.NewObjectId(),
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{},
+		},
+		Type:     "ovs",
+		NodeName: suite.nodeName,
 	}
 
 	//Create data into mongo manually
 	suite.session.C(entity.NetworkCollectionName).Insert(network)
 	err := exec.Command("ovs-vsctl", "add-br", tName).Run()
 	suite.NoError(err)
-	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
 
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	httpWriterDelete := httptest.NewRecorder()
@@ -230,16 +240,19 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 		VlanTags: []int{2043, 2143, 2243},
 	}
 	network := entity.Network{
-		ID:            bson.NewObjectId(),
-		BridgeName:    tName,
-		BridgeType:    tType,
-		NodeName:      suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{eth1},
+		ID:       bson.NewObjectId(),
+		Name:     tName,
+		Type:     tType,
+		NodeName: suite.nodeName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
 	}
 
 	//Create data into mongo manually
 	suite.session.C(entity.NetworkCollectionName).Insert(network)
-	defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", tName)
+	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	suite.NoError(err)
@@ -251,9 +264,9 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 	network = entity.Network{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &network)
 	suite.NoError(err)
-	suite.Equal(tName, network.BridgeName)
-	suite.Equal(eth1, network.PhysicalPorts[0])
-	suite.Equal(tType, network.BridgeType)
+	suite.Equal(tName, network.Name)
+	suite.Equal(eth1, network.OVS.PhysicalPorts[0])
+	suite.Equal(tType, network.Type)
 	suite.Equal(suite.nodeName, network.NodeName)
 }
 
@@ -272,16 +285,20 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	networks := []entity.Network{}
 	for i := 0; i < 3; i++ {
 		networks = append(networks, entity.Network{
-			BridgeName:    namesgenerator.GetRandomName(0),
-			BridgeType:    "ovs",
-			NodeName:      suite.nodeName,
-			PhysicalPorts: []entity.PhysicalPort{}})
+			Name: namesgenerator.GetRandomName(0),
+			OVS: entity.OVSNetwork{
+				BridgeName:    namesgenerator.GetRandomName(0),
+				PhysicalPorts: []entity.PhysicalPort{},
+			},
+			Type:     "ovs",
+			NodeName: suite.nodeName,
+		})
 	}
 
 	for _, v := range networks {
 		err := suite.session.C(entity.NetworkCollectionName).Insert(v)
 		suite.NoError(err)
-		defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", v.BridgeName)
+		defer suite.session.Remove(entity.NetworkCollectionName, "name", v.Name)
 	}
 
 	//list data by default page and page_size
@@ -297,10 +314,10 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	suite.NoError(err)
 	suite.Equal(len(networks), len(retNetworks))
 	for i, v := range retNetworks {
-		suite.Equal(networks[i].BridgeName, v.BridgeName)
-		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].Name, v.Name)
+		suite.Equal(networks[i].Type, v.Type)
 		suite.Equal(networks[i].NodeName, v.NodeName)
-		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].OVS.PhysicalPorts, v.OVS.PhysicalPorts)
 	}
 
 	//list data by different page and page_size
@@ -316,10 +333,10 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	suite.NoError(err)
 	suite.Equal(len(networks), len(retNetworks))
 	for i, v := range retNetworks {
-		suite.Equal(networks[i].BridgeName, v.BridgeName)
-		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].Name, v.Name)
+		suite.Equal(networks[i].Type, v.Type)
 		suite.Equal(networks[i].NodeName, v.NodeName)
-		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].OVS.PhysicalPorts, v.OVS.PhysicalPorts)
 	}
 
 	//list data by different page and page_size
@@ -335,10 +352,10 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	suite.NoError(err)
 	suite.Equal(1, len(retNetworks))
 	for i, v := range retNetworks {
-		suite.Equal(networks[i].BridgeName, v.BridgeName)
-		suite.Equal(networks[i].BridgeType, v.BridgeType)
+		suite.Equal(networks[i].Name, v.Name)
+		suite.Equal(networks[i].Type, v.Type)
 		suite.Equal(networks[i].NodeName, v.NodeName)
-		suite.Equal(networks[i].PhysicalPorts, v.PhysicalPorts)
+		suite.Equal(networks[i].OVS.PhysicalPorts, v.OVS.PhysicalPorts)
 	}
 }
 

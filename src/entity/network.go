@@ -10,19 +10,13 @@ const (
 	NetworkCollectionName string = "networks"
 )
 
-type PhysicalPort struct {
-	Name     string `bson:"name" json:"name"`
-	MTU      int    `bson:"maximumTransmissionUnit" MTC:"maximumTransmissionUnit"`
-	VlanTags []int  `bson:"vlanTag" MTC:"vlanTag"`
-}
-
 type Network struct {
-	ID            bson.ObjectId  `bson:"_id,omitempty" json:"id"`
-	BridgeName    string         `bson:"bridgeName" json:"bridgeName"`
-	BridgeType    string         `bson:"bridgeType" json:"bridgeType"`
-	NodeName      string         `bson:"nodeName" json:"nodeName"`
-	PhysicalPorts []PhysicalPort `bson:"physicalPorts" json:"physicalPorts"`
-	CreatedAt     *time.Time     `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	Type      string        `bson:"type" json:"type"`
+	Name      string        `bson:"name" json:"name"`
+	NodeName  string        `bson:"nodeName" json:"nodeName"`
+	OVS       OVSNetwork    `bson:"ovs" json:"ovs"`
+	CreatedAt *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 }
 
 //GetCollection - get model mongo collection name.

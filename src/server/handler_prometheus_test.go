@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	restful "github.com/emicklei/go-restful"
@@ -34,10 +33,6 @@ func (suite *PrometheusTestSuite) SetupSuite() {
 }
 
 func TestPrometheusTestSuite(t *testing.T) {
-	if _, defined := os.LookupEnv("TEST_PROMETHEUS"); !defined {
-		t.SkipNow()
-		return
-	}
 	suite.Run(t, new(PrometheusTestSuite))
 }
 
