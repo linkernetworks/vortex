@@ -19,7 +19,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	//mgo "gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -155,14 +154,23 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 
 func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	//Parameters
+	ovsProvider := suite.np
+
+	//create a mongo-document to test duplicated name
+	session := suite.sp.Mongo.NewSession()
+	err := session.C(entity.NetworkCollectionName).Insert(suite.network)
+	suite.NoError(err)
+	err = ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
+	suite.Error(err)
+
+	//Test wrong vlan ID
 	eth1 := entity.PhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
 		VlanTags: []int{2043, 2143, 22434},
 	}
 
-	ovsProvider := suite.np
 	ovsProvider.PhysicalPorts = []entity.PhysicalPort{eth1}
-	err := ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
+	err = ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
 	suite.Error(err)
 }
