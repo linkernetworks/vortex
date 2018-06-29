@@ -28,7 +28,6 @@ func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 	}
 
 	q := bson.M{"nodeName": network.NodeName, "ovs.bridgeName": ovs.BridgeName}
-	fmt.Println(q)
 	//Check the bridge name, we can't have the same bridge name in the same node
 	n, err := session.Count(entity.NetworkCollectionName, q)
 	if n >= 1 {
