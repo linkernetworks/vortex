@@ -279,7 +279,8 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	}
 
 	for _, v := range networks {
-		suite.session.C(entity.NetworkCollectionName).Insert(v)
+		err := suite.session.C(entity.NetworkCollectionName).Insert(v)
+		suite.NoError(err)
 		defer suite.session.Remove(entity.NetworkCollectionName, "bridgeName", v.BridgeName)
 	}
 
