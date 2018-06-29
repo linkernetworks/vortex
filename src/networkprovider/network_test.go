@@ -29,5 +29,12 @@ func TestGetNetworkProvider(t *testing.T) {
 			assert.Equal(t, a, tc.netProviderType)
 		})
 	}
+}
 
+func TestGetNetworkProviderFail(t *testing.T) {
+	_, err := GetNetworkProvider(
+		&entity.Network{
+			Type: "Unknown",
+		})
+	assert.Error(t, err)
 }
