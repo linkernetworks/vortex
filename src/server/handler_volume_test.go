@@ -180,11 +180,11 @@ func (suite *VolumeTestSuite) TestListVolume() {
 	count := 3
 	for i := 0; i < count; i++ {
 		volumes = append(volumes, entity.Volume{
-			ID:                  bson.NewObjectId(),
-			Name:                namesgenerator.GetRandomName(0),
-			StorageProviderName: namesgenerator.GetRandomName(0),
-			AccessMode:          corev1.PersistentVolumeAccessMode("ReadOnlyMany"),
-			Capacity:            "250",
+			ID:          bson.NewObjectId(),
+			Name:        namesgenerator.GetRandomName(0),
+			StorageName: namesgenerator.GetRandomName(0),
+			AccessMode:  corev1.PersistentVolumeAccessMode("ReadOnlyMany"),
+			Capacity:    "250",
 		})
 	}
 
@@ -226,7 +226,7 @@ func (suite *VolumeTestSuite) TestListVolume() {
 			for i, v := range retVolumes {
 				suite.Equal(volumes[i].Name, v.Name)
 				suite.Equal(volumes[i].MetaName, v.MetaName)
-				suite.Equal(volumes[i].StorageProviderName, v.StorageProviderName)
+				suite.Equal(volumes[i].StorageName, v.StorageName)
 				suite.Equal(volumes[i].AccessMode, v.AccessMode)
 			}
 		})
