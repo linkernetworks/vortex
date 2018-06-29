@@ -169,6 +169,48 @@ func (suite *NetworkTestSuite) TestDeleteEmptyNetwork() {
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
+func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
+	testCases := []struct {
+		cases     string
+		network   entity.Network
+		errorCode int
+	}{
+		{"DeleteNetwork", entity.Network{
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Type: "fake",
+			Fake: entity.FakeNetwork{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusInternalServerError},
+		{"NetworkTypeError", entity.Network{
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Type: "non-exist",
+			Fake: entity.FakeNetwork{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusBadRequest},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.cases, func(t *testing.T) {
+			suite.session.C(entity.NetworkCollectionName).Insert(tc.network)
+			defer suite.session.Remove(entity.NetworkCollectionName, "name", tc.network.Name)
+
+			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+tc.network.ID.Hex(), nil)
+			suite.NoError(err)
+
+			httpRequest.Header.Add("Content-Type", "application/json")
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
+		})
+	}
+}
+
 //Fot Get/List, we only return mongo document
 func (suite *NetworkTestSuite) TestGetNetwork() {
 	tName := namesgenerator.GetRandomName(0)
@@ -212,7 +254,9 @@ func (suite *NetworkTestSuite) TestGetNetworkWithInvalidID() {
 
 func (suite *NetworkTestSuite) TestListNetwork() {
 	networks := []entity.Network{}
-	for i := 0; i < 3; i++ {
+
+	count := 3
+	for i := 0; i < count; i++ {
 		networks = append(networks, entity.Network{
 			Name:     namesgenerator.GetRandomName(0),
 			Fake:     entity.FakeNetwork{},
@@ -221,64 +265,49 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 		})
 	}
 
+	testCases := []struct {
+		page       string
+		pageSize   string
+		expectSize int
+	}{
+		{"", "", count},
+		{"1", "1", count},
+		{"1", "3", count},
+	}
+
 	for _, v := range networks {
 		err := suite.session.C(entity.NetworkCollectionName).Insert(v)
 		defer suite.session.Remove(entity.NetworkCollectionName, "name", v.Name)
 		suite.NoError(err)
 	}
 
-	//list data by default page and page_size
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/", nil)
-	suite.NoError(err)
+	for _, tc := range testCases {
+		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
+		suite.T().Run(caseName, func(t *testing.T) {
+			url := "http://localhost:7890/v1/networks/"
+			if tc.page != "" || tc.pageSize != "" {
+				url = "http://localhost:7890/v1/networks?"
+				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
+			}
+			httpRequest, err := http.NewRequest("GET", url, nil)
 
-	httpWriter := httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+			suite.NoError(err)
 
-	retNetworks := []entity.Network{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	suite.NoError(err)
-	suite.Equal(len(networks), len(retNetworks))
-	for i, v := range retNetworks {
-		suite.Equal(networks[i].Name, v.Name)
-		suite.Equal(networks[i].Type, v.Type)
-		suite.Equal(networks[i].NodeName, v.NodeName)
-	}
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
-	//list data by different page and page_size
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=3", nil)
-	suite.NoError(err)
+			retNetworks := []entity.Network{}
+			err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
+			suite.NoError(err)
+			suite.Equal(tc.expectSize, len(retNetworks))
+			for i, v := range retNetworks {
+				suite.Equal(networks[i].Name, v.Name)
+				suite.Equal(networks[i].Type, v.Type)
+				suite.Equal(networks[i].NodeName, v.NodeName)
+			}
 
-	httpWriter = httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
-
-	retNetworks = []entity.Network{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	suite.NoError(err)
-	suite.Equal(len(networks), len(retNetworks))
-	for i, v := range retNetworks {
-		suite.Equal(networks[i].Name, v.Name)
-		suite.Equal(networks[i].Type, v.Type)
-		suite.Equal(networks[i].NodeName, v.NodeName)
-	}
-
-	//list data by different page and page_size
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=1&page_size=1", nil)
-	suite.NoError(err)
-
-	httpWriter = httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
-
-	retNetworks = []entity.Network{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &retNetworks)
-	suite.NoError(err)
-	suite.Equal(1, len(retNetworks))
-	for i, v := range retNetworks {
-		suite.Equal(networks[i].Name, v.Name)
-		suite.Equal(networks[i].Type, v.Type)
-		suite.Equal(networks[i].NodeName, v.NodeName)
+		})
 	}
 }
 

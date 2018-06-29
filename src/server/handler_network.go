@@ -5,7 +5,6 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
@@ -152,15 +151,13 @@ func deleteNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	nc, err := networkcontroller.New(sp.KubeCtl, network)
+	networkProvider, err := np.GetNetworkProvider(&network)
 	if err != nil {
-		logger.Errorf("Failed to new network controller: %s", err.Error())
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := nc.DeleteNetwork(); err != nil {
-		logger.Errorf("Failed to delete network: %s", err.Error())
+	if err := networkProvider.DeleteNetwork(sp, network); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}

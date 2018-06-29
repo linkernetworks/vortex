@@ -42,7 +42,7 @@ type NetworkTestSuite struct {
 	sp       *serviceprovider.Container
 	fakeName string //Use for non-connectivity node
 	np       OVSNetworkProvider
-	network  *entity.Network
+	network  entity.Network
 }
 
 func (suite *NetworkTestSuite) SetupSuite() {
@@ -89,7 +89,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	suite.NoError(err)
 
 	tName := namesgenerator.GetRandomName(0)
-	suite.network = &entity.Network{
+	suite.network = entity.Network{
 		Name: tName,
 		OVS: entity.OVSNetwork{
 			BridgeName:    tName,
@@ -99,7 +99,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 		NodeName: nodeName,
 	}
 
-	np, err := GetNetworkProvider(suite.network)
+	np, err := GetNetworkProvider(&suite.network)
 	suite.NoError(err)
 	suite.np = np.(OVSNetworkProvider)
 }
@@ -122,19 +122,19 @@ func TestNetworkSuite(t *testing.T) {
 
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	//Parameters
-	err := suite.np.CreateNetwork(suite.sp, *(suite.network))
+	err := suite.np.CreateNetwork(suite.sp, suite.network)
 	suite.NoError(err)
 	defer exec.Command("ovs-vsctl", "del-br", suite.np.BridgeName).Run()
 }
 
 func (suite *NetworkTestSuite) TestCreateNetworkFail() {
-	network := suite.network
+	network := entity.Network{}
 	network.NodeName = "non-exist"
-	err := suite.np.CreateNetwork(suite.sp, *network)
+	err := suite.np.CreateNetwork(suite.sp, network)
 	suite.Error(err)
 
 	network.NodeName = suite.fakeName
-	err = suite.np.CreateNetwork(suite.sp, *network)
+	err = suite.np.CreateNetwork(suite.sp, network)
 	suite.Error(err)
 }
 
@@ -148,7 +148,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 
 	ovsProvider := suite.np
 	ovsProvider.PhysicalPorts = []entity.PhysicalPort{eth1}
-	err := ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
+	err := ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
 	suite.NoError(err)
 }
 
@@ -161,7 +161,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	err := session.C(entity.NetworkCollectionName).Insert(suite.network)
 	defer session.C(entity.NetworkCollectionName).Remove(suite.network)
 	suite.NoError(err)
-	err = ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
+	err = ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
 	suite.Error(err)
 
 	//Test wrong vlan ID
@@ -172,6 +172,25 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	}
 
 	ovsProvider.PhysicalPorts = []entity.PhysicalPort{eth1}
-	err = ovsProvider.ValidateBeforeCreating(suite.sp, *suite.network)
+	err = ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
+	suite.Error(err)
+}
+
+func (suite *NetworkTestSuite) TestDeleteNetwork() {
+	//Parameters
+	exec.Command("ovs-vsctl", "add-br", suite.np.BridgeName).Run()
+	//FIXME we need a function to check the bridge is exist
+	err := suite.np.DeleteNetwork(suite.sp, suite.network)
+	suite.NoError(err)
+}
+
+func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
+	network := entity.Network{}
+	network.NodeName = "non-exist"
+	err := suite.np.DeleteNetwork(suite.sp, network)
+	suite.Error(err)
+
+	network.NodeName = suite.fakeName
+	err = suite.np.DeleteNetwork(suite.sp, network)
 	suite.Error(err)
 }

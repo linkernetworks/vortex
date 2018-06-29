@@ -8,7 +8,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 )
 
-func TestFakeNetworkValidateBeforeCreating(t *testing.T) {
+func TestNetworkValidateBeforeCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: "fake",
 		Fake: entity.FakeNetwork{
@@ -54,5 +54,27 @@ func TestFakeNetworkCreatingFail(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	err = fake.CreateNetwork(nil, entity.Network{})
+	assert.Error(t, err)
+}
+
+func TestFakeNetworkDelete(t *testing.T) {
+	fake, err := GetNetworkProvider(&entity.Network{
+		Type: "fake",
+		Fake: entity.FakeNetwork{},
+	})
+	assert.NoError(t, err)
+	err = fake.DeleteNetwork(nil, entity.Network{})
+	assert.NoError(t, err)
+}
+
+func TestFakeNetworkDeleteFail(t *testing.T) {
+	fake, err := GetNetworkProvider(&entity.Network{
+		Type: "fake",
+		Fake: entity.FakeNetwork{
+			IWantFail: true,
+		},
+	})
+	assert.NoError(t, err)
+	err = fake.DeleteNetwork(nil, entity.Network{})
 	assert.Error(t, err)
 }

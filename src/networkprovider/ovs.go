@@ -52,3 +52,18 @@ func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, netwo
 
 	return nc.CreateOVSNetwork(ovs.BridgeName, ovs.PhysicalPorts)
 }
+
+func (ovs OVSNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network entity.Network) error {
+	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(network.NodeName)
+	if err != nil {
+		return err
+	}
+
+	target := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
+	nc, err := networkcontroller.New(target)
+	if err != nil {
+		return err
+	}
+
+	return nc.DeleteOVSNetwork(ovs.BridgeName)
+}
