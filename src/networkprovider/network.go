@@ -11,13 +11,13 @@ type NetworkProvider interface {
 	CreateNetwork(sp *serviceprovider.Container, net entity.Network) error
 }
 
-func GetNetworkProvider(net *entity.Network) (NetworkProvider, error) {
-	switch net.Type {
+func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
+	switch network.Type {
 	case "ovs":
-		return OVSNetworkProvider{net.OVS}, nil
+		return OVSNetworkProvider{network.OVS}, nil
 	case "fake":
-		return FakeNetworkProvider{net.Fake}, nil
+		return FakeNetworkProvider{network.Fake}, nil
 	default:
-		return nil, fmt.Errorf("Unsupported Network Type %s", net.Type)
+		return nil, fmt.Errorf("Unsupported Network Type %s", network.Type)
 	}
 }

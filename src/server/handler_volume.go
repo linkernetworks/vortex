@@ -69,7 +69,6 @@ func deleteVolume(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	fmt.Println(id)
 	if err := session.Remove(entity.VolumeCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {
 			response.BadRequest(req.Request, resp.ResponseWriter, err)
