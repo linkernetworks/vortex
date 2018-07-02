@@ -42,7 +42,6 @@ func TestEncodeErrorPayload(t *testing.T) {
 			out, cType, err := EncodeErrorPayload(request, errPayload)
 			assert.Equal(t, tc.expType, cType)
 			assert.NoError(t, err)
-			fmt.Printf("%s", out)
 			assert.Equal(t, tc.expMessage, string(out[:len(out)]))
 		})
 	}

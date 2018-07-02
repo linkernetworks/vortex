@@ -5,12 +5,11 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
-	"github.com/linkernetworks/vortex/src/networkcontroller"
+	np "github.com/linkernetworks/vortex/src/networkprovider"
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -21,7 +20,6 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
-		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -29,29 +27,22 @@ func createNetworkHandler(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"bridgeName", "nodeName"},
+		Key:    []string{"name", "nodeName"},
 		Unique: true,
 	})
 
-	// Check whether vlangTag is 0~4095
-	for _, pp := range network.PhysicalPorts {
-		for _, vlangTag := range pp.VlanTags {
-			if vlangTag < 0 || vlangTag > 4095 {
-				response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("the vlangTag %v in PhysicalPort %v should between 0 and 4095", pp.Name, vlangTag))
-				return
-			}
-		}
-	}
-
-	nc, err := networkcontroller.New(sp.KubeCtl, network)
+	networkProvider, err := np.GetNetworkProvider(&network)
 	if err != nil {
-		logger.Errorf("Failed to new network controller: %s", err.Error())
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := nc.CreateNetwork(); err != nil {
-		logger.Errorf("Failed to create network: %s", err.Error())
+	if err := networkProvider.ValidateBeforeCreating(sp, network); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := networkProvider.CreateNetwork(sp, network); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -60,7 +51,7 @@ func createNetworkHandler(ctx *web.Context) {
 	network.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.BridgeName))
+			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -160,15 +151,13 @@ func deleteNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	nc, err := networkcontroller.New(sp.KubeCtl, network)
+	networkProvider, err := np.GetNetworkProvider(&network)
 	if err != nil {
-		logger.Errorf("Failed to new network controller: %s", err.Error())
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := nc.DeleteNetwork(); err != nil {
-		logger.Errorf("Failed to delete network: %s", err.Error())
+	if err := networkProvider.DeleteNetwork(sp, network); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
