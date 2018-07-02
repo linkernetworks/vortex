@@ -8,7 +8,9 @@ import (
 	restful "github.com/emicklei/go-restful"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/linkernetworks/vortex/src/web"
+	"github.com/prometheus/common/model"
 	"golang.org/x/net/context"
 )
 
@@ -17,15 +19,12 @@ func queryMetrics(ctx *web.Context) {
 
 	query := query.New(req.Request.URL.Query())
 
-	query_str := ""
+	expression := ""
 	if q, ok := query.Str("query"); ok {
-		query_str = q
+		expression = q
 	}
 
-	api := sp.Prometheus.API
-
-	testTime := time.Now()
-	result, err := api.Query(context.Background(), query_str, testTime)
+	result, err := queryFromPrometheus(sp, expression)
 
 	if result == nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", result, err))
@@ -35,4 +34,14 @@ func queryMetrics(ctx *web.Context) {
 		"status":  http.StatusOK,
 		"results": result,
 	}, restful.MIME_JSON)
+}
+
+func queryFromPrometheus(sp *serviceprovider.Container, expression string) (model.Value, error) {
+
+	api := sp.Prometheus.API
+
+	testTime := time.Now()
+	result, err := api.Query(context.Background(), expression, testTime)
+
+	return result, err
 }
