@@ -38,19 +38,37 @@ func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 	return nil
 }
 
+func createOVSNetwork(nodeIP string, bridgeName string, ports []entity.PhysicalPort) error {
+	nodeAddr := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
+	nc, err := networkcontroller.New(nodeAddr)
+	if err != nil {
+		return err
+	}
+
+	return nc.CreateOVSNetwork(bridgeName, ports)
+}
+
 func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network entity.Network) error {
+	if network.Clusterwise {
+		//Get all nodes
+		nodes, _ := sp.KubeCtl.GetNodes()
+		for _, v := range nodes {
+			nodeIP, err := sp.KubeCtl.GetNodeExternalIP(v.GetName())
+			fmt.Println(v.GetName(), nodeIP)
+			if err != nil {
+				return err
+			}
+			if err := createOVSNetwork(nodeIP, network.OVS.BridgeName, network.OVS.PhysicalPorts); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(network.NodeName)
 	if err != nil {
 		return err
 	}
-
-	target := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
-	nc, err := networkcontroller.New(target)
-	if err != nil {
-		return err
-	}
-
-	return nc.CreateOVSNetwork(ovs.BridgeName, ovs.PhysicalPorts)
+	return createOVSNetwork(nodeIP, network.OVS.BridgeName, network.OVS.PhysicalPorts)
 }
 
 func (ovs OVSNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network entity.Network) error {
