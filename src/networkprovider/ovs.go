@@ -27,11 +27,17 @@ func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 		}
 	}
 
-	q := bson.M{"nodeName": network.NodeName, "ovs.bridgeName": ovs.BridgeName}
-	//Check the bridge name, we can't have the same bridge name in the same node
+	q := bson.M{}
+	if network.Clusterwise {
+		//Only check the bridge name
+		q = bson.M{"ovs.bridgeName": ovs.BridgeName}
+	} else {
+		q = bson.M{"nodeName": network.NodeName, "ovs.bridgeName": ovs.BridgeName}
+	}
+
 	n, err := session.Count(entity.NetworkCollectionName, q)
 	if n >= 1 {
-		return fmt.Errorf("The bridge name %s is exist on the node %s\n, please use another bridge name", ovs.BridgeName, network.NodeName)
+		return fmt.Errorf("The bridge name %s is exist, please check your cluster type and reassign another bridge name", ovs.BridgeName)
 	} else if err != nil {
 		return err
 	}
