@@ -15,7 +15,7 @@ type Network struct {
 	Type        string        `bson:"type" json:"type"`
 	Name        string        `bson:"name" json:"name"`
 	Clusterwise bool          `bson:"clusterwise" json:"clusterwise"`
-	NodeName    string        `bson:"nodeName, omitempty" json:"nodeName,omitempty"`
+	NodeName    string        `bson:"nodeName,omitempty" json:"nodeName,omitempty"`
 	CreatedAt   *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	OVS         OVSNetwork    `bson:"ovs,omitempty" json:"ovs"`
 	Fake        FakeNetwork   `bson:"fake,omitempty" json:"fake"` //FakeNetwork, for restful testing.

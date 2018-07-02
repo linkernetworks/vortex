@@ -111,6 +111,12 @@ func (suite *NetworkTestSuite) TestCreateOVSNetwork() {
 	defer exec.Command("ovs-vsctl", "del-br", suite.np.BridgeName).Run()
 }
 
+func (suite *NetworkTestSuite) TestDeleteOVSNetwork() {
+	exec.Command("ovs-vsctl", "add-br", suite.np.BridgeName).Run()
+	err := deleteOVSNetwork(LOCAL_IP, suite.np.BridgeName)
+	suite.NoError(err)
+}
+
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	//Parameters
 	err := suite.np.CreateNetwork(suite.sp, suite.network)
@@ -177,10 +183,22 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 }
 
 func (suite *NetworkTestSuite) TestDeleteNetwork() {
-	//Parameters
 	exec.Command("ovs-vsctl", "add-br", suite.np.BridgeName).Run()
 	//FIXME we need a function to check the bridge is exist
 	err := suite.np.DeleteNetwork(suite.sp, suite.network)
+	suite.NoError(err)
+}
+
+func (suite *NetworkTestSuite) TestDeleteNetworkWithCluster() {
+	exec.Command("ovs-vsctl", "add-br", suite.np.BridgeName).Run()
+	//FIXME we need a function to check the bridge is exist
+	network := entity.Network{
+		OVS: entity.OVSNetwork{
+			BridgeName: suite.np.BridgeName,
+		},
+		Clusterwise: true,
+	}
+	err := suite.np.DeleteNetwork(suite.sp, network)
 	suite.NoError(err)
 }
 
