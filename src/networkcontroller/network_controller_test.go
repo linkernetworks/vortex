@@ -8,6 +8,7 @@ import (
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"math/rand"
+	"net"
 	"os"
 	"os/exec"
 	"runtime"
@@ -92,12 +93,8 @@ func TestNetworkControllerSuite(t *testing.T) {
 	suite.Run(t, new(NetworkControllerTestSuite))
 }
 
-func (suite *NetworkControllerTestSuite) TestNewNetworkController() {
-	network := entity.Network{
-		NodeName: suite.nodeName,
-	}
-
-	_, err := New(suite.kubectl, network)
+func (suite *NetworkControllerTestSuite) TestNew() {
+	_, err := New(net.JoinHostPort("127.0.0.1", DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
 }
 
@@ -111,17 +108,23 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		BridgeName:    tName,
-		BridgeType:    "ovs",
-		NodeName:      suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{eth1},
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type:     "ovs",
+		NodeName: suite.nodeName,
 	}
 
-	nc, err := New(suite.kubectl, network)
+	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
 	suite.NoError(err)
-	err = nc.CreateNetwork()
+	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
+	suite.NoError(err)
+	err = nc.CreateOVSNetwork(tName, network.OVS.PhysicalPorts)
 	suite.NoError(err)
 
+	//TODO we need support the list function to check the ovs is existed
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 }
 
@@ -135,17 +138,31 @@ func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		BridgeName:    tName,
-		BridgeType:    "ovs",
-		NodeName:      suite.nodeName,
-		PhysicalPorts: []entity.PhysicalPort{eth1},
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type:     "ovs",
+		NodeName: suite.nodeName,
 	}
 
-	nc, err := New(suite.kubectl, network)
+	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
 	suite.NoError(err)
-	err = nc.CreateNetwork()
+	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
+	suite.NoError(err)
+	err = nc.CreateOVSNetwork(tName, network.OVS.PhysicalPorts)
 	suite.NoError(err)
 
-	err = nc.DeleteNetwork()
+	err = nc.DeleteOVSNetwork(tName)
 	suite.NoError(err)
+}
+
+func (suite *NetworkControllerTestSuite) TestCreateNetworkWithInvalidAddress() {
+	nc, err := New(net.JoinHostPort("a.b.c.d", DEFAULT_CONTROLLER_PORT))
+	suite.NoError(err)
+
+	tName := namesgenerator.GetRandomName(0)
+	err = nc.CreateOVSNetwork(tName, []entity.PhysicalPort{})
+	suite.Error(err)
 }
