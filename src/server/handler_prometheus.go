@@ -36,12 +36,17 @@ func queryMetrics(ctx *web.Context) {
 	}, restful.MIME_JSON)
 }
 
-func queryFromPrometheus(sp *serviceprovider.Container, expression string) (model.Value, error) {
+func queryFromPrometheus(sp *serviceprovider.Container, expression string) (model.Vector, error) {
 
 	api := sp.Prometheus.API
 
 	testTime := time.Now()
 	result, err := api.Query(context.Background(), expression, testTime)
 
-	return result, err
+	switch {
+	case result.Type() == model.ValVector:
+		return result.(model.Vector), err
+	}
+
+	return nil, err
 }
