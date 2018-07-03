@@ -19,7 +19,6 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
-	container.Add(newNodeService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
 	return router
@@ -64,13 +63,7 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/monitoring").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/query").To(handler.RESTfulServiceHandler(sp, queryMetrics)))
-	return webService
-}
-
-func newNodeService(sp *serviceprovider.Container) *restful.WebService {
-	webService := new(restful.WebService)
-	webService.Path("/v1/nodes").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNodeHandler)))
-	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getNodeHandler)))
+	webService.Route(webService.GET("/nodes").To(handler.RESTfulServiceHandler(sp, listNodeMetricsHandler)))
+	webService.Route(webService.GET("/nodes/{id}").To(handler.RESTfulServiceHandler(sp, getNodeMetricsHandler)))
 	return webService
 }
