@@ -6,13 +6,20 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type NetworkType string
+
+const (
+	OVSNetworkType  NetworkType = "ovs"
+	FakeNetworkType NetworkType = "fake"
+)
+
 const (
 	NetworkCollectionName string = "networks"
 )
 
 type Network struct {
 	ID          bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	Type        string        `bson:"type" json:"type"`
+	Type        NetworkType   `bson:"type" json:"type"`
 	Name        string        `bson:"name" json:"name"`
 	Clusterwise bool          `bson:"clusterwise" json:"clusterwise"`
 	NodeName    string        `bson:"nodeName,omitempty" json:"nodeName,omitempty"`

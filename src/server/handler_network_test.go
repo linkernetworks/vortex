@@ -56,9 +56,9 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	network := entity.Network{
 		Name: tName,
 		Fake: entity.FakeNetwork{
-			FakeParameter: "fake",
+			FakeParameter: "fake~",
 		},
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
@@ -97,14 +97,14 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	}{
 		{"InvalidParameter", entity.Network{
 			Name: namesgenerator.GetRandomName(0),
-			Type: "fake",
+			Type: entity.FakeNetworkType,
 			Fake: entity.FakeNetwork{
 				FakeParameter: "",
 			}},
 			http.StatusBadRequest},
 		{"CreateFail", entity.Network{
 			Name: namesgenerator.GetRandomName(0),
-			Type: "fake",
+			Type: entity.FakeNetworkType,
 			Fake: entity.FakeNetwork{
 				FakeParameter: "Yo",
 				IWantFail:     true,
@@ -144,7 +144,7 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 		ID:   bson.NewObjectId(),
 		Name: tName,
 		Fake: entity.FakeNetwork{},
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 	}
 
 	//Create data into mongo manually
@@ -178,7 +178,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		{"DeleteNetwork", entity.Network{
 			ID:   bson.NewObjectId(),
 			Name: namesgenerator.GetRandomName(0),
-			Type: "fake",
+			Type: entity.FakeNetworkType,
 			Fake: entity.FakeNetwork{
 				FakeParameter: "Yo",
 				IWantFail:     true,
@@ -214,7 +214,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 //Fot Get/List, we only return mongo document
 func (suite *NetworkTestSuite) TestGetNetwork() {
 	tName := namesgenerator.GetRandomName(0)
-	tType := "fake"
+	tType := entity.FakeNetworkType
 
 	network := entity.Network{
 		ID:       bson.NewObjectId(),
@@ -260,7 +260,7 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 		networks = append(networks, entity.Network{
 			Name:     namesgenerator.GetRandomName(0),
 			Fake:     entity.FakeNetwork{},
-			Type:     "fake",
+			Type:     entity.FakeNetworkType,
 			NodeName: namesgenerator.GetRandomName(0),
 		})
 	}
