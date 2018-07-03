@@ -25,6 +25,8 @@ import (
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
+const LOCAL_IP = "127.0.0.1"
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -39,10 +41,9 @@ func execute(suite *suite.Suite, cmd *exec.Cmd) {
 
 type NetworkTestSuite struct {
 	suite.Suite
-	sp       *serviceprovider.Container
-	fakeName string //Use for non-connectivity node
-	np       OVSNetworkProvider
-	network  entity.Network
+	sp             *serviceprovider.Container
+	clusterNetwork entity.Network
+	singleNetwork  entity.Network
 }
 
 func (suite *NetworkTestSuite) SetupSuite() {
@@ -65,23 +66,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 			Addresses: []corev1.NodeAddress{
 				{
 					Type:    "ExternalIP",
-					Address: "127.0.0.1",
-				},
-			},
-		},
-	})
-	suite.NoError(err)
-
-	suite.fakeName = namesgenerator.GetRandomName(0)
-	_, err = suite.sp.KubeCtl.Clientset.CoreV1().Nodes().Create(&corev1.Node{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: suite.fakeName,
-		},
-		Status: corev1.NodeStatus{
-			Addresses: []corev1.NodeAddress{
-				{
-					Type:    "ExternalIP",
-					Address: "1.2.3.4",
+					Address: LOCAL_IP,
 				},
 			},
 		},
@@ -89,7 +74,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	suite.NoError(err)
 
 	tName := namesgenerator.GetRandomName(0)
-	suite.network = entity.Network{
+	suite.singleNetwork = entity.Network{
 		Name: tName,
 		OVS: entity.OVSNetwork{
 			BridgeName:    tName,
@@ -99,9 +84,20 @@ func (suite *NetworkTestSuite) SetupSuite() {
 		NodeName: nodeName,
 	}
 
-	np, err := GetNetworkProvider(&suite.network)
-	suite.NoError(err)
-	suite.np = np.(OVSNetworkProvider)
+	suite.clusterNetwork = entity.Network{
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{},
+		},
+		Type:        "ovs",
+		NodeName:    nodeName,
+		Clusterwise: true,
+	}
+
+	//np, err := GetNetworkProvider(&suite.network)
+	//suite.NoError(err)
+	//suite.np = np.(OVSNetworkProvider)
 }
 
 func (suite *NetworkTestSuite) TearDownSuite() {
@@ -120,77 +116,186 @@ func TestNetworkSuite(t *testing.T) {
 	suite.Run(t, new(NetworkTestSuite))
 }
 
-func (suite *NetworkTestSuite) TestCreateNetwork() {
-	//Parameters
-	err := suite.np.CreateNetwork(suite.sp, suite.network)
+//Member funcion
+func (suite *NetworkTestSuite) TestCreateOVSNetwork() {
+	name := namesgenerator.GetRandomName(0)
+	err := createOVSNetwork(LOCAL_IP, name, []entity.PhysicalPort{})
+	defer exec.Command("ovs-vsctl", "del-br", name).Run()
 	suite.NoError(err)
-	defer exec.Command("ovs-vsctl", "del-br", suite.np.BridgeName).Run()
+}
+
+func (suite *NetworkTestSuite) TestDeleteOVSNetwork() {
+	name := namesgenerator.GetRandomName(0)
+	exec.Command("ovs-vsctl", "add-br", name).Run()
+	err := deleteOVSNetwork(LOCAL_IP, name)
+	suite.NoError(err)
+}
+
+func (suite *NetworkTestSuite) TestCreateNetwork() {
+	testCases := []struct {
+		caseName string
+		network  *entity.Network
+	}{
+		{"singelNetwork", &suite.singleNetwork},
+		{"clusterNetwork", &suite.clusterNetwork},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			//Parameters
+			np, err := GetNetworkProvider(tc.network)
+			suite.NoError(err)
+			np = np.(OVSNetworkProvider)
+			err = np.CreateNetwork(suite.sp, *tc.network)
+			suite.NoError(err)
+			defer exec.Command("ovs-vsctl", "del-br", tc.network.OVS.BridgeName).Run()
+		})
+	}
 }
 
 func (suite *NetworkTestSuite) TestCreateNetworkFail() {
-	network := entity.Network{}
+	network := entity.Network{
+		Type: "ovs",
+	}
 	network.NodeName = "non-exist"
-	err := suite.np.CreateNetwork(suite.sp, network)
-	suite.Error(err)
-
-	network.NodeName = suite.fakeName
-	err = suite.np.CreateNetwork(suite.sp, network)
+	np, err := GetNetworkProvider(&network)
+	suite.NoError(err)
+	np = np.(OVSNetworkProvider)
+	err = np.CreateNetwork(suite.sp, network)
 	suite.Error(err)
 }
 
 func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
-	//Parameters
+	//Vlan
+	//multiple network
+	//single network
+
+	//Prepare data
 	eth1 := entity.PhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
 		VlanTags: []int{2043, 2143, 2243},
 	}
 
-	ovsProvider := suite.np
-	ovsProvider.PhysicalPorts = []entity.PhysicalPort{eth1}
-	err := ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
-	suite.NoError(err)
+	tName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type: "ovs",
+	}
+
+	testCases := []struct {
+		caseName string
+		network  *entity.Network
+	}{
+		{"valid", &network},
+		{"singelNetwork", &suite.singleNetwork},
+		{"clusterNetwork", &suite.clusterNetwork},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			//Parameters
+			np, err := GetNetworkProvider(tc.network)
+			suite.NoError(err)
+			np = np.(OVSNetworkProvider)
+
+			err = np.ValidateBeforeCreating(suite.sp, *tc.network)
+			suite.NoError(err)
+		})
+	}
 }
 
 func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
-	//Parameters
-	ovsProvider := suite.np
+	//Wrong Vlan
+	//Wrong Case for multiple
+	//Wrong Case for single
 
-	//create a mongo-document to test duplicated name
-	session := suite.sp.Mongo.NewSession()
-	err := session.C(entity.NetworkCollectionName).Insert(suite.network)
-	defer session.C(entity.NetworkCollectionName).Remove(suite.network)
-	suite.NoError(err)
-	err = ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
-	suite.Error(err)
-
-	//Test wrong vlan ID
+	//Prepare data
 	eth1 := entity.PhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
-		VlanTags: []int{2043, 2143, 22434},
+		VlanTags: []int{2043, 2143, 22435},
 	}
 
-	ovsProvider.PhysicalPorts = []entity.PhysicalPort{eth1}
-	err = ovsProvider.ValidateBeforeCreating(suite.sp, suite.network)
-	suite.Error(err)
+	tName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		Name: tName,
+		OVS: entity.OVSNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type: "ovs",
+	}
+
+	testCases := []struct {
+		caseName string
+		network  *entity.Network
+		mongo    bool
+	}{
+		{"invalidValid", &network, false},
+		{"singelNetwork", &suite.singleNetwork, true},
+		{"clusterNetwork", &suite.clusterNetwork, true},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			//Parameters
+			np, err := GetNetworkProvider(tc.network)
+			suite.NoError(err)
+			np = np.(OVSNetworkProvider)
+
+			if tc.mongo {
+				//create a mongo-document to test duplicated name
+				session := suite.sp.Mongo.NewSession()
+				err := session.C(entity.NetworkCollectionName).Insert(tc.network)
+				defer session.C(entity.NetworkCollectionName).Remove(tc.network)
+				suite.NoError(err)
+			}
+			err = np.ValidateBeforeCreating(suite.sp, *tc.network)
+			suite.Error(err)
+		})
+	}
 }
 
 func (suite *NetworkTestSuite) TestDeleteNetwork() {
-	//Parameters
-	exec.Command("ovs-vsctl", "add-br", suite.np.BridgeName).Run()
-	//FIXME we need a function to check the bridge is exist
-	err := suite.np.DeleteNetwork(suite.sp, suite.network)
-	suite.NoError(err)
+	testCases := []struct {
+		caseName string
+		network  *entity.Network
+	}{
+		{"singelNetwork", &suite.singleNetwork},
+		{"clusterNetwork", &suite.clusterNetwork},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			//Parameters
+			np, err := GetNetworkProvider(tc.network)
+			suite.NoError(err)
+			np = np.(OVSNetworkProvider)
+			err = np.CreateNetwork(suite.sp, *tc.network)
+			suite.NoError(err)
+
+			exec.Command("ovs-vsctl", "add-br", tc.network.OVS.BridgeName).Run()
+			//FIXME we need a function to check the bridge is exist
+			err = np.DeleteNetwork(suite.sp, *tc.network)
+			suite.NoError(err)
+		})
+	}
 }
 
 func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
-	network := entity.Network{}
+	network := entity.Network{
+		Type: "ovs",
+	}
 	network.NodeName = "non-exist"
-	err := suite.np.DeleteNetwork(suite.sp, network)
-	suite.Error(err)
 
-	network.NodeName = suite.fakeName
-	err = suite.np.DeleteNetwork(suite.sp, network)
+	np, err := GetNetworkProvider(&network)
+	suite.NoError(err)
+	np = np.(OVSNetworkProvider)
+	err = np.DeleteNetwork(suite.sp, network)
 	suite.Error(err)
 }

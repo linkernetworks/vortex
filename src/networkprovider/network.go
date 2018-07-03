@@ -14,9 +14,9 @@ type NetworkProvider interface {
 
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
-	case "ovs":
+	case entity.OVSNetworkType:
 		return OVSNetworkProvider{network.OVS}, nil
-	case "fake":
+	case entity.FakeNetworkType:
 		return FakeNetworkProvider{network.Fake}, nil
 	default:
 		return nil, fmt.Errorf("Unsupported Network Type %s", network.Type)

@@ -10,7 +10,7 @@ import (
 
 func TestNetworkValidateBeforeCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{
 			FakeParameter: "yes",
 		},
@@ -22,7 +22,7 @@ func TestNetworkValidateBeforeCreating(t *testing.T) {
 
 func TestFakeNetworkCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{
 			FakeParameter: "yes",
 			IWantFail:     false,
@@ -35,7 +35,7 @@ func TestFakeNetworkCreating(t *testing.T) {
 
 func TestFakeNetworkValidateBeforeCreatingFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{
 			FakeParameter: "",
 		},
@@ -47,7 +47,7 @@ func TestFakeNetworkValidateBeforeCreatingFail(t *testing.T) {
 
 func TestFakeNetworkCreatingFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{
 			IWantFail: true,
 		},
@@ -59,7 +59,7 @@ func TestFakeNetworkCreatingFail(t *testing.T) {
 
 func TestFakeNetworkDelete(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{},
 	})
 	assert.NoError(t, err)
@@ -69,7 +69,7 @@ func TestFakeNetworkDelete(t *testing.T) {
 
 func TestFakeNetworkDeleteFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: "fake",
+		Type: entity.FakeNetworkType,
 		Fake: entity.FakeNetwork{
 			IWantFail: true,
 		},

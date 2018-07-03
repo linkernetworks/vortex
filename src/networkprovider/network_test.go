@@ -12,11 +12,11 @@ import (
 func TestGetNetworkProvider(t *testing.T) {
 	testCases := []struct {
 		cases           string
-		netType         string
+		netType         entity.NetworkType
 		netProviderType interface{}
 	}{
-		{"ovs", "ovs", reflect.TypeOf(OVSNetworkProvider{})},
-		{"fake", "fake", reflect.TypeOf(FakeNetworkProvider{})},
+		{"ovs", entity.OVSNetworkType, reflect.TypeOf(OVSNetworkProvider{})},
+		{"fake", entity.FakeNetworkType, reflect.TypeOf(FakeNetworkProvider{})},
 	}
 
 	for _, tc := range testCases {
