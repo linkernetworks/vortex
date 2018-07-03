@@ -2,15 +2,14 @@ package server
 
 import (
 	"fmt"
-	"net/http"
 
-	restful "github.com/emicklei/go-restful"
+	"github.com/linkernetworks/logger"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/web"
 	"github.com/prometheus/common/model"
 )
 
-func listNodeHandler(ctx *web.Context) {
+func listNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	result, err := queryFromPrometheus(sp, "sum by (node)(kube_node_info)")
@@ -29,13 +28,11 @@ func listNodeHandler(ctx *web.Context) {
 		}
 	}
 
-	resp.WriteJson(map[string]interface{}{
-		"status":  http.StatusOK,
-		"results": nodeList,
-	}, restful.MIME_JSON)
+	logger.Infof("fetching all nodes. found %d nodes", len(nodeList))
+	resp.WriteEntity(nodeList)
 }
 
-func getNodeHandler(ctx *web.Context) {
+func getNodeMetricsHandler(ctx *web.Context) {
 	//sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 }
