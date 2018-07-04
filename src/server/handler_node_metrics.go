@@ -38,7 +38,10 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	node.Info.Labels = map[string]string{}
 	node.NICs = map[string]entity.NICMetrics{}
 
-	results, _ := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|",node=~"`+id+`"}`)
+	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|",node=~"`+id+`"}`)
+	if results == nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", results, err))
+	}
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
@@ -73,7 +76,10 @@ func getNodeMetricsHandler(ctx *web.Context) {
 		}
 	}
 
-	results, _ = queryFromPrometheus(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
+	results, err = queryFromPrometheus(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
+	if results == nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", results, err))
+	}
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
@@ -94,7 +100,10 @@ func getNodeMetricsHandler(ctx *web.Context) {
 		}
 	}
 
-	results, _ = queryFromPrometheus(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
+	results, err = queryFromPrometheus(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
+	if results == nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", results, err))
+	}
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
