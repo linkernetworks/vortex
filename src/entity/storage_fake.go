@@ -1,6 +1,6 @@
 package entity
 
-type FakeNetwork struct {
+type FakeStorage struct {
 	FakeParameter string
 	IWantFail     bool
 }
