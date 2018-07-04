@@ -21,23 +21,37 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y ntp
 
     # Install Docker
+    # kubernetes official valid max version 17.03.2~ce-0~ubuntu-xenial
+    export DOCKER_VERSION="17.06.2~ce-0~ubuntu"
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     sudo apt-get update
-    sudo apt-get install -y docker-ce=17.06.2~ce-0~ubuntu
+    sudo apt-get install -y docker-ce=${DOCKER_VERSION}
 
     # Install Kubernetes
+    export KUBE_VERSION="1.11.0"
+    export NET_IF_NAME="enp0s8"
     sudo apt-get install -y apt-transport-https curl
     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
     echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee --append /etc/apt/sources.list.d/kubernetes.list
     sudo apt-get update
-    sudo apt-get install -y kubelet kubeadm kubectl
-    sudo swapoff -a
-    sudo kubeadm init --apiserver-advertise-address=172.17.8.100 --pod-network-cidr=10.244.0.0/16
+    sudo apt-get install -y kubectl kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
+
+    # Disable swap
+    sudo swapoff -a && sudo sysctl -w vm.swappiness=0
+    sudo sed '/swap.img/d' -i /etc/fstab
+
+    sudo kubeadm init --kubernetes-version v${KUBE_VERSION} --apiserver-advertise-address=172.17.8.100 --pod-network-cidr=10.244.0.0/16
     mkdir -p $HOME/.kube
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
-    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
+
+    # Should give flannel the real network interface name
+    wget --quiet https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml -O /tmp/kube-flannel.yml
+    sed -i -- "s/\"--kube-subnet-mgr\"/\"--kube-subnet-mgr\"\, \"--iface=$NET_IF_NAME\"/g" /tmp/kube-flannel.yml
+    cat /tmp/kube-flannel.yml | grep iface
+    kubectl apply -f /tmp/kube-flannel.yml
+
     kubectl taint nodes --all node-role.kubernetes.io/master-
 
     # Install Golang
@@ -52,7 +66,7 @@ Vagrant.configure("2") do |config|
     # setup golang dir
     mkdir -p /home/$USER/go/src
     rm -rf /home/$USER/go1.10.2.linux-amd64.tar.gz
-    
+
     # install protoc
     if [ ! -d "${PROTOC_TARGET}" ]; then curl -fsSL "$PROTOC_RELEASE" > "${PROTOC_TARGET}.zip"; fi
     if [ -f "${PROTOC_TARGET}.zip" ]; then unzip "${PROTOC_TARGET}.zip" -d "${PROTOC_TARGET}"; fi
