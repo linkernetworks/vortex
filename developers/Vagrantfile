@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y ntp
 
     # Install Docker
-    # kubernetes official valid max version 17.03.2~ce-0~ubuntu-xenial
+    # kubernetes official max validated version: 17.03.2~ce-0~ubuntu-xenial
     export DOCKER_VERSION="17.06.2~ce-0~ubuntu"
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -48,8 +48,7 @@ Vagrant.configure("2") do |config|
 
     # Should give flannel the real network interface name
     wget --quiet https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml -O /tmp/kube-flannel.yml
-    sed -i -- "s/\"--kube-subnet-mgr\"/\"--kube-subnet-mgr\"\, \"--iface=$NET_IF_NAME\"/g" /tmp/kube-flannel.yml
-    cat /tmp/kube-flannel.yml | grep iface
+    sed -i -- 's/"--kube-subnet-mgr"/"--kube-subnet-mgr", "--iface='"$NET_IF_NAME"'"/g' /tmp/kube-flannel.yml
     kubectl apply -f /tmp/kube-flannel.yml
 
     kubectl taint nodes --all node-role.kubernetes.io/master-
