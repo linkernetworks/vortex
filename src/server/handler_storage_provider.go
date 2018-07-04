@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/storageprovider"
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -18,8 +19,8 @@ import (
 func createStorage(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	storageProvider := entity.Storage{}
-	if err := req.ReadEntity(&storageProvider); err != nil {
+	storage := entity.Storage{}
+	if err := req.ReadEntity(&storage); err != nil {
 		logger.Error(err)
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
@@ -32,11 +33,28 @@ func createStorage(ctx *web.Context) {
 	})
 	defer session.Close()
 	// Check whether this displayname has been used
-	storageProvider.ID = bson.NewObjectId()
-	storageProvider.CreatedAt = timeutils.Now()
-	if err := session.Insert(entity.StorageCollectionName, &storageProvider); err != nil {
+
+	storageProvider, err := storageprovider.GetStorageProvider(&storage)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := storageProvider.ValidateBeforeCreating(sp, storage); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := storageProvider.CreateStorage(sp, storage); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	storage.ID = bson.NewObjectId()
+	storage.CreatedAt = timeutils.Now()
+	if err := session.Insert(entity.StorageCollectionName, &storage); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storageProvider.DisplayName))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.DisplayName))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -98,12 +116,34 @@ func listStorage(ctx *web.Context) {
 }
 
 func deleteStorage(ctx *web.Context) {
-	as, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
 
-	session := as.Mongo.NewSession()
+	session := sp.Mongo.NewSession()
 	defer session.Close()
+	c := session.C(entity.StorageCollectionName)
+
+	var storage entity.Storage
+	if err := c.FindId(bson.ObjectIdHex(id)).One(&storage); err != nil {
+		if err == mgo.ErrNotFound {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	storageProvider, err := storageprovider.GetStorageProvider(&storage)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := storageProvider.DeleteStorage(sp, storage); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
 
 	if err := session.Remove(entity.StorageCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {

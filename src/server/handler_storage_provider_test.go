@@ -16,17 +16,22 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/mgo.v2/bson"
+	//	"gopkg.in/mgo.v2/bson"
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+type StorageSuite struct {
+	suite.Suite
+	wc      *restful.Container
+	session *mongo.Session
+}
+
 type StorageTestSuite struct {
 	suite.Suite
 	wc      *restful.Container
-	storage entity.NFSStorageSetting
 	session *mongo.Session
 }
 
@@ -53,15 +58,11 @@ func TestStorageSuite(t *testing.T) {
 func (suite *StorageTestSuite) TestCreateStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
-	tType := "nfs"
-	tIP := "1.2.3.4"
-	tPath := "/exports"
 	storage := entity.Storage{
-		Type:        tType,
+		Type:        entity.FakeStorageType,
 		DisplayName: tName,
-		NFSStorageSetting: entity.NFSStorageSetting{
-			IP:   tIP,
-			PATH: tPath,
+		Fake: entity.FakeStorage{
+			FakeParameter: "fake~",
 		},
 	}
 
@@ -92,6 +93,56 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
+func (suite *StorageTestSuite) TestCreateStorageFail() {
+	testCases := []struct {
+		cases     string
+		storage   entity.Storage
+		errorCode int
+	}{
+		{"InvalidParameter", entity.Storage{
+			DisplayName: namesgenerator.GetRandomName(0),
+			Type:        entity.FakeStorageType,
+			Fake: entity.FakeStorage{
+				FakeParameter: "",
+			}},
+			http.StatusBadRequest},
+		{"CreateFail", entity.Storage{
+			DisplayName: namesgenerator.GetRandomName(0),
+			Type:        entity.FakeStorageType,
+			Fake: entity.FakeStorage{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusInternalServerError},
+		{"StorageTypeError", entity.Storage{
+			DisplayName: namesgenerator.GetRandomName(0),
+			Type:        "non-exist",
+			Fake: entity.FakeStorage{
+				FakeParameter: "Yo",
+				IWantFail:     true,
+			}},
+			http.StatusBadRequest},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.cases, func(t *testing.T) {
+			bodyBytes, err := json.MarshalIndent(tc.storage, "", "  ")
+			suite.NoError(err)
+
+			bodyReader := strings.NewReader(string(bodyBytes))
+			httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
+			suite.NoError(err)
+
+			httpRequest.Header.Add("Content-Type", "application/json")
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
+		})
+	}
+
+}
+
+/*
 func (suite *StorageTestSuite) TestDeleteStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
@@ -217,3 +268,4 @@ func (suite *StorageTestSuite) TestListInvalidStorage() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
+*/
