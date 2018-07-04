@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -16,7 +17,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
-	//	"gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func init() {
@@ -142,30 +143,24 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 
 }
 
-/*
 func (suite *StorageTestSuite) TestDeleteStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
-	tType := "nfs"
-	tIP := "1.2.3.4"
-	tPath := "/exports"
 	storage := entity.Storage{
 		ID:          bson.NewObjectId(),
-		Type:        tType,
+		Type:        entity.FakeStorageType,
 		DisplayName: tName,
-		NFSStorageSetting: entity.NFSStorageSetting{
-			IP:   tIP,
-			PATH: tPath,
+		Fake: entity.FakeStorage{
+			FakeParameter: "fake~",
 		},
 	}
 
 	suite.session.C(entity.StorageCollectionName).Insert(storage)
 	defer suite.session.Remove(entity.StorageCollectionName, "displayName", tName)
 
-	bodyBytes, err := json.MarshalIndent(suite.storage, "", "  ")
+	bodyBytes, err := json.MarshalIndent(storage, "", "  ")
 	suite.NoError(err)
 
-	//Create again and it should fail since the name exist
 	bodyReader := strings.NewReader(string(bodyBytes))
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+storage.ID.Hex(), bodyReader)
 	suite.NoError(err)
@@ -173,6 +168,16 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+}
+
+func (suite *NetworkTestSuite) TestDeleteEmptyStorage() {
+	//Remove with non-exist network id
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
 func (suite *StorageTestSuite) TestInValidDeleteStorage() {
@@ -183,63 +188,106 @@ func (suite *StorageTestSuite) TestInValidDeleteStorage() {
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
-func (suite *StorageTestSuite) TestListStorage() {
-	storages := []entity.Storage{}
-	for i := 0; i < 3; i++ {
-		storages = append(storages, entity.Storage{
+func (suite *StorageTestSuite) TestDeleteStorageFail() {
+	testCases := []struct {
+		cases     string
+		storage   entity.Storage
+		errorCode int
+	}{
+		{"DeleteStorage", entity.Storage{
 			ID:          bson.NewObjectId(),
 			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        "nfs",
-			NFSStorageSetting: entity.NFSStorageSetting{
-				IP:   "1.2.3.4",
-				PATH: "/expots",
+			Type:        entity.FakeStorageType,
+			Fake: entity.FakeStorage{
+				FakeParameter: "Yo-Delete-Fail",
+				IWantFail:     true,
+			}},
+			http.StatusInternalServerError},
+		{"StorageTypeError", entity.Storage{
+			ID:          bson.NewObjectId(),
+			DisplayName: namesgenerator.GetRandomName(0),
+			Type:        "non-exist",
+			Fake: entity.FakeStorage{
+				FakeParameter: "Yo-Delete-Fail",
+				IWantFail:     true,
+			}},
+			http.StatusBadRequest},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.cases, func(t *testing.T) {
+			suite.session.C(entity.StorageCollectionName).Insert(tc.storage)
+			defer suite.session.Remove(entity.StorageCollectionName, "displayName", tc.storage.DisplayName)
+
+			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+tc.storage.ID.Hex(), nil)
+			suite.NoError(err)
+
+			httpRequest.Header.Add("Content-Type", "application/json")
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
+		})
+	}
+}
+
+func (suite *StorageTestSuite) TestListStorage() {
+	storages := []entity.Storage{}
+
+	count := 3
+	for i := 0; i < count; i++ {
+		storages = append(storages, entity.Storage{
+			DisplayName: namesgenerator.GetRandomName(0),
+			Type:        entity.FakeStorageType,
+			Fake: entity.FakeStorage{
+				FakeParameter: "Yo",
+				IWantFail:     false,
 			},
 		})
 	}
 
+	testCases := []struct {
+		page       string
+		pageSize   string
+		expectSize int
+	}{
+		{"", "", count},
+		{"1", "1", count},
+		{"1", "3", count},
+	}
+
 	for _, v := range storages {
 		err := suite.session.C(entity.StorageCollectionName).Insert(v)
+		defer suite.session.Remove(entity.StorageCollectionName, "displayName", v.DisplayName)
 		suite.NoError(err)
-		defer suite.session.Remove(entity.StorageCollectionName, "_id", v.ID)
 	}
 
-	//default page & page_size
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storageprovider/", nil)
-	suite.NoError(err)
+	for _, tc := range testCases {
+		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
+		suite.T().Run(caseName, func(t *testing.T) {
+			url := "http://localhost:7890/v1/storageprovider/"
+			if tc.page != "" || tc.pageSize != "" {
+				url = "http://localhost:7890/v1/storageprovider?"
+				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
+			}
+			httpRequest, err := http.NewRequest("GET", url, nil)
 
-	httpWriter := httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+			suite.NoError(err)
 
-	retStorages := []entity.Storage{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &retStorages)
-	suite.NoError(err)
-	suite.Equal(len(storages), len(retStorages))
-	for i, v := range retStorages {
-		suite.Equal(storages[i].ID, v.ID)
-		suite.Equal(storages[i].DisplayName, v.DisplayName)
-		suite.Equal(storages[i].Type, v.Type)
-		suite.Equal(storages[i].IP, v.IP)
-		suite.Equal(storages[i].PATH, v.PATH)
-	}
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=1&page_size=30", nil)
-	suite.NoError(err)
-
-	httpWriter = httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
-
-	retStorages = []entity.Storage{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &retStorages)
-	suite.NoError(err)
-	suite.Equal(len(storages), len(retStorages))
-	for i, v := range retStorages {
-		suite.Equal(storages[i].ID, v.ID)
-		suite.Equal(storages[i].DisplayName, v.DisplayName)
-		suite.Equal(storages[i].Type, v.Type)
-		suite.Equal(storages[i].IP, v.IP)
-		suite.Equal(storages[i].PATH, v.PATH)
+			retStorages := []entity.Storage{}
+			err = json.Unmarshal(httpWriter.Body.Bytes(), &retStorages)
+			suite.NoError(err)
+			suite.Equal(tc.expectSize, len(retStorages))
+			for i, v := range retStorages {
+				suite.Equal(storages[i].DisplayName, v.DisplayName)
+				fmt.Println(v.Type)
+				fmt.Println(storages[i].Type)
+				suite.Equal(storages[i].Type, v.Type)
+			}
+		})
 	}
 }
 
@@ -268,4 +316,3 @@ func (suite *StorageTestSuite) TestListInvalidStorage() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
-*/
