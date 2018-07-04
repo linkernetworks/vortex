@@ -35,3 +35,17 @@ docker run -it --network=host asia.gcr.io/linker-aurora/vortex:<git-branch> bash
 // example
 docker run -it --network=host asia.gcr.io/linker-aurora/vortex:develop bash
 ```
+
+# Deploy to Kubernetes
+
+1. Apply base storage system
+2. Apply service
+3. Apply apps
+  -  require cluster admin to apply role binding
+
+```
+kubectl apply -f deploy/kubernetes/base/service/mongodb
+
+kubectl apply -f deploy/kubernetes/apps/monitoring/monitoring-namespace.yaml
+kubectl apply -f deploy/kubernetes/apps/ --resursive
+```
