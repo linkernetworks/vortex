@@ -30,7 +30,7 @@ func (suite *KubeCtlDeploymentTestSuite) SetupSuite() {
 }
 
 func (suite *KubeCtlDeploymentTestSuite) TearDownSuite() {}
-func (suite *KubeCtlDeploymentTestSuite) TearCreateDeployment() {
+func (suite *KubeCtlDeploymentTestSuite) TestCreateDeployment() {
 
 	var replicas int32
 	replicas = 3
@@ -51,7 +51,7 @@ func (suite *KubeCtlDeploymentTestSuite) TearCreateDeployment() {
 	deploy, err := suite.kubectl.GetDeployment(name)
 	suite.NoError(err)
 	suite.NotNil(deploy)
-	suite.Equal(replicas, deploy.Spec.Replicas)
+	suite.Equal(replicas, *deploy.Spec.Replicas)
 }
 
 func TestDeploymentTestSuite(t *testing.T) {
