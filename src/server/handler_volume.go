@@ -32,7 +32,7 @@ func createVolume(ctx *web.Context) {
 	defer session.Close()
 
 	// Check the storageClass is existed
-	couunt, err := session.Count(entity.StorageCollectionName, bson.M{"displayName": volume.StorageName})
+	couunt, err := session.Count(entity.StorageCollectionName, bson.M{"name": volume.StorageName})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -41,7 +41,7 @@ func createVolume(ctx *web.Context) {
 		return
 	}
 
-	// Check whether this displayname has been used
+	// Check whether this name has been used
 	volume.ID = bson.NewObjectId()
 	volume.CreatedAt = timeutils.Now()
 	//Generate the metaName for PVC meta name and we will use it future

@@ -60,8 +60,8 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	storage := entity.Storage{
-		Type:        entity.FakeStorageType,
-		DisplayName: tName,
+		Type: entity.FakeStorageType,
+		Name: tName,
 		Fake: entity.FakeStorage{
 			FakeParameter: "fake~",
 		},
@@ -77,7 +77,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	defer suite.session.Remove(entity.StorageCollectionName, "displayName", tName)
+	defer suite.session.Remove(entity.StorageCollectionName, "name", tName)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 	//Empty data
 	//We use the new write but empty input
@@ -101,23 +101,23 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 		errorCode int
 	}{
 		{"InvalidParameter", entity.Storage{
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        entity.FakeStorageType,
+			Name: namesgenerator.GetRandomName(0),
+			Type: entity.FakeStorageType,
 			Fake: entity.FakeStorage{
 				FakeParameter: "",
 			}},
 			http.StatusBadRequest},
 		{"CreateFail", entity.Storage{
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        entity.FakeStorageType,
+			Name: namesgenerator.GetRandomName(0),
+			Type: entity.FakeStorageType,
 			Fake: entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
 			}},
 			http.StatusInternalServerError},
 		{"StorageTypeError", entity.Storage{
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        "non-exist",
+			Name: namesgenerator.GetRandomName(0),
+			Type: "non-exist",
 			Fake: entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
@@ -147,16 +147,16 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	storage := entity.Storage{
-		ID:          bson.NewObjectId(),
-		Type:        entity.FakeStorageType,
-		DisplayName: tName,
+		ID:   bson.NewObjectId(),
+		Type: entity.FakeStorageType,
+		Name: tName,
 		Fake: entity.FakeStorage{
 			FakeParameter: "fake~",
 		},
 	}
 
 	suite.session.C(entity.StorageCollectionName).Insert(storage)
-	defer suite.session.Remove(entity.StorageCollectionName, "displayName", tName)
+	defer suite.session.Remove(entity.StorageCollectionName, "name", tName)
 
 	bodyBytes, err := json.MarshalIndent(storage, "", "  ")
 	suite.NoError(err)
@@ -195,18 +195,18 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 		errorCode int
 	}{
 		{"DeleteStorage", entity.Storage{
-			ID:          bson.NewObjectId(),
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        entity.FakeStorageType,
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Type: entity.FakeStorageType,
 			Fake: entity.FakeStorage{
 				FakeParameter: "Yo-Delete-Fail",
 				IWantFail:     true,
 			}},
 			http.StatusInternalServerError},
 		{"StorageTypeError", entity.Storage{
-			ID:          bson.NewObjectId(),
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        "non-exist",
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Type: "non-exist",
 			Fake: entity.FakeStorage{
 				FakeParameter: "Yo-Delete-Fail",
 				IWantFail:     true,
@@ -217,7 +217,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 	for _, tc := range testCases {
 		suite.T().Run(tc.cases, func(t *testing.T) {
 			suite.session.C(entity.StorageCollectionName).Insert(tc.storage)
-			defer suite.session.Remove(entity.StorageCollectionName, "displayName", tc.storage.DisplayName)
+			defer suite.session.Remove(entity.StorageCollectionName, "name", tc.storage.Name)
 
 			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+tc.storage.ID.Hex(), nil)
 			suite.NoError(err)
@@ -236,8 +236,8 @@ func (suite *StorageTestSuite) TestListStorage() {
 	count := 3
 	for i := 0; i < count; i++ {
 		storages = append(storages, entity.Storage{
-			DisplayName: namesgenerator.GetRandomName(0),
-			Type:        entity.FakeStorageType,
+			Name: namesgenerator.GetRandomName(0),
+			Type: entity.FakeStorageType,
 			Fake: entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     false,
@@ -257,7 +257,7 @@ func (suite *StorageTestSuite) TestListStorage() {
 
 	for _, v := range storages {
 		err := suite.session.C(entity.StorageCollectionName).Insert(v)
-		defer suite.session.Remove(entity.StorageCollectionName, "displayName", v.DisplayName)
+		defer suite.session.Remove(entity.StorageCollectionName, "name", v.Name)
 		suite.NoError(err)
 	}
 
@@ -282,7 +282,7 @@ func (suite *StorageTestSuite) TestListStorage() {
 			suite.NoError(err)
 			suite.Equal(tc.expectSize, len(retStorages))
 			for i, v := range retStorages {
-				suite.Equal(storages[i].DisplayName, v.DisplayName)
+				suite.Equal(storages[i].Name, v.Name)
 				fmt.Println(v.Type)
 				fmt.Println(storages[i].Type)
 				suite.Equal(storages[i].Type, v.Type)

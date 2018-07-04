@@ -43,9 +43,9 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	suite.wc.Add(service)
 	//init a Storage
 	suite.storage = entity.Storage{
-		ID:          bson.NewObjectId(),
-		Type:        "nfs",
-		DisplayName: namesgenerator.GetRandomName(0),
+		ID:   bson.NewObjectId(),
+		Type: "nfs",
+		Name: namesgenerator.GetRandomName(0),
 	}
 	err := suite.session.Insert(entity.StorageCollectionName, suite.storage)
 	suite.NoError(err)
@@ -65,7 +65,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	tCapacity := "500G"
 	volume := entity.Volume{
 		Name:        tName,
-		StorageName: suite.storage.DisplayName,
+		StorageName: suite.storage.Name,
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
 	}

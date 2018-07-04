@@ -28,7 +28,7 @@ func createStorage(ctx *web.Context) {
 
 	session := sp.Mongo.NewSession()
 	session.C(entity.StorageCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"displayName"},
+		Key:    []string{"name"},
 		Unique: true,
 	})
 	defer session.Close()
@@ -54,7 +54,7 @@ func createStorage(ctx *web.Context) {
 	storage.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.StorageCollectionName, &storage); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.DisplayName))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
