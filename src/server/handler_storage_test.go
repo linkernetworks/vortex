@@ -71,7 +71,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storage", bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -86,7 +86,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
-	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
+	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/storage", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
@@ -131,7 +131,7 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 			suite.NoError(err)
 
 			bodyReader := strings.NewReader(string(bodyBytes))
-			httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storageprovider", bodyReader)
+			httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/storage", bodyReader)
 			suite.NoError(err)
 
 			httpRequest.Header.Add("Content-Type", "application/json")
@@ -162,7 +162,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+storage.ID.Hex(), bodyReader)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+storage.ID.Hex(), bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
@@ -172,7 +172,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 
 func (suite *NetworkTestSuite) TestDeleteEmptyStorage() {
 	//Remove with non-exist network id
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
@@ -181,7 +181,7 @@ func (suite *NetworkTestSuite) TestDeleteEmptyStorage() {
 }
 
 func (suite *StorageTestSuite) TestInValidDeleteStorage() {
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+bson.NewObjectId().Hex(), nil)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -219,7 +219,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 			suite.session.C(entity.StorageCollectionName).Insert(tc.storage)
 			defer suite.session.Remove(entity.StorageCollectionName, "displayName", tc.storage.DisplayName)
 
-			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storageprovider/"+tc.storage.ID.Hex(), nil)
+			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+tc.storage.ID.Hex(), nil)
 			suite.NoError(err)
 
 			httpRequest.Header.Add("Content-Type", "application/json")
@@ -264,9 +264,9 @@ func (suite *StorageTestSuite) TestListStorage() {
 	for _, tc := range testCases {
 		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
 		suite.T().Run(caseName, func(t *testing.T) {
-			url := "http://localhost:7890/v1/storageprovider/"
+			url := "http://localhost:7890/v1/storage/"
 			if tc.page != "" || tc.pageSize != "" {
-				url = "http://localhost:7890/v1/storageprovider?"
+				url = "http://localhost:7890/v1/storage?"
 				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
 			}
 			httpRequest, err := http.NewRequest("GET", url, nil)
@@ -293,7 +293,7 @@ func (suite *StorageTestSuite) TestListStorage() {
 
 func (suite *StorageTestSuite) TestListInvalidStorage() {
 	//Invliad page size
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=0", nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storage?page=0", nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
@@ -301,7 +301,7 @@ func (suite *StorageTestSuite) TestListInvalidStorage() {
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 
 	//Invliad page type
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page=asd", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storage?page=asd", nil)
 	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
@@ -309,7 +309,7 @@ func (suite *StorageTestSuite) TestListInvalidStorage() {
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	//Invliad page_size type
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storageprovider?page_size=asd", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storage?page_size=asd", nil)
 	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
