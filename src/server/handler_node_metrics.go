@@ -30,17 +30,15 @@ func listNodeMetricsHandler(ctx *web.Context) {
 	resp.WriteEntity(nodeList)
 }
 
-//vortex-dev
 func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
-
-	results, _ := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity_memory_bytes|",node=~"`+id+`"}`)
-
 	node := entity.NodeMetrics{}
-	nics := &node.Info.NICs
-	labels := &node.Info.Labels
+	node.Info.Labels = map[string]string{}
+	node.NICs = map[string]entity.NICMetrics{}
+
+	results, _ := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|",node=~"`+id+`"}`)
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
@@ -54,21 +52,10 @@ func getNodeMetricsHandler(ctx *web.Context) {
 		case "kube_node_created":
 			node.Info.CreatedAt = int(result.Value)
 
-		case "node_network_interface":
-			nic := entity.NICMetrics{}
-			nic.Name = string(result.Metric["device"])
-			nic.Default = string(result.Metric["default"])
-			nic.Type = string(result.Metric["type"])
-			nic.IP = string(result.Metric["ip_address"])
-			*nics = append(*nics, nic)
-
 		case "kube_node_labels":
-			label := entity.NodeLabelMetrics{}
 			for key, value := range result.Metric {
 				if strings.HasPrefix(string(key), "label_") {
-					label.Key = strings.TrimPrefix(string(key), "label_")
-					label.Value = string(value)
-					*labels = append(*labels, label)
+					node.Info.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
 				}
 			}
 
@@ -85,36 +72,63 @@ func getNodeMetricsHandler(ctx *web.Context) {
 			node.Resource.CapacityMemory = float32(result.Value)
 		}
 	}
-	// results, _ := queryFromPrometheus(sp, `{__name__=~"kube_node_info",node=~"`+id+`"}`)
-	// node.Info.Hostname = id
-	// node.Info.KernelVersion = string(results[0].Metric["kernel_version"])
-	// node.Info.OS = string(results[0].Metric["os_image"])
-	// node.Info.KubernetesVersion = string(results[0].Metric["kubelet_version"])
 
-	// results, _ = queryFromPrometheus(sp, `{__name__=~"kube_node_created",node=~"`+id+`"}`)
-	// node.Info.CreatedAt = int(results[0].Value)
+	results, _ = queryFromPrometheus(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
 
-	// results, _ = queryFromPrometheus(sp, `{__name__=~"node_network_interface",node=~"`+id+`"}`)
-	// NICs := []entity.NetworkInterfaceMetrics{}
-	// for _, result := range results {
-	// 	nic := entity.NetworkInterfaceMetrics{}
-	// 	nic.Name = string(result.Metric["device"])
-	// 	nic.Default = string(result.Metric["default"])
-	// 	nic.Type = string(result.Metric["type"])
-	// 	nic.IP = string(result.Metric["ip_address"])
-	// 	NICs = append(NICs, nic)
-	// }
-	// node.Info.NICs = NICs
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+		case "kube_pod_container_resource_requests":
+			switch result.Metric["resource"] {
+			case "cpu":
+				node.Resource.CPURequests = float32(result.Value)
+			case "memory":
+				node.Resource.MemoryRequests = float32(result.Value)
+			}
+		case "kube_pod_container_resource_limits":
+			switch result.Metric["resource"] {
+			case "cpu":
+				node.Resource.CPULimits = float32(result.Value)
+			case "memory":
+				node.Resource.MemoryLimits = float32(result.Value)
+			}
+		}
+	}
 
-	//node.Info.NIC = string(results[0].Value)
+	results, _ = queryFromPrometheus(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "node_network_interface":
+			nic := entity.NICMetrics{}
+			nic.Default = string(result.Metric["default"])
+			nic.Type = string(result.Metric["type"])
+			nic.IP = string(result.Metric["ip_address"])
+			nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
+			node.NICs[string(result.Metric["device"])] = nic
+
+		case "node_network_receive_bytes_total":
+			nic := node.NICs[string(result.Metric["device"])]
+			nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
+			node.NICs[string(result.Metric["device"])] = nic
+
+		case "node_network_transmit_bytes_total":
+			nic := node.NICs[string(result.Metric["device"])]
+			nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
+			node.NICs[string(result.Metric["device"])] = nic
+
+		case "node_network_receive_packets_total":
+			nic := node.NICs[string(result.Metric["device"])]
+			nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
+			node.NICs[string(result.Metric["device"])] = nic
+
+		case "node_network_transmit_packets_total":
+			nic := node.NICs[string(result.Metric["device"])]
+			nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
+			node.NICs[string(result.Metric["device"])] = nic
+		}
+	}
 
 	resp.WriteEntity(node)
-
-	// sum(kube_node_status_capacity_cpu_cores)-sum(kube_pod_container_resource_requests{resource="cpu",node="vortex-dev"})
-	// sum (kube_pod_container_resource_limits{resource="cpu",node="vortex-dev"})
-	// sum (kube_pod_container_resource_requests{resource="cpu",node="vortex-dev"})
-
-	// sum (kube_pod_container_resource_limits{resource="memory",node="vortex-dev"})
-	// sum (kube_pod_container_resource_requests{resource="memory",node="vortex-dev"})
 
 }
