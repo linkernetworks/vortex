@@ -44,8 +44,6 @@ docker run -it --network=host asia.gcr.io/linker-aurora/vortex:develop bash
   -  require cluster admin to apply role binding
 
 ```
-kubectl apply -f deploy/kubernetes/base/gluster/slow-many.yaml
-
 kubectl apply -f deploy/kubernetes/base/service/mongodb
 
 kubectl apply -f deploy/kubernetes/apps/monitoring/monitoring-namespace.yaml
