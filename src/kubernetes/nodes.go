@@ -5,7 +5,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//Get the Node object by the node name
+//Get the node object by the node name
 func (kc *KubeCtl) GetNode(name string) (*corev1.Node, error) {
 	return kc.Clientset.CoreV1().Nodes().Get(name, metav1.GetOptions{})
 }

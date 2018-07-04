@@ -44,7 +44,7 @@ func (suite *KubeCtlNodeTestSuite) TestGetNodeFail() {
 func (suite *KubeCtlNodeTestSuite) TestGetNodes() {
 	node := corev1.Node{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "K8S-Node2",
+			Name: "K8S-Node-2",
 		},
 	}
 	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
@@ -52,7 +52,7 @@ func (suite *KubeCtlNodeTestSuite) TestGetNodes() {
 
 	node = corev1.Node{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "K8S-Node3",
+			Name: "K8S-Node-3",
 		},
 	}
 	_, err = suite.fakeclient.CoreV1().Nodes().Create(&node)
