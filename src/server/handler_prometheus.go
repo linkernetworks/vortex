@@ -28,7 +28,7 @@ func queryMetrics(ctx *web.Context) {
 
 	result, err := queryFromPrometheus(sp, expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", result, err))
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
 
 	resp.WriteJson(map[string]interface{}{
