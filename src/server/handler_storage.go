@@ -26,32 +26,32 @@ func createStorage(ctx *web.Context) {
 		return
 	}
 
+	storage.ID = bson.NewObjectId()
+	storage.CreatedAt = timeutils.Now()
+
 	session := sp.Mongo.NewSession()
 	session.C(entity.StorageCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"name"},
 		Unique: true,
 	})
 	defer session.Close()
-	// Check whether this displayname has been used
-
+	// Check whether this name has been used
 	storageProvider, err := storageprovider.GetStorageProvider(&storage)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := storageProvider.ValidateBeforeCreating(sp, storage); err != nil {
+	if err := storageProvider.ValidateBeforeCreating(sp, &storage); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := storageProvider.CreateStorage(sp, storage); err != nil {
+	if err := storageProvider.CreateStorage(sp, &storage); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	storage.ID = bson.NewObjectId()
-	storage.CreatedAt = timeutils.Now()
 	if err := session.Insert(entity.StorageCollectionName, &storage); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.Name))
@@ -140,7 +140,7 @@ func deleteStorage(ctx *web.Context) {
 		return
 	}
 
-	if err := storageProvider.DeleteStorage(sp, storage); err != nil {
+	if err := storageProvider.DeleteStorage(sp, &storage); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}

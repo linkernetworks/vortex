@@ -16,7 +16,7 @@ func TestStorageValidateBeforeCreating(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, entity.Storage{})
+	err = fake.ValidateBeforeCreating(nil, &entity.Storage{})
 	assert.NoError(t, err)
 }
 
@@ -29,7 +29,7 @@ func TestFakeStorageCreating(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateStorage(nil, entity.Storage{})
+	err = fake.CreateStorage(nil, &entity.Storage{})
 	assert.NoError(t, err)
 }
 
@@ -41,7 +41,7 @@ func TestFakeStorageValidateBeforeCreatingFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, entity.Storage{})
+	err = fake.ValidateBeforeCreating(nil, &entity.Storage{})
 	assert.Error(t, err)
 }
 
@@ -53,7 +53,7 @@ func TestFakeStorageCreatingFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateStorage(nil, entity.Storage{})
+	err = fake.CreateStorage(nil, &entity.Storage{})
 	assert.Error(t, err)
 }
 
@@ -63,7 +63,7 @@ func TestFakeStorageDelete(t *testing.T) {
 		Fake: entity.FakeStorage{},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteStorage(nil, entity.Storage{})
+	err = fake.DeleteStorage(nil, &entity.Storage{})
 	assert.NoError(t, err)
 }
 
@@ -75,6 +75,6 @@ func TestFakeStorageDeleteFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteStorage(nil, entity.Storage{})
+	err = fake.DeleteStorage(nil, &entity.Storage{})
 	assert.Error(t, err)
 }

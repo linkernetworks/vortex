@@ -82,7 +82,7 @@ func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 	suite.NoError(err)
 	sp = sp.(NFSStorageProvider)
 
-	err = sp.ValidateBeforeCreating(suite.sp, *storage)
+	err = sp.ValidateBeforeCreating(suite.sp, storage)
 	suite.NoError(err)
 }
 
@@ -100,7 +100,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	suite.NoError(err)
 	sp = sp.(NFSStorageProvider)
 
-	err = sp.CreateStorage(suite.sp, storage)
+	err = sp.CreateStorage(suite.sp, &storage)
 	suite.NoError(err)
 
 	deploy, err := suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
@@ -109,7 +109,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 }
 
 func (suite *StorageTestSuite) TestDeleteStorage() {
-	storage := entity.Storage{
+	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
 		NFS: entity.NFSStorage{
@@ -118,7 +118,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 		},
 	}
 
-	sp, err := GetStorageProvider(&storage)
+	sp, err := GetStorageProvider(storage)
 	suite.NoError(err)
 	sp = sp.(NFSStorageProvider)
 
@@ -171,7 +171,7 @@ func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
 			suite.NoError(err)
 			np = np.(NFSStorageProvider)
 
-			err = np.ValidateBeforeCreating(suite.sp, *tc.storage)
+			err = np.ValidateBeforeCreating(suite.sp, tc.storage)
 			suite.Error(err)
 		})
 	}
