@@ -108,6 +108,35 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	suite.NoError(err)
 }
 
+func (suite *StorageTestSuite) TestDeleteStorage() {
+	storage := entity.Storage{
+		ID:   bson.NewObjectId(),
+		Type: entity.NFSStorageType,
+		NFS: entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+	}
+
+	sp, err := GetStorageProvider(&storage)
+	suite.NoError(err)
+	sp = sp.(NFSStorageProvider)
+
+	err = sp.CreateStorage(suite.sp, storage)
+	suite.NoError(err)
+
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	suite.NotNil(deploy)
+	suite.NoError(err)
+
+	err = sp.DeleteStorage(suite.sp, storage)
+	suite.NoError(err)
+
+	deploy, err = suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	suite.Nil(deploy)
+	suite.Error(err)
+}
+
 func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
 	testCases := []struct {
 		caseName string
@@ -146,5 +175,4 @@ func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
 			suite.Error(err)
 		})
 	}
-
 }

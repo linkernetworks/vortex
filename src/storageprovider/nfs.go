@@ -97,5 +97,9 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 }
 
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage entity.Storage) error {
-	return nil
+	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
+	//Delete StorageClass
+
+	//Delete Deployment
+	return sp.KubeCtl.DeleteDeployment(name)
 }
