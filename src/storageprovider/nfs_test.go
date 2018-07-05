@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os/exec"
-	"runtime"
 	"testing"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	kc "github.com/linkernetworks/vortex/src/kubernetes"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	//"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 
 	//mgo "gopkg.in/mgo.v2"
@@ -57,13 +57,50 @@ func (suite *StorageTestSuite) TearDownSuite() {
 }
 
 func TestStorageSuite(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		fmt.Println("We only testing the ovs function on Linux Host")
-		t.Skip()
-		return
-	}
 	suite.Run(t, new(StorageTestSuite))
 }
 
 func (suite *StorageTestSuite) TestCreateStorage() {
+
+}
+
+func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
+	testCases := []struct {
+		caseName string
+		storage  *entity.Storage
+	}{
+		{"invalidIP", &entity.Storage{
+			Type: entity.NFSStorageType,
+			NFS: entity.NFSStorage{
+				IP: "a.b.c.d",
+			},
+		}},
+		{"invalidExports-1", &entity.Storage{
+			Type: entity.NFSStorageType,
+			NFS: entity.NFSStorage{
+				IP:   "1.2.3.4",
+				PATH: "tmp",
+			},
+		}},
+		{"invalidExports-2", &entity.Storage{
+			Type: entity.NFSStorageType,
+			NFS: entity.NFSStorage{
+				IP:   "1.2.3.4",
+				PATH: "",
+			},
+		}},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			//Parameters
+			np, err := GetStorageProvider(tc.storage)
+			suite.NoError(err)
+			np = np.(NFSStorageProvider)
+
+			err = np.ValidateBeforeCreating(suite.sp, *tc.storage)
+			suite.Error(err)
+		})
+	}
+
 }
