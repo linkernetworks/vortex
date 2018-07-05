@@ -16,7 +16,7 @@ func TestNetworkValidateBeforeCreating(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, entity.Network{})
+	err = fake.ValidateBeforeCreating(nil, &entity.Network{})
 	assert.NoError(t, err)
 }
 
@@ -29,7 +29,7 @@ func TestFakeNetworkCreating(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateNetwork(nil, entity.Network{})
+	err = fake.CreateNetwork(nil, &entity.Network{})
 	assert.NoError(t, err)
 }
 
@@ -41,7 +41,7 @@ func TestFakeNetworkValidateBeforeCreatingFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, entity.Network{})
+	err = fake.ValidateBeforeCreating(nil, &entity.Network{})
 	assert.Error(t, err)
 }
 
@@ -53,7 +53,7 @@ func TestFakeNetworkCreatingFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateNetwork(nil, entity.Network{})
+	err = fake.CreateNetwork(nil, &entity.Network{})
 	assert.Error(t, err)
 }
 
@@ -63,7 +63,7 @@ func TestFakeNetworkDelete(t *testing.T) {
 		Fake: entity.FakeNetwork{},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteNetwork(nil, entity.Network{})
+	err = fake.DeleteNetwork(nil, &entity.Network{})
 	assert.NoError(t, err)
 }
 
@@ -75,6 +75,6 @@ func TestFakeNetworkDeleteFail(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteNetwork(nil, entity.Network{})
+	err = fake.DeleteNetwork(nil, &entity.Network{})
 	assert.Error(t, err)
 }
