@@ -24,11 +24,13 @@ func queryMetrics(ctx *web.Context) {
 		expression = q
 	} else {
 		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("wrong expression: %v", q))
+		return
 	}
 
 	result, err := queryFromPrometheus(sp, expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
 	}
 
 	resp.WriteJson(map[string]interface{}{
