@@ -146,7 +146,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
 			np = np.(OVSNetworkProvider)
-			err = np.CreateNetwork(suite.sp, *tc.network)
+			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 			defer exec.Command("ovs-vsctl", "del-br", tc.network.OVS.BridgeName).Run()
 		})
@@ -161,7 +161,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
 	np = np.(OVSNetworkProvider)
-	err = np.CreateNetwork(suite.sp, network)
+	err = np.CreateNetwork(suite.sp, &network)
 	suite.Error(err)
 }
 
@@ -203,7 +203,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 			suite.NoError(err)
 			np = np.(OVSNetworkProvider)
 
-			err = np.ValidateBeforeCreating(suite.sp, *tc.network)
+			err = np.ValidateBeforeCreating(suite.sp, tc.network)
 			suite.NoError(err)
 		})
 	}
@@ -255,7 +255,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 				defer session.C(entity.NetworkCollectionName).Remove(tc.network)
 				suite.NoError(err)
 			}
-			err = np.ValidateBeforeCreating(suite.sp, *tc.network)
+			err = np.ValidateBeforeCreating(suite.sp, tc.network)
 			suite.Error(err)
 		})
 	}
@@ -276,12 +276,12 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
 			np = np.(OVSNetworkProvider)
-			err = np.CreateNetwork(suite.sp, *tc.network)
+			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 
 			exec.Command("ovs-vsctl", "add-br", tc.network.OVS.BridgeName).Run()
 			//FIXME we need a function to check the bridge is exist
-			err = np.DeleteNetwork(suite.sp, *tc.network)
+			err = np.DeleteNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 		})
 	}
@@ -296,6 +296,6 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
 	np = np.(OVSNetworkProvider)
-	err = np.DeleteNetwork(suite.sp, network)
+	err = np.DeleteNetwork(suite.sp, &network)
 	suite.Error(err)
 }
