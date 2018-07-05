@@ -50,6 +50,25 @@ func (nc *NetworkController) CreateOVSNetwork(bridgeName string, ports []entity.
 		if err != nil {
 			return err
 		}
+
+		if len(port.VlanTags) > 0 {
+			tags := []int32{}
+			for _, t := range port.VlanTags {
+				tags = append(tags, int32(t))
+			}
+			_, err := nc.ClientCtl.SetPort(
+				nc.Context,
+				&pb.SetPortRequest{
+					IfaceName: port.Name,
+					Options: &pb.PortOptions{
+						VLANMode: "trunk",
+						Trunk:    tags,
+					},
+				})
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
