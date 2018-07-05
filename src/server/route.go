@@ -63,5 +63,7 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/monitoring").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/query").To(handler.RESTfulServiceHandler(sp, queryMetrics)))
+	webService.Route(webService.GET("/nodes").To(handler.RESTfulServiceHandler(sp, listNodeMetricsHandler)))
+	webService.Route(webService.GET("/nodes/{id}").To(handler.RESTfulServiceHandler(sp, getNodeMetricsHandler)))
 	return webService
 }

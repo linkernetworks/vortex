@@ -45,6 +45,9 @@ data:
       - source_labels: [__meta_kubernetes_service_name]
         action: replace
         target_label: kubernetes_name
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: node
 
 
     - job_name: 'kubernetes-pods'
@@ -71,3 +74,6 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: node
