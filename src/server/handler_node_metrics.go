@@ -16,7 +16,6 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_node_info, kube_node_labels
 	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_labels"}`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -43,7 +42,6 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_node_status_condition
 	results, err = queryFromPrometheus(sp, `{__name__=~"kube_node_status_condition",status="true"}==1`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -56,7 +54,6 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
 	results, err = queryFromPrometheus(sp, `sum by(__name__, resource,node) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests"})`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -95,7 +92,6 @@ func getNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_node_info, kube_node_created, node_network_interface, kube_node_labels, kube_node_status_capacity, kube_node_status_allocatable
 	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_capacity|kube_node_status_allocatable",node=~"`+id+`"}`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -148,7 +144,6 @@ func getNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_node_status_condition
 	results, err = queryFromPrometheus(sp, `	{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -157,7 +152,6 @@ func getNodeMetricsHandler(ctx *web.Context) {
 
 	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
 	results, err = queryFromPrometheus(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
@@ -183,7 +177,6 @@ func getNodeMetricsHandler(ctx *web.Context) {
 
 	// node_network_interface, node_network_receive_bytes_total, node_network_transmit_bytes_total, node_network_receive_packets_total, node_network_transmit_packets_total
 	results, err = queryFromPrometheus(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
-
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 	}
