@@ -15,9 +15,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	//"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
-
-	//mgo "gopkg.in/mgo.v2"
-
+	"gopkg.in/mgo.v2/bson"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
@@ -35,10 +33,7 @@ func execute(suite *suite.Suite, cmd *exec.Cmd) {
 
 type StorageTestSuite struct {
 	suite.Suite
-	sp       *serviceprovider.Container
-	fakeName string //Use for non-connectivity node
-	np       NFSStorageProvider
-	network  entity.Storage
+	sp *serviceprovider.Container
 }
 
 func (suite *StorageTestSuite) SetupSuite() {
@@ -60,8 +55,57 @@ func TestStorageSuite(t *testing.T) {
 	suite.Run(t, new(StorageTestSuite))
 }
 
-func (suite *StorageTestSuite) TestCreateStorage() {
+func (suite *StorageTestSuite) TestGetDeployment() {
+	storage := &entity.Storage{
+		Type: entity.NFSStorageType,
+		NFS: entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+	}
 
+	deployment := getDeployment(bson.NewObjectId().Hex(), storage)
+	suite.NotNil(deployment)
+}
+
+func (suite *StorageTestSuite) TestValidateBeforeCreating() {
+	storage := &entity.Storage{
+		Type: entity.NFSStorageType,
+		NFS: entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+	}
+
+	//Parameters
+	sp, err := GetStorageProvider(storage)
+	suite.NoError(err)
+	sp = sp.(NFSStorageProvider)
+
+	err = sp.ValidateBeforeCreating(suite.sp, *storage)
+	suite.NoError(err)
+}
+
+func (suite *StorageTestSuite) TestCreateStorage() {
+	storage := entity.Storage{
+		ID:   bson.NewObjectId(),
+		Type: entity.NFSStorageType,
+		NFS: entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+	}
+
+	sp, err := GetStorageProvider(&storage)
+	suite.NoError(err)
+	sp = sp.(NFSStorageProvider)
+
+	err = sp.CreateStorage(suite.sp, storage)
+	suite.NoError(err)
+
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	suite.NotNil(deploy)
+	suite.NoError(err)
 }
 
 func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
