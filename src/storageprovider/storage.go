@@ -15,9 +15,9 @@ type StorageProvider interface {
 func GetStorageProvider(storage *entity.Storage) (StorageProvider, error) {
 	switch storage.Type {
 	case "nfs":
-		return NFSStorageProvider{storage.NFS}, nil
+		return NFSStorageProvider{*storage.NFS}, nil
 	case "fake":
-		return FakeStorageProvider{storage.Fake}, nil
+		return FakeStorageProvider{*storage.Fake}, nil
 	default:
 		return nil, fmt.Errorf("Unsupported Storage Type %s", storage.Type)
 	}
