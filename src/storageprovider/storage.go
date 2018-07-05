@@ -7,9 +7,9 @@ import (
 )
 
 type StorageProvider interface {
-	ValidateBeforeCreating(sp *serviceprovider.Container, net entity.Storage) error
-	CreateStorage(sp *serviceprovider.Container, net entity.Storage) error
-	DeleteStorage(sp *serviceprovider.Container, net entity.Storage) error
+	ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Storage) error
+	CreateStorage(sp *serviceprovider.Container, net *entity.Storage) error
+	DeleteStorage(sp *serviceprovider.Container, net *entity.Storage) error
 }
 
 func GetStorageProvider(storage *entity.Storage) (StorageProvider, error) {

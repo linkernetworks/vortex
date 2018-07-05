@@ -12,14 +12,14 @@ import (
 	//	"gopkg.in/mgo.v2/bson"
 )
 
-const NFS_PROVISIONER_PREFIX = "nfs-provisioner"
-const NFS_STORAGECLASS_PREFIX = "nfs-storageclass"
+const NFS_PROVISIONER_PREFIX = "nfs-provisioner-"
+const NFS_STORAGECLASS_PREFIX = "nfs-storageclass-"
 
 type NFSStorageProvider struct {
 	entity.NFSStorage
 }
 
-func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage entity.Storage) error {
+func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage *entity.Storage) error {
 	ip := net.ParseIP(storage.NFS.IP)
 	if len(ip) == 0 {
 		return fmt.Errorf("Invalid IP address %s\n", storage.NFS.IP)
@@ -86,17 +86,17 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 
 }
 
-func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage entity.Storage) error {
+func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
 
 	//Create deployment
-	deployment := getDeployment(name, &storage)
+	deployment := getDeployment(name, storage)
 	//Create storageClass
 	_, err := sp.KubeCtl.CreateDeployment(deployment)
 	return err
 }
 
-func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage entity.Storage) error {
+func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
 	//Delete StorageClass
 
