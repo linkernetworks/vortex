@@ -2,8 +2,8 @@ package entity
 
 type PhysicalPort struct {
 	Name     string `bson:"name" json:"name"`
-	MTU      int    `bson:"maximumTransmissionUnit" MTC:"maximumTransmissionUnit"`
-	VlanTags []int  `bson:"vlanTag" MTC:"vlanTag"`
+	MTU      int    `bson:"MTU" json:"MTU"`
+	VlanTags []int  `bson:"vlanTag" json:"vlanTag"`
 }
 
 type OVSNetwork struct {
