@@ -15,7 +15,7 @@ type OVSNetworkProvider struct {
 	entity.OVSNetwork
 }
 
-func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network entity.Network) error {
+func (ovs OVSNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network *entity.Network) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	//Check whether vlangTag is 0~4095
@@ -64,7 +64,7 @@ func deleteOVSNetwork(nodeIP string, bridgeName string) error {
 	return nc.DeleteOVSNetwork(bridgeName)
 }
 
-func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network entity.Network) error {
+func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network *entity.Network) error {
 	if network.Clusterwise {
 		nodes, _ := sp.KubeCtl.GetNodes()
 		for _, v := range nodes {
@@ -85,7 +85,7 @@ func (ovs OVSNetworkProvider) CreateNetwork(sp *serviceprovider.Container, netwo
 	return createOVSNetwork(nodeIP, network.OVS.BridgeName, network.OVS.PhysicalPorts)
 }
 
-func (ovs OVSNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network entity.Network) error {
+func (ovs OVSNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network *entity.Network) error {
 	if network.Clusterwise {
 		nodes, _ := sp.KubeCtl.GetNodes()
 		for _, v := range nodes {

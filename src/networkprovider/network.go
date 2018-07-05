@@ -2,14 +2,15 @@ package networkprovider
 
 import (
 	"fmt"
+
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
 type NetworkProvider interface {
-	ValidateBeforeCreating(sp *serviceprovider.Container, net entity.Network) error
-	CreateNetwork(sp *serviceprovider.Container, net entity.Network) error
-	DeleteNetwork(sp *serviceprovider.Container, net entity.Network) error
+	ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error
+	CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error
+	DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error
 }
 
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
