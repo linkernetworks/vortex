@@ -26,9 +26,9 @@ func init() {
 
 type VolumeTestSuite struct {
 	suite.Suite
-	wc              *restful.Container
-	session         *mongo.Session
-	storageProvider entity.Storage
+	wc      *restful.Container
+	session *mongo.Session
+	storage entity.Storage
 }
 
 func (suite *VolumeTestSuite) SetupSuite() {
@@ -42,17 +42,17 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	service := newVolumeService(sp)
 	suite.wc.Add(service)
 	//init a Storage
-	suite.storageProvider = entity.Storage{
-		ID:          bson.NewObjectId(),
-		Type:        "nfs",
-		DisplayName: namesgenerator.GetRandomName(0),
+	suite.storage = entity.Storage{
+		ID:   bson.NewObjectId(),
+		Type: "nfs",
+		Name: namesgenerator.GetRandomName(0),
 	}
-	err := suite.session.Insert(entity.StorageCollectionName, suite.storageProvider)
+	err := suite.session.Insert(entity.StorageCollectionName, suite.storage)
 	suite.NoError(err)
 }
 
 func (suite *VolumeTestSuite) TearDownSuite() {
-	suite.session.Remove(entity.StorageCollectionName, "_id", suite.storageProvider.ID)
+	suite.session.Remove(entity.StorageCollectionName, "_id", suite.storage.ID)
 }
 
 func TestVolumeSuite(t *testing.T) {
@@ -65,7 +65,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	tCapacity := "500G"
 	volume := entity.Volume{
 		Name:        tName,
-		StorageName: suite.storageProvider.DisplayName,
+		StorageName: suite.storage.Name,
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
 	}
