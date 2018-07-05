@@ -11,7 +11,7 @@ import (
 func TestStorageValidateBeforeCreating(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			FakeParameter: "yes",
 		},
 	})
@@ -23,7 +23,7 @@ func TestStorageValidateBeforeCreating(t *testing.T) {
 func TestFakeStorageCreating(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			FakeParameter: "yes",
 			IWantFail:     false,
 		},
@@ -36,7 +36,7 @@ func TestFakeStorageCreating(t *testing.T) {
 func TestFakeStorageValidateBeforeCreatingFail(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			FakeParameter: "",
 		},
 	})
@@ -48,7 +48,7 @@ func TestFakeStorageValidateBeforeCreatingFail(t *testing.T) {
 func TestFakeStorageCreatingFail(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			IWantFail: true,
 		},
 	})
@@ -60,7 +60,7 @@ func TestFakeStorageCreatingFail(t *testing.T) {
 func TestFakeStorageDelete(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{},
+		Fake: &entity.FakeStorage{},
 	})
 	assert.NoError(t, err)
 	err = fake.DeleteStorage(nil, &entity.Storage{})
@@ -70,7 +70,7 @@ func TestFakeStorageDelete(t *testing.T) {
 func TestFakeStorageDeleteFail(t *testing.T) {
 	fake, err := GetStorageProvider(&entity.Storage{
 		Type: "fake",
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			IWantFail: true,
 		},
 	})

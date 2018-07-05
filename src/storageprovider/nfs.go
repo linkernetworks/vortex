@@ -42,6 +42,11 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 			Name: name,
 		},
 		Spec: appsv1.DeploymentSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": name,
+				},
+			},
 			Replicas: &replicas,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.RecreateDeploymentStrategyType,

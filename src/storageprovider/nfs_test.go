@@ -58,7 +58,7 @@ func TestStorageSuite(t *testing.T) {
 func (suite *StorageTestSuite) TestGetDeployment() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,
-		NFS: entity.NFSStorage{
+		NFS: &entity.NFSStorage{
 			IP:   "1.2.3.4",
 			PATH: "/exports",
 		},
@@ -71,7 +71,7 @@ func (suite *StorageTestSuite) TestGetDeployment() {
 func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,
-		NFS: entity.NFSStorage{
+		NFS: &entity.NFSStorage{
 			IP:   "1.2.3.4",
 			PATH: "/exports",
 		},
@@ -90,7 +90,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	storage := entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
-		NFS: entity.NFSStorage{
+		NFS: &entity.NFSStorage{
 			IP:   "1.2.3.4",
 			PATH: "/exports",
 		},
@@ -112,7 +112,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
-		NFS: entity.NFSStorage{
+		NFS: &entity.NFSStorage{
 			IP:   "1.2.3.4",
 			PATH: "/exports",
 		},
@@ -144,20 +144,20 @@ func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
 	}{
 		{"invalidIP", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: entity.NFSStorage{
+			NFS: &entity.NFSStorage{
 				IP: "a.b.c.d",
 			},
 		}},
 		{"invalidExports-1", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: entity.NFSStorage{
+			NFS: &entity.NFSStorage{
 				IP:   "1.2.3.4",
 				PATH: "tmp",
 			},
 		}},
 		{"invalidExports-2", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: entity.NFSStorage{
+			NFS: &entity.NFSStorage{
 				IP:   "1.2.3.4",
 				PATH: "",
 			},
