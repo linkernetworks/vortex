@@ -22,11 +22,12 @@ func queryMetrics(ctx *web.Context) {
 	var expression string
 	if q, ok := query.Str("query"); ok {
 		expression = q
+	} else {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("wrong expression: %v", q))
 	}
 
 	result, err := queryFromPrometheus(sp, expression)
-
-	if result == nil {
+	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("%v: %v", result, err))
 	}
 
@@ -52,8 +53,8 @@ func queryFromPrometheus(sp *serviceprovider.Container, expression string) (mode
 
 	switch {
 	case result.Type() == model.ValVector:
-		return result.(model.Vector), err
+		return result.(model.Vector), nil
+	default:
+		return nil, fmt.Errorf("the type of the return result can not be identify")
 	}
-
-	return nil, err
 }
