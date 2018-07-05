@@ -9,6 +9,8 @@ spec:
       name:  node-exporter
       labels:
         name: node-exporter
+      annotations:
+        prometheus.io/scrape: 'true'
     spec:
       hostPID: true
       containers:
@@ -16,6 +18,4 @@ spec:
         image: sdnvortex/node-exporter:latest
         securityContext:
           privileged: true
-        ports:
-        - containerPort: 9100
       hostNetwork: true
