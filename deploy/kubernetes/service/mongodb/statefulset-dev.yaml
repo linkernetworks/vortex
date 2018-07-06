@@ -1,10 +1,10 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: mongo
+  name: mongo-statefulset
 spec:
-  serviceName: "mongo"
-  replicas: 1
+  serviceName: "mongo-statefulset"
+  replicas: 3
   template:
     metadata:
       labels:
@@ -13,7 +13,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: mongo
+        - name: mongo-container
           resources:
             requests:
               cpu: 100m
@@ -24,15 +24,4 @@ spec:
             - 0.0.0.0
           ports:
             - containerPort: 27017
-          volumeMounts:
-            - name: mongodb
-              mountPath: /data/db
-  volumeClaimTemplates:
-  - metadata:
-      name: mongodb
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "manual"
-      resources:
-        requests:
-          storage: 10Gi
+

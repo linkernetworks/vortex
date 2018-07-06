@@ -7,23 +7,23 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
 	"github.com/linkernetworks/vortex/src/web"
+	"github.com/prometheus/common/model"
 )
 
-func listNodesMetricsHandler(ctx *web.Context) {
+func listNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	replacer := map[string]string{}
-	replacer["metric"] = "kube_node_info"
-	replacer["node"] = ".*"
-	replacer["namespace"] = ".*"
+	expression := pc.Expression{}
+	expression.Metrics = []string{"kube_node_info"}
+	expression.TargetLabels = []model.LabelName{"node"}
 
-	nodeList, err := pc.ListResource(sp, "node", replacer)
+	containerList, err := pc.ListResource(sp, expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	resp.WriteEntity(nodeList)
+	resp.WriteEntity(containerList)
 }
 
 func getNodeMetricsHandler(ctx *web.Context) {
