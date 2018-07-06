@@ -9,6 +9,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/volume"
 	"github.com/linkernetworks/vortex/src/web"
 
 	mgo "gopkg.in/mgo.v2"
@@ -18,8 +19,8 @@ import (
 func createVolume(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	volume := entity.Volume{}
-	if err := req.ReadEntity(&volume); err != nil {
+	v := entity.Volume{}
+	if err := req.ReadEntity(&v); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -32,23 +33,27 @@ func createVolume(ctx *web.Context) {
 	defer session.Close()
 
 	// Check the storageClass is existed
-	couunt, err := session.Count(entity.StorageCollectionName, bson.M{"name": volume.StorageName})
+	couunt, err := session.Count(entity.StorageCollectionName, bson.M{"name": v.StorageName})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	} else if couunt < 1 {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The reference storage provider %s doesn't exist", volume.StorageName))
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The reference storage provider %s doesn't exist", v.StorageName))
 		return
 	}
 
 	// Check whether this name has been used
-	volume.ID = bson.NewObjectId()
-	volume.CreatedAt = timeutils.Now()
+	v.ID = bson.NewObjectId()
+	v.CreatedAt = timeutils.Now()
+	v.MetaName = v.GenerateMetaName()
 	//Generate the metaName for PVC meta name and we will use it future
-	volume.MetaName = volume.GenerateMetaName()
-	if err := session.Insert(entity.VolumeCollectionName, &volume); err != nil {
+	if err := volume.CreateVolume(sp, &v); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", volume.Name))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", v.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -68,6 +73,18 @@ func deleteVolume(ctx *web.Context) {
 
 	session := sp.Mongo.NewSession()
 	defer session.Close()
+
+	v := entity.Volume{}
+	if err := session.FindOne(entity.VolumeCollectionName, bson.M{"_id": bson.ObjectIdHex(id)}, &v); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if err := volume.DeleteVolume(sp, &v); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		fmt.Println("QQ-", err)
+		return
+	}
 
 	if err := session.Remove(entity.VolumeCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {
