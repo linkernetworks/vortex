@@ -32,14 +32,13 @@ func (suite *KubeCtlPVCTestSuite) TestGetPVC() {
 	_, err := suite.fakeclient.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
 	suite.NoError(err)
 
-	result, err := suite.kubectl.GetPVC("K8S-PVC-1", namespace)
+	result, err := suite.kubectl.GetPVC("K8S-PVC-1")
 	suite.NoError(err)
 	suite.Equal(pvc.GetName(), result.GetName())
 }
 
 func (suite *KubeCtlPVCTestSuite) TestGetPVCFail() {
-	namespace := "Unknown_Namespace"
-	_, err := suite.kubectl.GetPVC("Unknown_Name", namespace)
+	_, err := suite.kubectl.GetPVC("Unknown_Name")
 	suite.Error(err)
 }
 
@@ -61,21 +60,20 @@ func (suite *KubeCtlPVCTestSuite) TestGetPVCs() {
 	_, err = suite.fakeclient.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
 	suite.NoError(err)
 
-	pvcs, err := suite.kubectl.GetPVCs(namespace)
+	pvcs, err := suite.kubectl.GetPVCs()
 	suite.NoError(err)
 	suite.NotEqual(0, len(pvcs))
 }
 
 func (suite *KubeCtlPVCTestSuite) TestCreateDeletePVC() {
-	namespace := "default"
 	pvc := corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "K8S-PVC-4",
 		},
 	}
-	_, err := suite.kubectl.CreatePVC(&pvc, namespace)
+	_, err := suite.kubectl.CreatePVC(&pvc)
 	suite.NoError(err)
-	err = suite.kubectl.DeletePVC("K8S-PVC-4", namespace)
+	err = suite.kubectl.DeletePVC("K8S-PVC-4")
 	suite.NoError(err)
 }
 

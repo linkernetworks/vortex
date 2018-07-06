@@ -6,14 +6,14 @@ import (
 )
 
 //Get the pod object by the pod name
-func (kc *KubeCtl) GetPod(name string, namespace string) (*corev1.Pod, error) {
-	return kc.Clientset.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
+func (kc *KubeCtl) GetPod(name string) (*corev1.Pod, error) {
+	return kc.Clientset.CoreV1().Pods(kc.Namespace).Get(name, metav1.GetOptions{})
 }
 
 //Get all pods from the k8s cluster
-func (kc *KubeCtl) GetPods(namespace string) ([]*corev1.Pod, error) {
+func (kc *KubeCtl) GetPods() ([]*corev1.Pod, error) {
 	pods := []*corev1.Pod{}
-	podsList, err := kc.Clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	podsList, err := kc.Clientset.CoreV1().Pods(kc.Namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return pods, err
 	}
@@ -24,12 +24,12 @@ func (kc *KubeCtl) GetPods(namespace string) ([]*corev1.Pod, error) {
 }
 
 //Create the pod by the pod object
-func (kc *KubeCtl) CreatePod(pod *corev1.Pod, namespace string) (*corev1.Pod, error) {
-	return kc.Clientset.CoreV1().Pods(namespace).Create(pod)
+func (kc *KubeCtl) CreatePod(pod *corev1.Pod) (*corev1.Pod, error) {
+	return kc.Clientset.CoreV1().Pods(kc.Namespace).Create(pod)
 }
 
 //Delete the pod by the pod name
-func (kc *KubeCtl) DeletePod(name string, namespace string) error {
+func (kc *KubeCtl) DeletePod(name string) error {
 	options := metav1.DeleteOptions{}
-	return kc.Clientset.CoreV1().Pods(namespace).Delete(name, &options)
+	return kc.Clientset.CoreV1().Pods(kc.Namespace).Delete(name, &options)
 }
