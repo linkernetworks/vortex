@@ -1,4 +1,4 @@
-package storageprovider
+package volume
 
 import (
 	"github.com/linkernetworks/mongo"
