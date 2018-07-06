@@ -25,10 +25,10 @@ func listNodeMetricsHandler(ctx *web.Context) {
 func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	node := entity.PodMetrics{}
+	node := entity.NodeMetrics{}
 	id := req.PathParameter("id")
 
-	node, err := pc.GetPod(sp, id)
+	node, err := pc.GetNode(sp, id)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
