@@ -174,7 +174,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 	eth1 := entity.PhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
+		VlanTags: []int32{2043, 2143, 2243},
 	}
 
 	tName := namesgenerator.GetRandomName(0)
@@ -218,7 +218,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	eth1 := entity.PhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
-		VlanTags: []int{2043, 2143, 22435},
+		VlanTags: []int32{2043, 2143, 22435},
 	}
 
 	tName := namesgenerator.GetRandomName(0)
