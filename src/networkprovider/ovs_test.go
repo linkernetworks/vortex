@@ -1,6 +1,7 @@
 package networkprovider
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"os"
@@ -25,6 +26,14 @@ const OVS_LOCAL_IP = "127.0.0.1"
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+}
+
+func execute(suite *suite.Suite, cmd *exec.Cmd) {
+	w := bytes.NewBuffer(nil)
+	cmd.Stderr = w
+	err := cmd.Run()
+	suite.NoError(err)
+	fmt.Printf("Stderr: %s\n", string(w.Bytes()))
 }
 
 type NetworkTestSuite struct {

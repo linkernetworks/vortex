@@ -122,7 +122,36 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork(tName, network.OVS.PhysicalPorts)
+	err = nc.CreateOVSNetwork(tName, network.OVSUserspace.PhysicalPorts)
+	suite.NoError(err)
+
+	//TODO we need support the list function to check the ovs is existed
+	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
+}
+
+func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
+	eth1 := entity.PhysicalPort{
+		Name:     suite.ifName,
+		MTU:      1500,
+		VlanTags: []int32{2043, 2143, 2243},
+	}
+
+	tName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		Name: tName,
+		OVSUserspace: entity.OVSUserspaceNetwork{
+			BridgeName:    tName,
+			PhysicalPorts: []entity.PhysicalPort{eth1},
+		},
+		Type:     "netdev",
+		NodeName: suite.nodeName,
+	}
+
+	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
+	suite.NoError(err)
+	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
+	suite.NoError(err)
+	err = nc.CreateOVSUserpsaceNetwork(tName, network.OVS.PhysicalPorts)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
