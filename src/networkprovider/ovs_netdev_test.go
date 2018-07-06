@@ -64,7 +64,7 @@ func (suite *DPDKNetworkTestSuite) SetupSuite() {
 	tName := namesgenerator.GetRandomName(0)
 	suite.singleNetwork = entity.Network{
 		Name: tName,
-		OVSDPDK: entity.OVSDPDKNetwork{
+		OVSUserspace: entity.OVSUserspaceNetwork{
 			BridgeName:        tName,
 			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{},
 		},
@@ -74,7 +74,7 @@ func (suite *DPDKNetworkTestSuite) SetupSuite() {
 
 	suite.clusterNetwork = entity.Network{
 		Name: tName,
-		OVSDPDK: entity.OVSDPDKNetwork{
+		OVSUserspace: entity.OVSUserspaceNetwork{
 			BridgeName:        tName,
 			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{},
 		},
@@ -108,11 +108,18 @@ func (suite *DPDKNetworkTestSuite) TestCreateOVSDPDKNetwork() {
 	suite.NoError(err)
 }
 
-func (suite *DPDKNetworkTestSuite) TestDeleteOVSDPDKNetwork() {
+func (suite *DPDKNetworkTestSuite) TestCreateOVSUserspaceNetwork() {
+	name := namesgenerator.GetRandomName(0)
+	err := createOVSUserspaceNetwork(DPDK_LOCAL_IP, name, []entity.PhysicalPort{})
+	defer exec.Command("ovs-vsctl", "del-br", name).Run()
+	suite.NoError(err)
+}
+
+func (suite *DPDKNetworkTestSuite) TestDeleteOVSUserspaceNetwork() {
 	name := namesgenerator.GetRandomName(0)
 	// ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
 	exec.Command("ovs-vsctl", "add-br", name, "--", "set", "bridge", name, "datapath_type=netdev").Run()
-	err := deleteOVSDPDKNetwork(DPDK_LOCAL_IP, name)
+	err := deleteOVSUserspaceNetwork(DPDK_LOCAL_IP, name)
 	suite.NoError(err)
 }
 
@@ -130,10 +137,10 @@ func (suite *DPDKNetworkTestSuite) TestCreateNetwork() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSDPDKNetworkProvider)
+			np = np.(OVSUserspaceNetworkProvider)
 			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
-			defer exec.Command("ovs-vsctl", "del-br", tc.network.OVS.BridgeName).Run()
+			defer exec.Command("ovs-vsctl", "del-br", tc.network.OVSUserspace.BridgeName).Run()
 		})
 	}
 }
@@ -145,7 +152,7 @@ func (suite *DPDKNetworkTestSuite) TestCreateNetworkFail() {
 	network.NodeName = "non-exist"
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
-	np = np.(OVSDPDKNetworkProvider)
+	np = np.(OVSUserspaceNetworkProvider)
 	err = np.CreateNetwork(suite.sp, &network)
 	suite.Error(err)
 }
@@ -170,7 +177,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreating() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Name: tName,
-		OVSDPDK: entity.OVSDPDKNetwork{
+		OVSUserspace: entity.OVSUserspaceNetwork{
 			BridgeName:        tName,
 			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{eth1},
 		},
@@ -191,7 +198,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreating() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSDPDKNetworkProvider)
+			np = np.(OVSUserspaceNetworkProvider)
 
 			err = np.ValidateBeforeCreating(suite.sp, tc.network)
 			suite.NoError(err)
@@ -215,7 +222,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreatingFail() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Name: tName,
-		OVSDPDK: entity.OVSDPDKNetwork{
+		OVSUserspace: entity.OVSUserspaceNetwork{
 			BridgeName:        tName,
 			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{eth1},
 		},
@@ -237,7 +244,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreatingFail() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSDPDKNetworkProvider)
+			np = np.(OVSUserspaceNetworkProvider)
 
 			if tc.mongo {
 				//create a mongo-document to test duplicated name
@@ -266,12 +273,12 @@ func (suite *DPDKNetworkTestSuite) TestDeleteNetwork() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSDPDKNetworkProvider)
+			np = np.(OVSUserspaceNetworkProvider)
 			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 
 			// ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
-			exec.Command("ovs-vsctl", "add-br", tc.network.OVSDPDK.BridgeName, "--", "set", "bridge", tc.network.OVSDPDK.BridgeName, "datapath_type=netdev").Run()
+			exec.Command("ovs-vsctl", "add-br", tc.network.OVSUserspace.BridgeName, "--", "set", "bridge", tc.network.OVSUserspace.BridgeName, "datapath_type=netdev").Run()
 			//FIXME we need a function to check the bridge is exist
 			err = np.DeleteNetwork(suite.sp, tc.network)
 			suite.NoError(err)
@@ -287,7 +294,7 @@ func (suite *DPDKNetworkTestSuite) TestDeleteNetworkFail() {
 
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
-	np = np.(OVSDPDKNetworkProvider)
+	np = np.(OVSUserspaceNetworkProvider)
 	err = np.DeleteNetwork(suite.sp, &network)
 	suite.Error(err)
 }

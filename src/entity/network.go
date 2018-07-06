@@ -19,15 +19,15 @@ const (
 )
 
 type Network struct {
-	ID          bson.ObjectId  `bson:"_id,omitempty" json:"id"`
-	Type        NetworkType    `bson:"type" json:"type"`
-	Name        string         `bson:"name" json:"name"`
-	Clusterwise bool           `bson:"clusterwise" json:"clusterwise"`
-	NodeName    string         `bson:"nodeName,omitempty" json:"nodeName,omitempty"`
-	CreatedAt   *time.Time     `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	OVS         OVSNetwork     `bson:"ovs,omitempty" json:"ovs"`
-	OVSDPDK     OVSDPDKNetwork `bson:"ovsdpdk,omitempty" json:"ovsdpdk"`
-	Fake        FakeNetwork    `json:"fake"` //FakeNetwork, for restful testing.
+	ID           bson.ObjectId       `bson:"_id,omitempty" json:"id"`
+	Type         NetworkType         `bson:"type" json:"type"`
+	Name         string              `bson:"name" json:"name"`
+	Clusterwise  bool                `bson:"clusterwise" json:"clusterwise"`
+	NodeName     string              `bson:"nodeName,omitempty" json:"nodeName,omitempty"`
+	CreatedAt    *time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	OVS          OVSNetwork          `bson:"ovs,omitempty" json:"ovs"`
+	OVSUserspace OVSUserspaceNetwork `bson:"ovsUserspace,omitempty" json:"ovsUserspace"`
+	Fake         FakeNetwork         `json:"fake"` //FakeNetwork, for restful testing.
 }
 
 //GetCollection - get model mongo collection name.
