@@ -237,7 +237,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreatingFail() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSNetworkProvider)
+			np = np.(OVSDPDKNetworkProvider)
 
 			if tc.mongo {
 				//create a mongo-document to test duplicated name
