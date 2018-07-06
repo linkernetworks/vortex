@@ -6,7 +6,6 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
 	"github.com/linkernetworks/vortex/src/web"
-	"github.com/prometheus/common/model"
 )
 
 func listPodMetricsHandler(ctx *web.Context) {
@@ -16,7 +15,6 @@ func listPodMetricsHandler(ctx *web.Context) {
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_pod_info"}
 	expression.QueryLabels = map[string]string{}
-	expression.TargetLabels = []model.LabelName{"pod"}
 
 	if node, ok := query.Str("node"); ok {
 		expression.QueryLabels["node"] = node
@@ -30,7 +28,7 @@ func listPodMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, expression)
+	containerList, err := pc.ListResource(sp, "pod", expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
@@ -40,10 +38,16 @@ func listPodMetricsHandler(ctx *web.Context) {
 }
 
 func getPodMetricsHandler(ctx *web.Context) {
-	_, _, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	// id := req.PathParameter("id")
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	pod := entity.PodMetrics{}
+	id := req.PathParameter("id")
+
+	pod, err := pc.GetPod(sp, id)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
 
 	resp.WriteEntity(pod)
 }
