@@ -7,7 +7,6 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
 	"github.com/linkernetworks/vortex/src/web"
-	"github.com/prometheus/common/model"
 )
 
 func listNodeMetricsHandler(ctx *web.Context) {
@@ -15,9 +14,8 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_node_info"}
-	expression.TargetLabels = []model.LabelName{"node"}
 
-	containerList, err := pc.ListResource(sp, expression)
+	containerList, err := pc.ListResource(sp, "node", expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return

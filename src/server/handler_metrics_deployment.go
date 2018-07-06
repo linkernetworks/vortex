@@ -5,7 +5,6 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
 	"github.com/linkernetworks/vortex/src/web"
-	"github.com/prometheus/common/model"
 )
 
 func listDeploymentMetricsHandler(ctx *web.Context) {
@@ -15,7 +14,6 @@ func listDeploymentMetricsHandler(ctx *web.Context) {
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_deployment_metadata_generation"}
 	expression.QueryLabels = map[string]string{}
-	expression.TargetLabels = []model.LabelName{"deployment"}
 
 	if node, ok := query.Str("node"); ok {
 		expression.QueryLabels["node"] = node
@@ -29,7 +27,7 @@ func listDeploymentMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, expression)
+	containerList, err := pc.ListResource(sp, "deployment", expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return

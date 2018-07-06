@@ -5,15 +5,16 @@ import (
 	"strings"
 
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/prometheus/common/model"
 )
 
 type Expression struct {
-	Metrics      []string          `json:"metrics"`
-	QueryLabels  map[string]string `json:"queryLabels"`
-	TargetLabels []model.LabelName `json:"targetLabels"`
-	SumBy        []string          `json:"sumBy"`
+	Metrics     []string          `json:"metrics"`
+	QueryLabels map[string]string `json:"queryLabels"`
+	SumBy       []string          `json:"sumBy"`
+	Value       *int              `json:"value"`
 }
 
 func getElements(sp *serviceprovider.Container, expression Expression) (model.Vector, error) {
@@ -44,6 +45,10 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 		str = rule.Replace(str)
 	}
 
+	if expression.Value != nil {
+		str = fmt.Sprintf(`%s==%v`, str, *expression.Value)
+	}
+
 	logger.Infof(str)
 
 	results, err := query(sp, str)
@@ -53,16 +58,66 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 	return results, nil
 }
 
-func ListResource(sp *serviceprovider.Container, expression Expression) ([]string, error) {
-	resourceList := []string{}
+func ListResource(sp *serviceprovider.Container, resource model.LabelName, expression Expression) ([]string, error) {
 	results, err := getElements(sp, expression)
 	if err != nil {
 		return nil, err
 	}
 
+	resourceList := []string{}
 	for _, result := range results {
-		resourceList = append(resourceList, string(result.Metric[expression.TargetLabels[0]]))
+		resourceList = append(resourceList, string(result.Metric[resource]))
 	}
 
 	return resourceList, nil
+}
+
+func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
+	pod := entity.PodMetrics{}
+	pod.Detail.Labels = map[string]string{}
+
+	expression := Expression{}
+	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
+	expression.QueryLabels = map[string]string{"pod": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_pod_info":
+			pod.Detail.PodName = id
+			pod.Detail.IP = string(result.Metric["pod_ip"])
+			pod.Detail.Node = string(result.Metric["node"])
+			pod.Detail.Namespace = string(result.Metric["namespace"])
+			pod.Detail.CreateByKind = string(result.Metric["created_by_kind"])
+			pod.Detail.CreateByName = string(result.Metric["created_by_name"])
+
+		case "kube_pod_created":
+			pod.Detail.CreateAt = int(result.Value)
+
+		case "kube_pod_labels":
+			for key, value := range result.Metric {
+				if strings.HasPrefix(string(key), "label_") {
+					pod.Detail.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+				}
+			}
+
+		case "kube_pod_status_phase":
+			if int(result.Value) == 1 {
+				pod.Detail.Status = string(result.Metric["phase"])
+			}
+
+		case "kube_pod_container_info":
+			pod.Containers = append(pod.Containers, string(result.Metric["container"]))
+
+		case "kube_pod_container_status_restarts_total":
+			pod.Detail.RestartCount = pod.Detail.RestartCount + int(result.Value)
+		}
+	}
+
+	return pod, nil
 }
