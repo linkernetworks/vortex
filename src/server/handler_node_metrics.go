@@ -5,81 +5,22 @@ import (
 
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
+	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
 	"github.com/linkernetworks/vortex/src/web"
 )
 
-func listNodeMetricsHandler(ctx *web.Context) {
+func listNodesMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	nodeList := entity.NodeListMetrics{}
-	nodeList.Node = map[string]entity.NodeInfoMetrics{}
+	replacer := map[string]string{}
+	replacer["metric"] = "kube_node_info"
+	replacer["node"] = ".*"
+	replacer["namespace"] = ".*"
 
-	// kube_node_info, kube_node_labels
-	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_labels"}`)
+	nodeList, err := pc.ListResource(sp, "node", replacer)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
-	}
-
-	for _, result := range results {
-		switch result.Metric["__name__"] {
-
-		case "kube_node_info":
-			nodeInfo := entity.NodeInfoMetrics{}
-			nodeInfo.NodeName = string(result.Metric["node"])
-			nodeList.Node[string(result.Metric["node"])] = nodeInfo
-
-		case "kube_node_labels":
-			nodeInfo := nodeList.Node[string(result.Metric["node"])]
-			nodeInfo.Labels = map[string]string{}
-			for key, value := range result.Metric {
-				if strings.HasPrefix(string(key), "label_") {
-					nodeInfo.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
-				}
-			}
-			nodeList.Node[string(result.Metric["node"])] = nodeInfo
-		}
-	}
-
-	// kube_node_status_condition
-	results, err = queryFromPrometheus(sp, `{__name__=~"kube_node_status_condition",status="true"}==1`)
-	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	for _, result := range results {
-		nodeInfo := nodeList.Node[string(result.Metric["node"])]
-		nodeInfo.Status = string(result.Metric["condition"])
-		nodeList.Node[string(result.Metric["node"])] = nodeInfo
-	}
-
-	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
-	results, err = queryFromPrometheus(sp, `sum by(__name__, resource,node) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests"})`)
-	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	for _, result := range results {
-		nodeInfo := nodeList.Node[string(result.Metric["node"])]
-		switch result.Metric["__name__"] {
-		case "kube_pod_container_resource_requests":
-			switch result.Metric["resource"] {
-			case "cpu":
-				nodeInfo.Resource.CPURequests = float32(result.Value)
-			case "memory":
-				nodeInfo.Resource.MemoryRequests = float32(result.Value)
-			}
-		case "kube_pod_container_resource_limits":
-			switch result.Metric["resource"] {
-			case "cpu":
-				nodeInfo.Resource.CPULimits = float32(result.Value)
-			case "memory":
-				nodeInfo.Resource.MemoryLimits = float32(result.Value)
-			}
-		}
-		nodeList.Node[string(result.Metric["node"])] = nodeInfo
 	}
 
 	resp.WriteEntity(nodeList)
@@ -147,7 +88,7 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	}
 
 	// kube_node_status_condition
-	results, err = queryFromPrometheus(sp, `	{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
+	results, err = queryFromPrometheus(sp, `{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
