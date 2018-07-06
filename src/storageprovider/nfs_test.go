@@ -68,6 +68,20 @@ func (suite *StorageTestSuite) TestGetDeployment() {
 	suite.NotNil(deployment)
 }
 
+func (suite *StorageTestSuite) TestGetStorageClass() {
+	storage := &entity.Storage{
+		Type: entity.NFSStorageType,
+		NFS: &entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+	}
+
+	storageClass := getStorageClass(bson.NewObjectId().Hex(), bson.NewObjectId().Hex(), storage)
+	suite.NotNil(storageClass)
+
+}
+
 func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,

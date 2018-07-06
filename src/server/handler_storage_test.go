@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -283,8 +282,6 @@ func (suite *StorageTestSuite) TestListStorage() {
 			suite.Equal(tc.expectSize, len(retStorages))
 			for i, v := range retStorages {
 				suite.Equal(storages[i].Name, v.Name)
-				fmt.Println(v.Type)
-				fmt.Println(storages[i].Type)
 				suite.Equal(storages[i].Type, v.Type)
 			}
 		})

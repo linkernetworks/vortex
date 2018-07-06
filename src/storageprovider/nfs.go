@@ -8,6 +8,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
+	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	//	"gopkg.in/mgo.v2/bson"
 )
@@ -58,10 +59,11 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 					},
 				},
 				Spec: v1.PodSpec{
+					ServiceAccountName: "nfs-client-provisioner",
 					Containers: []v1.Container{
 						{
 							Name:            name,
-							Image:           "quay.io/kubernetes_incubator/nfs-provisioner:latest",
+							Image:           "quay.io/external_storage/nfs-client-provisioner:latest",
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Env: []v1.EnvVar{
 								{Name: "PROVISIONER_NAME", Value: name},
@@ -88,23 +90,39 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 			},
 		},
 	}
+}
 
+func getStorageClass(name string, provisioner string, storage *entity.Storage) *storagev1.StorageClass {
+	return &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		Provisioner: provisioner,
+	}
 }
 
 func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
-
+	storageClassName := NFS_STORAGECLASS_PREFIX + storage.ID.Hex()
 	//Create deployment
 	deployment := getDeployment(name, storage)
 	//Create storageClass
-	_, err := sp.KubeCtl.CreateDeployment(deployment)
+	storageClass := getStorageClass(storageClassName, name, storage)
+	storage.StorageClassName = storageClassName
+	if _, err := sp.KubeCtl.CreateDeployment(deployment); err != nil {
+		return err
+	}
+	_, err := sp.KubeCtl.CreateStorageClass(storageClass)
 	return err
 }
 
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
-	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
+	deployName := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
+	storageName := NFS_STORAGECLASS_PREFIX + storage.ID.Hex()
 	//Delete StorageClass
-
+	if err := sp.KubeCtl.DeleteStorageClass(storageName); err != nil {
+		return err
+	}
 	//Delete Deployment
-	return sp.KubeCtl.DeleteDeployment(name)
+	return sp.KubeCtl.DeleteDeployment(deployName)
 }
