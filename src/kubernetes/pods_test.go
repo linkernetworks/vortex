@@ -32,14 +32,13 @@ func (suite *KubeCtlPodTestSuite) TestGetPod() {
 	_, err := suite.fakeclient.CoreV1().Pods(namespace).Create(&pod)
 	suite.NoError(err)
 
-	result, err := suite.kubectl.GetPod("K8S-Pod-1", namespace)
+	result, err := suite.kubectl.GetPod("K8S-Pod-1")
 	suite.NoError(err)
 	suite.Equal(pod.GetName(), result.GetName())
 }
 
 func (suite *KubeCtlPodTestSuite) TestGetPodFail() {
-	namespace := "Unknown_Namespace"
-	_, err := suite.kubectl.GetPod("Unknown_Name", namespace)
+	_, err := suite.kubectl.GetPod("Unknown_Name")
 	suite.Error(err)
 }
 
@@ -61,21 +60,20 @@ func (suite *KubeCtlPodTestSuite) TestGetPods() {
 	_, err = suite.fakeclient.CoreV1().Pods(namespace).Create(&pod)
 	suite.NoError(err)
 
-	pods, err := suite.kubectl.GetPods(namespace)
+	pods, err := suite.kubectl.GetPods()
 	suite.NoError(err)
 	suite.NotEqual(0, len(pods))
 }
 
 func (suite *KubeCtlPodTestSuite) TestCreateDeletePod() {
-	namespace := "default"
 	pod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "K8S-Pod-4",
 		},
 	}
-	_, err := suite.kubectl.CreatePod(&pod, namespace)
+	_, err := suite.kubectl.CreatePod(&pod)
 	suite.NoError(err)
-	err = suite.kubectl.DeletePod("K8S-Pod-4", namespace)
+	err = suite.kubectl.DeletePod("K8S-Pod-4")
 	suite.NoError(err)
 }
 
