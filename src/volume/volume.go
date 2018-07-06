@@ -12,7 +12,7 @@ import (
 )
 
 func getPVCInstance(volume *entity.Volume, storageClassName string) *v1.PersistentVolumeClaim {
-	capacity, _ := resource.ParseQuantity(volume.Capacity + "Gi")
+	capacity, _ := resource.ParseQuantity(volume.Capacity)
 	return &v1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: volume.MetaName,
