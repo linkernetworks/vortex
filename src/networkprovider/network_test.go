@@ -15,8 +15,8 @@ func TestGetNetworkProvider(t *testing.T) {
 		netType         entity.NetworkType
 		netProviderType interface{}
 	}{
-		{"ovs", entity.OVSNetworkType, reflect.TypeOf(OVSNetworkProvider{})},
-		{"dpdk", entity.OVSDPDKNetworkType, reflect.TypeOf(OVSDPDKNetworkProvider{})},
+		{"system", entity.OVSKernelspaceNetworkType, reflect.TypeOf(OVSNetworkProvider{})},
+		{"netdev", entity.OVSUserspaceNetworkType, reflect.TypeOf(OVSDPDKNetworkProvider{})},
 		{"fake", entity.FakeNetworkType, reflect.TypeOf(FakeNetworkProvider{})},
 	}
 

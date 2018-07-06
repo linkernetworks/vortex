@@ -9,9 +9,9 @@ import (
 type NetworkType string
 
 const (
-	OVSNetworkType     NetworkType = "ovs"
-	OVSDPDKNetworkType NetworkType = "dpdk"
-	FakeNetworkType    NetworkType = "fake"
+	OVSKernelspaceNetworkType NetworkType = "system"
+	OVSUserspaceNetworkType   NetworkType = "netdev"
+	FakeNetworkType           NetworkType = "fake"
 )
 
 const (
