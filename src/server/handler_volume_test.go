@@ -112,6 +112,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 }
 
 func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
+	//the storageName doesn't exist
 	tName := namesgenerator.GetRandomName(0)
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
@@ -132,7 +133,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 	defer suite.session.Remove(entity.VolumeCollectionName, "name", volume.Name)
 }
 
