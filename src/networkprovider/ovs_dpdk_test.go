@@ -21,20 +21,20 @@ import (
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
 
-const OVS_LOCAL_IP = "127.0.0.1"
+const DPDK_LOCAL_IP = "127.0.0.1"
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type NetworkTestSuite struct {
+type DPDKNetworkTestSuite struct {
 	suite.Suite
 	sp             *serviceprovider.Container
 	clusterNetwork entity.Network
 	singleNetwork  entity.Network
 }
 
-func (suite *NetworkTestSuite) SetupSuite() {
+func (suite *DPDKNetworkTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.NewForTesting(cf)
 
@@ -54,7 +54,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 			Addresses: []corev1.NodeAddress{
 				{
 					Type:    "ExternalIP",
-					Address: OVS_LOCAL_IP,
+					Address: DPDK_LOCAL_IP,
 				},
 			},
 		},
@@ -64,30 +64,30 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	tName := namesgenerator.GetRandomName(0)
 	suite.singleNetwork = entity.Network{
 		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{},
+		OVSDPDK: entity.OVSDPDKNetwork{
+			BridgeName:        tName,
+			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{},
 		},
-		Type:     entity.OVSKernelspaceNetworkType,
+		Type:     entity.OVSUserspaceNetworkType,
 		NodeName: nodeName,
 	}
 
 	suite.clusterNetwork = entity.Network{
 		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{},
+		OVSDPDK: entity.OVSDPDKNetwork{
+			BridgeName:        tName,
+			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{},
 		},
-		Type:        entity.OVSKernelspaceNetworkType,
+		Type:        entity.OVSUserspaceNetworkType,
 		NodeName:    nodeName,
 		Clusterwise: true,
 	}
 }
 
-func (suite *NetworkTestSuite) TearDownSuite() {
+func (suite *DPDKNetworkTestSuite) TearDownSuite() {
 }
 
-func TestOVSDPDKNetworkSuite(t *testing.T) {
+func TestNetworkSuite(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		fmt.Println("We only testing the ovs function on Linux Host")
 		t.Skip()
@@ -97,26 +97,26 @@ func TestOVSDPDKNetworkSuite(t *testing.T) {
 		t.SkipNow()
 		return
 	}
-	suite.Run(t, new(NetworkTestSuite))
+	suite.Run(t, new(DPDKNetworkTestSuite))
 }
 
 //Member funcion
-func (suite *NetworkTestSuite) TestCreateOVSNetwork() {
+func (suite *DPDKNetworkTestSuite) TestCreateOVSDPDKNetwork() {
 	name := namesgenerator.GetRandomName(0)
-	err := createOVSNetwork(OVS_LOCAL_IP, name, []entity.PhysicalPort{})
+	err := createOVSDPDKNetwork(DPDK_LOCAL_IP, name, []entity.DPDKPhysicalPort{})
 	defer exec.Command("ovs-vsctl", "del-br", name).Run()
 	suite.NoError(err)
 }
 
-func (suite *NetworkTestSuite) TestDeleteOVSNetwork() {
+func (suite *DPDKNetworkTestSuite) TestDeleteOVSDPDKNetwork() {
 	name := namesgenerator.GetRandomName(0)
 	// ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
 	exec.Command("ovs-vsctl", "add-br", name, "--", "set", "bridge", name, "datapath_type=netdev").Run()
-	err := deleteOVSNetwork(OVS_LOCAL_IP, name)
+	err := deleteOVSDPDKNetwork(DPDK_LOCAL_IP, name)
 	suite.NoError(err)
 }
 
-func (suite *NetworkTestSuite) TestCreateNetwork() {
+func (suite *DPDKNetworkTestSuite) TestCreateNetwork() {
 	testCases := []struct {
 		caseName string
 		network  *entity.Network
@@ -130,7 +130,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSNetworkProvider)
+			np = np.(OVSDPDKNetworkProvider)
 			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 			defer exec.Command("ovs-vsctl", "del-br", tc.network.OVS.BridgeName).Run()
@@ -138,38 +138,43 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	}
 }
 
-func (suite *NetworkTestSuite) TestCreateNetworkFail() {
+func (suite *DPDKNetworkTestSuite) TestCreateNetworkFail() {
 	network := entity.Network{
-		Type: entity.OVSKernelspaceNetworkType,
+		Type: entity.OVSUserspaceNetworkType,
 	}
 	network.NodeName = "non-exist"
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
-	np = np.(OVSNetworkProvider)
+	np = np.(OVSDPDKNetworkProvider)
 	err = np.CreateNetwork(suite.sp, &network)
 	suite.Error(err)
 }
 
-func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
+func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreating() {
 	//Vlan
 	//multiple network
 	//single network
 
 	//Prepare data
-	eth1 := entity.PhysicalPort{
-		Name:     namesgenerator.GetRandomName(0),
-		MTU:      1500,
-		VlanTags: []int32{2043, 2143, 2243},
+	eth1 := entity.DPDKPhysicalPort{
+		Name:  namesgenerator.GetRandomName(0),
+		MTU:   1500,
+		PCIID: "0000:03:00.0",
+		VlanTags: []int32{
+			2043,
+			2143,
+			2243,
+		},
 	}
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{eth1},
+		OVSDPDK: entity.OVSDPDKNetwork{
+			BridgeName:        tName,
+			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{eth1},
 		},
-		Type: entity.OVSKernelspaceNetworkType,
+		Type: entity.OVSUserspaceNetworkType,
 	}
 
 	testCases := []struct {
@@ -186,7 +191,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSNetworkProvider)
+			np = np.(OVSDPDKNetworkProvider)
 
 			err = np.ValidateBeforeCreating(suite.sp, tc.network)
 			suite.NoError(err)
@@ -194,26 +199,27 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreating() {
 	}
 }
 
-func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
+func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreatingFail() {
 	//Wrong Vlan
 	//Wrong Case for multiple
 	//Wrong Case for single
 
 	//Prepare data
-	eth1 := entity.PhysicalPort{
+	eth1 := entity.DPDKPhysicalPort{
 		Name:     namesgenerator.GetRandomName(0),
 		MTU:      1500,
+		PCIID:    "0000:03:00.0",
 		VlanTags: []int32{2043, 2143, 22435},
 	}
 
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{eth1},
+		OVSDPDK: entity.OVSDPDKNetwork{
+			BridgeName:        tName,
+			DPDKPhysicalPorts: []entity.DPDKPhysicalPort{eth1},
 		},
-		Type: entity.OVSKernelspaceNetworkType,
+		Type: entity.OVSUserspaceNetworkType,
 	}
 
 	testCases := []struct {
@@ -246,7 +252,7 @@ func (suite *NetworkTestSuite) TestValidateBeforeCreatingFail() {
 	}
 }
 
-func (suite *NetworkTestSuite) TestDeleteNetwork() {
+func (suite *DPDKNetworkTestSuite) TestDeleteNetwork() {
 	testCases := []struct {
 		caseName string
 		network  *entity.Network
@@ -260,11 +266,12 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 			//Parameters
 			np, err := GetNetworkProvider(tc.network)
 			suite.NoError(err)
-			np = np.(OVSNetworkProvider)
+			np = np.(OVSDPDKNetworkProvider)
 			err = np.CreateNetwork(suite.sp, tc.network)
 			suite.NoError(err)
 
-			exec.Command("ovs-vsctl", "add-br", tc.network.OVS.BridgeName).Run()
+			// ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
+			exec.Command("ovs-vsctl", "add-br", tc.network.OVSDPDK.BridgeName, "--", "set", "bridge", tc.network.OVSDPDK.BridgeName, "datapath_type=netdev").Run()
 			//FIXME we need a function to check the bridge is exist
 			err = np.DeleteNetwork(suite.sp, tc.network)
 			suite.NoError(err)
@@ -272,15 +279,15 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	}
 }
 
-func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
+func (suite *DPDKNetworkTestSuite) TestDeleteNetworkFail() {
 	network := entity.Network{
-		Type: entity.OVSKernelspaceNetworkType,
+		Type: entity.OVSUserspaceNetworkType,
 	}
 	network.NodeName = "non-exist"
 
 	np, err := GetNetworkProvider(&network)
 	suite.NoError(err)
-	np = np.(OVSNetworkProvider)
+	np = np.(OVSDPDKNetworkProvider)
 	err = np.DeleteNetwork(suite.sp, &network)
 	suite.Error(err)
 }

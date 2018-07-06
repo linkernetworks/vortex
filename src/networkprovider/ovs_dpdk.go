@@ -1,11 +1,13 @@
 package networkprovider
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type OVSDPDKNetworkProvider struct {
@@ -13,6 +15,31 @@ type OVSDPDKNetworkProvider struct {
 }
 
 func (ovsdpdk OVSDPDKNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network *entity.Network) error {
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+	//Check whether vlangTag is 0~4095
+	for _, pp := range ovsdpdk.DPDKPhysicalPorts {
+		for _, vlangTag := range pp.VlanTags {
+			if vlangTag < 0 || vlangTag > 4095 {
+				return fmt.Errorf("The vlangTag %v in PhysicalPort %v should between 0 and 4095", pp.Name, vlangTag)
+			}
+		}
+	}
+
+	q := bson.M{}
+	if network.Clusterwise {
+		//Only check the bridge name
+		q = bson.M{"ovs.bridgeName": ovsdpdk.BridgeName}
+	} else {
+		q = bson.M{"nodeName": network.NodeName, "ovs.bridgeName": ovsdpdk.BridgeName}
+	}
+
+	n, err := session.Count(entity.NetworkCollectionName, q)
+	if n >= 1 {
+		return fmt.Errorf("The bridge name %s is exist, please check your cluster type and reassign another bridge name", ovsdpdk.BridgeName)
+	} else if err != nil {
+		return err
+	}
 	return nil
 }
 
