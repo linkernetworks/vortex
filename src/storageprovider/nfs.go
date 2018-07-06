@@ -59,10 +59,11 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 					},
 				},
 				Spec: v1.PodSpec{
+					ServiceAccountName: "nfs-client-provisioner",
 					Containers: []v1.Container{
 						{
 							Name:            name,
-							Image:           "quay.io/kubernetes_incubator/nfs-provisioner:latest",
+							Image:           "quay.io/external_storage/nfs-client-provisioner:latest",
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Env: []v1.EnvVar{
 								{Name: "PROVISIONER_NAME", Value: name},
@@ -96,7 +97,7 @@ func getStorageClass(name string, provisioner string, storage *entity.Storage) *
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
-		Provisioner: name,
+		Provisioner: provisioner,
 	}
 }
 
