@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
@@ -37,10 +38,16 @@ func listServiceMetricsHandler(ctx *web.Context) {
 }
 
 func getServiceMetricsHandler(ctx *web.Context) {
-	// _, _, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	// id := req.PathParameter("id")
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	// pod := entity.PodMetrics{}
+	service := entity.ServiceMetrics{}
+	id := req.PathParameter("id")
 
-	// resp.WriteEntity()
+	service, err := pc.GetService(sp, id)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(service)
 }

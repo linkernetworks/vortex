@@ -74,7 +74,7 @@ func ListResource(sp *serviceprovider.Container, resource model.LabelName, expre
 
 func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
 	pod := entity.PodMetrics{}
-	pod.Detail.Labels = map[string]string{}
+	pod.Labels = map[string]string{}
 
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
@@ -89,35 +89,75 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_info":
-			pod.Detail.PodName = id
-			pod.Detail.IP = string(result.Metric["pod_ip"])
-			pod.Detail.Node = string(result.Metric["node"])
-			pod.Detail.Namespace = string(result.Metric["namespace"])
-			pod.Detail.CreateByKind = string(result.Metric["created_by_kind"])
-			pod.Detail.CreateByName = string(result.Metric["created_by_name"])
+			pod.PodName = id
+			pod.IP = string(result.Metric["pod_ip"])
+			pod.Node = string(result.Metric["node"])
+			pod.Namespace = string(result.Metric["namespace"])
+			pod.CreateByKind = string(result.Metric["created_by_kind"])
+			pod.CreateByName = string(result.Metric["created_by_name"])
 
 		case "kube_pod_created":
-			pod.Detail.CreateAt = int(result.Value)
+			pod.CreateAt = int(result.Value)
 
 		case "kube_pod_labels":
 			for key, value := range result.Metric {
 				if strings.HasPrefix(string(key), "label_") {
-					pod.Detail.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+					pod.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
 				}
 			}
 
 		case "kube_pod_status_phase":
 			if int(result.Value) == 1 {
-				pod.Detail.Status = string(result.Metric["phase"])
+				pod.Status = string(result.Metric["phase"])
 			}
 
 		case "kube_pod_container_info":
 			pod.Containers = append(pod.Containers, string(result.Metric["container"]))
 
 		case "kube_pod_container_status_restarts_total":
-			pod.Detail.RestartCount = pod.Detail.RestartCount + int(result.Value)
+			pod.RestartCount = pod.RestartCount + int(result.Value)
 		}
 	}
 
 	return pod, nil
+}
+
+func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics, error) {
+	service := entity.ServiceMetrics{}
+	service.Labels = map[string]string{}
+
+	expression := Expression{}
+	expression.Metrics = []string{"kube_service_info", "kube_service_created", "kube_service_labels", "kube_service_spec_type"}
+	expression.QueryLabels = map[string]string{"service": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return service, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_service_info":
+			service.ServiceName = id
+			service.Namespace = string(result.Metric["namespace"])
+			service.ClusterIP = string(result.Metric["cluster_ip"])
+
+		case "kube_service_spec_type":
+			service.Type = string(result.Metric["type"])
+
+		case "kube_service_created":
+			service.CreateAt = int(result.Value)
+
+		case "kube_service_labels":
+			for key, value := range result.Metric {
+				if strings.HasPrefix(string(key), "label_") {
+					service.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+				}
+			}
+		}
+
+	}
+
+	return service, nil
 }
