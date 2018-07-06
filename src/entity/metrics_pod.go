@@ -1,6 +1,6 @@
 package entity
 
-type PodDetailMetrics struct {
+type PodMetrics struct {
 	PodName      string            `json:"podName"`
 	Namespace    string            `json:"namespace"`
 	Node         string            `json:"node"`
@@ -11,10 +11,5 @@ type PodDetailMetrics struct {
 	IP           string            `json:"ip"`
 	Labels       map[string]string `json:"labels"`
 	RestartCount int               `json:"restartCount"`
-}
-
-type PodMetrics struct {
-	Detail     PodDetailMetrics `json:"detail"`
-	Containers []string         `json:"containers"`
-	Events     string           `json:"events"`
+	Containers   []string          `json:"containers"`
 }
