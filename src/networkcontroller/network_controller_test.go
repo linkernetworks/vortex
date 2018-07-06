@@ -3,10 +3,6 @@ package networkcontroller
 import (
 	"bytes"
 	"fmt"
-	"github.com/linkernetworks/vortex/src/entity"
-	"github.com/linkernetworks/vortex/src/kubernetes"
-	"github.com/moby/moby/pkg/namesgenerator"
-	"github.com/stretchr/testify/suite"
 	"math/rand"
 	"net"
 	"os"
@@ -14,6 +10,11 @@ import (
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/kubernetes"
+	"github.com/moby/moby/pkg/namesgenerator"
+	"github.com/stretchr/testify/suite"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -103,7 +104,7 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 	eth1 := entity.PhysicalPort{
 		Name:     suite.ifName,
 		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
+		VlanTags: []int32{2043, 2143, 2243},
 	}
 
 	tName := namesgenerator.GetRandomName(0)
@@ -133,7 +134,7 @@ func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 	eth1 := entity.PhysicalPort{
 		Name:     suite.ifName,
 		MTU:      1500,
-		VlanTags: []int{2043, 2143, 2243},
+		VlanTags: []int32{2043, 2143, 2243},
 	}
 
 	tName := namesgenerator.GetRandomName(0)

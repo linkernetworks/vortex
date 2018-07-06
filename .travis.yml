@@ -16,7 +16,7 @@ notifications:
 before_install:
   - go get -u github.com/kardianos/govendor
   - sudo apt-get install -y git build-essential openvswitch-switch
-  - docker run -d -v /run/openvswitch/db.sock:/var/run/openvswitch/db.sock -p 50051:50051 sdnvortex/network-controller:v0.1.1 /go/bin/server -tcp=0.0.0.0:50051
+  - docker run -d -v /run/openvswitch/db.sock:/var/run/openvswitch/db.sock -p 50051:50051 sdnvortex/network-controller:v0.2.1 /go/bin/server -tcp=0.0.0.0:50051
 
 install:
   - make pre-build
