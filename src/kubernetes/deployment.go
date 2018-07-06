@@ -13,3 +13,7 @@ func (kc *KubeCtl) CreateDeployment(deployment *appsv1.Deployment) (*appsv1.Depl
 func (kc *KubeCtl) GetDeployment(name string) (*appsv1.Deployment, error) {
 	return kc.Clientset.AppsV1().Deployments(kc.Namespace).Get(name, metav1.GetOptions{})
 }
+
+func (kc *KubeCtl) DeleteDeployment(name string) error {
+	return kc.Clientset.AppsV1().Deployments(kc.Namespace).Delete(name, &metav1.DeleteOptions{})
+}

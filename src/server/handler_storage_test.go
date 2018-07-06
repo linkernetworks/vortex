@@ -62,7 +62,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	storage := entity.Storage{
 		Type: entity.FakeStorageType,
 		Name: tName,
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			FakeParameter: "fake~",
 		},
 	}
@@ -103,14 +103,14 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 		{"InvalidParameter", entity.Storage{
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeStorageType,
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "",
 			}},
 			http.StatusBadRequest},
 		{"CreateFail", entity.Storage{
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeStorageType,
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
 			}},
@@ -118,7 +118,7 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 		{"StorageTypeError", entity.Storage{
 			Name: namesgenerator.GetRandomName(0),
 			Type: "non-exist",
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
 			}},
@@ -150,7 +150,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 		ID:   bson.NewObjectId(),
 		Type: entity.FakeStorageType,
 		Name: tName,
-		Fake: entity.FakeStorage{
+		Fake: &entity.FakeStorage{
 			FakeParameter: "fake~",
 		},
 	}
@@ -198,7 +198,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 			ID:   bson.NewObjectId(),
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeStorageType,
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo-Delete-Fail",
 				IWantFail:     true,
 			}},
@@ -207,7 +207,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 			ID:   bson.NewObjectId(),
 			Name: namesgenerator.GetRandomName(0),
 			Type: "non-exist",
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo-Delete-Fail",
 				IWantFail:     true,
 			}},
@@ -238,7 +238,7 @@ func (suite *StorageTestSuite) TestListStorage() {
 		storages = append(storages, entity.Storage{
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeStorageType,
-			Fake: entity.FakeStorage{
+			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     false,
 			},
