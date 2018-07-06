@@ -37,12 +37,12 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := networkProvider.ValidateBeforeCreating(sp, network); err != nil {
+	if err := networkProvider.ValidateBeforeCreating(sp, &network); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := networkProvider.CreateNetwork(sp, network); err != nil {
+	if err := networkProvider.CreateNetwork(sp, &network); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
@@ -157,7 +157,7 @@ func deleteNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := networkProvider.DeleteNetwork(sp, network); err != nil {
+	if err := networkProvider.DeleteNetwork(sp, &network); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
