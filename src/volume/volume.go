@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func getPVC(volume *entity.Volume, storageClassName string) *v1.PersistentVolumeClaim {
+func getPVCInstance(volume *entity.Volume, storageClassName string) *v1.PersistentVolumeClaim {
 	capacity, _ := resource.ParseQuantity(volume.Capacity + "Gi")
 	return &v1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
@@ -46,7 +46,7 @@ func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 		return err
 	}
 	//fetch the db to get the storageName
-	pvc := getPVC(volume, storageName)
+	pvc := getPVCInstance(volume, storageName)
 	_, err = sp.KubeCtl.CreatePVC(pvc)
 	return err
 }
