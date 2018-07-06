@@ -79,6 +79,57 @@ func (nc *NetworkController) DeleteOVSNetwork(bridgeName string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
+func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, ports []entity.DPDKPhysicalPort) error {
+	if _, err := nc.ClientCtl.CreateBridge(
+		nc.Context,
+		&pb.CreateBridgeRequest{
+			BridgeName:   bridgeName,
+			DatapathType: "netdev",
+		}); err != nil {
+		return err
+	}
+
+	for _, port := range ports {
+		_, err := nc.ClientCtl.AddDPDKPort(
+			nc.Context,
+			&pb.AddPortRequest{
+				BridgeName:  bridgeName,
+				IfaceName:   port.Name,
+				DpdkDevargs: port.PCIID,
+			})
+		if err != nil {
+			return err
+		}
+
+		if len(port.VlanTags) > 0 {
+			_, err := nc.ClientCtl.SetPort(
+				nc.Context,
+				&pb.SetPortRequest{
+					IfaceName: port.Name,
+					Options: &pb.PortOptions{
+						VLANMode: "trunk",
+						Trunk:    port.VlanTags,
+					},
+				})
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (nc *NetworkController) DeleteOVSDPDKNetwork(bridgeName string) error {
+	_, err := nc.ClientCtl.DeleteBridge(
+		nc.Context,
+		&pb.DeleteBridgeRequest{
+			BridgeName: bridgeName,
+		})
+	if err != nil {
+		return err
+	}
 	return nil
 }
