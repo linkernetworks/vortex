@@ -1,4 +1,4 @@
-package prometheus
+package prometheusprovider
 
 import (
 	"github.com/linkernetworks/logger"

@@ -7,7 +7,7 @@ import (
 
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/config"
-	"github.com/linkernetworks/vortex/src/prometheus"
+	"github.com/linkernetworks/vortex/src/prometheusprovider"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/redis"
@@ -23,7 +23,7 @@ type Container struct {
 	Config     config.Config
 	Redis      *redis.Service
 	Mongo      *mongo.Service
-	Prometheus *prometheus.Service
+	Prometheus *prometheusprovider.Service
 	KubeCtl    *kubeCtl.KubeCtl
 }
 
@@ -44,7 +44,7 @@ func New(cf config.Config) *Container {
 	mongo := mongo.New(cf.Mongo.Url)
 
 	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
-	prometheus := prometheus.New(cf.Prometheus.Url)
+	prometheus := prometheusprovider.New(cf.Prometheus.Url)
 
 	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	k8s, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -79,7 +79,7 @@ func NewForTesting(cf config.Config) *Container {
 	mongo := mongo.New(cf.Mongo.Url)
 
 	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
-	prometheus := prometheus.New(cf.Prometheus.Url)
+	prometheus := prometheusprovider.New(cf.Prometheus.Url)
 
 	clientset := fakeclientset.NewSimpleClientset()
 

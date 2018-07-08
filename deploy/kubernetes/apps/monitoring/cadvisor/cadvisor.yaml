@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         name: cadvisor
+      annotations:
+        prometheus.io/scrape: 'true'
     spec:
       containers:
       - name: cadvisor
