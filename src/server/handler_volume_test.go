@@ -14,6 +14,7 @@ import (
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	v "github.com/linkernetworks/vortex/src/volume"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
@@ -26,6 +27,7 @@ func init() {
 
 type VolumeTestSuite struct {
 	suite.Suite
+	sp      *serviceprovider.Container
 	wc      *restful.Container
 	session *mongo.Session
 	storage entity.Storage
@@ -35,11 +37,12 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
+	suite.sp = sp
 	//init session
 	suite.session = sp.Mongo.NewSession()
 	//init restful container
 	suite.wc = restful.NewContainer()
-	service := newVolumeService(sp)
+	service := newVolumeService(suite.sp)
 	suite.wc.Add(service)
 	//init a Storage
 	suite.storage = entity.Storage{
@@ -109,6 +112,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 }
 
 func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
+	//the storageName doesn't exist
 	tName := namesgenerator.GetRandomName(0)
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
@@ -129,7 +133,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 	defer suite.session.Remove(entity.VolumeCollectionName, "name", volume.Name)
 }
 
@@ -143,9 +147,19 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
+		MetaName:    namesgenerator.GetRandomName(0),
 	}
 
-	err := suite.session.Insert(entity.VolumeCollectionName, &volume)
+	err := suite.session.Insert(entity.StorageCollectionName, &entity.Storage{
+		Name: volume.StorageName,
+	})
+	defer suite.session.Remove(entity.StorageCollectionName, "name", volume.StorageName)
+	suite.NoError(err)
+
+	err = v.CreateVolume(suite.sp, &volume)
+	suite.NoError(err)
+
+	err = suite.session.Insert(entity.VolumeCollectionName, &volume)
 	suite.NoError(err)
 
 	bodyBytes, err := json.MarshalIndent(volume, "", "  ")

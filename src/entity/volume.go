@@ -12,14 +12,14 @@ const (
 )
 
 /*
-	Users will create the Volume from the storageProvider and they can use those volumes in their containers
+	Users will create the Volume from the storage and they can use those volumes in their containers
 	In the kubernetes implementation, it's PVC
 	So the Volume will create a PVC type and connect to a known StorageClass
 */
 type Volume struct {
 	ID          bson.ObjectId                     `bson:"_id,omitempty" json:"id"`
 	Name        string                            `bson:"name" json:"name"`
-	StorageName string                            `bson:"storageProviderName" json:"storageProviderName"`
+	StorageName string                            `bson:"storageName" json:"storageName"`
 	AccessMode  corev1.PersistentVolumeAccessMode `bson:"accessMode" json:"accessMode"`
 	Capacity    string                            `bson:"capacity" json:"capacity"`
 	MetaName    string                            `bson:"metaName" json:"metaName"` //For PVC metaname
@@ -33,5 +33,5 @@ func (m Volume) GetCollection() string {
 
 //GenerateMetaName - Generate a metaname for kubernetes PVC object
 func (m Volume) GenerateMetaName() string {
-	return "PVC-" + m.ID.Hex()
+	return "pvc-" + m.ID.Hex()
 }

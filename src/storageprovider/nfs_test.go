@@ -1,35 +1,15 @@
 package storageprovider
 
 import (
-	"bytes"
-	"fmt"
-	"math/rand"
-	"os/exec"
 	"testing"
-	"time"
 
 	//"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
-	kc "github.com/linkernetworks/vortex/src/kubernetes"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	//"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
-	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func execute(suite *suite.Suite, cmd *exec.Cmd) {
-	w := bytes.NewBuffer(nil)
-	cmd.Stderr = w
-	err := cmd.Run()
-	suite.NoError(err)
-	fmt.Printf("Stderr: %s\n", string(w.Bytes()))
-}
 
 type StorageTestSuite struct {
 	suite.Suite
@@ -39,13 +19,6 @@ type StorageTestSuite struct {
 func (suite *StorageTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.NewForTesting(cf)
-
-	//init fakeclient
-	fakeclient := fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	suite.sp.KubeCtl = kc.New(fakeclient, namespace)
-
-	//Create a fake clinet
 }
 
 func (suite *StorageTestSuite) TearDownSuite() {
