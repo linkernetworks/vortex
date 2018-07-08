@@ -19,5 +19,12 @@ Plugin 'fatih/vim-go', {'do': ':GoInstallBinaries'}
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/nerdtree'
 
+function! StartUp()
+    if 0 == argc()
+        NERDTree
+    end
+endfunction
+autocmd VimEnter * call StartUp()
+
 call vundle#end()            " required
 filetype plugin indent on    " required
