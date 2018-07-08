@@ -1,103 +1,133 @@
-package server
+package prometheuscontroller
 
 import (
 	"strings"
 
 	"github.com/linkernetworks/vortex/src/entity"
-	response "github.com/linkernetworks/vortex/src/net/http"
-	"github.com/linkernetworks/vortex/src/web"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/prometheus/common/model"
 )
 
-func listNodeMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	nodeList := entity.NodeListMetrics{}
-	nodeList.Node = map[string]entity.NodeInfoMetrics{}
-
-	// kube_node_info, kube_node_labels
-	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_labels"}`)
-	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	for _, result := range results {
-		switch result.Metric["__name__"] {
-
-		case "kube_node_info":
-			nodeInfo := entity.NodeInfoMetrics{}
-			nodeInfo.NodeName = string(result.Metric["node"])
-			nodeList.Node[string(result.Metric["node"])] = nodeInfo
-
-		case "kube_node_labels":
-			nodeInfo := nodeList.Node[string(result.Metric["node"])]
-			nodeInfo.Labels = map[string]string{}
-			for key, value := range result.Metric {
-				if strings.HasPrefix(string(key), "label_") {
-					nodeInfo.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
-				}
-			}
-			nodeList.Node[string(result.Metric["node"])] = nodeInfo
-		}
-	}
-
-	// kube_node_status_condition
-	results, err = queryFromPrometheus(sp, `{__name__=~"kube_node_status_condition",status="true"}==1`)
-	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	for _, result := range results {
-		nodeInfo := nodeList.Node[string(result.Metric["node"])]
-		nodeInfo.Status = string(result.Metric["condition"])
-		nodeList.Node[string(result.Metric["node"])] = nodeInfo
-	}
-
-	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
-	results, err = queryFromPrometheus(sp, `sum by(__name__, resource,node) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests"})`)
-	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	for _, result := range results {
-		nodeInfo := nodeList.Node[string(result.Metric["node"])]
-		switch result.Metric["__name__"] {
-		case "kube_pod_container_resource_requests":
-			switch result.Metric["resource"] {
-			case "cpu":
-				nodeInfo.Resource.CPURequests = float32(result.Value)
-			case "memory":
-				nodeInfo.Resource.MemoryRequests = float32(result.Value)
-			}
-		case "kube_pod_container_resource_limits":
-			switch result.Metric["resource"] {
-			case "cpu":
-				nodeInfo.Resource.CPULimits = float32(result.Value)
-			case "memory":
-				nodeInfo.Resource.MemoryLimits = float32(result.Value)
-			}
-		}
-		nodeList.Node[string(result.Metric["node"])] = nodeInfo
-	}
-
-	resp.WriteEntity(nodeList)
+type Expression struct {
+	Metrics     []string          `json:"metrics"`
+	QueryLabels map[string]string `json:"queryLabels"`
+	SumBy       []string          `json:"sumBy"`
+	Value       *int              `json:"value"`
 }
 
-func getNodeMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+func ListResource(sp *serviceprovider.Container, resource model.LabelName, expression Expression) ([]string, error) {
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return nil, err
+	}
 
-	id := req.PathParameter("id")
+	resourceList := []string{}
+	for _, result := range results {
+		resourceList = append(resourceList, string(result.Metric[resource]))
+	}
+
+	return resourceList, nil
+}
+
+func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
+	pod := entity.PodMetrics{}
+	pod.Labels = map[string]string{}
+
+	expression := Expression{}
+	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
+	expression.QueryLabels = map[string]string{"pod": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_pod_info":
+			pod.PodName = id
+			pod.IP = string(result.Metric["pod_ip"])
+			pod.Node = string(result.Metric["node"])
+			pod.Namespace = string(result.Metric["namespace"])
+			pod.CreateByKind = string(result.Metric["created_by_kind"])
+			pod.CreateByName = string(result.Metric["created_by_name"])
+
+		case "kube_pod_created":
+			pod.CreateAt = int(result.Value)
+
+		case "kube_pod_labels":
+			for key, value := range result.Metric {
+				if strings.HasPrefix(string(key), "label_") {
+					pod.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+				}
+			}
+
+		case "kube_pod_status_phase":
+			if int(result.Value) == 1 {
+				pod.Status = string(result.Metric["phase"])
+			}
+
+		case "kube_pod_container_info":
+			pod.Containers = append(pod.Containers, string(result.Metric["container"]))
+
+		case "kube_pod_container_status_restarts_total":
+			pod.RestartCount = pod.RestartCount + int(result.Value)
+		}
+	}
+
+	return pod, nil
+}
+
+func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics, error) {
+	service := entity.ServiceMetrics{}
+	service.Labels = map[string]string{}
+
+	expression := Expression{}
+	expression.Metrics = []string{"kube_service_info", "kube_service_created", "kube_service_labels", "kube_service_spec_type"}
+	expression.QueryLabels = map[string]string{"service": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return service, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_service_info":
+			service.ServiceName = id
+			service.Namespace = string(result.Metric["namespace"])
+			service.ClusterIP = string(result.Metric["cluster_ip"])
+
+		case "kube_service_spec_type":
+			service.Type = string(result.Metric["type"])
+
+		case "kube_service_created":
+			service.CreateAt = int(result.Value)
+
+		case "kube_service_labels":
+			for key, value := range result.Metric {
+				if strings.HasPrefix(string(key), "label_") {
+					service.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+				}
+			}
+		}
+
+	}
+
+	return service, nil
+}
+
+func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, error) {
 	node := entity.NodeMetrics{}
 	node.Detail.Labels = map[string]string{}
 	node.NICs = map[string]entity.NICMetrics{}
 
 	// kube_node_info, kube_node_created, node_network_interface, kube_node_labels, kube_node_status_capacity, kube_node_status_allocatable
-	results, err := queryFromPrometheus(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_capacity|kube_node_status_allocatable",node=~"`+id+`"}`)
+	results, err := query(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_capacity|kube_node_status_allocatable",node=~"`+id+`"}`)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
+		return node, err
 	}
 
 	for _, result := range results {
@@ -147,19 +177,17 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	}
 
 	// kube_node_status_condition
-	results, err = queryFromPrometheus(sp, `	{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
+	results, err = query(sp, `{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
+		return node, err
 	}
 
 	node.Detail.Status = string(results[0].Metric["condition"])
 
 	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
-	results, err = queryFromPrometheus(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
+	results, err = query(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
+		return node, err
 	}
 
 	for _, result := range results {
@@ -182,10 +210,9 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	}
 
 	// node_network_interface, node_network_receive_bytes_total, node_network_transmit_bytes_total, node_network_receive_packets_total, node_network_transmit_packets_total
-	results, err = queryFromPrometheus(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
+	results, err = query(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
+		return node, err
 	}
 
 	for _, result := range results {
@@ -221,5 +248,5 @@ func getNodeMetricsHandler(ctx *web.Context) {
 		}
 	}
 
-	resp.WriteEntity(node)
+	return node, nil
 }
