@@ -9,41 +9,39 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
-	"github.com/linkernetworks/vortex/src/volume"
+	"github.com/linkernetworks/vortex/src/pod"
 	"github.com/linkernetworks/vortex/src/web"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createVolume(ctx *web.Context) {
+func createPod(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	v := entity.Volume{}
-	if err := req.ReadEntity(&v); err != nil {
+	p := entity.Pod{}
+	if err := req.ReadEntity(&p); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
 	session := sp.Mongo.NewSession()
-	session.C(entity.VolumeCollectionName).EnsureIndex(mgo.Index{
+	session.C(entity.PodCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"name"},
 		Unique: true,
 	})
 	defer session.Close()
 
 	// Check whether this name has been used
-	v.ID = bson.NewObjectId()
-	v.CreatedAt = timeutils.Now()
-	v.MetaName = v.GenerateMetaName()
-	//Generate the metaName for PVC meta name and we will use it future
-	if err := volume.CreateVolume(sp, &v); err != nil {
+	p.ID = bson.NewObjectId()
+	p.CreatedAt = timeutils.Now()
+	if err := pod.CreatePod(sp, &p); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
-	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
+	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", v.Name))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -56,7 +54,7 @@ func createVolume(ctx *web.Context) {
 	})
 }
 
-func deleteVolume(ctx *web.Context) {
+func deletePod(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
@@ -64,18 +62,18 @@ func deleteVolume(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	v := entity.Volume{}
-	if err := session.FindOne(entity.VolumeCollectionName, bson.M{"_id": bson.ObjectIdHex(id)}, &v); err != nil {
+	p := entity.Pod{}
+	if err := session.FindOne(entity.PodCollectionName, bson.M{"_id": bson.ObjectIdHex(id)}, &p); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := volume.DeleteVolume(sp, &v); err != nil {
+	if err := pod.DeletePod(sp, p.Name); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	if err := session.Remove(entity.VolumeCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
+	if err := session.Remove(entity.PodCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		if mgo.ErrNotFound == err {
 			response.BadRequest(req.Request, resp.ResponseWriter, err)
 		} else {
@@ -90,7 +88,7 @@ func deleteVolume(ctx *web.Context) {
 	})
 }
 
-func listVolume(ctx *web.Context) {
+func listPod(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
@@ -110,14 +108,14 @@ func listVolume(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	volumes := []entity.Volume{}
-	var c = session.C(entity.VolumeCollectionName)
+	pods := []entity.Pod{}
+	var c = session.C(entity.PodCollectionName)
 	var q *mgo.Query
 
 	selector := bson.M{}
 	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
 
-	if err := q.All(&volumes); err != nil {
+	if err := q.All(&pods); err != nil {
 		if err == mgo.ErrNotFound {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
 		} else {
@@ -126,7 +124,7 @@ func listVolume(ctx *web.Context) {
 		return
 	}
 
-	count, err := session.Count(entity.VolumeCollectionName, bson.M{})
+	count, err := session.Count(entity.PodCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -134,5 +132,5 @@ func listVolume(ctx *web.Context) {
 	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
 	resp.AddHeader("X-Total-Count", strconv.Itoa(count))
 	resp.AddHeader("X-Total-Pages", strconv.Itoa(totalPages))
-	resp.WriteEntity(volumes)
+	resp.WriteEntity(pods)
 }
