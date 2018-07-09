@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	pc "github.com/linkernetworks/vortex/src/prometheuscontroller"
@@ -27,6 +28,12 @@ func listContainerMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
+	if pod, ok := query.Str("pod"); ok {
+		expression.QueryLabels["pod"] = pod
+	} else {
+		expression.QueryLabels["pod"] = ".*"
+	}
+
 	containerList, err := pc.ListResource(sp, "container", expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
@@ -37,10 +44,16 @@ func listContainerMetricsHandler(ctx *web.Context) {
 }
 
 func getContainerMetricsHandler(ctx *web.Context) {
-	// _, _, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	// id := req.PathParameter("id")
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	// pod := entity.PodMetrics{}
+	container := entity.ContainerMetrics{}
+	id := req.PathParameter("id")
 
-	// resp.WriteEntity()
+	container, err := pc.GetContainer(sp, id)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(container)
 }
