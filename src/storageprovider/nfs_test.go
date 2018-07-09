@@ -1,15 +1,23 @@
 package storageprovider
 
 import (
+	"math/rand"
 	"testing"
+	"time"
 
 	//"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
+
 	"gopkg.in/mgo.v2/bson"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type StorageTestSuite struct {
 	suite.Suite
@@ -52,7 +60,6 @@ func (suite *StorageTestSuite) TestGetStorageClass() {
 
 	storageClass := getStorageClass(bson.NewObjectId().Hex(), bson.NewObjectId().Hex(), storage)
 	suite.NotNil(storageClass)
-
 }
 
 func (suite *StorageTestSuite) TestValidateBeforeCreating() {
@@ -121,6 +128,36 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 
 	deploy, err = suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
 	suite.Nil(deploy)
+	suite.Error(err)
+}
+
+func (suite *StorageTestSuite) TestDeleteStorageFail() {
+	storage := &entity.Storage{
+		ID:   bson.NewObjectId(),
+		Type: entity.NFSStorageType,
+		NFS: &entity.NFSStorage{
+			IP:   "1.2.3.4",
+			PATH: "/exports",
+		},
+		Name: namesgenerator.GetRandomName(0),
+	}
+
+	volume := entity.Volume{
+		ID:          bson.NewObjectId(),
+		StorageName: storage.Name,
+	}
+
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	session.Insert(entity.VolumeCollectionName, volume)
+	defer session.Remove(entity.VolumeCollectionName, "_id", volume.ID)
+
+	sp, err := GetStorageProvider(storage)
+	suite.NoError(err)
+	sp = sp.(NFSStorageProvider)
+
+	err = sp.DeleteStorage(suite.sp, storage)
 	suite.Error(err)
 }
 
