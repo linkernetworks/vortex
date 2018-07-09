@@ -100,29 +100,30 @@ func (suite *NetworkControllerTestSuite) TestNew() {
 }
 
 func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
-	//Parameters
-	eth1 := entity.PhysicalPort{
-		Name:     suite.ifName,
-		MTU:      1500,
-		VlanTags: []int32{2043, 2143, 2243},
-	}
-
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{eth1},
+		Type:       entity.OVSKernelspaceNetworkType,
+		Name:       tName,
+		VLANTags:   []int32{0, 2048, 4095},
+		BridgeName: tName,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name: suite.nodeName,
+				PhyInterfaces: []entity.PhyInterface{
+					entity.PhyInterface{
+						Name:  suite.ifName,
+						PCIID: "",
+					},
+				},
+			},
 		},
-		Type:     "ovs",
-		NodeName: suite.nodeName,
 	}
 
 	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork(tName, network.OVSUserspace.PhysicalPorts)
+	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
@@ -130,28 +131,31 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 }
 
 func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
-	eth1 := entity.PhysicalPort{
-		Name:     suite.ifName,
-		MTU:      1500,
-		VlanTags: []int32{2043, 2143, 2243},
-	}
-
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name: tName,
-		OVSUserspace: entity.OVSUserspaceNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{eth1},
+		Type:       entity.OVSUserspaceNetworkType,
+		IsDPDKPort: false,
+		Name:       tName,
+		VLANTags:   []int32{0, 2048, 4095},
+		BridgeName: tName,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name: suite.nodeName,
+				PhyInterfaces: []entity.PhyInterface{
+					entity.PhyInterface{
+						Name:  suite.ifName,
+						PCIID: "",
+					},
+				},
+			},
 		},
-		Type:     "netdev",
-		NodeName: suite.nodeName,
 	}
 
 	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSUserpsaceNetwork(tName, network.OVS.PhysicalPorts)
+	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
@@ -159,29 +163,30 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 }
 
 func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
-	//Parameters
-	eth1 := entity.PhysicalPort{
-		Name:     suite.ifName,
-		MTU:      1500,
-		VlanTags: []int32{2043, 2143, 2243},
-	}
-
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name: tName,
-		OVS: entity.OVSNetwork{
-			BridgeName:    tName,
-			PhysicalPorts: []entity.PhysicalPort{eth1},
+		Type:       entity.OVSKernelspaceNetworkType,
+		Name:       tName,
+		VLANTags:   []int32{0, 2048, 4095},
+		BridgeName: tName,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name: suite.nodeName,
+				PhyInterfaces: []entity.PhyInterface{
+					entity.PhyInterface{
+						Name:  suite.ifName,
+						PCIID: "",
+					},
+				},
+			},
 		},
-		Type:     "ovs",
-		NodeName: suite.nodeName,
 	}
 
 	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork(tName, network.OVS.PhysicalPorts)
+	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
 	suite.NoError(err)
 
 	err = nc.DeleteOVSNetwork(tName)
@@ -193,6 +198,6 @@ func (suite *NetworkControllerTestSuite) TestCreateNetworkWithInvalidAddress() {
 	suite.NoError(err)
 
 	tName := namesgenerator.GetRandomName(0)
-	err = nc.CreateOVSNetwork(tName, []entity.PhysicalPort{})
+	err = nc.CreateOVSNetwork("system", tName, []entity.PhyInterface{}, []int32{})
 	suite.Error(err)
 }
