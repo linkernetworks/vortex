@@ -8,26 +8,32 @@ import (
 )
 
 type FakeNetworkProvider struct {
-	entity.FakeNetwork
+	nodes []entity.Node
 }
 
-func (fake FakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.FakeParameter == "" {
-		return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
+func (fnp FakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error {
+	for _, node := range fnp.nodes {
+		if node.FakeParameter == "" {
+			return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
+		}
 	}
 	return nil
 }
 
-func (fake FakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.IWantFail {
-		return fmt.Errorf("Fail to create network but don't worry, I'm fake network")
+func (fnp FakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error {
+	for _, node := range fnp.nodes {
+		if node.ShouldFail {
+			return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
+		}
 	}
 	return nil
 }
 
-func (fake FakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.IWantFail {
-		return fmt.Errorf("Fail to delete network but don't worry, I'm fake network")
+func (fnp FakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error {
+	for _, node := range fnp.nodes {
+		if node.ShouldFail {
+			return fmt.Errorf("Fail to delete network but don't worry, I'm fake network")
+		}
 	}
 	return nil
 }

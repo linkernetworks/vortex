@@ -10,107 +10,86 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type OVSUserspaceNetworkProvider struct {
-	entity.OVSUserspaceNetwork
+type KernelSpaceNetworkProvider struct {
+	nodes []entity.Node
 }
 
-func (ovsu OVSUserspaceNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network *entity.Network) error {
+func (knp KernelSpaceNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, network *entity.Network) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
-	// FIXME validate both dpdk or userspace datapath
-	// Check whether vlangTag is 0~4095
-	for _, pp := range ovsu.DPDKPhysicalPorts {
-		for _, vlangTag := range pp.VlanTags {
-			if vlangTag < 0 || vlangTag > 4095 {
-				return fmt.Errorf("The vlangTag %v in PhysicalPort %v should between 0 and 4095", pp.Name, vlangTag)
-			}
+
+	// Check whether VLAN Tag is 0~4095
+	for _, tag := range network.VLANTags {
+		if tag < 0 || tag > 4095 {
+			return fmt.Errorf("The vlangTag %d should between 0 and 4095", tag)
 		}
 	}
 
-	q := bson.M{}
-	if network.Clusterwise {
-		//Only check the bridge name
-		q = bson.M{"ovsUserspace.bridgeName": ovsu.BridgeName}
-	} else {
-		q = bson.M{"nodeName": network.NodeName, "ovsUserspace.bridgeName": ovsu.BridgeName}
+	// TODO Check dpdk port
+	for _, node := knp.nodes {
+		node
 	}
 
+	q := bson.M{
+		"networks.name": network.Name,
+	}
 	n, err := session.Count(entity.NetworkCollectionName, q)
 	if n >= 1 {
-		return fmt.Errorf("The bridge name %s is exist, please check your cluster type and reassign another bridge name", ovsu.BridgeName)
+		return fmt.Errorf("The network name: %s is exist.", network.Name)
 	} else if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ovsu OVSUserspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network *entity.Network) error {
-	if network.Clusterwise {
-		nodes, _ := sp.KubeCtl.GetNodes()
-		for _, v := range nodes {
-			nodeIP, err := sp.KubeCtl.GetNodeExternalIP(v.GetName())
-			if err != nil {
-				return err
-			}
-			// TODO if dpdk==true
-			if err := createOVSDPDKNetwork(nodeIP, network.OVSUserspace.BridgeName, network.OVSUserspace.DPDKPhysicalPorts); err != nil {
-				return err
-			}
-			// TODO else dpdk==false
-			// if err := createOVSUserspaceNetwork(nodeIP, network.OVS.BridgeName, network.OVS.PhysicalPorts); err != nil {
-			// 	return err
-			// }
+func (knp KernelSpaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container, network *entity.Network) error {
+	for _, node := range knp.nodes {
+		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		if err != nil {
+			return err
 		}
-		return nil
-	}
-	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(network.NodeName)
-	if err != nil {
-		return err
-	}
-	// TODO if dpdk==true
-	return createOVSDPDKNetwork(nodeIP, network.OVSUserspace.BridgeName, network.OVSUserspace.DPDKPhysicalPorts)
-	// TODO else dpdk==false
-	// return createOVSUserspaceNetwork(nodeIP, network.OVS.BridgeName, network.OVS.PhysicalPorts)
-}
-
-func (ovsu OVSUserspaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network *entity.Network) error {
-	if network.Clusterwise {
-		nodes, _ := sp.KubeCtl.GetNodes()
-		for _, v := range nodes {
-			nodeIP, err := sp.KubeCtl.GetNodeExternalIP(v.GetName())
-			if err != nil {
+		if node.PhyInterface.IsDPDKPort {
+			if err := createOVSDPDKNetwork(nodeIP, node.Name, node.PhyInterface, network.VLANTags); err != nil {
 				return err
 			}
-			if err := deleteOVSUserspaceNetwork(nodeIP, ovsu.BridgeName); err != nil {
+		} else {
+			if err := createOVSUserspaceNetwork(nodeIP, node.Name, node.PhyInterface, network.VLANTags); err != nil {
 				return err
 			}
 		}
-		return nil
 	}
-
-	nodeIP, err := sp.KubeCtl.GetNodeExternalIP(network.NodeName)
-	if err != nil {
-		return err
-	}
-	return deleteOVSUserspaceNetwork(nodeIP, ovsu.BridgeName)
+	return nil
 }
 
-func createOVSDPDKNetwork(nodeIP string, bridgeName string, ports []entity.DPDKPhysicalPort) error {
+func (knp KernelSpaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, network *entity.Network) error {
+	for _, node := range knp.nodes {
+		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		if err != nil {
+			return err
+		}
+		if err := deleteOVSUserspaceNetwork(nodeIP, network.BridgeName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func createOVSDPDKNetwork(nodeIP string, bridgeName string, phyIface entity.PhyInterface, vlanTags []int32) error {
 	nodeAddr := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
 	nc, err := networkcontroller.New(nodeAddr)
 	if err != nil {
 		return err
 	}
-	return nc.CreateOVSDPDKNetwork(bridgeName, ports)
+	return nc.CreateOVSDPDKNetwork(bridgeName, phyIface, vlanTags)
 }
 
-func createOVSUserspaceNetwork(nodeIP string, bridgeName string, ports []entity.PhysicalPort) error {
+func createOVSUserspaceNetwork(nodeIP string, bridgeName string, phyIface entity.PhyInterface, vlanTags []int32) error {
 	nodeAddr := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
 	nc, err := networkcontroller.New(nodeAddr)
 	if err != nil {
 		return err
 	}
-	return nc.CreateOVSUserpsaceNetwork(bridgeName, ports)
+	return nc.CreateOVSNetwork("netdev", bridgeName, phyIface, vlanTags)
 }
 
 func deleteOVSUserspaceNetwork(nodeIP string, bridgeName string) error {
