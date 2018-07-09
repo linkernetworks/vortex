@@ -7,11 +7,15 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
-type FakeNetworkProvider struct {
-	nodes []entity.Node
+type fakeNetworkProvider struct {
+	networkName string
+	bridgeName  string
+	vlanTags    []int32
+	nodes       []entity.Node
+	isDPDKPort  bool
 }
 
-func (fnp FakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error {
+func (fnp fakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container) error {
 	for _, node := range fnp.nodes {
 		if node.FakeParameter == "" {
 			return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
@@ -20,7 +24,7 @@ func (fnp FakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Contai
 	return nil
 }
 
-func (fnp FakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error {
+func (fnp fakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
 	for _, node := range fnp.nodes {
 		if node.ShouldFail {
 			return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
@@ -29,7 +33,7 @@ func (fnp FakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net 
 	return nil
 }
 
-func (fnp FakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error {
+func (fnp fakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
 	for _, node := range fnp.nodes {
 		if node.ShouldFail {
 			return fmt.Errorf("Fail to delete network but don't worry, I'm fake network")

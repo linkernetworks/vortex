@@ -31,7 +31,7 @@ func New(serverAddress string) (*NetworkController, error) {
 	}, nil
 }
 
-func (nc *NetworkController) CreateOVSNetwork(datapathType string, bridgeName string, phyIface entity.PhyInterface, vlanTags []int32) error {
+func (nc *NetworkController) CreateOVSNetwork(datapathType string, bridgeName string, phyIfaces []entity.PhyInterface, vlanTags []int32) error {
 	if _, err := nc.ClientCtl.CreateBridge(
 		nc.Context,
 		&pb.CreateBridgeRequest{
@@ -41,34 +41,36 @@ func (nc *NetworkController) CreateOVSNetwork(datapathType string, bridgeName st
 		return err
 	}
 
-	_, err := nc.ClientCtl.AddPort(
-		nc.Context,
-		&pb.AddPortRequest{
-			BridgeName: bridgeName,
-			IfaceName:  phyIface.Name,
-		})
-	if err != nil {
-		return err
-	}
-
-	if len(vlanTags) > 0 {
-		_, err := nc.ClientCtl.SetPort(
+	for _, phyIface := range phyIfaces {
+		_, err := nc.ClientCtl.AddPort(
 			nc.Context,
-			&pb.SetPortRequest{
-				IfaceName: phyIface.Name,
-				Options: &pb.PortOptions{
-					VLANMode: "trunk",
-					Trunk:    vlanTags,
-				},
+			&pb.AddPortRequest{
+				BridgeName: bridgeName,
+				IfaceName:  phyIface.Name,
 			})
 		if err != nil {
 			return err
+		}
+
+		if len(vlanTags) > 0 {
+			_, err := nc.ClientCtl.SetPort(
+				nc.Context,
+				&pb.SetPortRequest{
+					IfaceName: phyIface.Name,
+					Options: &pb.PortOptions{
+						VLANMode: "trunk",
+						Trunk:    vlanTags,
+					},
+				})
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIface entity.PhyInterface, vlanTags []int32) error {
+func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIfaces []entity.PhyInterface, vlanTags []int32) error {
 	if _, err := nc.ClientCtl.CreateBridge(
 		nc.Context,
 		&pb.CreateBridgeRequest{
@@ -78,7 +80,7 @@ func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIface en
 		return err
 	}
 
-	if phyIface.IsDPDKPort == true {
+	for _, phyIface := range phyIfaces {
 		_, err := nc.ClientCtl.AddDPDKPort(
 			nc.Context,
 			&pb.AddPortRequest{
@@ -89,30 +91,20 @@ func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIface en
 		if err != nil {
 			return err
 		}
-	} else {
-		_, err := nc.ClientCtl.AddPort(
-			nc.Context,
-			&pb.AddPortRequest{
-				BridgeName: bridgeName,
-				IfaceName:  phyIface.Name,
-			})
-		if err != nil {
-			return err
-		}
-	}
 
-	if len(vlanTags) > 0 {
-		_, err := nc.ClientCtl.SetPort(
-			nc.Context,
-			&pb.SetPortRequest{
-				IfaceName: phyIface.Name,
-				Options: &pb.PortOptions{
-					VLANMode: "trunk",
-					Trunk:    vlanTags,
-				},
-			})
-		if err != nil {
-			return err
+		if len(vlanTags) > 0 {
+			_, err := nc.ClientCtl.SetPort(
+				nc.Context,
+				&pb.SetPortRequest{
+					IfaceName: phyIface.Name,
+					Options: &pb.PortOptions{
+						VLANMode: "trunk",
+						Trunk:    vlanTags,
+					},
+				})
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
