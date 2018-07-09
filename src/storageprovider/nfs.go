@@ -6,11 +6,12 @@ import (
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"gopkg.in/mgo.v2/bson"
+
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	//	"gopkg.in/mgo.v2/bson"
 )
 
 const NFS_PROVISIONER_PREFIX = "nfs-provisioner-"
@@ -119,6 +120,19 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	deployName := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
 	storageName := NFS_STORAGECLASS_PREFIX + storage.ID.Hex()
+
+	//If the storage is used by some volume, we can't delete it.
+	q := bson.M{"storageName": storage.Name}
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	count, err := session.Count(entity.VolumeCollectionName, q)
+	if err != nil {
+		return err
+	} else if count > 0 {
+		return fmt.Errorf("The StorageName %s can't be deleted, since there're some volume still use it", storage.Name)
+	}
+
 	//Delete StorageClass
 	if err := sp.KubeCtl.DeleteStorageClass(storageName); err != nil {
 		return err
