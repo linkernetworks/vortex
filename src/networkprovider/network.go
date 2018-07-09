@@ -15,8 +15,10 @@ type NetworkProvider interface {
 
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
-	case entity.OVSNetworkType:
+	case entity.OVSKernelspaceNetworkType:
 		return OVSNetworkProvider{network.OVS}, nil
+	case entity.OVSUserspaceNetworkType:
+		return OVSUserspaceNetworkProvider{network.OVSUserspace}, nil
 	case entity.FakeNetworkType:
 		return FakeNetworkProvider{network.Fake}, nil
 	default:
