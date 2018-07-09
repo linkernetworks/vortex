@@ -28,6 +28,12 @@ func listPodMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
+	if controller, ok := query.Str("controller"); ok {
+		expression.QueryLabels["deployment"] = controller
+	} else {
+		expression.QueryLabels["deployment"] = ".*"
+	}
+
 	containerList, err := pc.ListResource(sp, "pod", expression)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)

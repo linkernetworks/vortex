@@ -11,6 +11,13 @@ import (
 	"golang.org/x/net/context"
 )
 
+type Expression struct {
+	Metrics     []string          `json:"metrics"`
+	QueryLabels map[string]string `json:"queryLabels"`
+	SumBy       []string          `json:"sumBy"`
+	Value       *int              `json:"value"`
+}
+
 func query(sp *serviceprovider.Container, expression string) (model.Vector, error) {
 
 	api := sp.Prometheus.API
@@ -61,6 +68,7 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 		str = rule.Replace(str)
 	}
 
+	// the result should equal to expression.Value
 	if expression.Value != nil {
 		str = fmt.Sprintf(`%s==%v`, str, *expression.Value)
 	}
