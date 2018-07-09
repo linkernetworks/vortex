@@ -222,6 +222,10 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	}
 
+	kc := sp.KubeCtl
+	object, _ := kc.GetService(service.ServiceName, service.Namespace)
+	service.Ports = object.Spec.Ports
+
 	return service, nil
 }
 
