@@ -16,11 +16,17 @@ type NetworkProvider interface {
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
 	case entity.OVSKernelspaceNetworkType:
-		return OVSNetworkProvider{network.OVS}, nil
+		return KernelSpaceNetworkProvider{
+			network.Nodes,
+		}, nil
 	case entity.OVSUserspaceNetworkType:
-		return OVSUserspaceNetworkProvider{network.OVSUserspace}, nil
+		return UserSpaceNetworkProvider{
+			network.Nodes,
+		}, nil
 	case entity.FakeNetworkType:
-		return FakeNetworkProvider{network.Fake}, nil
+		return FakeNetworkProvider{
+			network.Nodes,
+		}, nil
 	default:
 		return nil, fmt.Errorf("Unsupported Network Type %s", network.Type)
 	}
