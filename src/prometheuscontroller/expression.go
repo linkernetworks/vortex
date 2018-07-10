@@ -238,7 +238,9 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	}
 
-	object, err := sp.KubeCtl.GetService(service.ServiceName, service.Namespace)
+	kc := sp.KubeCtl
+	kc.Namespace = service.Namespace
+	object, err := kc.GetService(ervice.ServiceName)
 	if err != nil {
 		return entity.ServiceMetrics{}, err
 	}
