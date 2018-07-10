@@ -35,7 +35,6 @@ func createVolume(ctx *web.Context) {
 	// Check whether this name has been used
 	v.ID = bson.NewObjectId()
 	v.CreatedAt = timeutils.Now()
-	v.MetaName = v.GenerateMetaName()
 	//Generate the metaName for PVC meta name and we will use it future
 	if err := volume.CreateVolume(sp, &v); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
