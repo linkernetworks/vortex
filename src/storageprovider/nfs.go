@@ -14,8 +14,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const NFS_PROVISIONER_PREFIX = "nfs-provisioner-"
-const NFS_STORAGECLASS_PREFIX = "nfs-storageclass-"
+const (
+	NFSProvisionerPrefix  string = "nfs-provisioner-"
+	NFSStorageClassPrefix string = "nfs-storageclass-"
+)
 
 type NFSStorageProvider struct {
 	entity.Storage
@@ -103,8 +105,8 @@ func getStorageClass(name string, provisioner string, storage *entity.Storage) *
 }
 
 func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
-	name := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
-	storageClassName := NFS_STORAGECLASS_PREFIX + storage.ID.Hex()
+	name := NFSProvisionerPrefix + storage.ID.Hex()
+	storageClassName := NFSStorageClassPrefix + storage.ID.Hex()
 	//Create deployment
 	deployment := getDeployment(name, storage)
 	//Create storageClass
@@ -118,8 +120,8 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 }
 
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
-	deployName := NFS_PROVISIONER_PREFIX + storage.ID.Hex()
-	storageName := NFS_STORAGECLASS_PREFIX + storage.ID.Hex()
+	deployName := NFSProvisionerPrefix + storage.ID.Hex()
+	storageName := NFSStorageClassPrefix + storage.ID.Hex()
 
 	//If the storage is used by some volume, we can't delete it.
 	q := bson.M{"storageName": storage.Name}
