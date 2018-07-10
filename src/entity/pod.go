@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	PodCollectionName string = "pod"
+	PodCollectionName string = "pods"
 )
 
 type Container struct {

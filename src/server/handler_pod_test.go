@@ -69,7 +69,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/pod", bodyReader)
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/pods", bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -92,7 +92,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
-	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/pod", bodyReader)
+	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/pods", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
@@ -128,7 +128,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pod/"+pod.ID.Hex(), bodyReader)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pods/"+pod.ID.Hex(), bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -142,7 +142,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 }
 
 func (suite *PodTestSuite) TestDeletePodWithInvalidID() {
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pod/"+bson.NewObjectId().Hex(), nil)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pods/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -188,9 +188,9 @@ func (suite *PodTestSuite) TestListPod() {
 		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
 		suite.T().Run(caseName, func(t *testing.T) {
 			//list data by default page and page_size
-			url := "http://localhost:7890/v1/pod/"
+			url := "http://localhost:7890/v1/pods/"
 			if tc.page != "" || tc.pageSize != "" {
-				url = "http://localhost:7890/v1/pod?"
+				url = "http://localhost:7890/v1/pods?"
 				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
 			}
 			httpRequest, err := http.NewRequest("GET", url, nil)
@@ -214,21 +214,21 @@ func (suite *PodTestSuite) TestListPod() {
 
 func (suite *PodTestSuite) TestListPodWithInvalidPage() {
 	//Get data with non-exits ID
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pod?page=asdd", nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods?page=asdd", nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pod?page_size=asdd", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pods?page_size=asdd", nil)
 	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pod?page=-1", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pods?page=-1", nil)
 	suite.NoError(err)
 
 	httpWriter = httptest.NewRecorder()
