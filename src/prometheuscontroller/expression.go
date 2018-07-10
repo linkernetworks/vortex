@@ -186,7 +186,10 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	// command
 	kc := sp.KubeCtl
 	kc.Namespace = container.Detail.Namespace
-	pod, _ := kc.GetPod(container.Detail.Pod)
+	pod, err := kc.GetPod(container.Detail.Pod)
+	if err != nil {
+		return entity.ContainerMetrics{}, err
+	}
 
 	for _, obj := range pod.Spec.Containers {
 		if obj.Name == id {
@@ -235,8 +238,11 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	}
 
-	kc := sp.KubeCtl
-	object, _ := kc.GetService(service.ServiceName, service.Namespace)
+	object, err := sp.KubeCtl.GetService(service.ServiceName, service.Namespace)
+	if err != nil {
+		return entity.ServiceMetrics{}, err
+	}
+
 	service.Ports = object.Spec.Ports
 
 	return service, nil
