@@ -15,7 +15,7 @@ spec:
       nodePort: {{ .Values.service.nodePort }}
       name: {{ template "vortex-server.name" . }}
   selector:
-  app: {{ template "vortex-server.name" . }}
-  release: {{ .Release.Name }}
+    app: {{ template "vortex-server.name" . }}
+    release: {{ .Release.Name }}
   
 
