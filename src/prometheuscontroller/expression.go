@@ -93,6 +93,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 			container.Detail.Pod = string(result.Metric["pod"])
 			container.Detail.Node = string(result.Metric["node"])
 			container.Detail.Image = string(result.Metric["image"])
+			container.Detail.Namespace = string(result.Metric["namespace"])
 
 		case "kube_pod_container_status_restarts_total":
 			container.Status.RestartTime = int(result.Value)
@@ -179,6 +180,18 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		case "container_network_transmit_packets_total":
 			container.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
 
+		}
+	}
+
+	// command
+	kc := sp.KubeCtl
+	kc.Namespace = container.Detail.Namespace
+	pod, _ := kc.GetPod(container.Detail.Pod)
+
+	for _, obj := range pod.Spec.Containers {
+		if obj.Name == id {
+			container.Detail.Command = obj.Command
+			break
 		}
 	}
 

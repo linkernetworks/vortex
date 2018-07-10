@@ -13,13 +13,14 @@ type ContainerStatusMetrics struct {
 }
 
 type ContainerDetailMetrics struct {
-	ContainerName string `json:"containerName"`
-	CreatedAt     int    `json:"createAt"`
-	Pod           string `json:"pod"`
-	Node          string `json:"node"`
-	Image         string `json:"image"`
-	Command       string `json:"command"`
-	vNIC          string `json:"vNic"`
+	ContainerName string   `json:"containerName"`
+	CreatedAt     int      `json:"createAt"`
+	Pod           string   `json:"pod"`
+	Namespace     string   `json:"namespace"`
+	Node          string   `json:"node"`
+	Image         string   `json:"image"`
+	Command       []string `json:"command"`
+	vNIC          string   `json:"vNic"`
 }
 type ContainerMetrics struct {
 	Detail            ContainerDetailMetrics   `json:"detail"`
