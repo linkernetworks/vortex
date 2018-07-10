@@ -18,16 +18,16 @@ const NFS_PROVISIONER_PREFIX = "nfs-provisioner-"
 const NFS_STORAGECLASS_PREFIX = "nfs-storageclass-"
 
 type NFSStorageProvider struct {
-	entity.NFSStorage
+	entity.Storage
 }
 
 func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage *entity.Storage) error {
-	ip := net.ParseIP(storage.NFS.IP)
+	ip := net.ParseIP(storage.IP)
 	if len(ip) == 0 {
-		return fmt.Errorf("Invalid IP address %s\n", storage.NFS.IP)
+		return fmt.Errorf("Invalid IP address %s\n", storage.IP)
 	}
 
-	path := storage.NFS.PATH
+	path := storage.PATH
 	if path == "" || path[0] != '/' {
 		return fmt.Errorf("Invalid NFS export path %s\n", path)
 	}
@@ -68,8 +68,8 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Env: []v1.EnvVar{
 								{Name: "PROVISIONER_NAME", Value: name},
-								{Name: "NFS_SERVER", Value: storage.NFS.IP},
-								{Name: "NFS_PATH", Value: storage.NFS.PATH},
+								{Name: "NFS_SERVER", Value: storage.IP},
+								{Name: "NFS_PATH", Value: storage.PATH},
 							},
 							VolumeMounts: []v1.VolumeMount{
 								{Name: volumeName, MountPath: "/persistentvolumes"},
@@ -81,8 +81,8 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 							Name: volumeName,
 							VolumeSource: v1.VolumeSource{
 								NFS: &v1.NFSVolumeSource{
-									Server: storage.NFS.IP,
-									Path:   storage.NFS.PATH,
+									Server: storage.IP,
+									Path:   storage.PATH,
 								},
 							},
 						},
