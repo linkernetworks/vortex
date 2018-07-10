@@ -1,19 +1,21 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: {{ template "vortex-server.fullname" . }}
   labels:
     app: {{ template "vortex-server.name" . }}
     chart: {{ template "vortex-server.chart" . }}
     release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
 spec:
-  type: {{ .Values.service.type }}
+  type: NodePort
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}
+      name: {{ template "vortex-server.name" . }}
   selector:
-    app: {{ template "vortex-server.name" . }}
-    release: {{ .Release.Name }}
+  app: {{ template "vortex-server.name" . }}
+  release: {{ .Release.Name }}
+  
+
