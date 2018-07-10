@@ -32,14 +32,13 @@ func (suite *KubeCtlServiceTestSuite) TestGetService() {
 	_, err := suite.fakeclient.CoreV1().Services(namespace).Create(&service)
 	suite.NoError(err)
 
-	result, err := suite.kubectl.GetService("K8S-Service-1", namespace)
+	result, err := suite.kubectl.GetService("K8S-Service-1")
 	suite.NoError(err)
 	suite.Equal(service.GetName(), result.GetName())
 }
 
 func (suite *KubeCtlServiceTestSuite) TestGetServiceFail() {
-	namespace := "Unknown_Namespace"
-	_, err := suite.kubectl.GetService("Unknown_Name", namespace)
+	_, err := suite.kubectl.GetService("Unknown_Name")
 	suite.Error(err)
 }
 
@@ -61,21 +60,20 @@ func (suite *KubeCtlServiceTestSuite) TestGetServices() {
 	_, err = suite.fakeclient.CoreV1().Services(namespace).Create(&service)
 	suite.NoError(err)
 
-	services, err := suite.kubectl.GetServices(namespace)
+	services, err := suite.kubectl.GetServices()
 	suite.NoError(err)
 	suite.NotEqual(0, len(services))
 }
 
 func (suite *KubeCtlServiceTestSuite) TestCreateDeleteService() {
-	namespace := "default"
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "K8S-Service-4",
 		},
 	}
-	_, err := suite.kubectl.CreateService(&service, namespace)
+	_, err := suite.kubectl.CreateService(&service)
 	suite.NoError(err)
-	err = suite.kubectl.DeleteService("K8S-Service-4", namespace)
+	err = suite.kubectl.DeleteService("K8S-Service-4")
 	suite.NoError(err)
 }
 
