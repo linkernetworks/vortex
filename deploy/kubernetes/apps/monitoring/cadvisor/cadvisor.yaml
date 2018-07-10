@@ -36,7 +36,8 @@ spec:
             protocol: TCP
         args:
           - --profiling
-          - --housekeeping_interval=1s
+          - --housekeeping_interval=5s
+          - --disable_metrics=disk
       terminationGracePeriodSeconds: 30
       volumes:
       - name: rootfs

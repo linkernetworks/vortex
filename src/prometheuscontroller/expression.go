@@ -8,13 +8,6 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-type Expression struct {
-	Metrics     []string          `json:"metrics"`
-	QueryLabels map[string]string `json:"queryLabels"`
-	SumBy       []string          `json:"sumBy"`
-	Value       *int              `json:"value"`
-}
-
 func ListResource(sp *serviceprovider.Container, resource model.LabelName, expression Expression) ([]string, error) {
 	results, err := getElements(sp, expression)
 	if err != nil {
@@ -79,6 +72,135 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	return pod, nil
 }
 
+func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMetrics, error) {
+	container := entity.ContainerMetrics{}
+
+	// basic info
+	expression := Expression{}
+	expression.Metrics = []string{"kube_pod_container_info", "kube_pod_container_status_restarts_total"}
+	expression.QueryLabels = map[string]string{"container": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return container, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_pod_container_info":
+			container.Detail.ContainerName = id
+			container.Detail.Pod = string(result.Metric["pod"])
+			container.Detail.Node = string(result.Metric["node"])
+			container.Detail.Image = string(result.Metric["image"])
+			container.Detail.Namespace = string(result.Metric["namespace"])
+
+		case "kube_pod_container_status_restarts_total":
+			container.Status.RestartTime = int(result.Value)
+		}
+	}
+
+	// status
+	expression = Expression{}
+	expression.Metrics = []string{"kube_pod_container_status.*"}
+	expression.QueryLabels = map[string]string{"container": id}
+	ValueInt := 1
+	expression.Value = &ValueInt
+
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return container, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_pod_container_status_ready":
+			if container.Status.Status == "" {
+				container.Status.Status = "ready"
+			}
+
+		case "kube_pod_container_status_running":
+			container.Status.Status = "running"
+
+		case "kube_pod_container_status_waiting":
+			container.Status.Status = "waiting"
+
+		case "kube_pod_container_status_terminated":
+			container.Status.Status = "terminated"
+
+		case "kube_pod_container_status_terminated_reason":
+			container.Status.TerminatedReason = string(result.Metric["reason"])
+
+		case "kube_pod_container_status_waiting_reason":
+			container.Status.WaitingReason = string(result.Metric["reason"])
+		}
+	}
+
+	// resource
+	results, err = query(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
+	if err != nil {
+		return container, err
+	}
+	container.Resource.CPUUsagePercentage = float32(results[0].Value)
+
+	expression = Expression{}
+	expression.Metrics = []string{"container_memory_usage_bytes"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
+
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return container, err
+	}
+
+	container.Resource.MemoryUsageBytes = float32(results[0].Value)
+
+	// network traffic
+	expression = Expression{}
+	expression.Metrics = []string{"container_network_receive_bytes_total", "container_network_transmit_bytes_total", "container_network_receive_packets_total", "container_network_transmit_packets_total"}
+	expression.QueryLabels = map[string]string{"exported_name": "k8s_POD_" + id + ".*"}
+
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return container, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "container_network_receive_bytes_total":
+			container.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
+
+		case "container_network_transmit_bytes_total":
+			container.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
+
+		case "container_network_receive_packets_total":
+			container.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
+
+		case "container_network_transmit_packets_total":
+			container.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
+
+		}
+	}
+
+	// command
+	kc := sp.KubeCtl
+	kc.Namespace = container.Detail.Namespace
+	pod, err := kc.GetPod(container.Detail.Pod)
+	if err != nil {
+		return entity.ContainerMetrics{}, err
+	}
+
+	for _, obj := range pod.Spec.Containers {
+		if obj.Name == id {
+			container.Detail.Command = obj.Command
+			break
+		}
+	}
+
+	return container, nil
+}
+
 func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics, error) {
 	service := entity.ServiceMetrics{}
 	service.Labels = map[string]string{}
@@ -116,7 +238,62 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	}
 
+	kc := sp.KubeCtl
+	kc.Namespace = service.Namespace
+	object, err := kc.GetService(service.ServiceName)
+	if err != nil {
+		return entity.ServiceMetrics{}, err
+	}
+
+	service.Ports = object.Spec.Ports
+
 	return service, nil
+}
+
+func GetController(sp *serviceprovider.Container, id string) (entity.ControllerMetrics, error) {
+	controller := entity.ControllerMetrics{}
+	controller.Labels = map[string]string{}
+	controller.Type = "deployment"
+
+	expression := Expression{}
+	expression.Metrics = []string{"kube_deployment_metadata_generation", "kube_deployment_created", "kube_deployment_labels", "kube_deployment_spec_replicas", "kube_deployment_status_replicas"}
+	expression.QueryLabels = map[string]string{"deployment": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return controller, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "kube_deployment_metadata_generation":
+			controller.ControllerName = id
+			controller.Namespace = string(result.Metric["namespace"])
+
+		case "kube_deployment_spec_replicas":
+			controller.DesiredPod = int(result.Value)
+
+		case "kube_deployment_status_replicas":
+			controller.CurrentPod = int(result.Value)
+
+		case "kube_deployment_status_replicas_available":
+			controller.AvailablePod = int(result.Value)
+
+		case "kube_deployment_created":
+			controller.CreateAt = int(result.Value)
+
+		case "kube_deployment_labels":
+			for key, value := range result.Metric {
+				if strings.HasPrefix(string(key), "label_") {
+					controller.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
+				}
+			}
+		}
+
+	}
+
+	return controller, nil
 }
 
 func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, error) {
@@ -124,8 +301,12 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	node.Detail.Labels = map[string]string{}
 	node.NICs = map[string]entity.NICMetrics{}
 
-	// kube_node_info, kube_node_created, node_network_interface, kube_node_labels, kube_node_status_capacity, kube_node_status_allocatable
-	results, err := query(sp, `{__name__=~"kube_node_info|kube_node_created|node_network_interface|kube_node_labels|kube_node_status_capacity|kube_node_status_allocatable",node=~"`+id+`"}`)
+	// basic info
+	expression := Expression{}
+	expression.Metrics = []string{"kube_node_info", "kube_node_created", "node_network_interface", "kube_node_labels", "kube_node_status_capacity", "kube_node_status_allocatable"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	results, err := getElements(sp, expression)
 	if err != nil {
 		return node, err
 	}
@@ -149,6 +330,14 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 					node.Detail.Labels[strings.TrimPrefix(string(key), "label_")] = string(value)
 				}
 			}
+
+		case "node_network_interface":
+			nic := entity.NICMetrics{}
+			nic.Default = string(result.Metric["default"])
+			nic.Type = string(result.Metric["type"])
+			nic.IP = string(result.Metric["ip_address"])
+			nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
+			node.NICs[string(result.Metric["device"])] = nic
 
 		case "kube_node_status_allocatable":
 			switch result.Metric["resource"] {
@@ -176,16 +365,27 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		}
 	}
 
-	// kube_node_status_condition
-	results, err = query(sp, `{__name__=~"kube_node_status_condition",node=~"`+id+`",status="true"}==1`)
+	// status
+	expression = Expression{}
+	expression.Metrics = []string{"kube_node_status_condition"}
+	expression.QueryLabels = map[string]string{"node": id, "status": "true"}
+	ValueInt := 1
+	expression.Value = &ValueInt
+
+	results, err = getElements(sp, expression)
 	if err != nil {
 		return node, err
 	}
 
 	node.Detail.Status = string(results[0].Metric["condition"])
 
-	// kube_pod_container_resource_limits, kube_pod_container_resource_requests
-	results, err = query(sp, `sum by(__name__, resource) ({__name__=~"kube_pod_container_resource_limits|kube_pod_container_resource_requests",node=~"`+id+`"})`)
+	// resource
+	expression = Expression{}
+	expression.Metrics = []string{"kube_pod_container_resource_limits", "kube_pod_container_resource_requests"}
+	expression.QueryLabels = map[string]string{"node": id}
+	expression.SumBy = []string{"__name__", "resource"}
+
+	results, err = getElements(sp, expression)
 	if err != nil {
 		return node, err
 	}
@@ -209,22 +409,18 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		}
 	}
 
-	// node_network_interface, node_network_receive_bytes_total, node_network_transmit_bytes_total, node_network_receive_packets_total, node_network_transmit_packets_total
-	results, err = query(sp, `{__name__=~"node_network_interface|node_network_receive_bytes_total|node_network_transmit_bytes_total|node_network_receive_packets_total|node_network_transmit_packets_total",node=~"`+id+`"}`)
+	// network traffic
+	expression = Expression{}
+	expression.Metrics = []string{"node_network_receive_bytes_total", "node_network_transmit_bytes_total", "node_network_receive_packets_total", "node_network_transmit_packets_total"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	results, err = getElements(sp, expression)
 	if err != nil {
 		return node, err
 	}
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
-
-		case "node_network_interface":
-			nic := entity.NICMetrics{}
-			nic.Default = string(result.Metric["default"])
-			nic.Type = string(result.Metric["type"])
-			nic.IP = string(result.Metric["ip_address"])
-			nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
-			node.NICs[string(result.Metric["device"])] = nic
 
 		case "node_network_receive_bytes_total":
 			nic := node.NICs[string(result.Metric["device"])]

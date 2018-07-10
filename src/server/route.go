@@ -84,8 +84,8 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	// service
 	webService.Route(webService.GET("/services").To(handler.RESTfulServiceHandler(sp, listServiceMetricsHandler)))
 	webService.Route(webService.GET("/services/{id}").To(handler.RESTfulServiceHandler(sp, getServiceMetricsHandler)))
-	// deployment
-	webService.Route(webService.GET("/deployments").To(handler.RESTfulServiceHandler(sp, listDeploymentMetricsHandler)))
-	webService.Route(webService.GET("/deployments/{id}").To(handler.RESTfulServiceHandler(sp, getDeploymentMetricsHandler)))
+	// controller
+	webService.Route(webService.GET("/controllers").To(handler.RESTfulServiceHandler(sp, listControllerMetricsHandler)))
+	webService.Route(webService.GET("/controllers/{id}").To(handler.RESTfulServiceHandler(sp, getControllerMetricsHandler)))
 	return webService
 }
