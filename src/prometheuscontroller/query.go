@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/prometheus/common/model"
 	"golang.org/x/net/context"
@@ -72,8 +71,6 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 	if expression.Value != nil {
 		str = fmt.Sprintf(`%s==%v`, str, *expression.Value)
 	}
-
-	logger.Infof(str)
 
 	results, err := query(sp, str)
 	if err != nil {
