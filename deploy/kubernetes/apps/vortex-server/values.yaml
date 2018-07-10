@@ -1,0 +1,10 @@
+replicaCount: 1
+
+image:
+  tag: develop
+
+service:
+  port: 7890
+  targetPort: 7890
+  nodePort: 32326
+
