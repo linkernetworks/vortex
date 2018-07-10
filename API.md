@@ -132,7 +132,7 @@ Example:
 
 ```
 curl -X POST -H "Content-Type: application/json" \
-     -d '{"type":"nfs","name":"My First Storage","nfs":{"ip":"172.17.8.100","path":"/nfs"}}' \
+     -d '{"type":"nfs","name":"My First Storage","ip":"172.17.8.100","path":"/nfs"}' \
      http://localhost:7890/v1/storage
 ```
 
@@ -140,11 +140,9 @@ Request Data:
 ```json
 {
 	"type": "nfs",
-	"name": "My First Storage",
-	"nfs": {
-		"ip":"172.17.8.100",
-		"path":"/nfs"
-	}
+    "name": "My First Storage",
+    "ip":"172.17.8.100",
+    "path":"/nfs"
 }
 
 Response Data:
@@ -179,10 +177,8 @@ Response Data:
         "name": "My First Storage",
         "createdAt": "2018-07-09T03:42:12.708Z",
         "storageClassName": "nfs-storageclass-5b42d9944807c52e1c804fbb",
-        "nfs": {
-            "ip": "172.17.8.100",
-            "path": "/nfs"
-        }
+        "ip": "172.17.8.100",
+        "path": "/nfs"
     }
 ]
 ```
