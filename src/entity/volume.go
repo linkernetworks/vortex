@@ -9,6 +9,7 @@ import (
 
 const (
 	VolumeCollectionName string = "volume"
+	PVCNamePrefix        string = "pvc-"
 )
 
 /*
@@ -22,7 +23,6 @@ type Volume struct {
 	StorageName string                            `bson:"storageName" json:"storageName"`
 	AccessMode  corev1.PersistentVolumeAccessMode `bson:"accessMode" json:"accessMode"`
 	Capacity    string                            `bson:"capacity" json:"capacity"`
-	MetaName    string                            `bson:"metaName" json:"metaName"` //For PVC metaname
 	CreatedAt   *time.Time                        `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 }
 
@@ -31,7 +31,6 @@ func (m Volume) GetCollection() string {
 	return VolumeCollectionName
 }
 
-//GenerateMetaName - Generate a metaname for kubernetes PVC object
-func (m Volume) GenerateMetaName() string {
-	return "pvc-" + m.ID.Hex()
+func (m Volume) GetPVCName() string {
+	return PVCNamePrefix + m.ID.Hex()
 }
