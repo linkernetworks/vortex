@@ -240,7 +240,7 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	kc := sp.KubeCtl
 	kc.Namespace = service.Namespace
-	object, err := kc.GetService(ervice.ServiceName)
+	object, err := kc.GetService(service.ServiceName)
 	if err != nil {
 		return entity.ServiceMetrics{}, err
 	}
