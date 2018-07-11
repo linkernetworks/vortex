@@ -234,7 +234,7 @@ func (suite *DPDKNetworkTestSuite) TestValidateBeforeCreatingFail() {
 		network  *entity.Network
 		mongo    bool
 	}{
-		{"invalidValid", &network, false},
+		{"invalidVlan", &network, false},
 		{"singelNetwork", &suite.singleNetwork, true},
 		{"clusterNetwork", &suite.clusterNetwork, true},
 	}
