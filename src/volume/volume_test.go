@@ -40,12 +40,10 @@ func (suite *VolumeTestSuite) TestGetPVCInstance() {
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
 		StorageName: namesgenerator.GetRandomName(0),
-		MetaName:    namesgenerator.GetRandomName(0),
 	}
 
-	pvc := getPVCInstance(volume, namesgenerator.GetRandomName(0))
+	pvc := getPVCInstance(volume, namesgenerator.GetRandomName(0), namesgenerator.GetRandomName(0))
 	suite.NotNil(pvc)
-	suite.Equal(pvc.ObjectMeta.Name, volume.MetaName)
 }
 
 func (suite *VolumeTestSuite) TestGetStorageClassName() {
@@ -81,20 +79,20 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
 		StorageName: storage.Name,
-		MetaName:    namesgenerator.GetRandomName(0),
 	}
 
 	err := CreateVolume(suite.sp, volume)
 	suite.NoError(err)
 
-	v, err := suite.sp.KubeCtl.GetPVC(volume.MetaName)
+	name := volume.GetPVCName()
+	v, err := suite.sp.KubeCtl.GetPVC(name)
 	suite.NoError(err)
 	suite.NotNil(v)
 
 	err = DeleteVolume(suite.sp, volume)
 	suite.NoError(err)
 
-	v, err = suite.sp.KubeCtl.GetPVC(volume.MetaName)
+	v, err = suite.sp.KubeCtl.GetPVC(name)
 	suite.Error(err)
 	suite.Nil(v)
 }
@@ -104,7 +102,6 @@ func (suite *VolumeTestSuite) TestCreateVolumeFail() {
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
 		StorageName: namesgenerator.GetRandomName(0),
-		MetaName:    namesgenerator.GetRandomName(0),
 	}
 
 	err := CreateVolume(suite.sp, volume)

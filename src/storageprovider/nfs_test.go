@@ -39,10 +39,8 @@ func TestStorageSuite(t *testing.T) {
 func (suite *StorageTestSuite) TestGetDeployment() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 	}
 
 	deployment := getDeployment(bson.NewObjectId().Hex(), storage)
@@ -52,10 +50,8 @@ func (suite *StorageTestSuite) TestGetDeployment() {
 func (suite *StorageTestSuite) TestGetStorageClass() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 	}
 
 	storageClass := getStorageClass(bson.NewObjectId().Hex(), bson.NewObjectId().Hex(), storage)
@@ -65,10 +61,8 @@ func (suite *StorageTestSuite) TestGetStorageClass() {
 func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 	storage := &entity.Storage{
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 	}
 
 	//Parameters
@@ -84,10 +78,8 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	storage := entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 	}
 
 	sp, err := GetStorageProvider(&storage)
@@ -97,7 +89,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	err = sp.CreateStorage(suite.sp, &storage)
 	suite.NoError(err)
 
-	deploy, err := suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
 	suite.NotNil(deploy)
 	suite.NoError(err)
 }
@@ -106,10 +98,8 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 	}
 
 	sp, err := GetStorageProvider(storage)
@@ -119,14 +109,14 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	err = sp.CreateStorage(suite.sp, storage)
 	suite.NoError(err)
 
-	deploy, err := suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
 	suite.NotNil(deploy)
 	suite.NoError(err)
 
 	err = sp.DeleteStorage(suite.sp, storage)
 	suite.NoError(err)
 
-	deploy, err = suite.sp.KubeCtl.GetDeployment(NFS_PROVISIONER_PREFIX + storage.ID.Hex())
+	deploy, err = suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
 	suite.Nil(deploy)
 	suite.Error(err)
 }
@@ -135,10 +125,8 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
-		NFS: &entity.NFSStorage{
-			IP:   "1.2.3.4",
-			PATH: "/exports",
-		},
+		IP:   "1.2.3.4",
+		PATH: "/exports",
 		Name: namesgenerator.GetRandomName(0),
 	}
 
@@ -168,23 +156,17 @@ func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {
 	}{
 		{"invalidIP", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: &entity.NFSStorage{
-				IP: "a.b.c.d",
-			},
+			IP:   "a.b.c.d",
 		}},
 		{"invalidExports-1", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: &entity.NFSStorage{
-				IP:   "1.2.3.4",
-				PATH: "tmp",
-			},
+			IP:   "1.2.3.4",
+			PATH: "tmp",
 		}},
 		{"invalidExports-2", &entity.Storage{
 			Type: entity.NFSStorageType,
-			NFS: &entity.NFSStorage{
-				IP:   "1.2.3.4",
-				PATH: "",
-			},
+			IP:   "1.2.3.4",
+			PATH: "",
 		}},
 	}
 

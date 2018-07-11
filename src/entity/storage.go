@@ -23,7 +23,8 @@ type Storage struct {
 	Name             string        `bson:"name" json:"name"`
 	CreatedAt        *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	StorageClassName string        `bson:"storageClassName" json:"storageClassName"`
-	NFS              *NFSStorage   `bson:"nfs,omitempty" json:"nfs,omitempty"`
+	IP               string        `bson:"ip" json:"ip"`
+	PATH             string        `bson:"path" json:"path"`
 	Fake             *FakeStorage  `bson:"fake,omitempty" json:"fake,omitempty"` //FakeStorage, for restful testing.
 }
 
