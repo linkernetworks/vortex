@@ -36,7 +36,8 @@ func TestPodSuite(t *testing.T) {
 func (suite *PodTestSuite) TestCheckPodParameter() {
 	volumeName := namesgenerator.GetRandomName(0)
 	pod := &entity.Pod{
-		ID: bson.NewObjectId(),
+		ID:   bson.NewObjectId(),
+		Name: namesgenerator.GetRandomName(0),
 		Volumes: []entity.PodVolume{
 			{Name: volumeName},
 		},
@@ -62,6 +63,25 @@ func (suite *PodTestSuite) TestCheckPodParameterFail() {
 		caseName string
 		pod      *entity.Pod
 	}{
+		{
+			"InvalidPodName", &entity.Pod{
+				ID:   bson.NewObjectId(),
+				Name: "~!@#$%^&*()",
+			},
+		},
+		{
+			"InvalidContainerName", &entity.Pod{
+				ID:   bson.NewObjectId(),
+				Name: namesgenerator.GetRandomName(0),
+				Containers: []entity.Container{
+					{
+						Name:    "~!@#$%^&*()",
+						Image:   "busybox",
+						Command: []string{"sleep", "3600"},
+					},
+				},
+			},
+		},
 		{
 			"InvalidVolume", &entity.Pod{
 				ID:   bson.NewObjectId(),
@@ -147,33 +167,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 }
 
 func (suite *PodTestSuite) TestCreatePodFail() {
-	podName := "~!@#$%^&*()"
-	pod := &entity.Pod{
-		ID:   bson.NewObjectId(),
-		Name: podName,
-	}
-
-	err := CreatePod(suite.sp, pod)
-	suite.Error(err)
-
 	containers := []entity.Container{
-		{
-			Name:    "~!@#$%^&*()",
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
-		},
-	}
-	podName = namesgenerator.GetRandomName(0)
-	pod = &entity.Pod{
-		ID:         bson.NewObjectId(),
-		Name:       podName,
-		Containers: containers,
-	}
-
-	err = CreatePod(suite.sp, pod)
-	suite.Error(err)
-
-	containers = []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
 			Image:   "busybox",
@@ -181,8 +175,8 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 		},
 	}
 
-	podName = namesgenerator.GetRandomName(0)
-	pod = &entity.Pod{
+	podName := namesgenerator.GetRandomName(0)
+	pod := &entity.Pod{
 		ID:         bson.NewObjectId(),
 		Name:       podName,
 		Containers: containers,
@@ -191,6 +185,6 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 		},
 	}
 
-	err = CreatePod(suite.sp, pod)
+	err := CreatePod(suite.sp, pod)
 	suite.Error(err)
 }
