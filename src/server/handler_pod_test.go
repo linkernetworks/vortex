@@ -97,7 +97,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	err = p.DeletePod(suite.sp, tName)
 	suite.NoError(err)
@@ -179,6 +179,51 @@ func (suite *PodTestSuite) TestDeletePodWithInvalidID() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+}
+
+//For Get/List, we only return mongo document
+func (suite *PodTestSuite) TestGetPod() {
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+	tName := namesgenerator.GetRandomName(0)
+	pod := entity.Pod{
+		ID:         bson.NewObjectId(),
+		Name:       tName,
+		Containers: containers,
+	}
+
+	//Create data into mongo manually
+	suite.session.C(entity.PodCollectionName).Insert(pod)
+	defer suite.session.Remove(entity.PodCollectionName, "name", tName)
+
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods/"+pod.ID.Hex(), nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	pod = entity.Pod{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &pod)
+	suite.NoError(err)
+	suite.Equal(tName, pod.Name)
+	suite.Equal(len(containers), len(pod.Containers))
+}
+
+func (suite *PodTestSuite) TestGetPodWithInvalidID() {
+
+	//Get data with non-exits ID
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods/"+bson.NewObjectId().Hex(), nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
 func (suite *PodTestSuite) TestListPod() {

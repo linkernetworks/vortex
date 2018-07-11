@@ -2,6 +2,7 @@ package pod
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -60,6 +61,11 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	return volumes, volumeMounts, nil
 }
 
+func checkName(name string) bool {
+	re := regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])`)
+	return re.MatchString(name)
+}
+
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	session := sp.Mongo.NewSession()
@@ -72,12 +78,19 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	var containers []corev1.Container
 	for _, container := range pod.Containers {
+		if !checkName(container.Name) {
+			return fmt.Errorf("Container Name: %s is invalid value", container.Name)
+		}
 		containers = append(containers, corev1.Container{
 			Name:         container.Name,
 			Image:        container.Image,
 			Command:      container.Command,
 			VolumeMounts: volumeMounts,
 		})
+	}
+
+	if !checkName(pod.Name) {
+		return fmt.Errorf("Pod Name: %s is invalid value", pod.Name)
 	}
 	p := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
