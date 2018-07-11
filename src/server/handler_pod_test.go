@@ -103,6 +103,36 @@ func (suite *PodTestSuite) TestCreatePod() {
 	suite.NoError(err)
 }
 
+func (suite *PodTestSuite) TestCreatePodFail() {
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+	tName := namesgenerator.GetRandomName(0)
+	pod := entity.Pod{
+		Name:       tName,
+		Containers: containers,
+		Volumes: []entity.PodVolume{
+			{Name: namesgenerator.GetRandomName(0)},
+		},
+	}
+
+	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/pods", bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+}
+
 func (suite *PodTestSuite) TestDeletePod() {
 	containers := []entity.Container{
 		{
