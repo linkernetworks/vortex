@@ -36,7 +36,7 @@ func listContainerMetricsHandler(ctx *web.Context) {
 
 	containerList, err := pc.ListResource(sp, "container", expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -51,7 +51,7 @@ func getContainerMetricsHandler(ctx *web.Context) {
 
 	container, err := pc.GetContainer(sp, id)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -86,7 +86,7 @@ func listPodMetricsHandler(ctx *web.Context) {
 
 	containerList, err := pc.ListResource(sp, "pod", expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -101,7 +101,7 @@ func getPodMetricsHandler(ctx *web.Context) {
 
 	pod, err := pc.GetPod(sp, id)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -130,7 +130,7 @@ func listControllerMetricsHandler(ctx *web.Context) {
 
 	containerList, err := pc.ListResource(sp, "deployment", expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -145,7 +145,7 @@ func getControllerMetricsHandler(ctx *web.Context) {
 
 	controller, err := pc.GetController(sp, id)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func listServiceMetricsHandler(ctx *web.Context) {
 
 	containerList, err := pc.ListResource(sp, "service", expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -189,7 +189,7 @@ func getServiceMetricsHandler(ctx *web.Context) {
 
 	service, err := pc.GetService(sp, id)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -204,7 +204,7 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 	containerList, err := pc.ListResource(sp, "node", expression)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
@@ -219,7 +219,7 @@ func getNodeMetricsHandler(ctx *web.Context) {
 
 	node, err := pc.GetNode(sp, id)
 	if err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
