@@ -2,6 +2,8 @@ package volume
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
@@ -60,15 +62,26 @@ func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	defer session.Close()
 
 	pods := []entity.Pod{}
-	fmt.Println("Volume.Name", volume.Name)
 	err := session.FindAll(entity.PodCollectionName, bson.M{"volumes.name": volume.Name}, &pods)
 	if err != nil {
 		return fmt.Errorf("Load the database fail:%v", err)
 	}
 
+	usedPod := []string{}
 	for _, pod := range pods {
 		//Check the pod's status, report error if at least one pod is running.
-		fmt.Println(pod)
+		currentPod, err := sp.KubeCtl.GetPod(pod.Name)
+		if err != nil {
+			continue
+		}
+
+		if !sp.KubeCtl.DoesPodCompleted(currentPod) {
+			usedPod = append(usedPod, pod.Name)
+		}
+	}
+	if len(usedPod) != 0 {
+		podNames := strings.Join(usedPod, ",")
+		return fmt.Errorf("Delete the volume [%s] fail, since the followings pods still ust it: %s", volume.Name, podNames)
 	}
 
 	return sp.KubeCtl.DeletePVC(volume.GetPVCName())
