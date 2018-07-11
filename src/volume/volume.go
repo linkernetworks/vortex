@@ -11,11 +11,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func getPVCInstance(volume *entity.Volume, storageClassName string) *v1.PersistentVolumeClaim {
+func getPVCInstance(volume *entity.Volume, name string, storageClassName string) *v1.PersistentVolumeClaim {
 	capacity, _ := resource.ParseQuantity(volume.Capacity)
 	return &v1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: volume.MetaName,
+			Name: name,
 		},
 		Spec: v1.PersistentVolumeClaimSpec{
 			AccessModes: []v1.PersistentVolumeAccessMode{volume.AccessMode},
@@ -41,16 +41,19 @@ func getStorageClassName(session *mongo.Session, storageName string) (string, er
 func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
+	//fetch the db to get the storageName
 	storageName, err := getStorageClassName(session, volume.StorageName)
 	if err != nil {
 		return err
 	}
-	//fetch the db to get the storageName
-	pvc := getPVCInstance(volume, storageName)
+
+	name := volume.GetPVCName()
+	pvc := getPVCInstance(volume, name, storageName)
 	_, err = sp.KubeCtl.CreatePVC(pvc)
 	return err
 }
 
 func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
-	return sp.KubeCtl.DeletePVC(volume.MetaName)
+	name := volume.GetPVCName()
+	return sp.KubeCtl.DeletePVC(name)
 }

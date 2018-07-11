@@ -95,7 +95,6 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	suite.Equal(volume.StorageName, retVolume.StorageName)
 	suite.Equal(volume.AccessMode, retVolume.AccessMode)
 	suite.Equal(volume.Capacity, retVolume.Capacity)
-	suite.NotEqual("", retVolume.MetaName)
 
 	//We use the new write but empty input which will cause the readEntity Error
 	httpWriter = httptest.NewRecorder()
@@ -147,7 +146,6 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
-		MetaName:    namesgenerator.GetRandomName(0),
 	}
 
 	err := suite.session.Insert(entity.StorageCollectionName, &entity.Storage{
@@ -239,7 +237,6 @@ func (suite *VolumeTestSuite) TestListVolume() {
 			suite.Equal(tc.expectSize, len(retVolumes))
 			for i, v := range retVolumes {
 				suite.Equal(volumes[i].Name, v.Name)
-				suite.Equal(volumes[i].MetaName, v.MetaName)
 				suite.Equal(volumes[i].StorageName, v.StorageName)
 				suite.Equal(volumes[i].AccessMode, v.AccessMode)
 			}

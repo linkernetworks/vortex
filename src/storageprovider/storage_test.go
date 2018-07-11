@@ -25,7 +25,6 @@ func TestGetStorageProvider(t *testing.T) {
 				&entity.Storage{
 					Type: tc.storageType,
 					Fake: &entity.FakeStorage{},
-					NFS:  &entity.NFSStorage{},
 				})
 			assert.NoError(t, err)
 			a := reflect.TypeOf(provider)
