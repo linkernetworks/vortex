@@ -107,3 +107,29 @@ func (suite *VolumeTestSuite) TestCreateVolumeFail() {
 	err := CreateVolume(suite.sp, volume)
 	suite.Error(err)
 }
+
+func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
+	volume := &entity.Volume{
+		ID:   bson.NewObjectId(),
+		Name: namesgenerator.GetRandomName(0),
+	}
+
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	pod := entity.Pod{
+		ID:   bson.NewObjectId(),
+		Name: namesgenerator.GetRandomName(0),
+		Volumes: []entity.PodVolume{
+			{
+				Name: volume.Name,
+			},
+		},
+	}
+
+	session.Insert(entity.PodCollectionName, pod)
+	defer session.Remove(entity.PodCollectionName, "name", pod.Name)
+
+	DeleteVolume(suite.sp, volume)
+
+}
