@@ -16,9 +16,27 @@ import (
 
 const VolumeNamePrefix = "volume-"
 
+func checkNameValidation(name string) bool {
+	re := regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])`)
+	return re.MatchString(name)
+}
+
 func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
+
+	//Check pod name validation
+	if !checkNameValidation(pod.Name) {
+		return fmt.Errorf("Pod Name: %s is invalid value", pod.Name)
+	}
+
+	//Check container name validation
+	for _, container := range pod.Containers {
+		if !checkNameValidation(container.Name) {
+			return fmt.Errorf("Container Name: %s is invalid value", container.Name)
+		}
+	}
+
 	//Check the volume
 	for _, v := range pod.Volumes {
 		count, err := session.Count(entity.VolumeCollectionName, bson.M{"name": v.Name})
@@ -61,11 +79,6 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	return volumes, volumeMounts, nil
 }
 
-func checkName(name string) bool {
-	re := regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])`)
-	return re.MatchString(name)
-}
-
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	session := sp.Mongo.NewSession()
@@ -78,9 +91,6 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	var containers []corev1.Container
 	for _, container := range pod.Containers {
-		if !checkName(container.Name) {
-			return fmt.Errorf("Container Name: %s is invalid value", container.Name)
-		}
 		containers = append(containers, corev1.Container{
 			Name:         container.Name,
 			Image:        container.Image,
@@ -89,9 +99,6 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		})
 	}
 
-	if !checkName(pod.Name) {
-		return fmt.Errorf("Pod Name: %s is invalid value", pod.Name)
-	}
 	p := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: pod.Name,

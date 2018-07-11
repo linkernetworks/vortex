@@ -41,7 +41,7 @@ func createPodHandler(ctx *web.Context) {
 	}
 
 	if err := pod.CreatePod(sp, &p); err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
