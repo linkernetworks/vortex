@@ -65,7 +65,7 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 			Name: vName,
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: volume.GenerateMetaName(),
+					ClaimName: volume.GetPVCName(),
 				},
 			},
 		})
