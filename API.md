@@ -213,7 +213,7 @@ accessMode: The accessMode of the Volume including the following options.
 - ReadWriteMany
 - ReeaOneMany
 But those options won't work for NFS storage since the permission is controled by the linux permission system.
-capacity: The capacity of the volume, 
+capacity: The capacity of the volume,
 
 Example:
 
@@ -266,7 +266,7 @@ Response Data:
         "storageName": "My First Storage2",
         "accessMode": "ReadWriteMany",
         "capacity": "300",
-        "createdAt": "2018-07-09T05:27:56.244Z"    
+        "createdAt": "2018-07-09T05:27:56.244Z"
     }
 ]
 ```
@@ -280,6 +280,121 @@ Example:
 
 ```
 curl -X DELETE http://localhost:7890/v1/volume/5b3475f94807c5199773910a
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Delete success"
+}
+```
+
+## Pod
+
+### Create Pod
+
+**POST /v1/pods**
+
+Example:
+
+```
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"name":"awesome","containers":[{"name":"busybox","image":"busybox","command":["sleep","3600"]}]}' \
+     http://localhost:7890/v1/pods
+```
+
+Request Data:
+
+```json
+{
+  "name": "awesome",
+  "containers": [{
+    "name": "busybox",
+    "image": "busybox",
+    "command": ["sleep", "3600"]
+  }]
+}
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Create success"
+}
+```
+
+### List Pods
+
+**GET /v1/pods/**
+
+Example:
+
+```
+curl http://localhost:7890/v1/pods/
+```
+
+Response Data:
+
+```json
+[{
+  "id": "5b459d344807c5707ddad740",
+  "name": "awesome",
+  "containers": [
+   {
+    "name": "busybox",
+    "image": "busybox",
+    "command": [
+     "sleep",
+     "3600"
+    ]
+   }
+  ],
+  "createdAt": "2018-07-11T06:01:24.637Z"
+}]
+```
+
+### Get Pod
+
+**GET /v1/pods/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/pods/5b459d344807c5707ddad740
+```
+
+Response Data:
+
+```json
+{
+  "id": "5b459d344807c5707ddad740",
+  "name": "awesome",
+  "containers": [
+   {
+    "name": "busybox",
+    "image": "busybox",
+    "command": [
+     "sleep",
+     "3600"
+    ]
+   }
+  ],
+  "createdAt": "2018-07-11T06:01:24.637Z"
+}
+```
+
+### Delete Pod
+
+**DELETE /v1/pods/[id]**
+
+Example:
+
+```
+curl -X DELETE http://localhost:7890/v1/pods/5b459d344807c5707ddad740
 ```
 
 Response Data:

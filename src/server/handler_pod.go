@@ -16,7 +16,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createPod(ctx *web.Context) {
+func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	p := entity.Pod{}
@@ -59,7 +59,7 @@ func createPod(ctx *web.Context) {
 	})
 }
 
-func deletePod(ctx *web.Context) {
+func deletePodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
@@ -93,7 +93,7 @@ func deletePod(ctx *web.Context) {
 	})
 }
 
-func listPod(ctx *web.Context) {
+func listPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
@@ -138,4 +138,25 @@ func listPod(ctx *web.Context) {
 	resp.AddHeader("X-Total-Count", strconv.Itoa(count))
 	resp.AddHeader("X-Total-Pages", strconv.Itoa(totalPages))
 	resp.WriteEntity(pods)
+}
+
+func getPodHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	id := req.PathParameter("id")
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+	c := session.C(entity.PodCollectionName)
+
+	var pod entity.Pod
+	if err := c.FindId(bson.ObjectIdHex(id)).One(&pod); err != nil {
+		if err == mgo.ErrNotFound {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+	resp.WriteEntity(pod)
 }
