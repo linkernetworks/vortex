@@ -1,6 +1,7 @@
 package volume
 
 import (
+	"fmt"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
@@ -54,6 +55,21 @@ func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 }
 
 func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
-	name := volume.GetPVCName()
-	return sp.KubeCtl.DeletePVC(name)
+	//Check the pod
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	pods := []entity.Pod{}
+	fmt.Println("Volume.Name", volume.Name)
+	err := session.FindAll(entity.PodCollectionName, bson.M{"volumes.name": volume.Name}, &pods)
+	if err != nil {
+		return fmt.Errorf("Load the database fail:%v", err)
+	}
+
+	for _, pod := range pods {
+		//Check the pod's status, report error if at least one pod is running.
+		fmt.Println(pod)
+	}
+
+	return sp.KubeCtl.DeletePVC(volume.GetPVCName())
 }
