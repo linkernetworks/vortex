@@ -35,6 +35,11 @@ func createPod(ctx *web.Context) {
 	// Check whether this name has been used
 	p.ID = bson.NewObjectId()
 	p.CreatedAt = timeutils.Now()
+	if err := pod.CheckPodParameter(sp, &p); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	if err := pod.CreatePod(sp, &p); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
