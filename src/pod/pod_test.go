@@ -58,16 +58,27 @@ func (suite *PodTestSuite) TestCheckPodParameter() {
 }
 
 func (suite *PodTestSuite) TestCheckPodParameterFail() {
-	volumeName := namesgenerator.GetRandomName(0)
-	pod := &entity.Pod{
-		ID: bson.NewObjectId(),
-		Volumes: []entity.PodVolume{
-			{Name: volumeName},
+	testCases := []struct {
+		caseName string
+		pod      *entity.Pod
+	}{
+		{
+			"InvalidVolume", &entity.Pod{
+				ID:   bson.NewObjectId(),
+				Name: namesgenerator.GetRandomName(0),
+				Volumes: []entity.PodVolume{
+					{Name: namesgenerator.GetRandomName(0)},
+				},
+			},
 		},
 	}
 
-	err := CheckPodParameter(suite.sp, pod)
-	suite.Error(err)
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			err := CheckPodParameter(suite.sp, tc.pod)
+			suite.Error(err)
+		})
+	}
 }
 
 func (suite *PodTestSuite) TestGenerateVolume() {
