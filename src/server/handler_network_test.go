@@ -211,7 +211,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 	}
 }
 
-//Fot Get/List, we only return mongo document
+//For Get/List, we only return mongo document
 func (suite *NetworkTestSuite) TestGetNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	tType := entity.FakeNetworkType
