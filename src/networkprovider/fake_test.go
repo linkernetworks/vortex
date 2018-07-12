@@ -11,70 +11,80 @@ import (
 func TestNetworkValidateBeforeCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "yes",
+		Nodes: []entity.Node{
+			entity.Node{
+				FakeParameter: "yes",
+			},
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, &entity.Network{})
+	err = fake.ValidateBeforeCreating(nil)
 	assert.NoError(t, err)
 }
 
 func TestFakeNetworkCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "yes",
-			IWantFail:     false,
+		Nodes: []entity.Node{
+			entity.Node{
+				FakeParameter: "yes",
+				ShouldFail:    false,
+			},
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateNetwork(nil, &entity.Network{})
+	err = fake.CreateNetwork(nil)
 	assert.NoError(t, err)
 }
 
 func TestFakeNetworkValidateBeforeCreatingFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "",
+		Nodes: []entity.Node{
+			entity.Node{
+				FakeParameter: "",
+			},
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.ValidateBeforeCreating(nil, &entity.Network{})
+	err = fake.ValidateBeforeCreating(nil)
 	assert.Error(t, err)
 }
 
 func TestFakeNetworkCreatingFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{
-			IWantFail: true,
+		Nodes: []entity.Node{
+			entity.Node{
+				ShouldFail: true,
+			},
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.CreateNetwork(nil, &entity.Network{})
+	err = fake.CreateNetwork(nil)
 	assert.Error(t, err)
 }
 
 func TestFakeNetworkDelete(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{},
+		Type:  entity.FakeNetworkType,
+		Nodes: []entity.Node{},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteNetwork(nil, &entity.Network{})
+	err = fake.DeleteNetwork(nil)
 	assert.NoError(t, err)
 }
 
 func TestFakeNetworkDeleteFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Fake: entity.FakeNetwork{
-			IWantFail: true,
+		Nodes: []entity.Node{
+			entity.Node{
+				ShouldFail: true,
+			},
 		},
 	})
 	assert.NoError(t, err)
-	err = fake.DeleteNetwork(nil, &entity.Network{})
+	err = fake.DeleteNetwork(nil)
 	assert.Error(t, err)
 }
