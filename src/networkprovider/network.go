@@ -8,19 +8,37 @@ import (
 )
 
 type NetworkProvider interface {
-	ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error
-	CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error
-	DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error
+	ValidateBeforeCreating(sp *serviceprovider.Container) error
+	CreateNetwork(sp *serviceprovider.Container) error
+	DeleteNetwork(sp *serviceprovider.Container) error
 }
 
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
 	case entity.OVSKernelspaceNetworkType:
-		return OVSNetworkProvider{network.OVS}, nil
+		return kernelspaceNetworkProvider{
+			network.Name,
+			network.BridgeName,
+			network.VLANTags,
+			network.Nodes,
+			network.IsDPDKPort,
+		}, nil
 	case entity.OVSUserspaceNetworkType:
-		return OVSUserspaceNetworkProvider{network.OVSUserspace}, nil
+		return userspaceNetworkProvider{
+			network.Name,
+			network.BridgeName,
+			network.VLANTags,
+			network.Nodes,
+			network.IsDPDKPort,
+		}, nil
 	case entity.FakeNetworkType:
-		return FakeNetworkProvider{network.Fake}, nil
+		return fakeNetworkProvider{
+			network.Name,
+			network.BridgeName,
+			network.VLANTags,
+			network.Nodes,
+			network.IsDPDKPort,
+		}, nil
 	default:
 		return nil, fmt.Errorf("Unsupported Network Type %s", network.Type)
 	}

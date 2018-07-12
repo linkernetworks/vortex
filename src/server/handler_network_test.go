@@ -54,11 +54,13 @@ func TestNetworkSuite(t *testing.T) {
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Name: tName,
-		Fake: entity.FakeNetwork{
-			FakeParameter: "fake~",
-		},
 		Type: entity.FakeNetworkType,
+		Name: tName,
+		Nodes: []entity.Node{
+			entity.Node{
+				FakeParameter: "fake",
+			},
+		},
 	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
@@ -95,28 +97,40 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 		network   entity.Network
 		errorCode int
 	}{
-		{"InvalidParameter", entity.Network{
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeNetworkType,
-			Fake: entity.FakeNetwork{
-				FakeParameter: "",
-			}},
+		{"InvalidParameter",
+			entity.Network{
+				Name: namesgenerator.GetRandomName(0),
+				Type: entity.FakeNetworkType,
+				Nodes: []entity.Node{
+					entity.Node{
+						FakeParameter: "",
+					},
+				},
+			},
 			http.StatusBadRequest},
-		{"CreateFail", entity.Network{
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeNetworkType,
-			Fake: entity.FakeNetwork{
-				FakeParameter: "Yo",
-				IWantFail:     true,
-			}},
+		{"CreateFail",
+			entity.Network{
+				Name: namesgenerator.GetRandomName(0),
+				Type: entity.FakeNetworkType,
+				Nodes: []entity.Node{
+					entity.Node{
+						FakeParameter: "Yo",
+						ShouldFail:    true,
+					},
+				},
+			},
 			http.StatusInternalServerError},
-		{"NetworkTypeError", entity.Network{
-			Name: namesgenerator.GetRandomName(0),
-			Type: "non-exist",
-			Fake: entity.FakeNetwork{
-				FakeParameter: "Yo",
-				IWantFail:     true,
-			}},
+		{"NetworkTypeError",
+			entity.Network{
+				Name: namesgenerator.GetRandomName(0),
+				Type: "non-exist",
+				Nodes: []entity.Node{
+					entity.Node{
+						FakeParameter: "Yo",
+						ShouldFail:    true,
+					},
+				},
+			},
 			http.StatusBadRequest},
 	}
 
@@ -143,8 +157,10 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	network := entity.Network{
 		ID:   bson.NewObjectId(),
 		Name: tName,
-		Fake: entity.FakeNetwork{},
 		Type: entity.FakeNetworkType,
+		Nodes: []entity.Node{
+			entity.Node{},
+		},
 	}
 
 	//Create data into mongo manually
@@ -179,19 +195,26 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 			ID:   bson.NewObjectId(),
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeNetworkType,
-			Fake: entity.FakeNetwork{
-				FakeParameter: "Yo",
-				IWantFail:     true,
-			}},
+			Nodes: []entity.Node{
+				entity.Node{
+					FakeParameter: "Yo",
+					ShouldFail:    true,
+				},
+			},
+		},
 			http.StatusInternalServerError},
-		{"NetworkTypeError", entity.Network{
-			ID:   bson.NewObjectId(),
-			Name: namesgenerator.GetRandomName(0),
-			Type: "non-exist",
-			Fake: entity.FakeNetwork{
-				FakeParameter: "Yo",
-				IWantFail:     true,
-			}},
+		{"NetworkTypeError",
+			entity.Network{
+				ID:   bson.NewObjectId(),
+				Name: namesgenerator.GetRandomName(0),
+				Type: "none-exist",
+				Nodes: []entity.Node{
+					entity.Node{
+						FakeParameter: "Yo",
+						ShouldFail:    true,
+					},
+				},
+			},
 			http.StatusBadRequest},
 	}
 
@@ -215,14 +238,17 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 func (suite *NetworkTestSuite) TestGetNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	tType := entity.FakeNetworkType
-
 	network := entity.Network{
-		ID:       bson.NewObjectId(),
-		Name:     tName,
-		Type:     tType,
-		NodeName: namesgenerator.GetRandomName(0),
+		ID:   bson.NewObjectId(),
+		Name: tName,
+		Type: tType,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name:          namesgenerator.GetRandomName(0),
+				FakeParameter: "fake",
+			},
+		},
 	}
-
 	//Create data into mongo manually
 	suite.session.C(entity.NetworkCollectionName).Insert(network)
 	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
@@ -242,8 +268,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 }
 
 func (suite *NetworkTestSuite) TestGetNetworkWithInvalidID() {
-
-	//Get data with non-exits ID
+	// Get data with none-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
@@ -258,10 +283,13 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	count := 3
 	for i := 0; i < count; i++ {
 		networks = append(networks, entity.Network{
-			Name:     namesgenerator.GetRandomName(0),
-			Fake:     entity.FakeNetwork{},
-			Type:     entity.FakeNetworkType,
-			NodeName: namesgenerator.GetRandomName(0),
+			Name: namesgenerator.GetRandomName(0),
+			Type: entity.FakeNetworkType,
+			Nodes: []entity.Node{
+				entity.Node{
+					Name: namesgenerator.GetRandomName(0),
+				},
+			},
 		})
 	}
 
@@ -304,7 +332,7 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 			for i, v := range retNetworks {
 				suite.Equal(networks[i].Name, v.Name)
 				suite.Equal(networks[i].Type, v.Type)
-				suite.Equal(networks[i].NodeName, v.NodeName)
+				suite.Equal(networks[i].Nodes[0].Name, v.Nodes[0].Name)
 			}
 
 		})
