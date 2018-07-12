@@ -406,7 +406,7 @@ Response Data:
 }
 ```
 
-## Resouce Monitoring
+## Resouce Monitoring
 
 ### List Nodes
 **GET /v1/monitoring/nodes**
@@ -649,7 +649,6 @@ Response Data:
 Example:
 ```
 curl -X GET http://localhost:7890/v1/monitoring/pods
-curl -X GET http://localhost:7890/v1/monitoring/pods?namespace=monitoring\&node\=vortex-dev\&controller\=prometheus
 ```
 
 Response Data:
