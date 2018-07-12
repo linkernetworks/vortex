@@ -1,0 +1,2 @@
+config:
+  housekeeping_interval: 5s
