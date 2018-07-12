@@ -36,7 +36,6 @@ func execute(suite *suite.Suite, cmd *exec.Cmd) {
 	fmt.Printf("Stderr: %s\n", string(w.Bytes()))
 }
 
-//OK
 type OVSSystemNetworkTestSuite struct {
 	suite.Suite
 	sp                 *serviceprovider.Container
@@ -44,7 +43,6 @@ type OVSSystemNetworkTestSuite struct {
 	clusterwiseNetwork entity.Network
 }
 
-// OK
 func (suite *OVSSystemNetworkTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.NewForTesting(cf)
@@ -119,7 +117,6 @@ func (suite *OVSSystemNetworkTestSuite) SetupSuite() {
 
 func (suite *OVSSystemNetworkTestSuite) TearDownSuite() {}
 
-// OK
 func TestOVSNetworkSuite(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		fmt.Println("We only testing the ovs function on Linux Host")
@@ -194,103 +191,6 @@ func (suite *OVSSystemNetworkTestSuite) TestCreateNetworkFail() {
 	suite.Error(err)
 }
 
-func (suite *OVSSystemNetworkTestSuite) TestValidateBeforeCreating() {
-	tName := namesgenerator.GetRandomName(0)
-	// Valid VLAN number
-	validVLANnetwork := entity.Network{
-		Type:       entity.OVSKernelspaceNetworkType,
-		Name:       tName,
-		VLANTags:   []int32{0, 2048, 4095},
-		BridgeName: "bro",
-		Nodes: []entity.Node{
-			entity.Node{
-				Name: "node-1",
-				PhyInterfaces: []entity.PhyInterface{
-					entity.PhyInterface{
-						Name:  namesgenerator.GetRandomName(0),
-						PCIID: "",
-					},
-				},
-			},
-		},
-	}
-
-	testCases := []struct {
-		caseName string
-		network  *entity.Network
-	}{
-		{"validVLAN", &validVLANnetwork},
-		{"singelNetwork", &suite.standaloneNetwork},
-		{"clusterNetwork", &suite.clusterwiseNetwork},
-	}
-
-	for _, tc := range testCases {
-		suite.T().Run(tc.caseName, func(t *testing.T) {
-			//Parameters
-			np, err := GetNetworkProvider(tc.network)
-			suite.NoError(err)
-			np = np.(kernelspaceNetworkProvider)
-
-			err = np.ValidateBeforeCreating(suite.sp)
-			suite.NoError(err)
-		})
-	}
-}
-
-// OK
-func (suite *OVSSystemNetworkTestSuite) TestValidateBeforeCreatingFail() {
-	tName := namesgenerator.GetRandomName(0)
-	// Invalid VLAN number
-	invalidVLANnetwork := entity.Network{
-		Type:       entity.OVSKernelspaceNetworkType,
-		Name:       tName,
-		VLANTags:   []int32{22435, 2143, 4096},
-		BridgeName: "brx",
-		Nodes: []entity.Node{
-			entity.Node{
-				Name: "node-1",
-				PhyInterfaces: []entity.PhyInterface{
-					entity.PhyInterface{
-						Name:  namesgenerator.GetRandomName(0),
-						PCIID: "",
-					},
-				},
-			},
-		},
-	}
-
-	// Invalid Case for duplicated name in standalone network
-	// Invalid Case for duplicates name in clusterwise network
-	testCases := []struct {
-		caseName string
-		network  *entity.Network
-		mongo    bool
-	}{
-		{"invalidVLAN", &invalidVLANnetwork, false},
-		{"singelNetwork", &suite.standaloneNetwork, true},
-		{"clusterNetwork", &suite.clusterwiseNetwork, true},
-	}
-
-	for _, tc := range testCases {
-		suite.T().Run(tc.caseName, func(t *testing.T) {
-			//Parameters
-			np, err := GetNetworkProvider(tc.network)
-			suite.NoError(err)
-			np = np.(kernelspaceNetworkProvider)
-
-			if tc.mongo {
-				//create a mongo-document to test duplicated name
-				session := suite.sp.Mongo.NewSession()
-				err := session.C(entity.NetworkCollectionName).Insert(tc.network)
-				defer session.C(entity.NetworkCollectionName).Remove(tc.network)
-				suite.NoError(err)
-			}
-			err = np.ValidateBeforeCreating(suite.sp)
-			suite.Error(err)
-		})
-	}
-}
-
 func (suite *OVSSystemNetworkTestSuite) TestDeleteNetwork() {
 	testCases := []struct {
 		caseName string
@@ -318,7 +218,6 @@ func (suite *OVSSystemNetworkTestSuite) TestDeleteNetwork() {
 	}
 }
 
-// OK
 func (suite *OVSSystemNetworkTestSuite) TestDeleteNetworkFail() {
 	network := entity.Network{
 		Type:       entity.OVSKernelspaceNetworkType,

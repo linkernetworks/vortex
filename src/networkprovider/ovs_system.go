@@ -1,13 +1,11 @@
 package networkprovider
 
 import (
-	"fmt"
 	"net"
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type kernelspaceNetworkProvider struct {
@@ -16,33 +14,6 @@ type kernelspaceNetworkProvider struct {
 	vlanTags    []int32
 	nodes       []entity.Node
 	isDPDKPort  bool
-}
-
-func (knp kernelspaceNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container) error {
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
-	// Check whether VLAN Tag is 0~4095
-	for _, tag := range knp.vlanTags {
-		if tag < 0 || tag > 4095 {
-			return fmt.Errorf("The vlangTag %d should between 0 and 4095", tag)
-		}
-	}
-
-	if knp.isDPDKPort != false {
-		return fmt.Errorf("unsupport dpdk in kernel space datapath")
-	}
-
-	q := bson.M{
-		"name": knp.networkName,
-	}
-	n, err := session.Count(entity.NetworkCollectionName, q)
-	if n >= 1 {
-		return fmt.Errorf("The network name: %s is exist.", knp.networkName)
-	} else if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {

@@ -3,6 +3,7 @@ package entity
 import (
 	"time"
 
+	"github.com/linkernetworks/vortex/src/errors"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -46,4 +47,14 @@ type Network struct {
 // GetCollection - get model mongo collection name.
 func (m Network) GetCollection() string {
 	return NetworkCollectionName
+}
+
+// Validate VLAN tags
+func ValidateVLANTags(vlanTags []int32) error {
+	for _, tag := range vlanTags {
+		if tag < 0 || tag > 4095 {
+			return errors.NewErrInvalidVLAN("VLAN tag should between 0 and 4095")
+		}
+	}
+	return nil
 }
