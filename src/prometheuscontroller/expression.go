@@ -256,7 +256,7 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 	controller.Type = "deployment"
 
 	expression := Expression{}
-	expression.Metrics = []string{"kube_deployment_metadata_generation", "kube_deployment_created", "kube_deployment_labels", "kube_deployment_spec_replicas", "kube_deployment_status_replicas"}
+	expression.Metrics = []string{"kube_deployment_metadata_generation", "kube_deployment_created", "kube_deployment_labels", "kube_deployment_spec_replicas", "kube_deployment_status_replicas", "kube_deployment_status_replicas_available"}
 	expression.QueryLabels = map[string]string{"deployment": id}
 
 	results, err := getElements(sp, expression)
