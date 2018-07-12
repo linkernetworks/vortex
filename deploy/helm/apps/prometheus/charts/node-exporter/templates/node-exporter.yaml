@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  namespace: monitoring
+  name: node-exporter
+spec:
+  template:
+    metadata:
+      name:  node-exporter
+      labels:
+        name: node-exporter
+      annotations:
+        prometheus.io/scrape: 'true'
+    spec:
+      hostPID: true
+      containers:
+      - name:  node-exporter
+        image: sdnvortex/node-exporter:{{ .Values.image.tag }}
+        ports:
+          - name: http-metrics
+            containerPort: 9100
+        securityContext:
+          privileged: true
+        args:
+          - --no-collector.arp
+          - --no-collector.bcache
+          - --no-collector.bonding
+          - --no-collector.conntrack
+          - --no-collector.diskstats
+          - --no-collector.edac
+          - --no-collector.entropy
+          - --no-collector.filefd
+          - --no-collector.filesystem
+          - --no-collector.hwmon
+          - --no-collector.infiniband
+          - --no-collector.ipvs
+          - --no-collector.loadavg
+          - --no-collector.mdadm
+          - --no-collector.nfs
+          - --no-collector.nfsd
+          - --no-collector.sockstat
+          - --no-collector.time
+          - --no-collector.timex
+          - --no-collector.uname
+          - --no-collector.vmstat
+          - --no-collector.wifi
+          - --no-collector.xfs
+          - --no-collector.zfs
+      hostNetwork: true
+        
