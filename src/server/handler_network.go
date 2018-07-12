@@ -7,6 +7,7 @@ import (
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/errors"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
@@ -38,14 +39,17 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := networkProvider.ValidateBeforeCreating(sp); err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
 	if err := networkProvider.CreateNetwork(sp); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
+		if err != nil {
+			switch err.(type) {
+			case *errors.ErrInvalidVLAN:
+				response.BadRequest(req.Request, resp.ResponseWriter, err)
+				return
+			default:
+				response.InternalServerError(req.Request, resp.ResponseWriter, err)
+				return
+			}
+		}
 	}
 
 	network.ID = bson.NewObjectId()

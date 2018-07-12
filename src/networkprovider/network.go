@@ -8,7 +8,6 @@ import (
 )
 
 type NetworkProvider interface {
-	ValidateBeforeCreating(sp *serviceprovider.Container) error
 	CreateNetwork(sp *serviceprovider.Container) error
 	DeleteNetwork(sp *serviceprovider.Container) error
 }
