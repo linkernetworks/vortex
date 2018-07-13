@@ -7,6 +7,7 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/linkernetworks/vortex/src/utils"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -88,6 +89,20 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	}
 
 	return volumes, volumeMounts, nil
+}
+
+func generateNodeLabels(networks []entity.Network) []string {
+	totalNames := [][]string{}
+	for _, network := range networks {
+		names := []string{}
+		for _, node := range network.Nodes {
+			names = append(names, node.Name)
+		}
+
+		totalNames = append(totalNames, names)
+	}
+
+	return utils.Intersections(totalNames)
 }
 
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
