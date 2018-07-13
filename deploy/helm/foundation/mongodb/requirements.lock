@@ -1,0 +1,6 @@
+dependencies:
+- name: hostpath
+  repository: http://127.0.0.1:8879/charts
+  version: 0.1.0
+digest: sha256:92d6e6bef4d6f24e6668735bdccc132d52ae76f4bc5da8a04e22ce2e98612163
+generated: 2018-07-12T17:01:03.649964724+08:00

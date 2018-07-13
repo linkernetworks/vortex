@@ -1,0 +1,9 @@
+dependencies:
+- name: auth
+  repository: http://127.0.0.1:8879/charts
+  version: 0.1.0
+- name: mongodb
+  repository: http://127.0.0.1:8879/charts
+  version: 0.1.0
+digest: sha256:0b1264442e7ceda5c176abf673ed8c8a9819f0bf2f0f664a86bf7d4e7350c394
+generated: 2018-07-12T17:06:18.869840668+08:00
