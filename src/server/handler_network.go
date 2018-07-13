@@ -7,6 +7,7 @@ import (
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/errors"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
@@ -24,12 +25,16 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
+	// overwrite the bridge name
+	network.BridgeName = np.GenerateBridgeName(string(network.Type), network.Name)
+
 	session := sp.Mongo.NewSession()
 	defer session.Close()
-	session.C(entity.NetworkCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"name", "nodeName"},
-		Unique: true,
-	})
+	session.C(entity.NetworkCollectionName).EnsureIndex(
+		mgo.Index{
+			Key:    []string{"name"},
+			Unique: true,
+		})
 
 	networkProvider, err := np.GetNetworkProvider(&network)
 	if err != nil {
@@ -37,14 +42,17 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := networkProvider.ValidateBeforeCreating(sp, &network); err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	if err := networkProvider.CreateNetwork(sp, &network); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
+	if err := networkProvider.CreateNetwork(sp); err != nil {
+		if err != nil {
+			switch err.(type) {
+			case *errors.ErrInvalidVLAN:
+				response.BadRequest(req.Request, resp.ResponseWriter, err)
+				return
+			default:
+				response.InternalServerError(req.Request, resp.ResponseWriter, err)
+				return
+			}
+		}
 	}
 
 	network.ID = bson.NewObjectId()
@@ -157,7 +165,7 @@ func deleteNetworkHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := networkProvider.DeleteNetwork(sp, &network); err != nil {
+	if err := networkProvider.DeleteNetwork(sp); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}

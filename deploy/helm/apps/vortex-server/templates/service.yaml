@@ -10,9 +10,9 @@ spec:
   type: NodePort
   ports:
     - protocol: TCP
-      port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      nodePort: {{ .Values.service.nodePort }}
+      port: {{ .Values.service.ports.port }}
+      targetPort: {{ .Values.service.ports.targetPort }}
+      nodePort: {{ .Values.service.ports.nodePort }}
       name: {{ template "vortex-server.name" . }}
   selector:
     app: {{ template "vortex-server.name" . }}

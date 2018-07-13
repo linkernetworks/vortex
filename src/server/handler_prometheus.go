@@ -79,9 +79,10 @@ func listPodMetricsHandler(ctx *web.Context) {
 	}
 
 	if controller, ok := query.Str("controller"); ok {
-		expression.QueryLabels["deployment"] = controller
+		expression.QueryLabels["created_by_kind"] = "ReplicaSet"
+		expression.QueryLabels["created_by_name"] = controller + ".*"
 	} else {
-		expression.QueryLabels["deployment"] = ".*"
+		expression.QueryLabels["created_by_name"] = ".*"
 	}
 
 	containerList, err := pc.ListResource(sp, "pod", expression)
@@ -115,12 +116,6 @@ func listControllerMetricsHandler(ctx *web.Context) {
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_deployment_metadata_generation"}
 	expression.QueryLabels = map[string]string{}
-
-	if node, ok := query.Str("node"); ok {
-		expression.QueryLabels["node"] = node
-	} else {
-		expression.QueryLabels["node"] = ".*"
-	}
 
 	if namespace, ok := query.Str("namespace"); ok {
 		expression.QueryLabels["namespace"] = namespace
@@ -159,12 +154,6 @@ func listServiceMetricsHandler(ctx *web.Context) {
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_service_info"}
 	expression.QueryLabels = map[string]string{}
-
-	if node, ok := query.Str("node"); ok {
-		expression.QueryLabels["node"] = node
-	} else {
-		expression.QueryLabels["node"] = ".*"
-	}
 
 	if namespace, ok := query.Str("namespace"); ok {
 		expression.QueryLabels["namespace"] = namespace

@@ -12,6 +12,9 @@ import (
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func init() {
@@ -105,5 +108,70 @@ func (suite *VolumeTestSuite) TestCreateVolumeFail() {
 	}
 
 	err := CreateVolume(suite.sp, volume)
+	suite.Error(err)
+}
+
+func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
+	volume := &entity.Volume{
+		ID:   bson.NewObjectId(),
+		Name: namesgenerator.GetRandomName(0),
+	}
+
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	pods := []entity.Pod{
+		{
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Volumes: []entity.PodVolume{
+				{
+					Name: volume.Name,
+				},
+			},
+		},
+		{
+			ID:   bson.NewObjectId(),
+			Name: namesgenerator.GetRandomName(0),
+			Volumes: []entity.PodVolume{
+				{
+					Name: volume.Name,
+				},
+			},
+		},
+	}
+
+	for _, pod := range pods {
+		session.Insert(entity.PodCollectionName, pod)
+		defer session.Remove(entity.PodCollectionName, "name", pod.Name)
+	}
+
+	//Create the pod via kubectl
+	suite.sp.KubeCtl.CreatePod(&corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: pods[0].Name,
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+		},
+	})
+	suite.sp.KubeCtl.CreatePod(&corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: pods[1].Name,
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+		},
+	})
+	suite.sp.KubeCtl.CreatePod(&corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namesgenerator.GetRandomName(0),
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+		},
+	})
+
+	err := DeleteVolume(suite.sp, volume)
 	suite.Error(err)
 }

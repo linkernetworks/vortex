@@ -15,9 +15,9 @@ func TestGetNetworkProvider(t *testing.T) {
 		netType         entity.NetworkType
 		netProviderType interface{}
 	}{
-		{"system", entity.OVSKernelspaceNetworkType, reflect.TypeOf(OVSNetworkProvider{})},
-		{"netdev", entity.OVSUserspaceNetworkType, reflect.TypeOf(OVSUserspaceNetworkProvider{})},
-		{"fake", entity.FakeNetworkType, reflect.TypeOf(FakeNetworkProvider{})},
+		{"system", entity.OVSKernelspaceNetworkType, reflect.TypeOf(kernelspaceNetworkProvider{})},
+		{"netdev", entity.OVSUserspaceNetworkType, reflect.TypeOf(userspaceNetworkProvider{})},
+		{"fake", entity.FakeNetworkType, reflect.TypeOf(fakeNetworkProvider{})},
 	}
 
 	for _, tc := range testCases {
@@ -38,4 +38,9 @@ func TestGetNetworkProviderFail(t *testing.T) {
 			Type: "Unknown",
 		})
 	assert.Error(t, err)
+}
+
+func TestGenerateBridgeName(t *testing.T) {
+	ans := GenerateBridgeName("netdev", "my network 1")
+	assert.Equal(t, "ovs-netdev-de0165", ans)
 }
