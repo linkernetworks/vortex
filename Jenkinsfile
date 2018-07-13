@@ -83,6 +83,9 @@ pipeline {
             }
         }
         stage("Build Image"){
+            when {
+                branch 'develop'
+            }
             steps {
                 script {
                     dir ("src/github.com/linkernetworks/vortex") {
