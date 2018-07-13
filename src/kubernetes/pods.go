@@ -34,7 +34,7 @@ func (kc *KubeCtl) DeletePod(name string) error {
 	return kc.Clientset.CoreV1().Pods(kc.Namespace).Delete(name, &options)
 }
 
-func (kc *KubeCtl) DoesPodCompleted(pod *corev1.Pod) bool {
+func (kc *KubeCtl) IsPodCompleted(pod *corev1.Pod) bool {
 	switch pod.Status.Phase {
 	case corev1.PodRunning, corev1.PodPending:
 		return false

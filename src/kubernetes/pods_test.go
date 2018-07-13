@@ -109,10 +109,10 @@ func (suite *KubeCtlPodTestSuite) TestDoesPodCompleted() {
 		suite.NoError(err)
 	}
 
-	run := suite.kubectl.DoesPodCompleted(&pods[0])
+	run := suite.kubectl.IsPodCompleted(&pods[0])
 	suite.False(run)
 
-	run = suite.kubectl.DoesPodCompleted(&pods[1])
+	run = suite.kubectl.IsPodCompleted(&pods[1])
 	suite.True(run)
 }
 

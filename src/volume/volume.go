@@ -64,7 +64,7 @@ func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	pods := []entity.Pod{}
 	err := session.FindAll(entity.PodCollectionName, bson.M{"volumes.name": volume.Name}, &pods)
 	if err != nil {
-		return fmt.Errorf("Load the database fail:%v", err)
+		return fmt.Errorf("load the database fail:%v", err)
 	}
 
 	usedPod := []string{}
@@ -75,13 +75,13 @@ func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 			continue
 		}
 
-		if !sp.KubeCtl.DoesPodCompleted(currentPod) {
+		if !sp.KubeCtl.IsPodCompleted(currentPod) {
 			usedPod = append(usedPod, pod.Name)
 		}
 	}
 	if len(usedPod) != 0 {
 		podNames := strings.Join(usedPod, ",")
-		return fmt.Errorf("Delete the volume [%s] fail, since the followings pods still ust it: %s", volume.Name, podNames)
+		return fmt.Errorf("delete the volume [%s] fail, since the followings pods still ust it: %s", volume.Name, podNames)
 	}
 
 	return sp.KubeCtl.DeletePVC(volume.GetPVCName())
