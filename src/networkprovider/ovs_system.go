@@ -9,27 +9,23 @@ import (
 )
 
 type kernelspaceNetworkProvider struct {
-	networkName string
-	bridgeName  string
-	vlanTags    []int32
-	nodes       []entity.Node
-	isDPDKPort  bool
+	entity.Network
 }
 
 func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(knp.vlanTags); err != nil {
+	if err := entity.ValidateVLANTags(knp.VLANTags); err != nil {
 		return err
 	}
-	for _, node := range knp.nodes {
+	for _, node := range knp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
 		if err != nil {
 			return err
 		}
 		if err := createOVSNetwork(
 			nodeIP,
-			knp.bridgeName,
+			knp.BridgeName,
 			node.PhyInterfaces,
-			knp.vlanTags,
+			knp.VLANTags,
 		); err != nil {
 			return err
 		}
@@ -38,14 +34,14 @@ func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Containe
 }
 
 func (knp kernelspaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
-	for _, node := range knp.nodes {
+	for _, node := range knp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
 		if err != nil {
 			return err
 		}
 		if err := deleteOVSNetwork(
 			nodeIP,
-			knp.bridgeName,
+			knp.BridgeName,
 		); err != nil {
 			return err
 		}
