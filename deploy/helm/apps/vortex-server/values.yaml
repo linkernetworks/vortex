@@ -1,0 +1,16 @@
+global:
+  tag: develop
+  environment: develop
+
+replicaCount: 1
+image:
+  tag: develop
+
+service:
+  ports:
+    port: 7890
+    targetPort: 7890
+    nodePort: 32326
+
+auth:
+  enabled: false

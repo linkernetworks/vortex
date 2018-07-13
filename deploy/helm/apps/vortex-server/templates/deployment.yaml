@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "sdnvortex/vortex:{{ .Values.image.tag }}"
+        image: sdnvortex/vortex:{{ .Values.global.tag }}
         ports:
         - containerPort: 7890
