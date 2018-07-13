@@ -14,4 +14,6 @@ func TestNewKubeCtl(t *testing.T) {
 	kubectl := New(clientset, namespace)
 	assert.Equal(t, namespace, kubectl.Namespace)
 	assert.NotNil(t, kubectl)
+	// Change struct namespace field value
+	kubectl.SetNamespace("test")
 }
