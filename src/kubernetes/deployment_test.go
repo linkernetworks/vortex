@@ -51,6 +51,11 @@ func (suite *KubeCtlDeploymentTestSuite) TestCreateDeployment() {
 	suite.NoError(err)
 	suite.NotNil(deploy)
 	suite.Equal(replicas, *deploy.Spec.Replicas)
+
+	deploys, err := suite.kubectl.GetDeployments()
+	suite.NoError(err)
+	suite.NotNil(deploys)
+	suite.Equal(replicas, *deploys[0].Spec.Replicas)
 }
 
 func (suite *KubeCtlDeploymentTestSuite) TestDeleteDeployment() {

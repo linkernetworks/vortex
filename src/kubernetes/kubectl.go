@@ -24,3 +24,7 @@ func New(clientset kubernetes.Interface, namespace string) *KubeCtl {
 		Namespace: namespace,
 	}
 }
+
+func (kc *KubeCtl) ChangeNamespace(namespace string) {
+	kc.Namespace = namespace
+}

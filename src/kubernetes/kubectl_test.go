@@ -15,3 +15,13 @@ func TestNewKubeCtl(t *testing.T) {
 	assert.Equal(t, namespace, kubectl.Namespace)
 	assert.NotNil(t, kubectl)
 }
+
+func TestChangeKubeCtlNamespace(t *testing.T) {
+	clientset := fakeclientset.NewSimpleClientset()
+	namespace := "default"
+	kubectl := New(clientset, namespace)
+	assert.Equal(t, namespace, kubectl.Namespace)
+	assert.NotNil(t, kubectl)
+
+	kubectl.ChangeNamespace("test")
+}
