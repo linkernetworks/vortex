@@ -10,13 +10,8 @@ import (
 
 func TestFakeNetworkCreating(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type: entity.FakeNetworkType,
-		Nodes: []entity.Node{
-			entity.Node{
-				FakeParameter: "yes",
-				ShouldFail:    false,
-			},
-		},
+		IsDPDKPort: true, // for fake testing
+		Type:       entity.FakeNetworkType,
 	})
 	assert.NoError(t, err)
 	err = fake.CreateNetwork(nil)
@@ -26,11 +21,6 @@ func TestFakeNetworkCreating(t *testing.T) {
 func TestFakeNetworkCreatingFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Nodes: []entity.Node{
-			entity.Node{
-				ShouldFail: true,
-			},
-		},
 	})
 	assert.NoError(t, err)
 	err = fake.CreateNetwork(nil)
@@ -39,8 +29,8 @@ func TestFakeNetworkCreatingFail(t *testing.T) {
 
 func TestFakeNetworkDelete(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
-		Type:  entity.FakeNetworkType,
-		Nodes: []entity.Node{},
+		IsDPDKPort: true, // for fake testing
+		Type:       entity.FakeNetworkType,
 	})
 	assert.NoError(t, err)
 	err = fake.DeleteNetwork(nil)
@@ -50,11 +40,6 @@ func TestFakeNetworkDelete(t *testing.T) {
 func TestFakeNetworkDeleteFail(t *testing.T) {
 	fake, err := GetNetworkProvider(&entity.Network{
 		Type: entity.FakeNetworkType,
-		Nodes: []entity.Node{
-			entity.Node{
-				ShouldFail: true,
-			},
-		},
 	})
 	assert.NoError(t, err)
 	err = fake.DeleteNetwork(nil)
