@@ -41,10 +41,10 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 
 func getElements(sp *serviceprovider.Container, expression Expression) (model.Vector, error) {
 	// append the metrics
+	var metrics string
 	str := `__name__=~"{{metrics}}"`
-	metrics := ""
 	for _, metric := range expression.Metrics {
-		metrics = metrics + metric + "|"
+		metrics = fmt.Sprintf("%s%s|", metrics, metric)
 	}
 	rule := strings.NewReplacer("{{metrics}}", strings.TrimSuffix(metrics, "|"))
 	str = rule.Replace(str)
@@ -54,14 +54,14 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 	for key, value := range labels {
 		str = fmt.Sprintf(`%s,%s=~"%s"`, str, key, value)
 	}
-	str = `{` + str + `}`
+	str = fmt.Sprintf("{%s}", str)
 
 	// use sum by if need it
+	var sumby string
 	if expression.SumBy != nil {
-		str = fmt.Sprintf(`sum by({{sumby}})(%s)`, str)
-		sumby := ""
+		str = fmt.Sprintf("sum by({{sumby}})(%s)", str)
 		for _, sumLabel := range expression.SumBy {
-			sumby = sumby + sumLabel + ","
+			sumby = fmt.Sprintf("%s%s,", sumby, sumLabel)
 		}
 		rule = strings.NewReplacer("{{sumby}}", strings.TrimSuffix(sumby, ","))
 		str = rule.Replace(str)
@@ -69,7 +69,7 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 
 	// the result should equal to expression.Value
 	if expression.Value != nil {
-		str = fmt.Sprintf(`%s==%v`, str, *expression.Value)
+		str = fmt.Sprintf("%s==%v", str, *expression.Value)
 	}
 
 	results, err := query(sp, str)
