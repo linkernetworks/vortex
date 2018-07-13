@@ -39,3 +39,8 @@ func TestGetNetworkProviderFail(t *testing.T) {
 		})
 	assert.Error(t, err)
 }
+
+func TestGenerateBridgeName(t *testing.T) {
+	ans := generateBridgeName("netdev", "my network 1")
+	assert.Equal(t, "ovs-netdev-de0165", ans)
+}

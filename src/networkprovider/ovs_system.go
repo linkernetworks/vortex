@@ -23,7 +23,7 @@ func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Containe
 		}
 		if err := createOVSNetwork(
 			nodeIP,
-			knp.BridgeName,
+			generateBridgeName(string(knp.Type), knp.Name),
 			node.PhyInterfaces,
 			knp.VLANTags,
 		); err != nil {
