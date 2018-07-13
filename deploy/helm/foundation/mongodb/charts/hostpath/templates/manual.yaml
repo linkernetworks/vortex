@@ -1,0 +1,13 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-manual
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ .Values.capacity.storage }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data"

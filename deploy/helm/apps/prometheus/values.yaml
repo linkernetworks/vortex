@@ -1,0 +1,26 @@
+global:
+  environment: develop
+
+replicaCount: 1
+
+config:
+  scrapeInterval: 5s
+
+service:
+  ports:
+    port: 9090
+    targetPort: 9090
+    nodePort: 32326
+
+
+# dependenvies
+cadvisor:
+  config:
+    housekeeping_interval: 10s
+kube-state-metrics:
+  image:
+    tag: develop
+node-exporter:
+  image:
+    tag: develop
+

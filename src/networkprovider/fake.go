@@ -7,27 +7,20 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
-type FakeNetworkProvider struct {
-	entity.FakeNetwork
+type fakeNetworkProvider struct {
+	entity.Network
 }
 
-func (fake FakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.FakeParameter == "" {
-		return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
+func (fnp fakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
+	if !fnp.IsDPDKPort {
+		return fmt.Errorf("fail to validate but don't worry, I'm fake network")
 	}
 	return nil
 }
 
-func (fake FakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.IWantFail {
-		return fmt.Errorf("Fail to create network but don't worry, I'm fake network")
-	}
-	return nil
-}
-
-func (fake FakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container, net *entity.Network) error {
-	if fake.IWantFail {
-		return fmt.Errorf("Fail to delete network but don't worry, I'm fake network")
+func (fnp fakeNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
+	if !fnp.IsDPDKPort {
+		return fmt.Errorf("fail to delete network but don't worry, I'm fake network")
 	}
 	return nil
 }

@@ -1,14 +1,21 @@
 package kubernetes
 
 import (
+	"math/rand"
 	"testing"
+	"time"
 
+	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type KubeCtlPodTestSuite struct {
 	suite.Suite
@@ -75,6 +82,38 @@ func (suite *KubeCtlPodTestSuite) TestCreateDeletePod() {
 	suite.NoError(err)
 	err = suite.kubectl.DeletePod("K8S-Pod-4")
 	suite.NoError(err)
+}
+
+func (suite *KubeCtlPodTestSuite) TestDoesPodCompleted() {
+	pods := []corev1.Pod{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: namesgenerator.GetRandomName(0),
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodPending,
+			},
+		},
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: namesgenerator.GetRandomName(0),
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodSucceeded,
+			},
+		},
+	}
+
+	for _, pod := range pods {
+		_, err := suite.kubectl.CreatePod(&pod)
+		suite.NoError(err)
+	}
+
+	run := suite.kubectl.IsPodCompleted(&pods[0])
+	suite.False(run)
+
+	run = suite.kubectl.IsPodCompleted(&pods[1])
+	suite.True(run)
 }
 
 func (suite *KubeCtlPodTestSuite) TearDownSuite() {}
