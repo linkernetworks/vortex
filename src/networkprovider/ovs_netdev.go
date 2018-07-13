@@ -24,7 +24,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 		if unp.IsDPDKPort {
 			if err := createOVSDPDKNetwork(
 				nodeIP,
-				unp.BridgeName,
+				generateBridgeName(string(unp.Type), unp.Name),
 				node.PhyInterfaces,
 				unp.VLANTags,
 			); err != nil {
@@ -33,7 +33,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 		} else {
 			if err := createOVSUserspaceNetwork(
 				nodeIP,
-				unp.BridgeName,
+				generateBridgeName(string(unp.Type), unp.Name),
 				node.PhyInterfaces,
 				unp.VLANTags,
 			); err != nil {
