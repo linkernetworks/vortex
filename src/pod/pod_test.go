@@ -204,3 +204,37 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	err := CreatePod(suite.sp, pod)
 	suite.Error(err)
 }
+
+func (suite *PodTestSuite) TestGenerateNodeLabels() {
+	networks := []entity.Network{
+		{
+			Nodes: []entity.Node{
+				{Name: "node1"},
+				{Name: "node4"},
+				{Name: "node5"},
+			},
+		},
+		{
+			Nodes: []entity.Node{
+				{Name: "node2"},
+				{Name: "node3"},
+				{Name: "node4"},
+				{Name: "node5"},
+				{Name: "node6"},
+			},
+		},
+		{
+			Nodes: []entity.Node{
+				{Name: "node1"},
+				{Name: "node2"},
+				{Name: "node3"},
+				{Name: "node4"},
+				{Name: "node5"},
+			},
+		},
+	}
+
+	names := generateNodeLabels(networks)
+	suite.Equal(2, len(names))
+	suite.Equal([]string{"node4", "node5"}, names)
+}
