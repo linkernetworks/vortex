@@ -54,12 +54,17 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Type:       entity.FakeNetworkType,
+		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
-		IsDPDKPort: true,                            // for fake network, true means success
-		BridgeName: namesgenerator.GetRandomName(0), // for fake network, true meas parameter good
+		VLANTags:   []int32{},
+		BridgeName: namesgenerator.GetRandomName(0),
 		Nodes: []entity.Node{
-			{},
+			entity.Node{
+				Name:          tName,
+				PhyInterfaces: []entity.PhyInterface{},
+			},
 		},
+		CreatedAt: &time.Time{},
 	}
 
 	bodyBytes, err := json.MarshalIndent(network, "", "  ")
@@ -98,20 +103,29 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	}{
 		{"CreateFail",
 			entity.Network{
-				Name:       namesgenerator.GetRandomName(0),
-				BridgeName: namesgenerator.GetRandomName(0),
 				Type:       entity.FakeNetworkType,
+				Name:       namesgenerator.GetRandomName(0),
+				VLANTags:   []int32{},
+				BridgeName: namesgenerator.GetRandomName(0),
 				Nodes: []entity.Node{
-					entity.Node{},
+					entity.Node{
+						Name:          namesgenerator.GetRandomName(0),
+						PhyInterfaces: []entity.PhyInterface{},
+					},
 				},
 			},
 			http.StatusInternalServerError},
 		{"NetworkTypeError",
 			entity.Network{
-				Name: namesgenerator.GetRandomName(0),
-				Type: "none-exist",
+				Type:       "none-exist",
+				Name:       namesgenerator.GetRandomName(0),
+				VLANTags:   []int32{},
+				BridgeName: namesgenerator.GetRandomName(0),
 				Nodes: []entity.Node{
-					entity.Node{},
+					entity.Node{
+						Name:          namesgenerator.GetRandomName(0),
+						PhyInterfaces: []entity.PhyInterface{},
+					},
 				},
 			},
 			http.StatusBadRequest},
@@ -141,10 +155,13 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 		ID:         bson.NewObjectId(),
 		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
+		VLANTags:   []int32{},
 		Type:       entity.FakeNetworkType,
+		BridgeName: namesgenerator.GetRandomName(0),
 		Nodes: []entity.Node{
 			entity.Node{
-				Name: "TestDeleteNetwork",
+				Name:          namesgenerator.GetRandomName(0),
+				PhyInterfaces: []entity.PhyInterface{},
 			},
 		},
 	}
@@ -178,21 +195,31 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		errorCode int
 	}{
 		{"DeleteNetwork", entity.Network{
-			ID:   bson.NewObjectId(),
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeNetworkType,
+			ID:         bson.NewObjectId(),
+			Type:       entity.FakeNetworkType,
+			Name:       namesgenerator.GetRandomName(0),
+			VLANTags:   []int32{},
+			BridgeName: namesgenerator.GetRandomName(0),
 			Nodes: []entity.Node{
-				entity.Node{},
+				entity.Node{
+					Name:          namesgenerator.GetRandomName(0),
+					PhyInterfaces: []entity.PhyInterface{},
+				},
 			},
 		},
 			http.StatusInternalServerError},
 		{"NetworkTypeError",
 			entity.Network{
-				ID:   bson.NewObjectId(),
-				Name: namesgenerator.GetRandomName(0),
-				Type: "none-exist",
+				ID:         bson.NewObjectId(),
+				Name:       namesgenerator.GetRandomName(0),
+				VLANTags:   []int32{},
+				BridgeName: namesgenerator.GetRandomName(0),
+				Type:       "none-exist",
 				Nodes: []entity.Node{
-					entity.Node{},
+					entity.Node{
+						Name:          namesgenerator.GetRandomName(0),
+						PhyInterfaces: []entity.PhyInterface{},
+					},
 				},
 			},
 			http.StatusBadRequest},
@@ -219,12 +246,14 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	tType := entity.FakeNetworkType
 	network := entity.Network{
-		ID:   bson.NewObjectId(),
-		Name: tName,
-		Type: tType,
+		ID:       bson.NewObjectId(),
+		Name:     tName,
+		VLANTags: []int32{},
+		Type:     tType,
 		Nodes: []entity.Node{
 			entity.Node{
-				Name: namesgenerator.GetRandomName(0),
+				Name:          namesgenerator.GetRandomName(0),
+				PhyInterfaces: []entity.PhyInterface{},
 			},
 		},
 	}
@@ -262,11 +291,14 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	count := 3
 	for i := 0; i < count; i++ {
 		networks = append(networks, entity.Network{
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeNetworkType,
+			Type:       entity.FakeNetworkType,
+			Name:       namesgenerator.GetRandomName(0),
+			VLANTags:   []int32{},
+			BridgeName: namesgenerator.GetRandomName(0),
 			Nodes: []entity.Node{
 				entity.Node{
-					Name: namesgenerator.GetRandomName(0),
+					Name:          namesgenerator.GetRandomName(0),
+					PhyInterfaces: []entity.PhyInterface{},
 				},
 			},
 		})

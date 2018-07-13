@@ -87,6 +87,24 @@
 			"revisionTime": "2018-05-03T02:20:59Z"
 		},
 		{
+			"checksumSHA1": "b4DmyMT9bicTRVJw1hJXHLhIH+0=",
+			"path": "github.com/go-playground/locales",
+			"revision": "f63010822830b6fe52288ee52d5a1151088ce039",
+			"revisionTime": "2018-03-23T16:04:04Z"
+		},
+		{
+			"checksumSHA1": "JgF260rC9YpWyY5WEljjimWLUXs=",
+			"path": "github.com/go-playground/locales/currency",
+			"revision": "f63010822830b6fe52288ee52d5a1151088ce039",
+			"revisionTime": "2018-03-23T16:04:04Z"
+		},
+		{
+			"checksumSHA1": "7QcjNTtW0Rc/5BPw1MPaQ6YNjso=",
+			"path": "github.com/go-playground/universal-translator",
+			"revision": "71201497bace774495daed26a3874fd339e0b538",
+			"revisionTime": "2017-03-27T19:17:03Z"
+		},
+		{
 			"checksumSHA1": "YuGQx5ilYzlkaqeyVQh8qpsGExI=",
 			"path": "github.com/godbus/dbus",
 			"revision": "8cbcc64e38bf24e9066af813a0f3236772ceb80a",
@@ -859,6 +877,12 @@
 			"path": "gopkg.in/alecthomas/kingpin.v2",
 			"revision": "947dcec5ba9c011838740e680966fd7087a71d0d",
 			"revisionTime": "2017-12-17T18:08:21Z"
+		},
+		{
+			"checksumSHA1": "AbuKUV0gxECkRpjb2fmgo3DZYac=",
+			"path": "gopkg.in/go-playground/validator.v9",
+			"revision": "ab2a8a99087e827c9af87ed6777ba897348fb178",
+			"revisionTime": "2018-07-09T15:35:10Z"
 		},
 		{
 			"checksumSHA1": "COfXAfInbcFT/YRsvLUQnNKHzF0=",

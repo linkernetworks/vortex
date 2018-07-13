@@ -7,7 +7,6 @@ import (
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
-	"github.com/linkernetworks/vortex/src/errors"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
@@ -28,6 +27,11 @@ func createNetworkHandler(ctx *web.Context) {
 	// overwrite the bridge name
 	network.BridgeName = np.GenerateBridgeName(string(network.Type), network.Name)
 
+	if err := sp.Validator.Struct(network); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(
@@ -43,16 +47,8 @@ func createNetworkHandler(ctx *web.Context) {
 	}
 
 	if err := networkProvider.CreateNetwork(sp); err != nil {
-		if err != nil {
-			switch err.(type) {
-			case *errors.ErrInvalidVLAN:
-				response.BadRequest(req.Request, resp.ResponseWriter, err)
-				return
-			default:
-				response.InternalServerError(req.Request, resp.ResponseWriter, err)
-				return
-			}
-		}
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
 	}
 
 	network.ID = bson.NewObjectId()
