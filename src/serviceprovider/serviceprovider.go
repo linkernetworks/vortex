@@ -13,6 +13,7 @@ import (
 	"github.com/linkernetworks/redis"
 	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
 
+	"gopkg.in/go-playground/validator.v9"
 	"k8s.io/client-go/kubernetes"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
@@ -25,6 +26,7 @@ type Container struct {
 	Mongo      *mongo.Service
 	Prometheus *prometheusprovider.Service
 	KubeCtl    *kubeCtl.KubeCtl
+	Validator  *validator.Validate
 }
 
 type ServiceDiscoverResponse struct {
@@ -63,6 +65,7 @@ func New(cf config.Config) *Container {
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset, "default"),
+		Validator:  validator.New(),
 	}
 
 	return sp
@@ -89,6 +92,7 @@ func NewForTesting(cf config.Config) *Container {
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset, "default"),
+		Validator:  validator.New(),
 	}
 
 	return sp

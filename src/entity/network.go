@@ -20,24 +20,24 @@ const (
 )
 
 type PhyInterface struct {
-	Name  string `bson:"name" json:"name"`
-	PCIID string `bson:"pciID" json:"pciID"`
+	Name  string `bson:"name" json:"name" validate:"-"`
+	PCIID string `bson:"pciID" json:"pciID" validate:"-"`
 }
 
 type Node struct {
-	Name          string         `bson:"name" json:"name"`
-	PhyInterfaces []PhyInterface `bson:"physicalInterfaces" json:"physicalInterfaces"`
+	Name          string         `bson:"name" json:"name" validate:"required"`
+	PhyInterfaces []PhyInterface `bson:"physicalInterfaces" json:"physicalInterfaces" validate:"required,dive,required"`
 }
 
 type Network struct {
-	ID         bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	Type       NetworkType   `bson:"type" json:"type"`
-	IsDPDKPort bool          `bson:"isDPDKPort" json:"isDPDKPort"`
-	Name       string        `bson:"name" json:"name"`
-	VLANTags   []int32       `bson:"VLANTags" json:"VLANTags"`
-	BridgeName string        `bson:"bridgeName" json:"bridgeName"`
-	Nodes      []Node        `bson:"nodes" json:"nodes"`
-	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ID         bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
+	Type       NetworkType   `bson:"type" json:"type" validate:"required"`
+	IsDPDKPort bool          `bson:"isDPDKPort" json:"isDPDKPort" validate:"-"`
+	Name       string        `bson:"name" json:"name" validate:"required"`
+	VLANTags   []int32       `bson:"VLANTags" json:"VLANTags" validate:"required,dive,max=4095,min=0"`
+	BridgeName string        `bson:"bridgeName" json:"bridgeName" validate:"-"`
+	Nodes      []Node        `bson:"nodes" json:"nodes" validate:"required,dive,required"`
+	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
 // GetCollection - get model mongo collection name.
