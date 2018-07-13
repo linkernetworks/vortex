@@ -16,29 +16,17 @@ func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
 	case entity.OVSKernelspaceNetworkType:
 		return kernelspaceNetworkProvider{
-			network.Name,
-			network.BridgeName,
-			network.VLANTags,
-			network.Nodes,
-			network.IsDPDKPort,
+			*network,
 		}, nil
 	case entity.OVSUserspaceNetworkType:
 		return userspaceNetworkProvider{
-			network.Name,
-			network.BridgeName,
-			network.VLANTags,
-			network.Nodes,
-			network.IsDPDKPort,
+			*network,
 		}, nil
 	case entity.FakeNetworkType:
 		return fakeNetworkProvider{
-			network.Name,
-			network.BridgeName,
-			network.VLANTags,
-			network.Nodes,
-			network.IsDPDKPort,
+			*network,
 		}, nil
 	default:
-		return nil, fmt.Errorf("Unsupported Network Type %s", network.Type)
+		return nil, fmt.Errorf("unsupported Network Type %s", network.Type)
 	}
 }

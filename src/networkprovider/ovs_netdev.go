@@ -9,37 +9,33 @@ import (
 )
 
 type userspaceNetworkProvider struct {
-	networkName string
-	bridgeName  string
-	vlanTags    []int32
-	nodes       []entity.Node
-	isDPDKPort  bool
+	entity.Network
 }
 
 func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(unp.vlanTags); err != nil {
+	if err := entity.ValidateVLANTags(unp.VLANTags); err != nil {
 		return err
 	}
-	for _, node := range unp.nodes {
+	for _, node := range unp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
 		if err != nil {
 			return err
 		}
-		if unp.isDPDKPort {
+		if unp.IsDPDKPort {
 			if err := createOVSDPDKNetwork(
 				nodeIP,
-				unp.bridgeName,
+				unp.BridgeName,
 				node.PhyInterfaces,
-				unp.vlanTags,
+				unp.VLANTags,
 			); err != nil {
 				return err
 			}
 		} else {
 			if err := createOVSUserspaceNetwork(
 				nodeIP,
-				unp.bridgeName,
+				unp.BridgeName,
 				node.PhyInterfaces,
-				unp.vlanTags,
+				unp.VLANTags,
 			); err != nil {
 				return err
 			}
@@ -49,14 +45,14 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 }
 
 func (unp userspaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
-	for _, node := range unp.nodes {
+	for _, node := range unp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
 		if err != nil {
 			return err
 		}
 		if err := deleteOVSUserspaceNetwork(
 			nodeIP,
-			unp.bridgeName,
+			unp.BridgeName,
 		); err != nil {
 			return err
 		}
