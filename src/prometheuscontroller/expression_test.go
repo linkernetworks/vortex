@@ -23,7 +23,7 @@ type PrometheusExpressionTestSuite struct {
 func (suite *PrometheusExpressionTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/local.json")
 	suite.sp = serviceprovider.New(cf)
-	suite.sp.KubeCtl.ChangeNamespace("monitoring")
+	suite.sp.KubeCtl.SetNamespace("monitoring")
 }
 
 func (suite *PrometheusExpressionTestSuite) TearDownSuite() {
