@@ -9,6 +9,9 @@ services:
 go:
   - "1.10.x"
 
+env:
+  - CHANGE_MINIKUBE_NONE_USER=true
+
 notifications:
   slack:
     secure: k4ElQjxzBFlHcSHny92pauJNsb6HDvK4BVnmc0wwm9SViQLHj/8yoRlfkUahQ6oAvnl2FaT5DN7gpWDxg5JDsEwvvtJfcqWzv0WIG911fCUlWEZ358DVcs59MOml2A13P6k7fbIxLSQD7yD4LJbnHg61ZFcj2yxy3H3KI3KUOvOrQCNk/ptIKAPahLLmlX4x6nO3bKT9zXOWZKzqSoERMBNuhdEU6BDggaQTxryz8uPoNJe1cb6WYcqqV7CXX/UTB1m0sVoJceAre5ukehp0uv+b0wjYSKm8bviZcFyy2W9eafnYeqyJht7U4Tqlw/l6xDbS3jPmFE7rMyGUDxkz92ZOr72xca7dRBSo6TXpJ4yHl4J/fHeHfMS1Di3OHHp/T4FgPykpbm+2lCCCR79bZ5XjnhDOimO35fzn+c8lHHqEgsdYK0cgmhbRs51A0lPjiWseosQ0tNQ/STd5FL+KDidJ+qHcahVSO0Afwwl7s573GuXDegAKCMJ09TMKSEVvXa8yZFqoo9UG+g+L6a0Mm71pymn+eEhAPXpl8ZzM2qjmTYdaIA/XLHHet49AkNdY7/27o+itXgA/Vh0DAcOHeTO1fJ17sVCP2R72KGRahWLRV5PpeiNnK7Xg2ZXuYaqA//gyjyzz3fVoImGHgjA80gS/xqPy79LxR3K5LR2TJjw=
@@ -21,10 +24,35 @@ before_install:
 install:
   - make pre-build
 
+before_script:
+    # Make root mounted as rshared to fix kube-dns issues.
+  - sudo mount --make-rshared /
+    # Make /sys mounted as rshared to support cadvisor
+  - sudo mount --make-rshared /sys
+    # # Download kubectl, which is a requirement for using minikube.
+  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+    # # Download minikube.
+  - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+  - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0
+    # # Fix the kubectl context, as it's often stale.
+  - minikube update-context
+    # # Wait for Kubernetes to be up and ready.
+  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+
 script:
-  - docker run --name prometheus -d -p 9090:9090 prom/prometheus
+  - kubectl cluster-info
+  # Verify kube-addon-manager.
+  # # kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
+  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
+  # # Wait for kube-dns to be ready.
+  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
+  - kubectl apply -f deploy/kubernetes/apps/monitoring/ -R
+  # Chck the functrion of prometheus
+  - until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n monitoring prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; done
+  # Wait the cadvisor to be ready
+  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n monitoring get pods -lname=cadvisor -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for cadvisor to be available"; kubectl get pods --all-namespaces; done
   - make build
-  - sudo -E PATH=$PATH TEST_GRPC=1 make src.test-coverage
+  - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage
   - if [ "$TRAVIS_BRANCH" == "develop" ]; then docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile . ; fi
 
 before_deploy:
@@ -37,6 +65,5 @@ deploy:
     branch: develop
 
 after_success:
-  - docker rm -f prometheus
   - cp build/src/coverage.txt coverage.txt
   - bash <(curl -s https://codecov.io/bash)
