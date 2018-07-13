@@ -27,10 +27,6 @@ type PhyInterface struct {
 type Node struct {
 	Name          string         `bson:"name" json:"name"`
 	PhyInterfaces []PhyInterface `bson:"physicalInterfaces" json:"physicalInterfaces"`
-
-	// Fake fields for restful testing
-	FakeParameter string `json:"fakeParameter"`
-	ShouldFail    bool   `json:"shouldFail"`
 }
 
 type Network struct {
