@@ -44,8 +44,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	suite.wc.Add(service)
 }
 
-func (suite *NetworkTestSuite) TearDownSuite() {
-}
+func (suite *NetworkTestSuite) TearDownSuite() {}
 
 func TestNetworkSuite(t *testing.T) {
 	suite.Run(t, new(NetworkTestSuite))
@@ -58,6 +57,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 		Name: tName,
 		Nodes: []entity.Node{
 			entity.Node{
+				Name:          "TestCreateNetwork",
 				FakeParameter: "fake",
 			},
 		},
@@ -97,17 +97,6 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 		network   entity.Network
 		errorCode int
 	}{
-		{"InvalidParameter",
-			entity.Network{
-				Name: namesgenerator.GetRandomName(0),
-				Type: entity.FakeNetworkType,
-				Nodes: []entity.Node{
-					entity.Node{
-						FakeParameter: "",
-					},
-				},
-			},
-			http.StatusBadRequest},
 		{"CreateFail",
 			entity.Network{
 				Name: namesgenerator.GetRandomName(0),
@@ -123,7 +112,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 		{"NetworkTypeError",
 			entity.Network{
 				Name: namesgenerator.GetRandomName(0),
-				Type: "non-exist",
+				Type: "none-exist",
 				Nodes: []entity.Node{
 					entity.Node{
 						FakeParameter: "Yo",
@@ -159,7 +148,9 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 		Name: tName,
 		Type: entity.FakeNetworkType,
 		Nodes: []entity.Node{
-			entity.Node{},
+			entity.Node{
+				Name: "TestDeleteNetwork",
+			},
 		},
 	}
 
@@ -334,7 +325,6 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 				suite.Equal(networks[i].Type, v.Type)
 				suite.Equal(networks[i].Nodes[0].Name, v.Nodes[0].Name)
 			}
-
 		})
 	}
 }

@@ -15,15 +15,6 @@ type fakeNetworkProvider struct {
 	isDPDKPort  bool
 }
 
-func (fnp fakeNetworkProvider) ValidateBeforeCreating(sp *serviceprovider.Container) error {
-	for _, node := range fnp.nodes {
-		if node.FakeParameter == "" {
-			return fmt.Errorf("Fail to validate but don't worry, I'm fake network")
-		}
-	}
-	return nil
-}
-
 func (fnp fakeNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
 	for _, node := range fnp.nodes {
 		if node.ShouldFail {
