@@ -91,6 +91,7 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	return volumes, volumeMounts, nil
 }
 
+//Get the intersecion of nodes' name
 func generateNodeLabels(networks []entity.Network) []string {
 	totalNames := [][]string{}
 	for _, network := range networks {
@@ -103,6 +104,14 @@ func generateNodeLabels(networks []entity.Network) []string {
 	}
 
 	return utils.Intersections(totalNames)
+}
+
+//For the network, we will generate two thins
+//[]string => a list of nodes and it will apply on nodeaffinity
+//[]corev1.Container => a list of init container we will apply on pod
+func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, error) {
+
+	return []string{}, nil
 }
 
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {

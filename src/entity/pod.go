@@ -17,9 +17,11 @@ type Container struct {
 }
 
 type PodNetwork struct {
-	Name   string `bson:"name" json:"name"`
-	IFName string `bson:"ifName" json:"isName"`
-	VLAN   int    `bson:"vlan" json:"vlan"`
+	Name      string `bson:"name" json:"name"`
+	IFName    string `bson:"ifName" json:"isName"`
+	VLAN      int    `bson:"vlan" json:"vlan"`
+	IPAddress string `bson:"ipAddress json:"ipAddress"`
+	Netmask   string `bson:"netmask" json:"netmask"`
 }
 
 type PodVolume struct {
