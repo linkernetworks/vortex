@@ -25,6 +25,9 @@ func createNetworkHandler(ctx *web.Context) {
 		return
 	}
 
+	// overwrite the bridge name
+	network.BridgeName = np.GenerateBridgeName(string(network.Type), network.Name)
+
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	session.C(entity.NetworkCollectionName).EnsureIndex(
