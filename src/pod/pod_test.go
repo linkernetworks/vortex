@@ -35,6 +35,7 @@ func TestPodSuite(t *testing.T) {
 
 func (suite *PodTestSuite) TestCheckPodParameter() {
 	volumeName := namesgenerator.GetRandomName(0)
+	networkName := namesgenerator.GetRandomName(0)
 	pod := &entity.Pod{
 		ID:   bson.NewObjectId(),
 		Name: namesgenerator.GetRandomName(0),
@@ -50,9 +51,15 @@ func (suite *PodTestSuite) TestCheckPodParameter() {
 		ID:   bson.NewObjectId(),
 		Name: volumeName,
 	}
-
 	session.Insert(entity.VolumeCollectionName, volume)
 	defer session.Remove(entity.VolumeCollectionName, "name", volume.Name)
+
+	network := entity.Network{
+		ID:   bson.NewObjectId(),
+		Name: networkName,
+	}
+	session.Insert(entity.NetworkCollectionName, network)
+	defer session.Remove(entity.NetworkCollectionName, "name", network.Name)
 
 	err := CheckPodParameter(suite.sp, pod)
 	suite.NoError(err)
@@ -87,6 +94,15 @@ func (suite *PodTestSuite) TestCheckPodParameterFail() {
 				ID:   bson.NewObjectId(),
 				Name: namesgenerator.GetRandomName(0),
 				Volumes: []entity.PodVolume{
+					{Name: namesgenerator.GetRandomName(0)},
+				},
+			},
+		},
+		{
+			"InvalidNetwork", &entity.Pod{
+				ID:   bson.NewObjectId(),
+				Name: namesgenerator.GetRandomName(0),
+				Networks: []entity.PodNetwork{
 					{Name: namesgenerator.GetRandomName(0)},
 				},
 			},

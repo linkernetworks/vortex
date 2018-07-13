@@ -46,6 +46,17 @@ func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 			return fmt.Errorf("The volume name %s doesn't exist", v.Name)
 		}
 	}
+
+	//Check the network
+	for _, v := range pod.Networks {
+		count, err := session.Count(entity.NetworkCollectionName, bson.M{"name": v.Name})
+		if err != nil {
+			return fmt.Errorf("check the network name error:%v", err)
+		} else if count == 0 {
+			return fmt.Errorf("the network name %s doesn't exist", v.Name)
+		}
+	}
+
 	return nil
 }
 
