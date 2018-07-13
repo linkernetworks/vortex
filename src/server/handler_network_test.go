@@ -53,13 +53,12 @@ func TestNetworkSuite(t *testing.T) {
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		Type: entity.FakeNetworkType,
-		Name: tName,
+		Type:       entity.FakeNetworkType,
+		Name:       tName,
+		IsDPDKPort: true,                            // for fake network, true means success
+		BridgeName: namesgenerator.GetRandomName(0), // for fake network, true meas parameter good
 		Nodes: []entity.Node{
-			entity.Node{
-				Name:          "TestCreateNetwork",
-				FakeParameter: "fake",
-			},
+			{},
 		},
 	}
 
@@ -99,13 +98,11 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	}{
 		{"CreateFail",
 			entity.Network{
-				Name: namesgenerator.GetRandomName(0),
-				Type: entity.FakeNetworkType,
+				Name:       namesgenerator.GetRandomName(0),
+				BridgeName: namesgenerator.GetRandomName(0),
+				Type:       entity.FakeNetworkType,
 				Nodes: []entity.Node{
-					entity.Node{
-						FakeParameter: "Yo",
-						ShouldFail:    true,
-					},
+					entity.Node{},
 				},
 			},
 			http.StatusInternalServerError},
@@ -114,10 +111,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 				Name: namesgenerator.GetRandomName(0),
 				Type: "none-exist",
 				Nodes: []entity.Node{
-					entity.Node{
-						FakeParameter: "Yo",
-						ShouldFail:    true,
-					},
+					entity.Node{},
 				},
 			},
 			http.StatusBadRequest},
@@ -144,9 +138,10 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
-		ID:   bson.NewObjectId(),
-		Name: tName,
-		Type: entity.FakeNetworkType,
+		ID:         bson.NewObjectId(),
+		IsDPDKPort: true, //for fake network, true means success,
+		Name:       tName,
+		Type:       entity.FakeNetworkType,
 		Nodes: []entity.Node{
 			entity.Node{
 				Name: "TestDeleteNetwork",
@@ -187,10 +182,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 			Name: namesgenerator.GetRandomName(0),
 			Type: entity.FakeNetworkType,
 			Nodes: []entity.Node{
-				entity.Node{
-					FakeParameter: "Yo",
-					ShouldFail:    true,
-				},
+				entity.Node{},
 			},
 		},
 			http.StatusInternalServerError},
@@ -200,10 +192,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 				Name: namesgenerator.GetRandomName(0),
 				Type: "none-exist",
 				Nodes: []entity.Node{
-					entity.Node{
-						FakeParameter: "Yo",
-						ShouldFail:    true,
-					},
+					entity.Node{},
 				},
 			},
 			http.StatusBadRequest},
@@ -235,8 +224,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 		Type: tType,
 		Nodes: []entity.Node{
 			entity.Node{
-				Name:          namesgenerator.GetRandomName(0),
-				FakeParameter: "fake",
+				Name: namesgenerator.GetRandomName(0),
 			},
 		},
 	}
