@@ -25,7 +25,7 @@ script:
   - docker run --name prometheus -d -p 9090:9090 prom/prometheus
   - make build
   - sudo -E PATH=$PATH TEST_PROMETHEUS=1 TEST_GRPC=1 make src.test-coverage
-  - docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile .
+  - if [ "$TRAVIS_BRANCH" == "develop" ]; then docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile . ; fi
 
 before_deploy:
   - echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin
