@@ -200,6 +200,21 @@ func listNodeMetricsHandler(ctx *web.Context) {
 	resp.WriteEntity(containerList)
 }
 
+func listNodeNicsMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	nicList := entity.NodeNICsMetrics{}
+	id := req.PathParameter("id")
+
+	nicList, err := pc.ListNodeNICs(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(nicList)
+}
+
 func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 

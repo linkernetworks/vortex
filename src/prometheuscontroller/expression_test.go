@@ -1,14 +1,15 @@
 package prometheuscontroller
 
 import (
-	"github.com/linkernetworks/vortex/src/config"
-	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/suite"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/linkernetworks/vortex/src/config"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/prometheus/common/model"
+	"github.com/stretchr/testify/suite"
 )
 
 func init() {
@@ -55,6 +56,16 @@ func (suite *PrometheusExpressionTestSuite) TestListResourceFail() {
 
 	_, err := ListResource(suite.sp, labelName, expression)
 	suite.Error(err)
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
+	nodes, err := suite.sp.KubeCtl.GetNodes()
+	suite.NoError(err)
+	nodeName := nodes[0].GetName()
+
+	nicList, err := ListNodeNICs(suite.sp, nodeName)
+	suite.NoError(err)
+	suite.NotEqual(0, len(nicList.NICs))
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetPod() {

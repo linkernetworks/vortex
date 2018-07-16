@@ -643,6 +643,78 @@ Response Data:
  }
 ```
 
+### List NICs of certain node
+
+**Get /v1/monitoring/nodes/{id}/nics**
+
+Example:
+```
+curl -X GET  http://localhost:7890/v1/monitoring/nodes/vortex-dev/nics
+```
+
+Response Data:
+``` json
+{
+  "nics": [
+   {
+    "name": "cni0",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "docker0",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "enp0s8",
+    "default": "false",
+    "type": "physical"
+   },
+   {
+    "name": "flannel.1",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "lo",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "veth22ed2ac7",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "veth256ca549",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "veth734c84cf",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "vethd7819e83",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "vethdc767f86",
+    "default": "false",
+    "type": "virtual"
+   },
+   {
+    "name": "enp0s3",
+    "default": "true",
+    "type": "physical"
+   }
+  ]
+ }
+```
+
 ### List Pod
 **GET /v1/monitoring/pods?namespace=\.\*&node=\.\*&deployment=\.***
 
