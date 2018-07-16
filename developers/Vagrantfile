@@ -9,20 +9,15 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = 'vortex-dev'
   config.vm.define vm_name = 'vortex'
 
-  development_env = ENV.fetch('DEVELOPMENT_ENV', "true")
-
-  config.vm.provision "file", source: "configs/docker.conf", destination: "/tmp/override.conf"
-  config.vm.provision "file", source: "configs/.vimrc", destination: "$HOME/.vimrc"
+  development_env = ENV.fetch('DEVELOPMENT_ENV', true)
 
 $vortex_env = <<SHELL
 set -e -x -u
+echo "=== Install Vortex Server Environment ==="
 sudo mkdir -p "/etc/systemd/system/docker.service.d/"
 sudo cp "/tmp/override.conf" "/etc/systemd/system/docker.service.d/override.conf"
 sudo apt-get update
-sudo apt-get install -y git build-essential openvswitch-switch nfs-common
-
-# Install ntp
-sudo apt-get install -y ntp
+sudo apt-get install -y git build-essential openvswitch-switch nfs-common ntp
 
 # Install Docker
 # kubernetes official max validated version: 17.03.2~ce-0~ubuntu-xenial
@@ -63,9 +58,10 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 git clone https://github.com/linkernetworks/vortex.git
 SHELL
 
-# Install development toolkits
+# Install development toolkit
 $vortex_dev_toolkits = <<SHELL
 set -e -x -u
+echo "=== Install Development Toolkit ==="
 sudo apt-get install -y vim cmake tcpdump unzip tig
 # Install Golang
 wget --quiet https://storage.googleapis.com/golang/go1.10.2.linux-amd64.tar.gz
@@ -101,11 +97,15 @@ cd ~/.vim/bundle/YouCompleteMe
 go get -u github.com/kardianos/govendor
 SHELL
 
+  config.vm.provision "file", source: "configs/docker.conf", destination: "/tmp/override.conf"
+
   if development_env
+    config.vm.provision "file", source: "configs/.vimrc", destination: "$HOME/.vimrc"
     config.vm.provision "shell", privileged: false, inline: $vortex_env
     config.vm.provision "shell", privileged: false, inline: $vortex_dev_toolkits
   else
     config.vm.provision "shell", privileged: false, inline: $vortex_env
+  end
 
   config.vm.network :private_network, ip: "172.17.8.100"
   # to simulate multiple interfaces
@@ -121,4 +121,3 @@ SHELL
       v.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
   end
 end
-
