@@ -18,12 +18,12 @@ const (
 	So the Volume will create a PVC type and connect to a known StorageClass
 */
 type Volume struct {
-	ID          bson.ObjectId                     `bson:"_id,omitempty" json:"id"`
-	Name        string                            `bson:"name" json:"name"`
-	StorageName string                            `bson:"storageName" json:"storageName"`
-	AccessMode  corev1.PersistentVolumeAccessMode `bson:"accessMode" json:"accessMode"`
-	Capacity    string                            `bson:"capacity" json:"capacity"`
-	CreatedAt   *time.Time                        `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ID          bson.ObjectId                     `bson:"_id,omitempty" json:"id" validate:"-"`
+	Name        string                            `bson:"name" json:"name" validate:"required"`
+	StorageName string                            `bson:"storageName" json:"storageName" validate:"required"`
+	AccessMode  corev1.PersistentVolumeAccessMode `bson:"accessMode" json:"accessMode" validate:"required"`
+	Capacity    string                            `bson:"capacity" json:"capacity" validate:"required"`
+	CreatedAt   *time.Time                        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
 //GetCollection - get model mongo collection name.
