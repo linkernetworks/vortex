@@ -11,6 +11,7 @@ type NICMetrics struct {
 	Default           string                   `json:"default"`
 	Type              string                   `json:"type"`
 	IP                string                   `json:"ip"`
+	PCIID             string                   `json:"pciID"`
 	NICNetworkTraffic NICNetworkTrafficMetrics `json:"nicNetworkTraffic"`
 }
 
@@ -18,6 +19,7 @@ type NICOverviewMetrics struct {
 	Name    string `json:"name"`
 	Default string `json:"default"`
 	Type    string `json:"type"`
+	PCIID   string `json:"pciID"`
 }
 
 type NodeResourceMetrics struct {
