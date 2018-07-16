@@ -14,6 +14,12 @@ type NICMetrics struct {
 	NICNetworkTraffic NICNetworkTrafficMetrics `json:"nicNetworkTraffic"`
 }
 
+type NICOverviewMetrics struct {
+	Name    string `json:"name"`
+	Default string `json:"default"`
+	Type    string `json:"type"`
+}
+
 type NodeResourceMetrics struct {
 	CPURequests                 float32 `json:"cpuRequests"`
 	CPULimits                   float32 `json:"cpuLimits"`
@@ -38,6 +44,10 @@ type NodeDetailMetrics struct {
 	KubeproxyVersion  string            `json:"kubeproxyVersion"`
 	KubernetesVersion string            `json:"kubernetesVersion"`
 	Labels            map[string]string `json:"labels"`
+}
+
+type NodeNICsMetrics struct {
+	NICs []NICOverviewMetrics `json:"nics"`
 }
 
 type NodeMetrics struct {
