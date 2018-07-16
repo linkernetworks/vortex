@@ -25,6 +25,11 @@ func createVolume(ctx *web.Context) {
 		return
 	}
 
+	if err := sp.Validator.Struct(v); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	session := sp.Mongo.NewSession()
 	session.C(entity.VolumeCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"name"},
