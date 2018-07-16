@@ -89,6 +89,13 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.network :private_network, ip: "172.17.8.100"
+  # to simulate multiple interfaces
+  config.vm.network :private_network, ip: "172.17.8.50"
+  config.vm.network :private_network, ip: "172.17.8.60"
+  config.vm.network :private_network, ip: "172.17.8.70"
+  config.vm.network :private_network, ip: "172.17.8.80"
+  config.vm.network :private_network, ip: "172.17.8.90"
+
   config.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--cpus", 2]
       v.customize ["modifyvm", :id, "--memory", 4096]
