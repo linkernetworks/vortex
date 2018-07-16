@@ -24,13 +24,14 @@ func init() {
 }
 
 func (suite *KubeCtlDeploymentTestSuite) SetupSuite() {
-	suite.fakeclient = fakeclientset.NewSimpleClientset()
 	namespace := "default"
+	suite.fakeclient = fakeclientset.NewSimpleClientset()
 	suite.kubectl = New(suite.fakeclient, namespace)
 }
 
 func (suite *KubeCtlDeploymentTestSuite) TearDownSuite() {}
 func (suite *KubeCtlDeploymentTestSuite) TestCreateDeployment() {
+	namespace := "default"
 	var replicas int32
 	replicas = 3
 	name := namesgenerator.GetRandomName(0)
@@ -43,22 +44,23 @@ func (suite *KubeCtlDeploymentTestSuite) TestCreateDeployment() {
 		},
 		Status: appsv1.DeploymentStatus{},
 	}
-	ret, err := suite.kubectl.CreateDeployment(&deployment)
+	ret, err := suite.kubectl.CreateDeployment(&deployment, namespace)
 	suite.NoError(err)
 	suite.NotNil(ret)
 
-	deploy, err := suite.kubectl.GetDeployment(name)
+	deploy, err := suite.kubectl.GetDeployment(name, namespace)
 	suite.NoError(err)
 	suite.NotNil(deploy)
 	suite.Equal(replicas, *deploy.Spec.Replicas)
 
-	deploys, err := suite.kubectl.GetDeployments()
+	deploys, err := suite.kubectl.GetDeployments(namespace)
 	suite.NoError(err)
 	suite.NotNil(deploys)
 	suite.Equal(replicas, *deploys[0].Spec.Replicas)
 }
 
 func (suite *KubeCtlDeploymentTestSuite) TestDeleteDeployment() {
+	namespace := "default"
 	var replicas int32
 	replicas = 3
 	name := namesgenerator.GetRandomName(0)
@@ -71,18 +73,18 @@ func (suite *KubeCtlDeploymentTestSuite) TestDeleteDeployment() {
 		},
 		Status: appsv1.DeploymentStatus{},
 	}
-	ret, err := suite.kubectl.CreateDeployment(&deployment)
+	ret, err := suite.kubectl.CreateDeployment(&deployment, namespace)
 	suite.NoError(err)
 	suite.NotNil(ret)
 
-	deploy, err := suite.kubectl.GetDeployment(name)
+	deploy, err := suite.kubectl.GetDeployment(name, namespace)
 	suite.NoError(err)
 	suite.NotNil(deploy)
 	suite.Equal(replicas, *deploy.Spec.Replicas)
 
-	err = suite.kubectl.DeleteDeployment(name)
+	err = suite.kubectl.DeleteDeployment(name, namespace)
 	suite.NoError(err)
-	deploy, err = suite.kubectl.GetDeployment(name)
+	deploy, err = suite.kubectl.GetDeployment(name, namespace)
 	suite.Error(err)
 	suite.Nil(deploy)
 }
