@@ -24,9 +24,8 @@ type KubeCtlPodTestSuite struct {
 }
 
 func (suite *KubeCtlPodTestSuite) SetupSuite() {
-	namespace := "default"
 	suite.fakeclient = fakeclientset.NewSimpleClientset()
-	suite.kubectl = New(suite.fakeclient, namespace)
+	suite.kubectl = New(suite.fakeclient)
 }
 
 func (suite *KubeCtlPodTestSuite) TestGetPod() {

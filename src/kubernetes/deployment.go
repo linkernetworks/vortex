@@ -7,23 +7,14 @@ import (
 
 //Get the external IP address of node
 func (kc *KubeCtl) CreateDeployment(deployment *appsv1.Deployment, namespace string) (*appsv1.Deployment, error) {
-	if namespace == "" {
-		namespace = kc.Namespace
-	}
 	return kc.Clientset.AppsV1().Deployments(namespace).Create(deployment)
 }
 
 func (kc *KubeCtl) GetDeployment(name string, namespace string) (*appsv1.Deployment, error) {
-	if namespace == "" {
-		namespace = kc.Namespace
-	}
 	return kc.Clientset.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
 }
 
 func (kc *KubeCtl) GetDeployments(namespace string) ([]*appsv1.Deployment, error) {
-	if namespace == "" {
-		namespace = kc.Namespace
-	}
 	deployments := []*appsv1.Deployment{}
 	deploymentsList, err := kc.Clientset.AppsV1().Deployments(namespace).List(metav1.ListOptions{})
 	if err != nil {
@@ -36,8 +27,5 @@ func (kc *KubeCtl) GetDeployments(namespace string) ([]*appsv1.Deployment, error
 }
 
 func (kc *KubeCtl) DeleteDeployment(name string, namespace string) error {
-	if namespace == "" {
-		namespace = kc.Namespace
-	}
 	return kc.Clientset.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{})
 }
