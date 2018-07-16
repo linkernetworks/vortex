@@ -65,7 +65,7 @@ func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
 
 	nicList, err := ListNodeNICs(suite.sp, nodeName)
 	suite.NoError(err)
-	suite.NotEqual(0, len(nicList))
+	suite.NotEqual(0, len(nicList.NICs))
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetPod() {
