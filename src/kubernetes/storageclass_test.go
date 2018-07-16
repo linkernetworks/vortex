@@ -25,8 +25,7 @@ func init() {
 
 func (suite *KubeCtlStorageClassTestSuite) SetupSuite() {
 	suite.fakeclient = fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	suite.kubectl = New(suite.fakeclient, namespace)
+	suite.kubectl = New(suite.fakeclient)
 }
 
 func (suite *KubeCtlStorageClassTestSuite) TearDownSuite() {}

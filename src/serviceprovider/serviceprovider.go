@@ -64,7 +64,7 @@ func New(cf config.Config) *Container {
 		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
-		KubeCtl:    kubeCtl.New(clientset, "default"),
+		KubeCtl:    kubeCtl.New(clientset),
 		Validator:  validator.New(),
 	}
 
@@ -91,7 +91,7 @@ func NewForTesting(cf config.Config) *Container {
 		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
-		KubeCtl:    kubeCtl.New(clientset, "default"),
+		KubeCtl:    kubeCtl.New(clientset),
 		Validator:  validator.New(),
 	}
 

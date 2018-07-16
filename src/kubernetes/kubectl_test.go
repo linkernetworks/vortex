@@ -10,8 +10,6 @@ import (
 
 func TestNewKubeCtl(t *testing.T) {
 	clientset := fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	kubectl := New(clientset, namespace)
-	assert.Equal(t, namespace, kubectl.Namespace)
+	kubectl := New(clientset)
 	assert.NotNil(t, kubectl)
 }

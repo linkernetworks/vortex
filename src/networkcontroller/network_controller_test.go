@@ -45,8 +45,7 @@ type NetworkControllerTestSuite struct {
 func (suite *NetworkControllerTestSuite) SetupSuite() {
 	// init fakeclient
 	fakeclient := fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	suite.kubectl = kubernetes.New(fakeclient, namespace)
+	suite.kubectl = kubernetes.New(fakeclient)
 
 	//Create a fake clinet
 	//Init

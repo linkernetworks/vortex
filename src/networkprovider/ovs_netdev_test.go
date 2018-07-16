@@ -40,8 +40,7 @@ func (suite *OVSNetdevNetworkTestSuite) SetupSuite() {
 
 	// init fakeclient
 	fakeclient := fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	suite.sp.KubeCtl = kc.New(fakeclient, namespace)
+	suite.sp.KubeCtl = kc.New(fakeclient)
 
 	// Create a fake clinet
 	// Initial nodes
