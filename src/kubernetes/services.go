@@ -6,14 +6,14 @@ import (
 )
 
 //Get the service object by the service name
-func (kc *KubeCtl) GetService(name string) (*corev1.Service, error) {
-	return kc.Clientset.CoreV1().Services(kc.Namespace).Get(name, metav1.GetOptions{})
+func (kc *KubeCtl) GetService(name string, namespace string) (*corev1.Service, error) {
+	return kc.Clientset.CoreV1().Services(namespace).Get(name, metav1.GetOptions{})
 }
 
 //Get all services from the k8s cluster
-func (kc *KubeCtl) GetServices() ([]*corev1.Service, error) {
+func (kc *KubeCtl) GetServices(namespace string) ([]*corev1.Service, error) {
 	services := []*corev1.Service{}
-	servicesList, err := kc.Clientset.CoreV1().Services(kc.Namespace).List(metav1.ListOptions{})
+	servicesList, err := kc.Clientset.CoreV1().Services(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return services, err
 	}
@@ -24,12 +24,12 @@ func (kc *KubeCtl) GetServices() ([]*corev1.Service, error) {
 }
 
 //Create the service by the service object
-func (kc *KubeCtl) CreateService(service *corev1.Service) (*corev1.Service, error) {
-	return kc.Clientset.CoreV1().Services(kc.Namespace).Create(service)
+func (kc *KubeCtl) CreateService(service *corev1.Service, namespace string) (*corev1.Service, error) {
+	return kc.Clientset.CoreV1().Services(namespace).Create(service)
 }
 
 //Delete the service by the service name
-func (kc *KubeCtl) DeleteService(name string) error {
+func (kc *KubeCtl) DeleteService(name string, namespace string) error {
 	options := metav1.DeleteOptions{}
-	return kc.Clientset.CoreV1().Services(kc.Namespace).Delete(name, &options)
+	return kc.Clientset.CoreV1().Services(namespace).Delete(name, &options)
 }

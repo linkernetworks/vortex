@@ -75,6 +75,7 @@ func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 }
 
 func (suite *StorageTestSuite) TestCreateStorage() {
+	namespace := "default"
 	storage := entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
@@ -89,12 +90,13 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	err = sp.CreateStorage(suite.sp, &storage)
 	suite.NoError(err)
 
-	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix+storage.ID.Hex(), namespace)
 	suite.NotNil(deploy)
 	suite.NoError(err)
 }
 
 func (suite *StorageTestSuite) TestDeleteStorage() {
+	namespace := "default"
 	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
@@ -109,14 +111,14 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	err = sp.CreateStorage(suite.sp, storage)
 	suite.NoError(err)
 
-	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
+	deploy, err := suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix+storage.ID.Hex(), namespace)
 	suite.NotNil(deploy)
 	suite.NoError(err)
 
 	err = sp.DeleteStorage(suite.sp, storage)
 	suite.NoError(err)
 
-	deploy, err = suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix + storage.ID.Hex())
+	deploy, err = suite.sp.KubeCtl.GetDeployment(NFSProvisionerPrefix+storage.ID.Hex(), namespace)
 	suite.Nil(deploy)
 	suite.Error(err)
 }

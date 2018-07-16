@@ -18,8 +18,7 @@ type KubeCtlNodeTestSuite struct {
 
 func (suite *KubeCtlNodeTestSuite) SetupSuite() {
 	suite.fakeclient = fakeclientset.NewSimpleClientset()
-	namespace := "default"
-	suite.kubectl = New(suite.fakeclient, namespace)
+	suite.kubectl = New(suite.fakeclient)
 }
 
 func (suite *KubeCtlNodeTestSuite) TestGetNode() {

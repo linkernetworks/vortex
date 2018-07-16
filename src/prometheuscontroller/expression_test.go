@@ -24,7 +24,6 @@ type PrometheusExpressionTestSuite struct {
 func (suite *PrometheusExpressionTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/local.json")
 	suite.sp = serviceprovider.New(cf)
-	suite.sp.KubeCtl.SetNamespace("monitoring")
 }
 
 func (suite *PrometheusExpressionTestSuite) TearDownSuite() {
@@ -69,7 +68,8 @@ func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetPod() {
-	pods, err := suite.sp.KubeCtl.GetPods()
+	namespace := "monitoring"
+	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	podName := pods[0].GetName()
 
@@ -79,7 +79,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetPod() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
-	pods, err := suite.sp.KubeCtl.GetPods()
+	namespace := "monitoring"
+	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	containerName := pods[0].Status.ContainerStatuses[0].Name
 
@@ -89,7 +90,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetService() {
-	services, err := suite.sp.KubeCtl.GetServices()
+	namespace := "monitoring"
+	services, err := suite.sp.KubeCtl.GetServices(namespace)
 	suite.NoError(err)
 	serviceName := services[0].GetName()
 
@@ -99,7 +101,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetService() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetController() {
-	deployments, err := suite.sp.KubeCtl.GetDeployments()
+	namespace := "monitoring"
+	deployments, err := suite.sp.KubeCtl.GetDeployments(namespace)
 	suite.NoError(err)
 	deploymentName := deployments[0].GetName()
 
