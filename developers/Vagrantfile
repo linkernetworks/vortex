@@ -29,7 +29,6 @@ Vagrant.configure("2") do |config|
     sudo apt-get update
     sudo apt-get install -y docker-ce=${DOCKER_VERSION}
     # Manage Docker as a non-root user
-    sudo groupadd docker
     sudo usermod -aG docker $USER
 
     # Install Kubernetes
