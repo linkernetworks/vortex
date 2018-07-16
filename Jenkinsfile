@@ -1,4 +1,4 @@
-pipeline {
+ pipeline {
     agent {
         dockerfile {
             dir "src/github.com/linkernetworks/vortex/jenkins"
@@ -64,8 +64,12 @@ pipeline {
             steps {
                 withEnv(["GOPATH+AA=${env.WORKSPACE}", "TEST_PROMETHEUS=1"]) {
                     dir ("src/github.com/linkernetworks/vortex") {
-                        sh "make src.test-prometheus 2>&1 | tee >(go-junit-report > report.xml)"
-                        sh "make src.test-coverage 2>&1 | tee >(go-junit-report > report.xml)"
+                        waitUntil {
+                            fileExists "ready"
+                        }
+                        sh "make apps.init-helm 2>&1 | tee >(go-junit-report > report.xml)"
+                        sh "make apps.launch-in-minikube 2>&1 | tee >(go-junit-report > report.xml)"
+                        sh "make src.test-coverage-minikube 2>&1 | tee >(go-junit-report > report.xml)"
                         junit "report.xml"
                         sh 'gocover-cobertura < build/src/coverage.txt > cobertura.xml'
                         cobertura coberturaReportFile: "cobertura.xml", failNoReports: true, failUnstable: true

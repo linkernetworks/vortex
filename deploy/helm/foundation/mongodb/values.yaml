@@ -1,4 +1,6 @@
-environment: develop
+global:
+  environment: develop
+  storage: 1Gi
 
 hostpath:
   enabled: false

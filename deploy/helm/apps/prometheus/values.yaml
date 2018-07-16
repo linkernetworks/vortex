@@ -10,7 +10,7 @@ service:
   ports:
     port: 9090
     targetPort: 9090
-    nodePort: 32326
+    nodePort: 30003
 
 
 # dependenvies

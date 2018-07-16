@@ -12,6 +12,10 @@ vagrant/credentials
 **/*.vmdk
 **/*.creds
 
+# helm
+helm/**/*.tgz
+helm/**/requirements.lock
+
 # ansible
 **/*.retry
 

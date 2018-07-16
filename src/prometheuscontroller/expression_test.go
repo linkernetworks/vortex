@@ -22,7 +22,7 @@ type PrometheusExpressionTestSuite struct {
 }
 
 func (suite *PrometheusExpressionTestSuite) SetupSuite() {
-	cf := config.MustRead("../../config/local.json")
+	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.New(cf)
 }
 
