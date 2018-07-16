@@ -6,7 +6,7 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: {{ .Values.capacity.storage }}
+    storage: {{ .Values.global.storage }}
   accessModes:
     - ReadWriteOnce
   hostPath:

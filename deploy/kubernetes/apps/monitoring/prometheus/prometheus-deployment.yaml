@@ -12,6 +12,10 @@ spec:
       labels:
         app: prometheus
     spec:
+      initContainers:
+      - name: init-kube-state-metricsks
+        image: busybox
+        command: ["sh", "-c", "until nslookup kube-state-metrics.monitoring.svc.cluster.local; do echo waiting for kube-state-metricsks; sleep 2; done;"]
       containers:
       - image: prom/prometheus:v2.2.1
         name: prometheus

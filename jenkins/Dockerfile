@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y curl software-properties-common git
+RUN apt-get update && apt-get install -y curl software-properties-common git socat
 RUN curl -fsSL get.docker.com | sh
 
 ##
@@ -20,13 +20,18 @@ RUN go get -u github.com/jstemmer/go-junit-report
 RUN go get -u github.com/t-yuki/gocover-cobertura
 
 ##
-## MongoDB
+## kubectl
 ##
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | \
-    tee /etc/apt/sources.list.d/mongodb-org-3.6.list
-RUN apt-get update
-RUN apt-get install -y mongodb-org
+RUN curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
+RUN chmod +x kubectl
+RUN mv kubectl /usr/local/bin/
+
+##
+## Helm
+##
+RUN curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz
+RUN tar -zxvf helm-v2.9.1-linux-amd64.tar.gz
+RUN mv linux-amd64/helm /usr/local/bin/helm
 
 ##
 ## Make jenkins can do anything
