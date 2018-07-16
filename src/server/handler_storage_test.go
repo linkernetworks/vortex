@@ -59,8 +59,11 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	//Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	storage := entity.Storage{
-		Type: entity.FakeStorageType,
-		Name: tName,
+		Type:             entity.FakeStorageType,
+		Name:             tName,
+		StorageClassName: tName,
+		IP:               "192.168.5.100",
+		PATH:             "/myspace",
 		Fake: &entity.FakeStorage{
 			FakeParameter: "fake~",
 		},
@@ -100,23 +103,33 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 		errorCode int
 	}{
 		{"InvalidParameter", entity.Storage{
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeStorageType,
+			Type:             entity.FakeStorageType,
+			Name:             namesgenerator.GetRandomName(0),
+			StorageClassName: namesgenerator.GetRandomName(1),
+			IP:               "192.168.5.100",
+			PATH:             "/myspace",
 			Fake: &entity.FakeStorage{
 				FakeParameter: "",
-			}},
+			},
+		},
 			http.StatusBadRequest},
 		{"CreateFail", entity.Storage{
-			Name: namesgenerator.GetRandomName(0),
-			Type: entity.FakeStorageType,
+			Name:             namesgenerator.GetRandomName(0),
+			StorageClassName: namesgenerator.GetRandomName(1),
+			Type:             entity.FakeStorageType,
+			IP:               "192.168.5.100",
+			PATH:             "/myspace",
 			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
 			}},
 			http.StatusInternalServerError},
 		{"StorageTypeError", entity.Storage{
-			Name: namesgenerator.GetRandomName(0),
-			Type: "non-exist",
+			Name:             namesgenerator.GetRandomName(0),
+			StorageClassName: namesgenerator.GetRandomName(1),
+			Type:             "non-exist",
+			IP:               "192.168.5.100",
+			PATH:             "/myspace",
 			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,

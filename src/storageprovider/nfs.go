@@ -2,7 +2,6 @@ package storageprovider
 
 import (
 	"fmt"
-	"net"
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
@@ -24,16 +23,10 @@ type NFSStorageProvider struct {
 }
 
 func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage *entity.Storage) error {
-	ip := net.ParseIP(storage.IP)
-	if len(ip) == 0 {
-		return fmt.Errorf("Invalid IP address %s\n", storage.IP)
-	}
-
 	path := storage.PATH
 	if path == "" || path[0] != '/' {
 		return fmt.Errorf("Invalid NFS export path %s\n", path)
 	}
-
 	return nil
 }
 
