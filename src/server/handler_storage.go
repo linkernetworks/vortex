@@ -26,6 +26,11 @@ func createStorage(ctx *web.Context) {
 		return
 	}
 
+	if err := sp.Validator.Struct(storage); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	storage.ID = bson.NewObjectId()
 	storage.CreatedAt = timeutils.Now()
 
