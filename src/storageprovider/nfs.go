@@ -105,6 +105,7 @@ func getStorageClass(name string, provisioner string, storage *entity.Storage) *
 }
 
 func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
+	namespace := "default"
 	name := NFSProvisionerPrefix + storage.ID.Hex()
 	storageClassName := NFSStorageClassPrefix + storage.ID.Hex()
 	//Create deployment
@@ -112,7 +113,7 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 	//Create storageClass
 	storageClass := getStorageClass(storageClassName, name, storage)
 	storage.StorageClassName = storageClassName
-	if _, err := sp.KubeCtl.CreateDeployment(deployment); err != nil {
+	if _, err := sp.KubeCtl.CreateDeployment(deployment, namespace); err != nil {
 		return err
 	}
 	_, err := sp.KubeCtl.CreateStorageClass(storageClass)
@@ -120,6 +121,7 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 }
 
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
+	namespace := "default"
 	deployName := NFSProvisionerPrefix + storage.ID.Hex()
 	storageName := NFSStorageClassPrefix + storage.ID.Hex()
 
@@ -140,5 +142,5 @@ func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, stora
 		return err
 	}
 	//Delete Deployment
-	return sp.KubeCtl.DeleteDeployment(deployName)
+	return sp.KubeCtl.DeleteDeployment(deployName, namespace)
 }

@@ -69,7 +69,8 @@ func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetPod() {
-	pods, err := suite.sp.KubeCtl.GetPods()
+	namespace := "default"
+	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	podName := pods[0].GetName()
 
@@ -79,7 +80,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetPod() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
-	pods, err := suite.sp.KubeCtl.GetPods()
+	namespace := "default"
+	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	containerName := pods[0].Status.ContainerStatuses[0].Name
 
@@ -89,7 +91,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetService() {
-	services, err := suite.sp.KubeCtl.GetServices()
+	namespace := "default"
+	services, err := suite.sp.KubeCtl.GetServices(namespace)
 	suite.NoError(err)
 	serviceName := services[0].GetName()
 
@@ -99,7 +102,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetService() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetController() {
-	deployments, err := suite.sp.KubeCtl.GetDeployments()
+	namespace := "default"
+	deployments, err := suite.sp.KubeCtl.GetDeployments(namespace)
 	suite.NoError(err)
 	deploymentName := deployments[0].GetName()
 
