@@ -99,11 +99,13 @@ SHELL
 
   config.vm.provision "file", source: "configs/docker.conf", destination: "/tmp/override.conf"
 
-  if development_env
+  if development_env == true
+    puts "Install Vortex Server with Development Toolkits"
     config.vm.provision "file", source: "configs/.vimrc", destination: "$HOME/.vimrc"
     config.vm.provision "shell", privileged: false, inline: $vortex_env
     config.vm.provision "shell", privileged: false, inline: $vortex_dev_toolkits
   else
+    puts "Install Vortex Server"
     config.vm.provision "shell", privileged: false, inline: $vortex_env
   end
 
