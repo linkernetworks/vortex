@@ -22,6 +22,28 @@ func ListResource(sp *serviceprovider.Container, resource model.LabelName, expre
 	return resourceList, nil
 }
 
+func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetrics, error) {
+	nicList := entity.NodeNICsMetrics{}
+	expression := Expression{}
+	expression.Metrics = []string{"node_network_interface"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	results, err := getElements(sp, expression)
+	if err != nil {
+		return nicList, err
+	}
+
+	for _, result := range results {
+		nic := entity.NICOverviewMetrics{}
+		nic.Name = string(result.Metric["device"])
+		nic.Default = string(result.Metric["default"])
+		nic.Type = string(result.Metric["type"])
+		nicList.NICs = append(nicList.NICs, nic)
+	}
+
+	return nicList, nil
+}
+
 func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
 	pod := entity.PodMetrics{}
 	pod.Labels = map[string]string{}
