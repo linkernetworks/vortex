@@ -10,7 +10,6 @@ import (
 */
 type KubeCtl struct {
 	Clientset kubernetes.Interface
-	Namespace string
 }
 
 /*
@@ -18,13 +17,8 @@ type KubeCtl struct {
 	1. The kubernetes clientset object from the client-go library. You can also use the fake-client for testing
 	2. The namespace of the kubernetes you want to manipulate
 */
-func New(clientset kubernetes.Interface, namespace string) *KubeCtl {
+func New(clientset kubernetes.Interface) *KubeCtl {
 	return &KubeCtl{
 		Clientset: clientset,
-		Namespace: namespace,
 	}
-}
-
-func (kc *KubeCtl) SetNamespace(namespace string) {
-	kc.Namespace = namespace
 }
