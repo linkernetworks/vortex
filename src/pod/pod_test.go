@@ -182,7 +182,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	suite.NoError(err)
 }
 
-func (suite *PodTestSuite) TestCreatePodFail() {
+func (suite *PodTestSuite) TestCreatePodFailWithoutVolume() {
 	containers := []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
@@ -198,6 +198,31 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 		Containers: containers,
 		Volumes: []entity.PodVolume{
 			{Name: namesgenerator.GetRandomName(0)},
+		},
+	}
+
+	err := CreatePod(suite.sp, pod)
+	suite.Error(err)
+}
+
+func (suite *PodTestSuite) TestCreatePodFailWithoutNetwork() {
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+
+	podName := namesgenerator.GetRandomName(0)
+	pod := &entity.Pod{
+		ID:         bson.NewObjectId(),
+		Name:       podName,
+		Containers: containers,
+		Networks: []entity.PodNetwork{
+			{
+				Name: namesgenerator.GetRandomName(0),
+			},
 		},
 	}
 
