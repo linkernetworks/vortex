@@ -25,6 +25,11 @@ func createPodHandler(ctx *web.Context) {
 		return
 	}
 
+	if err := sp.Validator.Struct(p); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	session := sp.Mongo.NewSession()
 	session.C(entity.PodCollectionName).EnsureIndex(mgo.Index{
 		Key:    []string{"name"},
@@ -73,7 +78,7 @@ func deletePodHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := pod.DeletePod(sp, p.Name); err != nil {
+	if err := pod.DeletePod(sp, &p); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
