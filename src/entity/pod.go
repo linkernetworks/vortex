@@ -13,7 +13,7 @@ const (
 type Container struct {
 	Name    string   `bson:"name" json:"name" validate:"required"`
 	Image   string   `bson:"image" json:"image" validate:"required"`
-	Command []string `bson:"command" json:"command" validate:"-"`
+	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
 }
 
 type PodVolume struct {
@@ -25,10 +25,10 @@ type Pod struct {
 	ID         bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
 	Name       string            `bson:"name" json:"name" validate:"required"`
 	Namespace  string            `bson:"namespace" json:"namespace" validate:"required"`
-	Labels     map[string]string `bson:"labels,omitempty" json:"labels" validate:"-"`
+	Labels     map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
 	Containers []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
+	Volumes    []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
 	CreatedAt  *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
-	Volumes    []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"-"`
 }
 
 //GetCollection - get model mongo collection name.
