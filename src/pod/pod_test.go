@@ -252,3 +252,64 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	ans := []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24"}
 	suite.Equal(ans, command)
 }
+
+func (suite *PodTestSuite) TestGenerateNetwork() {
+	networkName := namesgenerator.GetRandomName(0)
+	bName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		ID:         bson.NewObjectId(),
+		Name:       networkName,
+		BridgeName: bName,
+	}
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	session.Insert(entity.NetworkCollectionName, network)
+	defer session.Remove(entity.NetworkCollectionName, "name", network.Name)
+
+	podName := namesgenerator.GetRandomName(0)
+	ifName := namesgenerator.GetRandomName(0)
+	pod := &entity.Pod{
+		ID:   bson.NewObjectId(),
+		Name: podName,
+		Networks: []entity.PodNetwork{
+			{
+				Name:      networkName,
+				IFName:    ifName,
+				IPAddress: "1.2.3.4",
+				Netmask:   "255.255.255.0",
+			},
+		},
+	}
+
+	nodes, containers, err := generateNetwork(pod, session)
+	suite.NoError(err)
+	suite.Equal(1, len(containers))
+	suite.Equal(0, len(nodes))
+}
+
+func (suite *PodTestSuite) TestGenerateNetworkFail() {
+	networkName := namesgenerator.GetRandomName(0)
+	podName := namesgenerator.GetRandomName(0)
+	ifName := namesgenerator.GetRandomName(0)
+	pod := &entity.Pod{
+		ID:   bson.NewObjectId(),
+		Name: podName,
+		Networks: []entity.PodNetwork{
+			{
+				Name:      networkName,
+				IFName:    ifName,
+				IPAddress: "1.2.3.4",
+				Netmask:   "255.255.255.0",
+			},
+		},
+	}
+
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	nodes, containers, err := generateNetwork(pod, session)
+	suite.Error(err)
+	suite.Nil(nodes)
+	suite.Nil(containers)
+}
