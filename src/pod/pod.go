@@ -194,6 +194,11 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		return err
 	}
 
+	nodesNames, initContainers, err := generateNetwork(pod, session)
+	if err != nil {
+		return err
+	}
+
 	volumes = append(volumes, corev1.Volume{
 		Name: "grpc-sock",
 		VolumeSource: corev1.VolumeSource{
@@ -202,6 +207,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			},
 		},
 	})
+
 	var containers []corev1.Container
 	for _, container := range pod.Containers {
 		containers = append(containers, corev1.Container{
@@ -218,8 +224,25 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Labels: pod.Labels,
 		},
 		Spec: corev1.PodSpec{
-			Containers: containers,
-			Volumes:    volumes,
+			InitContainers: initContainers,
+			Containers:     containers,
+			Volumes:        volumes,
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{
+								MatchExpressions: []corev1.NodeSelectorRequirement{
+									{
+										Key:    "kubernetes.io/hostname",
+										Values: nodesNames,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 	if pod.Namespace == "" {
