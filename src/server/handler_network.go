@@ -96,12 +96,14 @@ func listNetworkHandler(ctx *web.Context) {
 	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
 
 	if err := q.All(&networks); err != nil {
-		if err == mgo.ErrNotFound {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 
 	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
@@ -126,12 +128,14 @@ func getNetworkHandler(ctx *web.Context) {
 
 	var network entity.Network
 	if err := c.FindId(bson.ObjectIdHex(id)).One(&network); err != nil {
-		if err == mgo.ErrNotFound {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 	resp.WriteEntity(network)
 }
@@ -147,12 +151,14 @@ func deleteNetworkHandler(ctx *web.Context) {
 
 	var network entity.Network
 	if err := c.FindId(bson.ObjectIdHex(id)).One(&network); err != nil {
-		if err == mgo.ErrNotFound {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 
 	networkProvider, err := np.GetNetworkProvider(&network)
@@ -167,12 +173,14 @@ func deleteNetworkHandler(ctx *web.Context) {
 	}
 
 	if err := session.Remove(entity.NetworkCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
-		if mgo.ErrNotFound == err {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 
 	resp.WriteEntity(ActionResponse{
