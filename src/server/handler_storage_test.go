@@ -136,6 +136,16 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 			},
 		},
 			http.StatusBadRequest},
+		{"lackStorageName", entity.Storage{
+			Type:             entity.FakeStorageType,
+			StorageClassName: namesgenerator.GetRandomName(0),
+			IP:               "256.256.256.256",
+			PATH:             "/myspace",
+			Fake: &entity.FakeStorage{
+				FakeParameter: "Yo",
+			},
+		},
+			http.StatusBadRequest},
 		{"StorageTypeError", entity.Storage{
 			Name:             namesgenerator.GetRandomName(0),
 			StorageClassName: namesgenerator.GetRandomName(1),
