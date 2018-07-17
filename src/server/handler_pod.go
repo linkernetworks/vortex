@@ -79,12 +79,14 @@ func deletePodHandler(ctx *web.Context) {
 	}
 
 	if err := session.Remove(entity.PodCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
-		if mgo.ErrNotFound == err {
-			response.BadRequest(req.Request, resp.ResponseWriter, err)
-		} else {
+		switch err {
+		case mgo.ErrNotFound:
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 
 	resp.WriteEntity(ActionResponse{
@@ -121,12 +123,14 @@ func listPodHandler(ctx *web.Context) {
 	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
 
 	if err := q.All(&pods); err != nil {
-		if err == mgo.ErrNotFound {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 
 	count, err := session.Count(entity.PodCollectionName, bson.M{})
@@ -151,12 +155,14 @@ func getPodHandler(ctx *web.Context) {
 
 	var pod entity.Pod
 	if err := c.FindId(bson.ObjectIdHex(id)).One(&pod); err != nil {
-		if err == mgo.ErrNotFound {
+		switch err {
+		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
-		} else {
+			return
+		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
 		}
-		return
 	}
 	resp.WriteEntity(pod)
 }
