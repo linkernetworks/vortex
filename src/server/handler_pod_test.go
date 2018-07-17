@@ -52,6 +52,7 @@ func TestPodSuite(t *testing.T) {
 }
 
 func (suite *PodTestSuite) TestCreatePod() {
+	namespace := "default"
 	containers := []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
@@ -62,6 +63,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		Name:       tName,
+		Namespace:  namespace,
 		Containers: containers,
 	}
 
@@ -99,11 +101,12 @@ func (suite *PodTestSuite) TestCreatePod() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 
-	err = p.DeletePod(suite.sp, tName)
+	err = p.DeletePod(suite.sp, &retPod)
 	suite.NoError(err)
 }
 
 func (suite *PodTestSuite) TestCreatePodFail() {
+	namespace := "default"
 	containers := []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
@@ -114,6 +117,7 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		Name:       tName,
+		Namespace:  namespace,
 		Containers: containers,
 		Volumes: []entity.PodVolume{
 			{Name: namesgenerator.GetRandomName(0)},
@@ -134,6 +138,7 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 }
 
 func (suite *PodTestSuite) TestDeletePod() {
+	namespace := "default"
 	containers := []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
@@ -145,6 +150,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 	pod := entity.Pod{
 		ID:         bson.NewObjectId(),
 		Name:       tName,
+		Namespace:  namespace,
 		Containers: containers,
 	}
 
@@ -183,6 +189,7 @@ func (suite *PodTestSuite) TestDeletePodWithInvalidID() {
 
 //For Get/List, we only return mongo document
 func (suite *PodTestSuite) TestGetPod() {
+	namespace := "default"
 	containers := []entity.Container{
 		{
 			Name:    namesgenerator.GetRandomName(0),
@@ -194,6 +201,7 @@ func (suite *PodTestSuite) TestGetPod() {
 	pod := entity.Pod{
 		ID:         bson.NewObjectId(),
 		Name:       tName,
+		Namespace:  namespace,
 		Containers: containers,
 	}
 
@@ -216,7 +224,6 @@ func (suite *PodTestSuite) TestGetPod() {
 }
 
 func (suite *PodTestSuite) TestGetPodWithInvalidID() {
-
 	//Get data with non-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
@@ -227,6 +234,7 @@ func (suite *PodTestSuite) TestGetPodWithInvalidID() {
 }
 
 func (suite *PodTestSuite) TestListPod() {
+	namespace := "default"
 	pods := []entity.Pod{}
 	count := 3
 	for i := 0; i < count; i++ {
@@ -240,6 +248,7 @@ func (suite *PodTestSuite) TestListPod() {
 		pods = append(pods, entity.Pod{
 			ID:         bson.NewObjectId(),
 			Name:       namesgenerator.GetRandomName(0),
+			Namespace:  namespace,
 			Containers: containers,
 		})
 	}

@@ -80,7 +80,6 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 }
 
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
-	namespace := "default"
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
@@ -108,11 +107,13 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Volumes:    volumes,
 		},
 	}
-	_, err = sp.KubeCtl.CreatePod(&p, namespace)
+	if pod.Namespace == "" {
+		pod.Namespace = "default"
+	}
+	_, err = sp.KubeCtl.CreatePod(&p, pod.Namespace)
 	return err
 }
 
-func DeletePod(sp *serviceprovider.Container, podName string) error {
-	namespace := "default"
-	return sp.KubeCtl.DeletePod(podName, namespace)
+func DeletePod(sp *serviceprovider.Container, pod *entity.Pod) error {
+	return sp.KubeCtl.DeletePod(pod.Name, pod.Namespace)
 }

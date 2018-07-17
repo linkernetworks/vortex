@@ -162,7 +162,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	err := CreatePod(suite.sp, pod)
 	suite.NoError(err)
 
-	err = DeletePod(suite.sp, podName)
+	err = DeletePod(suite.sp, pod)
 	suite.NoError(err)
 }
 
