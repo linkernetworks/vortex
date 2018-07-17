@@ -133,6 +133,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 						FieldRef: &corev1.ObjectFieldSelector{
 							FieldPath: "metadata.name",
 						},
+					},
 				},
 				{
 					Name: "POD_NAMESPACE",
@@ -151,7 +152,12 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 					},
 				},
 			},
-			VolumeMounts: nil,
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "/grpc-sock",
+					MountPath: "/tmp/",
+				},
+			},
 		})
 	}
 
@@ -187,6 +193,14 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		return err
 	}
 
+	volumes = append(volumes, corev1.Volume{
+		Name: "grpc-sock",
+		VolumeSource: corev1.VolumeSource{
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: "/tmp/vortex",
+			},
+		},
+	})
 	var containers []corev1.Container
 	for _, container := range pod.Containers {
 		containers = append(containers, corev1.Container{
