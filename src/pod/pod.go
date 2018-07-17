@@ -171,17 +171,18 @@ func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev
 
 	networks := []entity.Network{}
 	containers := []corev1.Container{}
-	for _, v := range pod.Networks {
+	for i, v := range pod.Networks {
 		network := entity.Network{}
 		if err := session.FindOne(entity.NetworkCollectionName, bson.M{"name": v.Name}, &network); err != nil {
 			return nil, nil, err
 		}
 		networks = append(networks, network)
+		pod.Networks[i].BridgeName = network.BridgeName
 	}
 
 	nodes := generateNodeLabels(networks)
-
-	return nodes, containers, nil
+	containers, err := generateInitContainer(pod.Networks)
+	return nodes, containers, err
 }
 
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
