@@ -238,3 +238,17 @@ func (suite *PodTestSuite) TestGenerateNodeLabels() {
 	suite.Equal(2, len(names))
 	suite.Equal([]string{"node4", "node5"}, names)
 }
+
+func (suite *PodTestSuite) TestGenerateClientCommand() {
+	bName := namesgenerator.GetRandomName(0)
+	ifName := namesgenerator.GetRandomName(0)
+	podNetwork := entity.PodNetwork{
+		IFName:     ifName,
+		IPAddress:  "1.2.3.4",
+		Netmask:    "255.255.255.0",
+		BridgeName: bName,
+	}
+	command := generateClientCommand(podNetwork)
+	ans := []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24"}
+	suite.Equal(ans, command)
+}

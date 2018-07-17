@@ -106,12 +106,52 @@ func generateNodeLabels(networks []entity.Network) []string {
 	return utils.Intersections(totalNames)
 }
 
+func generateClientCommand(network entity.PodNetwork) []string {
+	ip := utils.IPToCIDR(network.IPAddress, network.Netmask)
+
+	return []string{
+		"-s=unix:///tmp/vortex.sock",
+		"-b=" + network.BridgeName,
+		"-n=" + network.IFName,
+		"-i=" + ip,
+	}
+}
+
+func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, error) {
+	containers := []corev1.Container{}
+
+	for _, v := range networks {
+		containers = append(containers, corev1.Container{
+			Name:         "",
+			Image:        "sdnvortex/network-controller:latest",
+			Command:      []string{"/go/bin/client/"},
+			Args:         generateClientCommand(v),
+			Env:          nil,
+			VolumeMounts: nil,
+		})
+	}
+
+	return containers, nil
+}
+
 //For the network, we will generate two thins
 //[]string => a list of nodes and it will apply on nodeaffinity
 //[]corev1.Container => a list of init container we will apply on pod
-func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, error) {
+func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev1.Container, error) {
 
-	return []string{}, nil
+	networks := []entity.Network{}
+	containers := []corev1.Container{}
+	for _, v := range pod.Networks {
+		network := entity.Network{}
+		if err := session.FindOne(entity.NetworkCollectionName, bson.M{"name": v.Name}, &network); err != nil {
+			return nil, nil, err
+		}
+		networks = append(networks, network)
+	}
+
+	nodes := generateNodeLabels(networks)
+
+	return nodes, containers, nil
 }
 
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
