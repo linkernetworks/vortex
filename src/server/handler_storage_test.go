@@ -122,18 +122,41 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
-			}},
+			},
+		},
 			http.StatusInternalServerError},
+		{"inValidNFSIP", entity.Storage{
+			Type:             entity.FakeStorageType,
+			Name:             namesgenerator.GetRandomName(1),
+			StorageClassName: namesgenerator.GetRandomName(0),
+			IP:               "256.256.256.256",
+			PATH:             "/myspace",
+			Fake: &entity.FakeStorage{
+				FakeParameter: "Yo",
+			},
+		},
+			http.StatusBadRequest},
+		{"lackStorageName", entity.Storage{
+			Type:             entity.FakeStorageType,
+			StorageClassName: namesgenerator.GetRandomName(0),
+			IP:               "256.256.256.256",
+			PATH:             "/myspace",
+			Fake: &entity.FakeStorage{
+				FakeParameter: "Yo",
+			},
+		},
+			http.StatusBadRequest},
 		{"StorageTypeError", entity.Storage{
 			Name:             namesgenerator.GetRandomName(0),
 			StorageClassName: namesgenerator.GetRandomName(1),
-			Type:             "non-exist",
+			Type:             "none-exist",
 			IP:               "192.168.5.100",
 			PATH:             "/myspace",
 			Fake: &entity.FakeStorage{
 				FakeParameter: "Yo",
 				IWantFail:     true,
-			}},
+			},
+		},
 			http.StatusBadRequest},
 	}
 
