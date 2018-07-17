@@ -120,13 +120,37 @@ func generateClientCommand(network entity.PodNetwork) []string {
 func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, error) {
 	containers := []corev1.Container{}
 
-	for _, v := range networks {
+	for i, v := range networks {
 		containers = append(containers, corev1.Container{
-			Name:         "",
-			Image:        "sdnvortex/network-controller:latest",
-			Command:      []string{"/go/bin/client/"},
-			Args:         generateClientCommand(v),
-			Env:          nil,
+			Name:    fmt.Sprintf("init-network-client-%d", i),
+			Image:   "sdnvortex/network-controller:latest",
+			Command: []string{"/go/bin/client/"},
+			Args:    generateClientCommand(v),
+			Env: []corev1.EnvVar{
+				{
+					Name: "POD_NAME",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.name",
+						},
+				},
+				{
+					Name: "POD_NAMESPACE",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.namespace",
+						},
+					},
+				},
+				{
+					Name: "POD_UUID",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.uid",
+						},
+					},
+				},
+			},
 			VolumeMounts: nil,
 		})
 	}
