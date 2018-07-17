@@ -22,12 +22,13 @@ type PodVolume struct {
 }
 
 type Pod struct {
-	ID         bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
-	Name       string        `bson:"name" json:"name" validate:"required"`
-	Namespace  string        `bson:"namespace" json:"namespace" validate:"required"`
-	Containers []Container   `bson:"containers" json:"containers" validate:"required,dive,required"`
-	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
-	Volumes    []PodVolume   `bson:"volumes,omitempty" json:"volumes" validate:"-"`
+	ID         bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
+	Name       string            `bson:"name" json:"name" validate:"required"`
+	Namespace  string            `bson:"namespace" json:"namespace" validate:"required"`
+	Labels     map[string]string `bson:"labels,omitempty" json:"labels" validate:"-"`
+	Containers []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
+	CreatedAt  *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
+	Volumes    []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"-"`
 }
 
 //GetCollection - get model mongo collection name.

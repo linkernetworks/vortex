@@ -100,7 +100,8 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	p := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: pod.Name,
+			Name:   pod.Name,
+			Labels: pod.Labels,
 		},
 		Spec: corev1.PodSpec{
 			Containers: containers,
