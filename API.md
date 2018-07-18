@@ -9,22 +9,56 @@
 Example:
 
 ```
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"type":"ovs","name":"awesomeNetworks","nodeName":"vortex-dev","ovs":{"bridgeName":"awesomeBridge", "physicalPorts":[]}}' \
-     http://localhost:7890/v1/networks
+  curl -X POST \
+  http://172.17.8.100:7890/v1/networks \
+  -H 'Content-Type: application/json' \
+  -d '{
+   "type":"system",
+   "isDPDKPort":false,
+   "name":"my network-3",
+   "VLANTags":[
+      100,
+      200
+   ],
+   "bridgeName":"ovsbr0",
+   "nodes":[
+      {
+         "name":"vortex-dev",
+         "physicalInterfaces":[
+            {
+               "name":"eth0",
+               "pciid":""
+            }
+         ]
+      }
+   ]
+}
+'
 ```
 
 Request Data:
 
 ```json
 {
-  "type": "ovs",
-  "name": "awesomeNetworks",
-  "nodeName": "vortex-dev",
-  "ovs": {
-    "bridgeName": "awesomeBridge",
-    "physicalPorts":[]
-  }
+   "type":"system",
+   "isDPDKPort":false,
+   "name":"my network-3",
+   "VLANTags":[
+      100,
+      200
+   ],
+   "bridgeName":"ovsbr0",
+   "nodes":[
+      {
+         "name":"vortex-dev",
+         "physicalInterfaces":[
+            {
+               "name":"eth0",
+               "pciid":""
+            }
+         ]
+      }
+   ]
 }
 ```
 
@@ -50,21 +84,48 @@ curl http://localhost:7890/v1/networks/
 Response Data:
 
 ```json
-[{
-  "id": "5b3475f94807c5199773910a",
-  "type": "ovs",
-  "name": "awesomeNetworks",
-  "nodeName": "vortex-dev",
-  "createdAt": "2018-06-28T05:45:29.828Z",
-  "ovs": {
-   "bridgeName": "awesomeBridge",
-   "physicalPorts": []
-  },
-  "fake": {
-   "bridgeName": "",
-   "iWantFail": false
-  }
-}]
+[
+    {
+        "id": "5b47159c4807c50c741c579a",
+        "type": "system",
+        "isDPDKPort": false,
+        "name": "my network-1",
+        "VLANTags": [
+            100,
+            200
+        ],
+        "bridgeName": "",
+        "nodes": [
+            {
+                "name": "vortex-dev",
+                "physicalInterfaces": [],
+                "fakeParameter": "",
+                "shoulFail": false
+            }
+        ],
+        "createdAt": "2018-07-12T08:47:24.713Z"
+    },
+    {
+        "id": "5b4716e94807c512d544f437",
+        "type": "system",
+        "isDPDKPort": false,
+        "name": "my network-2",
+        "VLANTags": [
+            100,
+            200
+        ],
+        "bridgeName": "ovsbr0",
+        "nodes": [
+            {
+                "name": "vortex-dev",
+                "physicalInterfaces": [],
+                "fakeParameter": "",
+                "shoulFail": false
+            }
+        ],
+        "createdAt": "2018-07-12T08:52:57.567Z"
+    }
+]
 ```
 
 ### Get Network
@@ -74,26 +135,31 @@ Response Data:
 Example:
 
 ```
-curl http://localhost:7890/v1/networks/5b3475f94807c5199773910a
+curl http://localhost:7890/v1/networks/5b4716e94807c512d544f437
 ```
 
 Response Data:
 
 ```json
 {
-  "id": "5b3475f94807c5199773910a",
-  "type": "ovs",
-  "name": "awesomeNetwork",
-  "nodeName": "vortex-dev",
-  "createdAt": "2018-06-28T05:45:29.828Z",
-  "ovs": {
-   "bridgeName": "awesomeBridge",
-   "physicalPorts": []
-  },
-  "fake": {
-   "bridgeName": "",
-   "iWantFail": false
-  }
+    "id": "5b4716e94807c512d544f437",
+    "type": "system",
+    "isDPDKPort": false,
+    "name": "my network-2",
+    "VLANTags": [
+        100,
+        200
+    ],
+    "bridgeName": "ovsbr0",
+    "nodes": [
+        {
+            "name": "vortex-dev",
+            "physicalInterfaces": [],
+            "fakeParameter": "",
+            "shoulFail": false
+        }
+    ],
+    "createdAt": "2018-07-12T08:52:57.567Z"
 }
 ```
 
