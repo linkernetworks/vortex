@@ -1,4 +1,4 @@
- pipeline {
+  pipeline {
     agent {
         dockerfile {
             dir "src/github.com/linkernetworks/vortex/jenkins"
@@ -68,7 +68,11 @@
                             fileExists "ready"
                         }
                         sh "make apps.init-helm 2>&1 | tee >(go-junit-report > report.xml)"
-                        sh "make apps.launch-in-minikube 2>&1 | tee >(go-junit-report > report.xml)"
+	                    sh "JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lname=tiller -o jsonpath=\"\$JSONPATH\" 2>&1 | grep -q \"Ready=True\"; do sleep 1; echo \"wait the tiller to be available\"; done"
+
+                        sh "make apps.launch-apps 2>&1 | tee >(go-junit-report > report.xml)"
+                        sh "until curl --connect-timeout 1 -sL -w \"%{http_code}\\n\" http://`kubectl get service -n monitoring prometheus -o jsonpath=\"{.spec.clusterIP}\"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo \"wait the prometheus to be available\"; done"
+
                         sh "make src.test-coverage-minikube 2>&1 | tee >(go-junit-report > report.xml)"
                         junit "report.xml"
                         sh 'gocover-cobertura < build/src/coverage.txt > cobertura.xml'

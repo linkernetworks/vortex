@@ -20,10 +20,10 @@ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/miniku
 sudo env CHANGE_MINIKUBE_NONE_USER=true minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
 # Fix the kubectl context, as it's often stale.
 minikube update-context
-# enable rbac
+# Enable rbac
 kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
 
-# for checking if entry.sh finish or not
+# Check if entry.sh finish or not
 touch src/github.com/linkernetworks/vortex/ready
 
 bash

@@ -58,17 +58,16 @@ src.test-coverage:
 	$(MKDIR_P) $(BUILD_FOLDER)/src/
 	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
 	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
-	mv config/testing.json.bak config/testing.json
 
 .PHONY: src.test-coverage-minikube
 src.test-coverage-minikube:
-	sed -i.bak "s/localhost:9090/$$(minikube ip):9090/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
+	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
 	$(MAKE) src.test-coverage
 	mv config/testing.json.bak config/testing.json
 
 .PHONY: src.test-coverage-vagrant
 src.test-coverage-vagrant:
-	sed -i.bak "s/localhost:9090/172.17.8.100:9090/g; s/localhost:27017/172.17.8.100:31717/g" config/testing.json
+	sed -i.bak "s/localhost:9090/172.17.8.100:30003/g; s/localhost:27017/172.17.8.100:31717/g" config/testing.json
 	$(MAKE) src.test-coverage
 	mv config/testing.json.bak config/testing.json
 
@@ -81,27 +80,12 @@ check-govendor:
 
 ## launch apps #############################
 
-.PHONY: apps.launch-in-minikube
-apps.launch-in-minikube:
-	$(MAKE) apps.launch-apps
-	#Check if prometheus is ready
-	until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`minikube ip`:30003/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; done
-
-.PHONY: apps.launch-in-vagrant
-apps.launch-in-vagrant:
-	$(MAKE) apps.launch-apps
-	#Check if prometheus is ready
-	until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://172.17.8.100:30003/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; done
-
 .PHONY: apps.init-helm
 apps.init-helm:
-	# launch helm
 	helm init
 	kubectl create serviceaccount --namespace kube-system tiller
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-	# check tiller
-	JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lname=tiller -o jsonpath="$$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; echo "wait the tiller to be available"; done
 
 .PHONY: apps.launch-apps
 apps.launch-apps:
