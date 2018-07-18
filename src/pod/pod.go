@@ -7,6 +7,7 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/linkernetworks/vortex/src/utils"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,6 +47,17 @@ func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 			return fmt.Errorf("The volume name %s doesn't exist", v.Name)
 		}
 	}
+
+	//Check the network
+	for _, v := range pod.Networks {
+		count, err := session.Count(entity.NetworkCollectionName, bson.M{"name": v.Name})
+		if err != nil {
+			return fmt.Errorf("check the network name error:%v", err)
+		} else if count == 0 {
+			return fmt.Errorf("the network named %s doesn't exist", v.Name)
+		}
+	}
+
 	return nil
 }
 
@@ -79,6 +91,123 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	return volumes, volumeMounts, nil
 }
 
+//Get the Intersection of nodes' name
+func generateNodeLabels(networks []entity.Network) []string {
+	totalNames := [][]string{}
+	for _, network := range networks {
+		names := []string{}
+		for _, node := range network.Nodes {
+			names = append(names, node.Name)
+		}
+
+		totalNames = append(totalNames, names)
+	}
+
+	return utils.Intersections(totalNames)
+}
+
+func generateClientCommand(network entity.PodNetwork) []string {
+	ip := utils.IPToCIDR(network.IPAddress, network.Netmask)
+
+	return []string{
+		"-s=unix:///tmp/vortex.sock",
+		"-b=" + network.BridgeName,
+		"-n=" + network.IfName,
+		"-i=" + ip,
+	}
+}
+
+func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, error) {
+	containers := []corev1.Container{}
+
+	for i, v := range networks {
+		containers = append(containers, corev1.Container{
+			Name:    fmt.Sprintf("init-network-client-%d", i),
+			Image:   "sdnvortex/network-controller:v0.2.1",
+			Command: []string{"/go/bin/client"},
+			Args:    generateClientCommand(v),
+			Env: []corev1.EnvVar{
+				{
+					Name: "POD_NAME",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.name",
+						},
+					},
+				},
+				{
+					Name: "POD_NAMESPACE",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.namespace",
+						},
+					},
+				},
+				{
+					Name: "POD_UUID",
+					ValueFrom: &corev1.EnvVarSource{
+						FieldRef: &corev1.ObjectFieldSelector{
+							FieldPath: "metadata.uid",
+						},
+					},
+				},
+			},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "grpc-sock",
+					MountPath: "/tmp/",
+				},
+			},
+		})
+	}
+
+	return containers, nil
+}
+
+//For the network, we will generate two things
+//[]string => a list of nodes and it will apply on nodeaffinity
+//[]corev1.Container => a list of init container we will apply on pod
+func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev1.Container, error) {
+
+	networks := []entity.Network{}
+	containers := []corev1.Container{}
+	for i, v := range pod.Networks {
+		network := entity.Network{}
+		if err := session.FindOne(entity.NetworkCollectionName, bson.M{"name": v.Name}, &network); err != nil {
+			return nil, nil, err
+		}
+		networks = append(networks, network)
+		pod.Networks[i].BridgeName = network.BridgeName
+	}
+
+	nodes := generateNodeLabels(networks)
+	containers, err := generateInitContainer(pod.Networks)
+	return nodes, containers, err
+}
+
+func generateAffinity(nodeNames []string) *corev1.Affinity {
+	if len(nodeNames) == 0 {
+		return &corev1.Affinity{}
+	}
+	return &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "kubernetes.io/hostname",
+								Values:   nodeNames,
+								Operator: corev1.NodeSelectorOpIn,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -87,6 +216,20 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	if err != nil {
 		return err
 	}
+
+	nodeNames, initContainers, err := generateNetwork(pod, session)
+	if err != nil {
+		return err
+	}
+
+	volumes = append(volumes, corev1.Volume{
+		Name: "grpc-sock",
+		VolumeSource: corev1.VolumeSource{
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: "/tmp/vortex",
+			},
+		},
+	})
 
 	var containers []corev1.Container
 	for _, container := range pod.Containers {
@@ -104,10 +247,13 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Labels: pod.Labels,
 		},
 		Spec: corev1.PodSpec{
-			Containers: containers,
-			Volumes:    volumes,
+			InitContainers: initContainers,
+			Containers:     containers,
+			Volumes:        volumes,
+			Affinity:       generateAffinity(nodeNames),
 		},
 	}
+
 	if pod.Namespace == "" {
 		pod.Namespace = "default"
 	}
