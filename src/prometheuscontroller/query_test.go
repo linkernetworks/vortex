@@ -2,14 +2,15 @@ package prometheuscontroller
 
 import (
 	"fmt"
-	"github.com/linkernetworks/vortex/src/config"
-	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/suite"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/linkernetworks/vortex/src/config"
+	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/prometheus/common/model"
+	"github.com/stretchr/testify/suite"
 )
 
 func init() {
@@ -23,7 +24,7 @@ type PrometheusQueryTestSuite struct {
 }
 
 func (suite *PrometheusQueryTestSuite) SetupSuite() {
-	cf := config.MustRead("../../config/local.json")
+	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.New(cf)
 	suite.containerName = "cadvisor"
 }

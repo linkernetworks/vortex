@@ -31,13 +31,13 @@ spec:
   - metadata:
       name: mongodb
     spec:
-      {{ if eq .Values.environment "develop" }}
+      {{ if eq .Values.global.environment  "develop" }}
       accessModes: [ "ReadWriteMany" ]
       storageClassName: "slow-many"
-      {{ else if eq .Values.environment "local"}}
+      {{ else if or (eq .Values.global.environment "local") (eq .Values.global.environment "testing") }}
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "manual"
       {{ end }}
       resources:
         requests:
-          storage: 10Gi
+          storage: {{ .Values.global.storage }}
