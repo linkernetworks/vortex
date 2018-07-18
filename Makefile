@@ -75,6 +75,11 @@ src.test-coverage-vagrant:
 
 ## check build env #############################
 
+.PHONY: src.test-bats
+src.test-bats:
+	cd tests; \
+	bats .;
+
 .PHONY: check-govendor
 check-govendor:
 	$(info check govendor)
@@ -87,6 +92,9 @@ apps.init-helm:
 	helm init
 	kubectl create serviceaccount --namespace kube-system tiller
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+	kubectl apply -f deploy/kubernetes/apps/vortex/00-namespace.yaml
+	kubectl apply -f deploy/kubernetes/apps/vortex/01-rbac.yaml
+	kubectl apply -f deploy/kubernetes/apps/vortex/02-serviceaccount.yaml
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
 .PHONY: apps.launch-apps
