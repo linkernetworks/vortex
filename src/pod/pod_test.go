@@ -338,3 +338,11 @@ func (suite *PodTestSuite) TestGenerateNetworkFail() {
 	suite.Nil(nodes)
 	suite.Nil(containers)
 }
+
+func (suite *PodTestSuite) TestGenerateAffinity() {
+	affinity := generateAffinity([]string{})
+	suite.Nil(affinity.NodeAffinity)
+	affinity = generateAffinity([]string{"123"})
+	suite.NotNil(affinity.NodeAffinity)
+
+}

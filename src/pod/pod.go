@@ -185,6 +185,29 @@ func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev
 	return nodes, containers, err
 }
 
+func generateAffinity(nodeNames []string) *corev1.Affinity {
+	if len(nodeNames) == 0 {
+		return &corev1.Affinity{}
+	}
+	return &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "kubernetes.io/hostname",
+								Values:   nodeNames,
+								Operator: corev1.NodeSelectorOpIn,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -194,7 +217,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		return err
 	}
 
-	nodesNames, initContainers, err := generateNetwork(pod, session)
+	nodeNames, initContainers, err := generateNetwork(pod, session)
 	if err != nil {
 		return err
 	}
@@ -227,25 +250,10 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			InitContainers: initContainers,
 			Containers:     containers,
 			Volumes:        volumes,
-			Affinity: &corev1.Affinity{
-				NodeAffinity: &corev1.NodeAffinity{
-					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-						NodeSelectorTerms: []corev1.NodeSelectorTerm{
-							{
-								MatchExpressions: []corev1.NodeSelectorRequirement{
-									{
-										Key:      "kubernetes.io/hostname",
-										Values:   nodesNames,
-										Operator: corev1.NodeSelectorOpIn,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			Affinity:       generateAffinity(nodeNames),
 		},
 	}
+
 	if pod.Namespace == "" {
 		pod.Namespace = "default"
 	}
