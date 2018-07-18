@@ -124,7 +124,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 		containers = append(containers, corev1.Container{
 			Name:    fmt.Sprintf("init-network-client-%d", i),
 			Image:   "sdnvortex/network-controller:latest",
-			Command: []string{"/go/bin/client/"},
+			Command: []string{"/go/bin/client"},
 			Args:    generateClientCommand(v),
 			Env: []corev1.EnvVar{
 				{
@@ -154,7 +154,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      "/grpc-sock",
+					Name:      "grpc-sock",
 					MountPath: "/tmp/",
 				},
 			},
@@ -234,8 +234,9 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 							{
 								MatchExpressions: []corev1.NodeSelectorRequirement{
 									{
-										Key:    "kubernetes.io/hostname",
-										Values: nodesNames,
+										Key:      "kubernetes.io/hostname",
+										Values:   nodesNames,
+										Operator: corev1.NodeSelectorOpIn,
 									},
 								},
 							},
