@@ -1065,3 +1065,134 @@ Response Data:
   }
  }
 ```
+
+## Service
+
+### Create Service
+
+**POST /v1/services**
+
+Example:
+
+```
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"name":"awesome","namespace":"default","type":"NodePort","selector":{"podname":"awesome"},"ports":[{"name":"awesome","port":80,"targetPort":80,"nodePort":30000}]}' \
+     http://localhost:7890/v1/services
+```
+
+Request Data:
+
+```json
+{
+  "name": "awesome",
+  "namespace": "default",
+  "type": "NodePort",
+  "selector": {
+    "podname": "awesome"
+  },
+  "ports": [
+    {
+      "name": "awesome",
+      "port": 80,
+      "targetPort": 80,
+      "nodePort": 30000
+    }
+  ]
+}
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Create success"
+}
+```
+
+### List Services
+
+**GET /v1/services/**
+
+Example:
+
+```
+curl http://localhost:7890/v1/services/
+```
+
+Response Data:
+
+```json
+[
+  {
+   "id": "5b4edcbc4807c557d9feb69e",
+   "name": "awesome",
+   "namespace": "default",
+   "type": "NodePort",
+   "selector": {
+    "podname": "awesome"
+   },
+   "ports": [
+    {
+     "name": "awesome",
+     "port": 80,
+     "targetPort": 80,
+     "nodePort": 30000
+    }
+   ],
+   "createdAt": "2018-07-18T06:22:52.403Z"
+  }
+]
+```
+
+### Get Service
+
+**GET /v1/services/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/services/5b4edcbc4807c557d9feb69e
+```
+
+Response Data:
+
+```json
+{
+  "id": "5b4edcbc4807c557d9feb69e",
+  "name": "awesome",
+  "namespace": "default",
+  "type": "NodePort",
+  "selector": {
+   "podname": "awesome"
+  },
+  "ports": [
+   {
+    "name": "awesome",
+    "port": 80,
+    "targetPort": 80,
+    "nodePort": 30000
+   }
+  ],
+  "createdAt": "2018-07-18T06:22:52.403Z"
+}
+```
+
+### Delete Service
+
+**DELETE /v1/services/[id]**
+
+Example:
+
+```
+curl -X DELETE http://localhost:7890/v1/services/5b4edcbc4807c557d9feb69e
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Delete success"
+}
+```
