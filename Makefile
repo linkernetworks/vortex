@@ -53,25 +53,23 @@ src.test:
 src.install:
 	$(GO) install -v ./src/...
 
-.PHONY: src.test-prometheus
-src.test-prometheus:
-	kubectl apply -f deploy/kubernetes/apps/monitoring/ -R
-	JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
-	#Verify kube-addon-manager.
-	#kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
-	JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
-	# Wait for kube-dns to be ready.
-	JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
-	#Chck the functrion of prometheus
-	until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n monitoring prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; done
-	#Wait the cadvisor to be ready
-	JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n monitoring get pods -lname=cadvisor -o jsonpath="$$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for cadvisor to be available"; kubectl get pods --all-namespaces; done
-
 .PHONY: src.test-coverage
 src.test-coverage:
 	$(MKDIR_P) $(BUILD_FOLDER)/src/
 	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
 	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
+
+.PHONY: src.test-coverage-minikube
+src.test-coverage-minikube:
+	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
+	$(MAKE) src.test-coverage
+	mv config/testing.json.bak config/testing.json
+
+.PHONY: src.test-coverage-vagrant
+src.test-coverage-vagrant:
+	sed -i.bak "s/localhost:9090/172.17.8.100:30003/g; s/localhost:27017/172.17.8.100:31717/g" config/testing.json
+	$(MAKE) src.test-coverage
+	mv config/testing.json.bak config/testing.json
 
 ## check build env #############################
 
@@ -79,6 +77,24 @@ src.test-coverage:
 check-govendor:
 	$(info check govendor)
 	@[ "`which $(GO_VENDOR)`" != "" ] || (echo "$(GO_VENDOR) is missing"; false)
+
+## launch apps #############################
+
+.PHONY: apps.init-helm
+apps.init-helm:
+	helm init
+	kubectl create serviceaccount --namespace kube-system tiller
+	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+
+.PHONY: apps.launch-apps
+apps.launch-apps:
+	helm install --debug --wait --set global.environment=testing deploy/helm/foundation/mongodb
+	helm install --debug --wait --set global.environment=testing deploy/helm/apps/prometheus/
+
+.PHONY: apps.teardown
+apps.teardown:
+	helm ls --short | xargs -L1 helm delete
 
 ## dockerfiles/ ########################################
 

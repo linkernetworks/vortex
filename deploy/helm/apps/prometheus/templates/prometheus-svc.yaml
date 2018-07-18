@@ -11,7 +11,7 @@ spec:
   ports:
   - port: {{ .Values.service.ports.port }}
     targetPort: {{ .Values.service.ports.targetPort }}
-  {{ else if eq .Values.global.environment "local"}}
+  {{ else if or (eq .Values.global.environment "local") (eq .Values.global.environment "testing") }}
   type: NodePort
   ports:
   - port: {{ .Values.service.ports.port }}
