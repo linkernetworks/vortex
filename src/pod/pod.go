@@ -54,7 +54,7 @@ func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 		if err != nil {
 			return fmt.Errorf("check the network name error:%v", err)
 		} else if count == 0 {
-			return fmt.Errorf("the network name %s doesn't exist", v.Name)
+			return fmt.Errorf("the network named %s doesn't exist", v.Name)
 		}
 	}
 
@@ -91,7 +91,7 @@ func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, [
 	return volumes, volumeMounts, nil
 }
 
-//Get the intersecion of nodes' name
+//Get the Intersection of nodes' name
 func generateNodeLabels(networks []entity.Network) []string {
 	totalNames := [][]string{}
 	for _, network := range networks {
@@ -112,7 +112,7 @@ func generateClientCommand(network entity.PodNetwork) []string {
 	return []string{
 		"-s=unix:///tmp/vortex.sock",
 		"-b=" + network.BridgeName,
-		"-n=" + network.IFName,
+		"-n=" + network.IfName,
 		"-i=" + ip,
 	}
 }
@@ -123,7 +123,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 	for i, v := range networks {
 		containers = append(containers, corev1.Container{
 			Name:    fmt.Sprintf("init-network-client-%d", i),
-			Image:   "sdnvortex/network-controller:latest",
+			Image:   "sdnvortex/network-controller:v0.2.1",
 			Command: []string{"/go/bin/client"},
 			Args:    generateClientCommand(v),
 			Env: []corev1.EnvVar{
@@ -164,7 +164,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 	return containers, nil
 }
 
-//For the network, we will generate two thins
+//For the network, we will generate two things
 //[]string => a list of nodes and it will apply on nodeaffinity
 //[]corev1.Container => a list of init container we will apply on pod
 func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev1.Container, error) {
