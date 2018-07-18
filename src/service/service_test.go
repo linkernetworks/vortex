@@ -33,48 +33,6 @@ func TestServiceSuite(t *testing.T) {
 	suite.Run(t, new(ServiceTestSuite))
 }
 
-func (suite *ServiceTestSuite) TestCheckServiceParameter() {
-	service := &entity.Service{
-		ID:   bson.NewObjectId(),
-		Name: namesgenerator.GetRandomName(0),
-	}
-
-	err := CheckServiceParameter(suite.sp, service)
-	suite.NoError(err)
-}
-
-func (suite *ServiceTestSuite) TestCheckServiceParameterFail() {
-	testCases := []struct {
-		caseName string
-		service  *entity.Service
-	}{
-		{
-			"InvalidServiceName", &entity.Service{
-				ID:   bson.NewObjectId(),
-				Name: "~!@#$%^&*()",
-			},
-		},
-		{
-			"InvalidServicePortName", &entity.Service{
-				ID:   bson.NewObjectId(),
-				Name: namesgenerator.GetRandomName(0),
-				Ports: []entity.ServicePort{
-					{
-						Name: "~!@#$%^&*()",
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		suite.T().Run(tc.caseName, func(t *testing.T) {
-			err := CheckServiceParameter(suite.sp, tc.service)
-			suite.Error(err)
-		})
-	}
-}
-
 func (suite *ServiceTestSuite) TestCreateService() {
 	selector := map[string]string{
 		"podname": "awesome",

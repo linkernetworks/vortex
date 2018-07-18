@@ -59,13 +59,17 @@ func New(cf config.Config) *Container {
 
 	clientset := kubernetes.NewForConfigOrDie(k8s)
 
+	validate := validator.New()
+	// Register validation for kubernetes name
+	validate.RegisterValidation("k8sname", checkNameValidation)
+
 	sp := &Container{
 		Config:     cf,
 		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset),
-		Validator:  validator.New(),
+		Validator:  validate,
 	}
 
 	return sp
@@ -86,13 +90,17 @@ func NewForTesting(cf config.Config) *Container {
 
 	clientset := fakeclientset.NewSimpleClientset()
 
+	validate := validator.New()
+	// Register validation for kubernetes name
+	validate.RegisterValidation("k8sname", checkNameValidation)
+
 	sp := &Container{
 		Config:     cf,
 		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset),
-		Validator:  validator.New(),
+		Validator:  validate,
 	}
 
 	return sp
