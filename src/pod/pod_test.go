@@ -268,7 +268,7 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	bName := namesgenerator.GetRandomName(0)
 	ifName := namesgenerator.GetRandomName(0)
 	podNetwork := entity.PodNetwork{
-		IFName:     ifName,
+		IfName:     ifName,
 		IPAddress:  "1.2.3.4",
 		Netmask:    "255.255.255.0",
 		BridgeName: bName,
@@ -300,7 +300,7 @@ func (suite *PodTestSuite) TestGenerateNetwork() {
 		Networks: []entity.PodNetwork{
 			{
 				Name:      networkName,
-				IFName:    ifName,
+				IfName:    ifName,
 				IPAddress: "1.2.3.4",
 				Netmask:   "255.255.255.0",
 			},
@@ -323,7 +323,7 @@ func (suite *PodTestSuite) TestGenerateNetworkFail() {
 		Networks: []entity.PodNetwork{
 			{
 				Name:      networkName,
-				IFName:    ifName,
+				IfName:    ifName,
 				IPAddress: "1.2.3.4",
 				Netmask:   "255.255.255.0",
 			},
