@@ -44,8 +44,7 @@ func (suite *PodTestSuite) SetupSuite() {
 	suite.wc.Add(service)
 }
 
-func (suite *PodTestSuite) TearDownSuite() {
-}
+func (suite *PodTestSuite) TearDownSuite() {}
 
 func TestPodSuite(t *testing.T) {
 	suite.Run(t, new(PodTestSuite))
@@ -64,7 +63,9 @@ func (suite *PodTestSuite) TestCreatePod() {
 	pod := entity.Pod{
 		Name:       tName,
 		Namespace:  namespace,
+		Labels:     map[string]string{},
 		Containers: containers,
+		Volumes:    []entity.PodVolume{},
 	}
 
 	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
