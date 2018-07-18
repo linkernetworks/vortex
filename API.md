@@ -16,7 +16,7 @@ Example:
    "type":"system",
    "isDPDKPort":false,
    "name":"my network-3",
-   "VLANTags":[
+   "vlanTags":[
       100,
       200
    ],
@@ -27,7 +27,7 @@ Example:
          "physicalInterfaces":[
             {
                "name":"eth0",
-               "pciid":""
+               "pciID":""
             }
          ]
       }
@@ -43,7 +43,7 @@ Request Data:
    "type":"system",
    "isDPDKPort":false,
    "name":"my network-3",
-   "VLANTags":[
+   "vlanTags":[
       100,
       200
    ],
@@ -54,7 +54,7 @@ Request Data:
          "physicalInterfaces":[
             {
                "name":"eth0",
-               "pciid":""
+               "pciID":""
             }
          ]
       }
@@ -90,7 +90,7 @@ Response Data:
         "type": "system",
         "isDPDKPort": false,
         "name": "my network-1",
-        "VLANTags": [
+        "vlanTags": [
             100,
             200
         ],
@@ -98,9 +98,7 @@ Response Data:
         "nodes": [
             {
                 "name": "vortex-dev",
-                "physicalInterfaces": [],
-                "fakeParameter": "",
-                "shoulFail": false
+                "physicalInterfaces": []
             }
         ],
         "createdAt": "2018-07-12T08:47:24.713Z"
@@ -110,7 +108,7 @@ Response Data:
         "type": "system",
         "isDPDKPort": false,
         "name": "my network-2",
-        "VLANTags": [
+        "vlanTags": [
             100,
             200
         ],
@@ -118,9 +116,7 @@ Response Data:
         "nodes": [
             {
                 "name": "vortex-dev",
-                "physicalInterfaces": [],
-                "fakeParameter": "",
-                "shoulFail": false
+                "physicalInterfaces": []
             }
         ],
         "createdAt": "2018-07-12T08:52:57.567Z"
@@ -146,7 +142,7 @@ Response Data:
     "type": "system",
     "isDPDKPort": false,
     "name": "my network-2",
-    "VLANTags": [
+    "vlanTags": [
         100,
         200
     ],
@@ -154,9 +150,7 @@ Response Data:
     "nodes": [
         {
             "name": "vortex-dev",
-            "physicalInterfaces": [],
-            "fakeParameter": "",
-            "shoulFail": false
+            "physicalInterfaces": []
         }
     ],
     "createdAt": "2018-07-12T08:52:57.567Z"
