@@ -11,7 +11,7 @@ const (
 )
 
 type ServicePort struct {
-	Name       string `bson:"name" json:"name" validate:"required"`
+	Name       string `bson:"name" json:"name" validate:"required,k8sname"`
 	Port       int32  `bson:"port" json:"port" validate:"required"`
 	TargetPort int    `bson:"targetPort" json:"targetPort" validate:"required,max=65535,min=1"`
 	NodePort   int32  `bson:"nodePort" json:"nodePort" validate:"max=32767,min=30000"`
@@ -19,7 +19,7 @@ type ServicePort struct {
 
 type Service struct {
 	ID        bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
-	Name      string            `bson:"name" json:"name" validate:"required"`
+	Name      string            `bson:"name" json:"name" validate:"required,k8sname"`
 	Namespace string            `bson:"namespace" json:"namespace" validate:"required"`
 	Type      string            `bson:"type" json:"type" validate:"oneof=ClusterIP NodePort"`
 	Selector  map[string]string `bson:"selector" json:"selector" validate:"required"`

@@ -1,9 +1,6 @@
 package service
 
 import (
-	"fmt"
-	"regexp"
-
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 
@@ -12,33 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func checkNameValidation(name string) bool {
-	re := regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])`)
-	return re.MatchString(name)
-}
-
-func CheckServiceParameter(sp *serviceprovider.Container, service *entity.Service) error {
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
-	//Check service name validation
-	if !checkNameValidation(service.Name) {
-		return fmt.Errorf("Service Name: %s is invalid value", service.Name)
-	}
-
-	//Check the service port name validation
-	for _, port := range service.Ports {
-		if !checkNameValidation(port.Name) {
-			return fmt.Errorf("Port Name: %s is invalid value", port.Name)
-		}
-	}
-	return nil
-}
-
 func CreateService(sp *serviceprovider.Container, service *entity.Service) error {
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
 	var serviceType corev1.ServiceType
 	switch service.Type {
 	default:

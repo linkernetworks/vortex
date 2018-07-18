@@ -40,10 +40,6 @@ func createServiceHandler(ctx *web.Context) {
 	// Check whether this name has been used
 	s.ID = bson.NewObjectId()
 	s.CreatedAt = timeutils.Now()
-	if err := service.CheckServiceParameter(sp, &s); err != nil {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
 
 	if err := service.CreateService(sp, &s); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
