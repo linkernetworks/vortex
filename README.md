@@ -1,4 +1,4 @@
-Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=develop)](https://travis-ci.org/linkernetworks/vortex) [![Go Report Card](https://goreportcard.com/badge/github.com/linkernetworks/vortex)](https://goreportcard.com/report/github.com/linkernetworks/vortex) [![codecov](https://codecov.io/gh/linkernetworks/vortex/branch/develop/graph/badge.svg)](https://codecov.io/gh/linkernetworks/vortex)
+Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=develop)](https://travis-ci.org/linkernetworks/vortex) [![Go Report Card](https://goreportcard.com/badge/github.com/linkernetworks/vortex)](https://goreportcard.com/report/github.com/linkernetworks/vortex) [![codecov](https://codecov.io/gh/linkernetworks/vortex/branch/develop/graph/badge.svg)](https://codecov.io/gh/linkernetworks/vortex) [![Docker Build Status](https://img.shields.io/docker/build/sdnvortex/vortex.svg)](https://hub.docker.com/r/sdnvortex/vortex/)
 ===
 
 # Vortex server
