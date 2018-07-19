@@ -38,7 +38,7 @@ type Pod struct {
 	Containers []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
 	CreatedAt  *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 	Volumes    []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
-	Networks   []PodNetwork      `bson:"networks,omitempty" json:"networks validate:"required,dive,required"`
+	Networks   []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 }
 
 //GetCollection - get model mongo collection name.
