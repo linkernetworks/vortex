@@ -123,7 +123,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 	for i, v := range networks {
 		containers = append(containers, corev1.Container{
 			Name:    fmt.Sprintf("init-network-client-%d", i),
-			Image:   "sdnvortex/network-controller:v0.2.1",
+			Image:   "sdnvortex/network-controller:v0.3.0",
 			Command: []string{"/go/bin/client"},
 			Args:    generateClientCommand(v),
 			Env: []corev1.EnvVar{
