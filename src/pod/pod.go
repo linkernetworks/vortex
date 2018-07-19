@@ -118,7 +118,7 @@ func generateClientCommand(network entity.PodNetwork) (command []string) {
 	}
 
 	if network.VlanTag != nil {
-		command = append(command, "-v="+strconv.Itoa(*network.VlanTag))
+		command = append(command, "-v="+strconv.Itoa((int)(*network.VlanTag)))
 	}
 	return
 }
