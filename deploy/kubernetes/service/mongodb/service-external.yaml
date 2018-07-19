@@ -5,6 +5,7 @@ metadata:
   labels:
     environment: testing
   name: mongo-external
+  namespace: vortex
 spec:
   externalTrafficPolicy: Cluster
   ports:
