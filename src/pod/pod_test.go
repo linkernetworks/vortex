@@ -136,7 +136,7 @@ func (suite *PodTestSuite) TestGenerateVolume() {
 	session.Insert(entity.VolumeCollectionName, volume)
 	defer session.Remove(entity.VolumeCollectionName, "name", volume.Name)
 
-	volumes, volumeMounts, err := generateVolume(pod, session)
+	volumes, volumeMounts, err := generateVolume(session, pod)
 	suite.NotNil(volumes)
 	suite.NotNil(volumeMounts)
 	suite.NoError(err)
@@ -153,7 +153,7 @@ func (suite *PodTestSuite) TestGenerateVolumeFail() {
 
 	session := suite.sp.Mongo.NewSession()
 	defer session.Close()
-	volumes, volumeMounts, err := generateVolume(pod, session)
+	volumes, volumeMounts, err := generateVolume(session, pod)
 	suite.Nil(volumes)
 	suite.Nil(volumeMounts)
 	suite.Error(err)
@@ -307,7 +307,7 @@ func (suite *PodTestSuite) TestGenerateNetwork() {
 		},
 	}
 
-	nodes, containers, err := generateNetwork(pod, session)
+	nodes, containers, err := generateNetwork(session, pod)
 	suite.NoError(err)
 	suite.Equal(1, len(containers))
 	suite.Equal(0, len(nodes))
@@ -333,7 +333,7 @@ func (suite *PodTestSuite) TestGenerateNetworkFail() {
 	session := suite.sp.Mongo.NewSession()
 	defer session.Close()
 
-	nodes, containers, err := generateNetwork(pod, session)
+	nodes, containers, err := generateNetwork(session, pod)
 	suite.Error(err)
 	suite.Nil(nodes)
 	suite.Nil(containers)
