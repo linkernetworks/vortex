@@ -267,12 +267,12 @@
 			"revisionTime": "2018-05-24T10:14:37Z"
 		},
 		{
-			"checksumSHA1": "yn+Mnhby5jor32R9p/Oi2mhBXS8=",
+			"checksumSHA1": "5B2koV6vKlEKqyTXLBBrr8qpsMI=",
 			"path": "github.com/linkernetworks/network-controller/messages",
-			"revision": "6732f1138d000319d734c9f1d0bb27a7c7bb05a3",
-			"revisionTime": "2018-07-06T02:29:06Z",
-			"version": "=v0.2.1",
-			"versionExact": "v0.2.1"
+			"revision": "60522ed136801f7f769f33ecb700bfdbc06d0b59",
+			"revisionTime": "2018-07-19T03:03:19Z",
+			"version": "=v0.3.0",
+			"versionExact": "v0.3.0"
 		},
 		{
 			"checksumSHA1": "V89FgGKA+7A70mAedEvmhDSCIyQ=",
