@@ -61,7 +61,7 @@ func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 	return nil
 }
 
-func generateVolume(pod *entity.Pod, session *mongo.Session) ([]corev1.Volume, []corev1.VolumeMount, error) {
+func generateVolume(session *mongo.Session, pod *entity.Pod) ([]corev1.Volume, []corev1.VolumeMount, error) {
 	volumes := []corev1.Volume{}
 	volumeMounts := []corev1.VolumeMount{}
 
@@ -167,7 +167,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 //For the network, we will generate two things
 //[]string => a list of nodes and it will apply on nodeaffinity
 //[]corev1.Container => a list of init container we will apply on pod
-func generateNetwork(pod *entity.Pod, session *mongo.Session) ([]string, []corev1.Container, error) {
+func generateNetwork(session *mongo.Session, pod *entity.Pod) ([]string, []corev1.Container, error) {
 
 	networks := []entity.Network{}
 	containers := []corev1.Container{}
@@ -212,12 +212,12 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	volumes, volumeMounts, err := generateVolume(pod, session)
+	volumes, volumeMounts, err := generateVolume(session, pod)
 	if err != nil {
 		return err
 	}
 
-	nodeNames, initContainers, err := generateNetwork(pod, session)
+	nodeNames, initContainers, err := generateNetwork(session, pod)
 	if err != nil {
 		return err
 	}
