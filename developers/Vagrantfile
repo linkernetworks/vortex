@@ -10,6 +10,7 @@ Vagrant.configure("2") do |config|
   config.vm.define vm_name = 'vortex'
 
   development_env = ENV.fetch('DEVELOPMENT_ENV', true)
+  dpdk_ovs_env = ENV.fetch('DPDK', true)
 
 $vortex_env = <<SHELL
 set -e -x -u
@@ -17,7 +18,7 @@ echo "=== Install Vortex Server Environment ==="
 sudo mkdir -p "/etc/systemd/system/docker.service.d/"
 sudo cp "/tmp/override.conf" "/etc/systemd/system/docker.service.d/override.conf"
 sudo apt-get update
-sudo apt-get install -y git build-essential openvswitch-switch nfs-common ntp
+sudo apt-get install -y git build-essential nfs-common ntp
 
 # Install Docker
 # kubernetes official max validated version: 17.03.2~ce-0~ubuntu-xenial
@@ -97,25 +98,128 @@ cd ~/.vim/bundle/YouCompleteMe
 go get -u github.com/kardianos/govendor
 SHELL
 
+$apt_openvswitch = <<SHELL
+set -e -x -u
+sudo apt-get update && sudo apt-get install -y openvswitch-switch
+SHELL
+
+# Open vSwitch 	DPDK
+# 2.6.x         16.07.2
+# 2.7.x         16.11.6
+# 2.8.x         17.05.2
+# 2.9.x         17.11.2
+
+$ovs_dpdk = <<SHELL
+set -e -x -u
+echo "=== Install OVS/DPDK ==="
+# Configure hugepages
+# You can later check if this change was successful with `cat /proc/meminfo`
+# Hugepages setup should be done as early as possible after boot
+echo 'vm.nr_hugepages=1024' | sudo tee /etc/sysctl.d/hugepages.conf
+sudo mount -t hugetlbfs none /dev/hugepages
+sudo sysctl -w vm.nr_hugepages=1024
+
+sudo cp /tmp/ovs-vswitchd.service /etc/systemd/system/ovs-vswitchd.service
+sudo cp /tmp/ovsdb-server.service /etc/systemd/system/ovsdb-server.service
+
+# Name of network interface provisioned for DPDK to bind
+export NET_IF_NAME=enp0s18
+sudo apt-get -qq update
+sudo apt-get -y -qq install clang doxygen hugepages build-essential libnuma-dev libpcap-dev inux-headers-`uname -r` dh-autoreconf libssl-dev libcap-ng-dev openssl python python-pip htop
+sudo pip install six
+
+#### Download DPDK, Open vSwitch and pktgen source
+wget --quiet https://fast.dpdk.org/rel/dpdk-17.11.2.tar.xz
+sudo tar xf dpdk-17.11.2.tar.xz -C /usr/src/
+wget --quiet http://openvswitch.org/releases/openvswitch-2.9.2.tar.gz
+sudo tar -zxf openvswitch-2.9.2.tar.gz -C /usr/src/
+wget --quiet http://www.dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.4.9.tar.gz
+sudo tar -zxf pktgen-3.4.9.tar.gz -C /usr/src/
+
+#### Install DPDK
+echo 'export DPDK_DIR=/usr/src/dpdk-stable-17.11.2' | sudo tee -a /root/.bashrc
+echo 'export LD_LIBRARY_PATH=$DPDK_DIR/x86_64-native-linuxapp-gcc/lib' | sudo tee -a /root/.bashrc
+echo 'export DPDK_TARGET=x86_64-native-linuxapp-gcc' | sudo tee -a /root/.bashrc
+echo 'export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET' | sudo tee -a /root/.bashrc
+export DPDK_DIR=/usr/src/dpdk-stable-17.11.2
+export LD_LIBRARY_PATH=$DPDK_DIR/x86_64-native-linuxapp-gcc/lib
+export DPDK_TARGET=x86_64-native-linuxapp-gcc
+export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET
+cd $DPDK_DIR
+
+# Build and install the DPDK library
+sudo make install T=$DPDK_TARGET DESTDIR=install
+
+# (Optional) Export the DPDK shared library location
+sudo sed -i 's/CONFIG_RTE_BUILD_SHARED_LIB=n/CONFIG_RTE_BUILD_SHARED_LIB=y/g' ${DPDK_DIR}/config/common_base
+
+# Install kernel modules
+sudo modprobe uio
+sudo insmod ${DPDK_DIR}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko
+
+# Make uio and igb_uio installations persist across reboots
+sudo ln -sf ${DPDK_DIR}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko /lib/modules/`uname -r`
+sudo depmod -a
+echo "uio" | sudo tee -a /etc/modules
+echo "igb_uio" | sudo tee -a /etc/modules
+
+# Bind secondary network adapter
+# Note that this NIC setup does not persist across reboots
+sudo ifconfig ${NET_IF_NAME} down
+sudo ${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}
+sudo ${DPDK_DIR}/usertools/dpdk-devbind.py --status
+
+#### Install Open vSwitch with DPDK
+export OVS_DIR=/usr/src/openvswitch-2.9.2
+cd $OVS_DIR
+./boot.sh
+CFLAGS='-march=native' ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --with-dpdk=$DPDK_BUILD
+make && sudo make install
+sudo mkdir -p /usr/local/etc/openvswitch
+sudo mkdir -p /usr/local/var/run/openvswitch
+sudo mkdir -p /usr/local/var/log/openvswitch
+sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
+echo 'export PATH=$PATH:/usr/local/share/openvswitch/scripts' | sudo tee -a /root/.bashrc
+sudo systemctl enable ovsdb-server
+sudo systemctl start ovsdb-server
+sudo systemctl enable ovs-vswitchd
+sudo systemctl start ovs-vswitchd
+
+#### Cleanup
+rm -rf /home/vagrant/openvswitch-2.9.2.tar.gz /home/vagrant/dpdk-17.11.2.tar.xz /home/vagrant/pktgen-3.4.9.tar.gz
+SHELL
+
+  # In order to simulate multiple interfaces
+  # enp0s8
+  config.vm.network :private_network, ip: "172.17.8.100"
+  # enp0s9
+  config.vm.network :private_network, ip: "172.17.8.50"
+  # enp0s10
+  config.vm.network :private_network, ip: "172.17.8.60"
+  # enp0s16
+  config.vm.network :private_network, ip: "172.17.8.70"
+  # enp0s17
+  config.vm.network :private_network, ip: "172.17.8.80"
+  # enp0s18
+  config.vm.network :private_network, ip: "172.17.8.90"
+
   config.vm.provision "file", source: "configs/docker.conf", destination: "/tmp/override.conf"
 
+  if dpdk_ovs_env == true
+     config.vm.provision "file", source: "systemctl/ovs-vswitchd.service", destination: "/tmp/ovs-vswitchd.service"
+     config.vm.provision "file", source: "systemctl/ovsdb-server.service", destination: "/tmp/ovsdb-server.service"
+     config.vm.provision "shell", privileged: false, inline: $ovs_dpdk
+  else
+     config.vm.provision "shell", privileged: false, inline: $apt_openvswitch
+  end
+
   if development_env == true
-    puts "Install Vortex Server with Development Toolkits"
     config.vm.provision "file", source: "configs/.vimrc", destination: "$HOME/.vimrc"
     config.vm.provision "shell", privileged: false, inline: $vortex_env
     config.vm.provision "shell", privileged: false, inline: $vortex_dev_toolkits
   else
-    puts "Install Vortex Server"
     config.vm.provision "shell", privileged: false, inline: $vortex_env
   end
-
-  config.vm.network :private_network, ip: "172.17.8.100"
-  # to simulate multiple interfaces
-  config.vm.network :private_network, ip: "172.17.8.50"
-  config.vm.network :private_network, ip: "172.17.8.60"
-  config.vm.network :private_network, ip: "172.17.8.70"
-  config.vm.network :private_network, ip: "172.17.8.80"
-  config.vm.network :private_network, ip: "172.17.8.90"
 
   config.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--cpus", 2]
