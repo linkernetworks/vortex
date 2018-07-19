@@ -36,9 +36,14 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 	for _, result := range results {
 		nic := entity.NICOverviewMetrics{}
 		nic.Name = string(result.Metric["device"])
-		nic.Default = string(result.Metric["default"])
 		nic.Type = string(result.Metric["type"])
 		nic.PCIID = string(result.Metric["pci_id"])
+		defaultValue, err := valueToBool(result.Metric["default"])
+		if err != nil {
+			return nicList, err
+		}
+		nic.Default = defaultValue
+
 		nicList.NICs = append(nicList.NICs, nic)
 	}
 
@@ -354,7 +359,11 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 		case "node_network_interface":
 			nic := entity.NICMetrics{}
-			nic.Default = string(result.Metric["default"])
+			defaultValue, err := valueToBool(result.Metric["default"])
+			if err != nil {
+				return node, err
+			}
+			nic.Default = defaultValue
 			nic.Type = string(result.Metric["type"])
 			nic.IP = string(result.Metric["ip_address"])
 			nic.PCIID = string(result.Metric["pci_id"])
