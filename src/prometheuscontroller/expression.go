@@ -1,6 +1,7 @@
 package prometheuscontroller
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/linkernetworks/vortex/src/entity"
@@ -38,7 +39,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 		nic.Name = string(result.Metric["device"])
 		nic.Type = string(result.Metric["type"])
 		nic.PCIID = string(result.Metric["pci_id"])
-		defaultValue, err := valueToBool(result.Metric["default"])
+		defaultValue, err := strconv.ParseBool(string(result.Metric["default"]))
 		if err != nil {
 			return nicList, err
 		}
@@ -359,7 +360,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 		case "node_network_interface":
 			nic := entity.NICMetrics{}
-			defaultValue, err := valueToBool(result.Metric["default"])
+			defaultValue, err := strconv.ParseBool(string(result.Metric["default"]))
 			if err != nil {
 				return node, err
 			}
