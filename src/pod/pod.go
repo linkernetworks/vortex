@@ -3,6 +3,7 @@ package pod
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -106,15 +107,20 @@ func generateNodeLabels(networks []entity.Network) []string {
 	return utils.Intersections(totalNames)
 }
 
-func generateClientCommand(network entity.PodNetwork) []string {
+func generateClientCommand(network entity.PodNetwork) (command []string) {
 	ip := utils.IPToCIDR(network.IPAddress, network.Netmask)
 
-	return []string{
+	command = []string{
 		"-s=unix:///tmp/vortex.sock",
 		"-b=" + network.BridgeName,
 		"-n=" + network.IfName,
 		"-i=" + ip,
 	}
+
+	if network.VlanTag != nil {
+		command = append(command, "-v="+strconv.Itoa(*network.VlanTag))
+	}
+	return
 }
 
 func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, error) {
