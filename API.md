@@ -357,13 +357,25 @@ Response Data:
 
 **POST /v1/pods**
 
+For each Pod, we have fileds need to handle.
+1. name: the name of the Pod and it should follow the kubernetes yaml rules (Required)
+2. labels: the map (string to stirng) for the kubernetes label
+3. namespace: the namespace of the Pod.
+4. containers: a array of a container (Required)
+    - name: the name of the container, it also follow kubernetes naming rule.
+    - image: the image of the contaienr.
+    - command: a string array, the command of the container.
+5. volumes: the array of the voluems that we want to mount to Pod. (Optional)
+    - name: the name of the volume and it should be the volume we created before.
+    - mountPath: the mountPath of the volume and the container can see files under this path.
+6. networks: the array of the network that we want to create in the Pod (Optional)
+    - name: the name of the network and it should be the network we created before.
+    - ifName: the inteface name you want to create in your container.
+    - vlanTag: the vlan tag for `ifName` interface.
+    - ipADdress: the IPv4 address of the `ifName` interface.
+    - netmask: the IPv4 netmask of the `ifName` interface.
+ 
 Example:
-
-```
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"name":"awesome","containers":[{"name":"busybox","image":"busybox","command":["sleep","3600"]}]}' \
-     http://localhost:7890/v1/pods
-```
 
 Request Data:
 
@@ -374,7 +386,17 @@ Request Data:
     "name": "busybox",
     "image": "busybox",
     "command": ["sleep", "3600"]
-  }]
+  }],
+  "networks":[
+  {
+      "name":"MyNetwork2",
+      "ifName":"eth12",
+      "vlan":0,
+      "ipAddress":"1.2.3.4",
+      "netmask":"255.255.255.0"
+  },
+  "volumes":[
+  ]
 }
 ```
 
@@ -433,6 +455,8 @@ Response Data:
 {
   "id": "5b459d344807c5707ddad740",
   "name": "awesome",
+  "namespace": "default",
+  "labels": null,
   "containers": [
    {
     "name": "busybox",
@@ -443,7 +467,9 @@ Response Data:
     ]
    }
   ],
-  "createdAt": "2018-07-11T06:01:24.637Z"
+  "createdAt": "2018-07-11T06:01:24.637Z",
+  "volumes": null,
+  "networks": null
 }
 ```
 
