@@ -276,6 +276,14 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	command := generateClientCommand(podNetwork)
 	ans := []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24"}
 	suite.Equal(ans, command)
+
+	var vlanTag int32
+	vlanTag = 123
+	podNetwork.VlanTag = &vlanTag
+	command = generateClientCommand(podNetwork)
+	ans = []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24", "-v=123"}
+	suite.Equal(ans, command)
+
 }
 
 func (suite *PodTestSuite) TestGenerateNetwork() {
