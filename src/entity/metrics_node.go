@@ -8,7 +8,7 @@ type NICNetworkTrafficMetrics struct {
 }
 
 type NICMetrics struct {
-	Default           string                   `json:"default"`
+	Default           bool                     `json:"default"`
 	Type              string                   `json:"type"`
 	IP                string                   `json:"ip"`
 	PCIID             string                   `json:"pciID"`
@@ -17,7 +17,7 @@ type NICMetrics struct {
 
 type NICOverviewMetrics struct {
 	Name    string `json:"name"`
-	Default string `json:"default"`
+	Default bool   `json:"default"`
 	Type    string `json:"type"`
 	PCIID   string `json:"pciID"`
 }

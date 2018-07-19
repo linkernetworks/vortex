@@ -52,6 +52,20 @@ func (suite *PrometheusQueryTestSuite) TestQuery() {
 	suite.Equal(model.Vector(nil), resource)
 }
 
+func (suite *PrometheusQueryTestSuite) TestValueToBool() {
+	result, err := valueToBool("false")
+	suite.NoError(err)
+	suite.Equal(result, false)
+
+	result, err = valueToBool("true")
+	suite.NoError(err)
+	suite.Equal(result, true)
+}
+func (suite *PrometheusQueryTestSuite) TestWrongValueToBool() {
+	_, err := valueToBool("wrong")
+	suite.Error(err)
+}
+
 func (suite *PrometheusQueryTestSuite) TestGetElements() {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_container_info"}

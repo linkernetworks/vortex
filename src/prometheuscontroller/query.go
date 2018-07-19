@@ -2,6 +2,7 @@ package prometheuscontroller
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -77,4 +78,12 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 		return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
 	}
 	return results, nil
+}
+
+func valueToBool(value model.LabelValue) (bool, error) {
+	result, err := strconv.ParseBool(string(value))
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }
