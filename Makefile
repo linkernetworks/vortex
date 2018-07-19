@@ -1,5 +1,5 @@
 ## vortex server version
-SERVER_VERSION = v0.1.1
+SERVER_VERSION = v0.1.2
 ## Folder content generated files
 BUILD_FOLDER = ./build
 
