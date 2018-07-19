@@ -1,0 +1,21 @@
+[Unit]
+Description=Open vSwitch Forwarding Unit
+After=ovsdb-server.service network-pre.target systemd-udev-settle.service
+Before=network.target network.service
+Requires=ovsdb-server.service
+ReloadPropagatedFrom=ovsdb-server.service
+AssertPathIsReadWrite=/var/run/openvswitch/db.sock
+
+[Service]
+Type=forking
+Restart=on-failure
+ExecStart=/usr/share/openvswitch/scripts/ovs-ctl \
+          --no-ovsdb-server --no-monitor --system-id=random \
+          --ovs-user=${OVS_USER_ID} \
+          start $OPTIONS
+ExecStop=/usr/share/openvswitch/scripts/ovs-ctl --no-ovsdb-server stop
+ExecReload=/usr/share/openvswitch/scripts/ovs-ctl --no-ovsdb-server \
+          --no-monitor --system-id=random \
+          --ovs-user=${OVS_USER_ID} \
+          restart $OPTIONS
+TimeoutSec=300
