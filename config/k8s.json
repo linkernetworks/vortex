@@ -14,7 +14,7 @@
         }
     },
     "mongo": {
-        "url": "mongodb://mongo-0.mongo:27017/vortex",
+        "url": "mongodb://mongo-0.vortex:27017/vortex",
         "public": {
             "url": "mongodb://35.189.177.37:31717/votex"
         }
