@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: vortex-server
-        image: sdnvortex/vortex:develop
+        image: sdnvortex/vortex:v0.1.0
         ports:
         - containerPort: 7890
