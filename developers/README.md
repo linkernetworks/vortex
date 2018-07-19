@@ -7,6 +7,13 @@ Before use the vagrant, you need to install the vagrant in your host and you can
 
 Usage about Vagrant
 ===================
+By default, vagrant will boot with backend development toolkit and dpdk installed
+
+- If you want to boot a vortex server without backend development toolkit and dpdk
+```
+DEV=false DPDK=false vagrant up 
+```
+
 - Boot
 ```
 make up
