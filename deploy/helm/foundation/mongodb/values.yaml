@@ -2,6 +2,8 @@ global:
   environment: develop
   storage: 1Gi
 
+replicaCount: 1
+
 hostpath:
   enabled: false
 

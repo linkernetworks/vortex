@@ -2,6 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ template "vortex-server.fullname" . }}
+  namespace: vortex
   labels:
     app: {{ template "vortex-server.name" . }}
     chart: {{ template "vortex-server.chart" . }}
