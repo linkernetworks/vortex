@@ -13,7 +13,7 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
-	s "github.com/linkernetworks/vortex/src/service"
+	svc "github.com/linkernetworks/vortex/src/service"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
@@ -108,7 +108,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 
-	err = s.DeleteService(suite.sp, &service)
+	err = svc.DeleteService(suite.sp, &service)
 	suite.NoError(err)
 }
 
@@ -155,7 +155,7 @@ func (suite *ServiceTestSuite) TestDeleteService() {
 		Ports:     ports,
 	}
 
-	err := s.CreateService(suite.sp, &service)
+	err := svc.CreateService(suite.sp, &service)
 	suite.NoError(err)
 
 	err = suite.session.Insert(entity.ServiceCollectionName, &service)
