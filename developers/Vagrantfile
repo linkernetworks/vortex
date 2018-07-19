@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = 'vortex-dev'
   config.vm.define vm_name = 'vortex'
 
-  development_env = ENV.fetch('DEVELOPMENT_ENV', true)
+  development_env = ENV.fetch('DEV', true)
   dpdk_ovs_env = ENV.fetch('DPDK', true)
 
 $vortex_env = <<SHELL
