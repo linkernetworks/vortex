@@ -496,7 +496,7 @@ Response Data:
 {
   "detail": {
    "hostname": "vortex-dev",
-   "createAt": 1530584195,
+   "createAt": 1531720236,
    "status": "Ready",
    "os": "Ubuntu 16.04.4 LTS",
    "kernelVersion": "4.4.0-128-generic",
@@ -524,53 +524,58 @@ Response Data:
   },
   "nics": {
    "cni0": {
-    "default": "false",
+    "default": false,
     "type": "virtual",
     "ip": "10.244.0.1/24",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 226772166,
-     "transmitBytesTotal": 1383390910,
-     "receivePacketsTotal": 2073736,
-     "transmitPacketsTotal": 2394274
+     "receiveBytesTotal": 60275571,
+     "transmitBytesTotal": 329098735,
+     "receivePacketsTotal": 842874,
+     "transmitPacketsTotal": 933364
     }
    },
    "docker0": {
-    "default": "false",
+    "default": false,
     "type": "virtual",
     "ip": "172.18.0.1/16",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 1441241,
-     "transmitBytesTotal": 1648414,
-     "receivePacketsTotal": 10605,
-     "transmitPacketsTotal": 18840
+     "receiveBytesTotal": 4027243,
+     "transmitBytesTotal": 381978119,
+     "receivePacketsTotal": 99172,
+     "transmitPacketsTotal": 128489
     }
    },
    "enp0s3": {
-    "default": "true",
+    "default": true,
     "type": "physical",
     "ip": "10.0.2.15/24",
+    "pciID": "0000:00:03.0",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 1279973603,
-     "transmitBytesTotal": 17027222,
-     "receivePacketsTotal": 1071124,
-     "transmitPacketsTotal": 264981
+     "receiveBytesTotal": 1567333520,
+     "transmitBytesTotal": 26003945,
+     "receivePacketsTotal": 1333865,
+     "transmitPacketsTotal": 414729
     }
    },
    "enp0s8": {
-    "default": "false",
+    "default": false,
     "type": "physical",
     "ip": "172.17.8.100/24",
+    "pciID": "0000:00:08.0",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 7886367,
-     "transmitBytesTotal": 116409318,
-     "receivePacketsTotal": 69027,
-     "transmitPacketsTotal": 84938
+     "receiveBytesTotal": 3549805,
+     "transmitBytesTotal": 14717952,
+     "receivePacketsTotal": 30557,
+     "transmitPacketsTotal": 27994
     }
    },
    "flannel.1": {
-    "default": "false",
+    "default": false,
     "type": "virtual",
     "ip": "10.244.0.0/32",
+    "pciID": "",
     "nicNetworkTraffic": {
      "receiveBytesTotal": 0,
      "transmitBytesTotal": 0,
@@ -579,124 +584,111 @@ Response Data:
     }
    },
    "lo": {
-    "default": "false",
+    "default": false,
     "type": "virtual",
     "ip": "127.0.0.1/8",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 7206320651,
-     "transmitBytesTotal": 7206320651,
-     "receivePacketsTotal": 30220996,
-     "transmitPacketsTotal": 30220996
+     "receiveBytesTotal": 4973678098,
+     "transmitBytesTotal": 4973678098,
+     "receivePacketsTotal": 21051659,
+     "transmitPacketsTotal": 21051659
     }
    },
-   "veth0369f171": {
-    "default": "false",
+   "veth0756b817": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::f4bf:f1ff:feb0:51e0/64",
+    "ip": "fe80::d402:ddff:fee1:924f/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 1927350790,
-     "transmitBytesTotal": 10996445,
-     "receivePacketsTotal": 139639,
-     "transmitPacketsTotal": 138994
+     "receiveBytesTotal": 15795365,
+     "transmitBytesTotal": 20571146,
+     "receivePacketsTotal": 176548,
+     "transmitPacketsTotal": 205045
     }
    },
-   "veth09ed0568": {
-    "default": "false",
+   "veth0ee29e7": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::c430:9cff:fe31:a21a/64",
+    "ip": "fe80::4082:94ff:fec0:39f4/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 129245700,
-     "transmitBytesTotal": 171833140,
-     "receivePacketsTotal": 217329,
-     "transmitPacketsTotal": 237110
+     "receiveBytesTotal": 1559314,
+     "transmitBytesTotal": 102459217,
+     "receivePacketsTotal": 28724,
+     "transmitPacketsTotal": 34721
     }
    },
-   "veth1542be78": {
-    "default": "false",
+   "veth1fd22c92": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::d047:ebff:fece:fb3f/64",
+    "ip": "fe80::98b0:f7ff:fead:c93d/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 3237703,
-     "transmitBytesTotal": 116003495,
-     "receivePacketsTotal": 58301,
-     "transmitPacketsTotal": 184394
+     "receiveBytesTotal": 122850,
+     "transmitBytesTotal": 168478,
+     "receivePacketsTotal": 760,
+     "transmitPacketsTotal": 1346
     }
    },
-   "veth17a03665": {
-    "default": "false",
+   "veth22ed2ac7": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::f493:3bff:fe1c:7bfe/64",
+    "ip": "fe80::e0cb:69ff:fe1e:edab/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 356941,
-     "transmitBytesTotal": 422027,
-     "receivePacketsTotal": 4073,
-     "transmitPacketsTotal": 2917
+     "receiveBytesTotal": 33869723,
+     "transmitBytesTotal": 120688011,
+     "receivePacketsTotal": 309937,
+     "transmitPacketsTotal": 345322
     }
    },
-   "veth340cca37": {
-    "default": "false",
+   "veth256ca549": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::e4ac:1cff:fe02:e06b/64",
+    "ip": "fe80::48f3:9eff:fe5d:9e15/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 5789767,
-     "transmitBytesTotal": 355262377,
-     "receivePacketsTotal": 55486,
-     "transmitPacketsTotal": 50945
+     "receiveBytesTotal": 33932785,
+     "transmitBytesTotal": 120753785,
+     "receivePacketsTotal": 309171,
+     "transmitPacketsTotal": 346335
     }
    },
-   "veth50f06084": {
-    "default": "false",
+   "veth7da58df2": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::5882:6dff:fec4:526c/64",
+    "ip": "fe80::3477:fff:fecb:5128/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 16031926,
-     "transmitBytesTotal": 20077451,
-     "receivePacketsTotal": 182376,
-     "transmitPacketsTotal": 223934
+     "receiveBytesTotal": 100588516,
+     "transmitBytesTotal": 595158,
+     "receivePacketsTotal": 7769,
+     "transmitPacketsTotal": 7651
     }
    },
-   "veth5e506aa3": {
-    "default": "false",
+   "vethbd37bcbc": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::c8fa:5fff:fec8:c7de/64",
+    "ip": "fe80::6858:a0ff:fe78:7f6b/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 96955868,
-     "transmitBytesTotal": 186560406,
-     "receivePacketsTotal": 515276,
-     "transmitPacketsTotal": 601733
+     "receiveBytesTotal": 2000970,
+     "transmitBytesTotal": 114194785,
+     "receivePacketsTotal": 18975,
+     "transmitPacketsTotal": 17595
     }
    },
-   "vethb90c3da6": {
-    "default": "false",
+   "vethddeea13c": {
+    "default": false,
     "type": "virtual",
-    "ip": "fe80::8c36:f2ff:fe60:a9e7/64",
+    "ip": "fe80::a8b4:b0ff:fe86:a25f/64",
+    "pciID": "",
     "nicNetworkTraffic": {
-     "receiveBytesTotal": 223475,
-     "transmitBytesTotal": 234836,
-     "receivePacketsTotal": 1246,
-     "transmitPacketsTotal": 2529
-    }
-   },
-   "vethe17ec2c5": {
-    "default": "false",
-    "type": "virtual",
-    "ip": "fe80::f8fe:6aff:fee4:b2a6/64",
-    "nicNetworkTraffic": {
-     "receiveBytesTotal": 96946925,
-     "transmitBytesTotal": 186348463,
-     "receivePacketsTotal": 516114,
-     "transmitPacketsTotal": 598524
-    }
-   },
-   "vethf0a4680": {
-    "default": "false",
-    "type": "virtual",
-    "ip": "fe80::a00b:b1ff:fe97:d00c/64",
-    "nicNetworkTraffic": {
-     "receiveBytesTotal": 1589711,
-     "transmitBytesTotal": 1649062,
-     "receivePacketsTotal": 10605,
-     "transmitPacketsTotal": 18848
+     "receiveBytesTotal": 6382391,
+     "transmitBytesTotal": 5280085,
+     "receivePacketsTotal": 6794,
+     "transmitPacketsTotal": 7497
     }
    }
   }
@@ -718,58 +710,87 @@ Response Data:
   "nics": [
    {
     "name": "cni0",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "docker0",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "enp0s8",
-    "default": "false",
-    "type": "physical"
+    "default": false,
+    "type": "physical",
+    "pciID": "0000:00:08.0"
    },
    {
     "name": "flannel.1",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "lo",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "veth0756b817",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "veth0ee29e7",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "veth1fd22c92",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "veth22ed2ac7",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "veth256ca549",
-    "default": "false",
-    "type": "virtual"
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
-    "name": "veth734c84cf",
-    "default": "false",
-    "type": "virtual"
+    "name": "veth7da58df2",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
-    "name": "vethd7819e83",
-    "default": "false",
-    "type": "virtual"
+    "name": "vethbd37bcbc",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
-    "name": "vethdc767f86",
-    "default": "false",
-    "type": "virtual"
+    "name": "vethddeea13c",
+    "default": false,
+    "type": "virtual",
+    "pciID": ""
    },
    {
     "name": "enp0s3",
-    "default": "true",
-    "type": "physical"
+    "default": true,
+    "type": "physical",
+    "pciID": "0000:00:03.0"
    }
   ]
  }
