@@ -4,7 +4,7 @@ global:
 
 replicaCount: 1
 image:
-  tag: develop
+  tag: v0.1.0
 
 service:
   ports:
