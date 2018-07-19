@@ -103,3 +103,11 @@ apps.teardown:
 .PHONY: dockerfiles.build
 dockerfiles.build:
 	docker build --tag sdnvortex/vortex:$(SERVER_VERSION) --file ./dockerfiles/Dockerfile .
+
+## git tag version ########################################
+
+.PHONY: push.tag
+push.tag:
+	@echo "Current git tag version:"$(SERVER_VERSION)
+	git tag $(SERVER_VERSION)
+	git push --tags
