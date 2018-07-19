@@ -1,3 +1,5 @@
+## vortex server version
+SERVER_VERSION = v0.1.0
 ## Folder content generated files
 BUILD_FOLDER = ./build
 
@@ -43,7 +45,7 @@ govendor-sync:
 src.build:
 	$(GO) build -v ./src/...
 	$(MKDIR_P) $(BUILD_FOLDER)/src/cmd/vortex/
-	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortex/vortex -ldflags="-X github.com/linkernetworks/vortex/src/version.version=1.0.0" ./src/cmd/vortex/...
+	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortex/vortex -ldflags="-X github.com/linkernetworks/vortex/src/version.version="$(SERVER_VERSION) ./src/cmd/vortex/...
 
 .PHONY: src.test
 src.test:
@@ -100,4 +102,4 @@ apps.teardown:
 
 .PHONY: dockerfiles.build
 dockerfiles.build:
-	docker build --tag sdnvortex/vortex:latest --file ./dockerfiles/Dockerfile .
+	docker build --tag sdnvortex/vortex:$(SERVER_VERSION) --file ./dockerfiles/Dockerfile .
