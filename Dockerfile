@@ -4,7 +4,7 @@ MAINTAINER David Chang <dchang@linkernetworks.com>
 # TODO fix path after move out
 WORKDIR /go/src/github.com/linkernetworks/vortex
 
-RUN apk add --no-cache protobuf ca-certificates git
+RUN apk add --no-cache protobuf ca-certificates make git
 
 # TODO fix path after move out
 COPY src /go/src/github.com/linkernetworks/vortex/src
