@@ -7,10 +7,12 @@ import (
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/kubeutils"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
 	"github.com/linkernetworks/vortex/src/web"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -138,6 +140,39 @@ func getNetworkHandler(ctx *web.Context) {
 		}
 	}
 	resp.WriteEntity(network)
+}
+
+func getNetworkStatusHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	id := req.PathParameter("id")
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+	c := session.C(entity.NetworkCollectionName)
+
+	var network entity.Network
+	if err := c.FindId(bson.ObjectIdHex(id)).One(&network); err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+	}
+
+	ret, err := kubeutils.GetNonCompletedPods(sp, bson.M{"networks.name": network.Name})
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	nameList := []string{}
+	for _, v := range ret {
+		nameList = append(nameList, v.Name)
+	}
+	resp.WriteEntity(nameList)
 }
 
 func deleteNetworkHandler(ctx *web.Context) {
