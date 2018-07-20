@@ -163,7 +163,6 @@ func getNetworkStatusHandler(ctx *web.Context) {
 		}
 	}
 
-	//FIXME since the network doesn't have the namespace but Pod has..
 	ret, err := kubeutils.GetNonCompletedPods(sp, bson.M{"networks.name": network.Name})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
