@@ -17,7 +17,7 @@ func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Containe
 		return err
 	}
 	for _, node := range knp.Nodes {
-		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {
 			return err
 		}
@@ -35,7 +35,7 @@ func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Containe
 
 func (knp kernelspaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
 	for _, node := range knp.Nodes {
-		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {
 			return err
 		}

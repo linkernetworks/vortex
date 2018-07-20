@@ -62,7 +62,7 @@ func (suite *OVSSystemNetworkTestSuite) SetupSuite() {
 		Status: corev1.NodeStatus{
 			Addresses: []corev1.NodeAddress{
 				{
-					Type:    "ExternalIP",
+					Type:    "InternalIP",
 					Address: OVS_LOCAL_IP,
 				},
 			},
@@ -77,7 +77,7 @@ func (suite *OVSSystemNetworkTestSuite) SetupSuite() {
 		Status: corev1.NodeStatus{
 			Addresses: []corev1.NodeAddress{
 				{
-					Type:    "ExternalIP",
+					Type:    "InternalIP",
 					Address: OVS_LOCAL_IP,
 				},
 			},
