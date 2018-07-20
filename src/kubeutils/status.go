@@ -21,8 +21,7 @@ func GetNonCompletedPods(sp *serviceprovider.Container, query bson.M) ([]entity.
 	ret := []entity.Pod{}
 	for _, pod := range pods {
 		//Check the pod's status, report error if at least one pod is running.
-		//We use the "" to fetch all pods for all namespaces
-		currentPod, err := sp.KubeCtl.GetPod(pod.Name, "")
+		currentPod, err := sp.KubeCtl.GetPod(pod.Name, pod.Namespace)
 		if err != nil {
 			continue
 		}
