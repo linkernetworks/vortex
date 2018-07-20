@@ -63,6 +63,12 @@
 			"revisionTime": "2018-03-08T23:13:08Z"
 		},
 		{
+			"checksumSHA1": "SvAnbKinPLfP+DoIB/uHdGCKClE=",
+			"path": "github.com/dgrijalva/jwt-go/request",
+			"revision": "0b96aaa707760d6ab28d9b9d1913ff5993328bae",
+			"revisionTime": "2018-07-19T21:18:23Z"
+		},
+		{
 			"checksumSHA1": "wPbKObbGzS/43nrskRaJVFVEW/A=",
 			"path": "github.com/ema/qdisc",
 			"revision": "b307c22d3ce761d351b6e6270b50195b44ee9248",
