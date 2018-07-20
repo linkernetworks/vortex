@@ -50,7 +50,7 @@ func (suite *NetworkControllerTestSuite) SetupSuite() {
 	//Create a fake clinet
 	//Init
 	nodeAddr := corev1.NodeAddress{
-		Type:    "ExternalIP",
+		Type:    "InternalIP",
 		Address: "127.0.0.1",
 	}
 
@@ -118,7 +118,7 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 		},
 	}
 
-	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
+	nodeIP, err := suite.kubectl.GetNodeInternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
@@ -150,7 +150,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 		},
 	}
 
-	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
+	nodeIP, err := suite.kubectl.GetNodeInternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
@@ -181,7 +181,7 @@ func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 		},
 	}
 
-	nodeIP, err := suite.kubectl.GetNodeExternalIP(suite.nodeName)
+	nodeIP, err := suite.kubectl.GetNodeInternalIP(suite.nodeName)
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
