@@ -285,6 +285,37 @@ func (suite *NetworkTestSuite) TestGetNetworkWithInvalidID() {
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
 }
 
+func (suite *NetworkTestSuite) TestGetNetworkStatus() {
+	tName := namesgenerator.GetRandomName(0)
+	tType := entity.FakeNetworkType
+	network := entity.Network{
+		ID:       bson.NewObjectId(),
+		Name:     tName,
+		VLANTags: []int32{},
+		Type:     tType,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name:          namesgenerator.GetRandomName(0),
+				PhyInterfaces: []entity.PhyInterface{},
+			},
+		},
+	}
+	//Create data into mongo manually
+	suite.session.C(entity.NetworkCollectionName).Insert(network)
+	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
+
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/status/"+network.ID.Hex(), nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	nameList := []string{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &nameList)
+	suite.NoError(err)
+}
+
 func (suite *NetworkTestSuite) TestListNetwork() {
 	networks := []entity.Network{}
 
