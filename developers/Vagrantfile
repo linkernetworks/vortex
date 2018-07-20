@@ -186,11 +186,11 @@ sudo systemctl enable ovs-vswitchd
 sudo systemctl start ovs-vswitchd
 
 ### openvswitch with dpdk initial
-ovs-vsctl --no-wait init
-ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-init=true
-ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem="1024"
-ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask=0x2
-ovs-vsctl --no-wait set Open_vSwitch . other_config:max-idle=30000
+sudo ovs-vsctl --no-wait init
+sudo ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-init=true
+sudo ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem="1024"
+sudo ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask=0x2
+sudo ovs-vsctl --no-wait set Open_vSwitch . other_config:max-idle=30000
 
 #### Cleanup
 rm -rf /home/vagrant/openvswitch-2.9.2.tar.gz /home/vagrant/dpdk-17.11.2.tar.xz /home/vagrant/pktgen-3.4.9.tar.gz
