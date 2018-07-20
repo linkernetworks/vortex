@@ -11,7 +11,7 @@ const (
 )
 
 type Container struct {
-	Name    string   `bson:"name" json:"name" validate:"required"`
+	Name    string   `bson:"name" json:"name" validate:"required,k8sname"`
 	Image   string   `bson:"image" json:"image" validate:"required"`
 	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
 }
@@ -32,7 +32,7 @@ type PodVolume struct {
 
 type Pod struct {
 	ID         bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
-	Name       string            `bson:"name" json:"name" validate:"required"`
+	Name       string            `bson:"name" json:"name" validate:"required,k8sname"`
 	Namespace  string            `bson:"namespace" json:"namespace" validate:"required"`
 	Labels     map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
 	Containers []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
