@@ -35,5 +35,5 @@ func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 func GenerateBridgeName(datapathType, networkName string) string {
 	tmp := fmt.Sprintf("%s%s", datapathType, networkName)
 	str := utils.SHA256String(tmp)
-	return fmt.Sprintf("ovs-%s-%s", datapathType, str[0:6])
+	return fmt.Sprintf("%s-%s", datapathType, str[0:6])
 }
