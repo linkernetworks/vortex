@@ -15,6 +15,7 @@ spec:
       labels:
         app: vortex-server
     spec:
+      serviceAccountName: vortex-admin
       containers:
       - name: vortex-server
         image: sdnvortex/vortex:v0.1.2
