@@ -191,13 +191,23 @@ func listNodeMetricsHandler(ctx *web.Context) {
 	expression := pc.Expression{}
 	expression.Metrics = []string{"kube_node_info"}
 
-	containerList, err := pc.ListResource(sp, "node", expression)
+	nodeNameList, err := pc.ListResource(sp, "node", expression)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	resp.WriteEntity(containerList)
+	nodeList := map[string]entity.NodeMetrics{}
+	for _, nodeName := range nodeNameList {
+		node, err := pc.GetNode(sp, nodeName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		nodeList[nodeName] = node
+	}
+
+	resp.WriteEntity(nodeList)
 }
 
 func listNodeNicsMetricsHandler(ctx *web.Context) {
