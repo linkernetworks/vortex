@@ -20,7 +20,7 @@ const (
 )
 
 type PhyInterface struct {
-	Name  string `bson:"name" json:"name" validate:"-"`
+	Name  string `bson:"name" json:"name" validate:"required"`
 	PCIID string `bson:"pciID" json:"pciID" validate:"-"`
 }
 
