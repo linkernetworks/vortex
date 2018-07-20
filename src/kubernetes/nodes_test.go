@@ -104,6 +104,48 @@ func (suite *KubeCtlNodeTestSuite) TestGetInvalidNodeExternalIP() {
 	suite.Equal("", nodeIP)
 }
 
+func (suite *KubeCtlNodeTestSuite) TestGetNodeInternalIP() {
+	nodeAddr := corev1.NodeAddress{
+		Type:    "InternalIP",
+		Address: "10.0.2.200",
+	}
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node-6",
+		},
+		Status: corev1.NodeStatus{
+			Addresses: []corev1.NodeAddress{nodeAddr},
+		},
+	}
+	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
+	suite.NoError(err)
+
+	nodeIP, err := suite.kubectl.GetNodeInternalIP("K8S-Node-6")
+	suite.NoError(err)
+	suite.Equal(nodeAddr.Address, nodeIP)
+}
+
+func (suite *KubeCtlNodeTestSuite) TestGetInvalidNodeInternalIP() {
+	nodeAddr := corev1.NodeAddress{
+		Type:    "InternalIP",
+		Address: "10.0.2.200",
+	}
+	node := corev1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "K8S-Node-7",
+		},
+		Status: corev1.NodeStatus{
+			Addresses: []corev1.NodeAddress{nodeAddr},
+		},
+	}
+	_, err := suite.fakeclient.CoreV1().Nodes().Create(&node)
+	suite.NoError(err)
+
+	nodeIP, err := suite.kubectl.GetNodeInternalIP("K8S-Node-99")
+	suite.Error(err)
+	suite.Equal("", nodeIP)
+}
+
 func (suite *KubeCtlNodeTestSuite) TearDownSuite() {}
 
 func TestKubeNodeTestSuite(t *testing.T) {

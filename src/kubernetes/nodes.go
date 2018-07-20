@@ -38,3 +38,19 @@ func (kc *KubeCtl) GetNodeExternalIP(name string) (string, error) {
 	}
 	return nodeIP, nil
 }
+
+//Get the internal IP address of node
+func (kc *KubeCtl) GetNodeInternalIP(name string) (string, error) {
+	node, err := kc.GetNode(name)
+	if err != nil {
+		return "", err
+	}
+	var nodeIP string
+	for _, addr := range node.Status.Addresses {
+		if addr.Type == "InternalIP" {
+			nodeIP = addr.Address
+			break
+		}
+	}
+	return nodeIP, nil
+}
