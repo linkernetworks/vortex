@@ -157,6 +157,29 @@ Response Data:
 }
 ```
 
+### Get Network Status
+
+This api will return the string array of Pod names and those Pod using the target network and still be running.
+
+**GET /v1/networks/status/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/networks/status/5b4716e94807c512d544f437
+```
+
+Response Data:
+
+```json
+[
+    "mypod3",
+    "mypod4",
+    "mypod5"
+]
+```
+
+
 ### Delete Network
 
 **DELETE /v1/networks/[id]**
