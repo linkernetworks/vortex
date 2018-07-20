@@ -17,7 +17,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 		return err
 	}
 	for _, node := range unp.Nodes {
-		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {
 			return err
 		}
@@ -46,7 +46,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 
 func (unp userspaceNetworkProvider) DeleteNetwork(sp *serviceprovider.Container) error {
 	for _, node := range unp.Nodes {
-		nodeIP, err := sp.KubeCtl.GetNodeExternalIP(node.Name)
+		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {
 			return err
 		}
