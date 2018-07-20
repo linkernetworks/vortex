@@ -21,7 +21,8 @@ RUN apk add --no-cache tzdata && \
 # TODO test go install
 RUN go get -x -u github.com/kardianos/govendor
 RUN govendor sync
-RUN go install ./src/cmd/...
+RUN make src.build
+RUN mv build/src/cmd/vortex/vortex /go/bin
 
 # the final image: vortex
 FROM alpine:3.7
