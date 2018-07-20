@@ -1,14 +1,16 @@
 # Change Log
 
-## [Unreleased](https://github.com/linkernetworks/vortex/tree/HEAD)
-
-[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.3...HEAD)
+## [v0.1.4](https://github.com/linkernetworks/vortex/tree/v0.1.4) (2018-07-20)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.3...v0.1.4)
 
 **Merged pull requests:**
 
+- \[Release\] bump to v0.1.4 [\#144](https://github.com/linkernetworks/vortex/pull/144) ([John-Lin](https://github.com/John-Lin))
+-  \[Bug\] VX-198 add make tools [\#143](https://github.com/linkernetworks/vortex/pull/143) ([John-Lin](https://github.com/John-Lin))
 - VX-199 pod k8s name validatation [\#141](https://github.com/linkernetworks/vortex/pull/141) ([John-Lin](https://github.com/John-Lin))
 - VX-198 use makefile to build source [\#140](https://github.com/linkernetworks/vortex/pull/140) ([John-Lin](https://github.com/John-Lin))
 - VX-197 ifname is required [\#139](https://github.com/linkernetworks/vortex/pull/139) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-88 Implement a new API to return the list of Pod which using the network and still be running. [\#138](https://github.com/linkernetworks/vortex/pull/138) ([hwchiu](https://github.com/hwchiu))
 - VX-195 DEV: Let get node api shows all the detail data [\#136](https://github.com/linkernetworks/vortex/pull/136) ([WakeupTsai](https://github.com/WakeupTsai))
 
 ## [v0.1.3](https://github.com/linkernetworks/vortex/tree/v0.1.3) (2018-07-20)
