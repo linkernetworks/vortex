@@ -2,7 +2,6 @@ package pod
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 
 	"github.com/linkernetworks/mongo"
@@ -18,26 +17,9 @@ import (
 
 const VolumeNamePrefix = "volume-"
 
-func checkNameValidation(name string) bool {
-	re := regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])`)
-	return re.MatchString(name)
-}
-
 func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
-
-	//Check pod name validation
-	if !checkNameValidation(pod.Name) {
-		return fmt.Errorf("Pod Name: %s is invalid value", pod.Name)
-	}
-
-	//Check container name validation
-	for _, container := range pod.Containers {
-		if !checkNameValidation(container.Name) {
-			return fmt.Errorf("Container Name: %s is invalid value", container.Name)
-		}
-	}
 
 	//Check the volume
 	for _, v := range pod.Volumes {

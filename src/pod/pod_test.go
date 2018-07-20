@@ -1,15 +1,16 @@
 package pod
 
 import (
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func init() {
@@ -70,25 +71,6 @@ func (suite *PodTestSuite) TestCheckPodParameterFail() {
 		caseName string
 		pod      *entity.Pod
 	}{
-		{
-			"InvalidPodName", &entity.Pod{
-				ID:   bson.NewObjectId(),
-				Name: "~!@#$%^&*()",
-			},
-		},
-		{
-			"InvalidContainerName", &entity.Pod{
-				ID:   bson.NewObjectId(),
-				Name: namesgenerator.GetRandomName(0),
-				Containers: []entity.Container{
-					{
-						Name:    "~!@#$%^&*()",
-						Image:   "busybox",
-						Command: []string{"sleep", "3600"},
-					},
-				},
-			},
-		},
 		{
 			"InvalidVolume", &entity.Pod{
 				ID:   bson.NewObjectId(),
