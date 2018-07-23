@@ -4,7 +4,7 @@ metadata:
   name: kube-state-metrics
   namespace: vortex
   labels:
-    k8s-app: kube-state-metrics
+    app: kube-state-metrics
   annotations:
     prometheus.io/scrape: 'true'
 spec:
@@ -14,5 +14,5 @@ spec:
     targetPort: http-metrics
     protocol: TCP
   selector:
-    k8s-app: kube-state-metrics
+    app: kube-state-metrics
 
