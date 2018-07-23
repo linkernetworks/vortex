@@ -21,7 +21,6 @@ before_install:
   - sudo add-apt-repository ppa:duggan/bats --yes
   - sudo apt-get update -qq
   - sudo apt-get install -qq bats
-  - docker run -d -v /run/openvswitch/db.sock:/var/run/openvswitch/db.sock -p 50051:50051 sdnvortex/network-controller:v0.3.0 /go/bin/server -tcp=0.0.0.0:50051
 
 install:
   - make pre-build
@@ -64,6 +63,9 @@ script:
   - make apps.launch-apps
   # # Check if prometheus is ready
   - until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n vortex prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; kubectl get pods --all-namespaces; done
+  - until [ `kubectl  -n vortex get --no-headers pods | awk '{c[$3]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex get pods;  done
+  - kubectl -n vortex describe daemonset/network-controller-server-tcp
+  - kubectl -n vortex describe daemonset/network-controller-server-unix
   # # Start to test and produce the coverage report
   - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
   - make src.test-bats
