@@ -9,13 +9,16 @@ import (
 	"google.golang.org/grpc"
 )
 
+// DEFAULT_CONTROLLER_PORT set the default port as 50051
 const DEFAULT_CONTROLLER_PORT = "50051"
 
+// NetworkController is the structure for Network Controller
 type NetworkController struct {
 	ClientCtl pb.NetworkControlClient
 	Context   context.Context
 }
 
+// New will Set up a connection to the Network Controller server
 func New(serverAddress string) (*NetworkController, error) {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
@@ -31,6 +34,7 @@ func New(serverAddress string) (*NetworkController, error) {
 	}, nil
 }
 
+// CreateOVSNetwork will Create OVS Network by Network Controller
 func (nc *NetworkController) CreateOVSNetwork(datapathType string, bridgeName string, phyIfaces []entity.PhyInterface, vlanTags []int32) error {
 	if _, err := nc.ClientCtl.CreateBridge(
 		nc.Context,
@@ -70,6 +74,7 @@ func (nc *NetworkController) CreateOVSNetwork(datapathType string, bridgeName st
 	return nil
 }
 
+// CreateOVSDPDKNetwork will Create OVS+DPDK Network by Network Controller
 func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIfaces []entity.PhyInterface, vlanTags []int32) error {
 	if _, err := nc.ClientCtl.CreateBridge(
 		nc.Context,
@@ -110,6 +115,7 @@ func (nc *NetworkController) CreateOVSDPDKNetwork(bridgeName string, phyIfaces [
 	return nil
 }
 
+// DeleteOVSNetwork will delete OVS network controller
 func (nc *NetworkController) DeleteOVSNetwork(bridgeName string) error {
 	_, err := nc.ClientCtl.DeleteBridge(
 		nc.Context,

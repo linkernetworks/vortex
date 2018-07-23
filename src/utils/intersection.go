@@ -1,5 +1,6 @@
 package utils
 
+// Intersection will do intersection
 func Intersection(a, b []string) (ret []string) {
 	m := make(map[string]bool)
 
@@ -15,6 +16,7 @@ func Intersection(a, b []string) (ret []string) {
 	return
 }
 
+// Intersections will do many intersection
 func Intersections(input [][]string) (ret []string) {
 	if len(input) == 0 {
 		return

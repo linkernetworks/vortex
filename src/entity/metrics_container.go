@@ -1,10 +1,12 @@
 package entity
 
+// ContainerResourceMetrics is the sructure for Container Resource Metrics
 type ContainerResourceMetrics struct {
 	CPUUsagePercentage float32 `json:"cpuUsagePercentage"`
 	MemoryUsageBytes   float32 `json:"memoryUsageBytes"`
 }
 
+// ContainerStatusMetrics is the sructure for Container Status Metrics
 type ContainerStatusMetrics struct {
 	Status           string `json:"status"`
 	WaitingReason    string `json:"waitingReason"`
@@ -12,6 +14,7 @@ type ContainerStatusMetrics struct {
 	RestartTime      int    `json:"restartTime"`
 }
 
+// ContainerDetailMetrics is the sructure  for Container Detail Metrics
 type ContainerDetailMetrics struct {
 	ContainerName string   `json:"containerName"`
 	CreatedAt     int      `json:"createAt"`
@@ -22,6 +25,8 @@ type ContainerDetailMetrics struct {
 	Command       []string `json:"command"`
 	vNIC          string   `json:"vNic"`
 }
+
+// ContainerMetrics is the structure for Container Metrics
 type ContainerMetrics struct {
 	Detail            ContainerDetailMetrics   `json:"detail"`
 	Status            ContainerStatusMetrics   `json:"status"`

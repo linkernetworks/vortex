@@ -4,6 +4,7 @@ import (
 	"k8s.io/api/core/v1"
 )
 
+// ServiceMetrics is the structure for Service Metrics
 type ServiceMetrics struct {
 	ServiceName string            `json:"serviceName"`
 	Namespace   string            `json:"namespace"`

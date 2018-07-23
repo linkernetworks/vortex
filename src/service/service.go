@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
+// CreateService will create service by serviceprovider container
 func CreateService(sp *serviceprovider.Container, service *entity.Service) error {
 	var serviceType corev1.ServiceType
 	switch service.Type {
@@ -43,6 +44,7 @@ func CreateService(sp *serviceprovider.Container, service *entity.Service) error
 	return err
 }
 
+// DeleteService willl delete service
 func DeleteService(sp *serviceprovider.Container, service *entity.Service) error {
 	return sp.KubeCtl.DeleteService(service.Name, service.Namespace)
 }
