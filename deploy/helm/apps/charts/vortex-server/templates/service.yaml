@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: vortex-server
+  namespace: vortex
+  labels:
+    app: vortex-server
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.ports.port }}
+      targetPort: {{ .Values.service.ports.targetPort }}
+      nodePort: {{ .Values.service.ports.nodePort }}
+  selector:
+    app: vortex-server
+  
+
