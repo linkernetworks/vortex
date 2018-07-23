@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vortex-server
+  namespace: vortex
+  labels:
+    app: vortex-server
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: vortex-server
+  template:
+    metadata:
+      labels:
+        app: vortex-server
+    spec:
+      containers:
+      - name: vortex-server
+        image: sdnvortex/vortex:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 7890

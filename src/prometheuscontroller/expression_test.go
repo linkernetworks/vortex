@@ -42,7 +42,7 @@ func (suite *PrometheusExpressionTestSuite) TestListResource() {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_container_info"}
 	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "monitoring"
+	expression.QueryLabels["namespace"] = "vortex"
 
 	resourceList, err := ListResource(suite.sp, labelName, expression)
 	suite.NoError(err)
@@ -68,7 +68,7 @@ func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetPod() {
-	namespace := "monitoring"
+	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	podName := pods[0].GetName()
@@ -79,7 +79,7 @@ func (suite *PrometheusExpressionTestSuite) TestGetPod() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
-	namespace := "monitoring"
+	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
 	containerName := pods[0].Status.ContainerStatuses[0].Name
@@ -90,7 +90,7 @@ func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetService() {
-	namespace := "monitoring"
+	namespace := "vortex"
 	services, err := suite.sp.KubeCtl.GetServices(namespace)
 	suite.NoError(err)
 	serviceName := services[0].GetName()
@@ -101,7 +101,7 @@ func (suite *PrometheusExpressionTestSuite) TestGetService() {
 }
 
 func (suite *PrometheusExpressionTestSuite) TestGetController() {
-	namespace := "monitoring"
+	namespace := "vortex"
 	deployments, err := suite.sp.KubeCtl.GetDeployments(namespace)
 	suite.NoError(err)
 	deploymentName := deployments[0].GetName()

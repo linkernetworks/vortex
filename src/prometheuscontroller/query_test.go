@@ -56,7 +56,7 @@ func (suite *PrometheusQueryTestSuite) TestGetElements() {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_container_info"}
 	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "monitoring"
+	expression.QueryLabels["namespace"] = "vortex"
 
 	resource, err := getElements(suite.sp, expression)
 	suite.NoError(err)

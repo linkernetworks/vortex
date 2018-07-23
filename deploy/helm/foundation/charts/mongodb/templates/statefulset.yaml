@@ -1,0 +1,44 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: vortex
+spec:
+  serviceName: "mongo"
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        service: mongo
+        role: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongo
+          resources:
+            requests:
+              cpu: 100m
+          image: mongo
+          command:
+            - mongod
+            - "--bind_ip"
+            - 0.0.0.0
+          ports:
+            - containerPort: {{ .Values.service.ports.targetPort }}
+          volumeMounts:
+            - name: mongodb
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb
+    spec:
+      {{ if eq .Values.global.environment  "develop" }}
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: "slow-many"
+      {{ else if or (eq .Values.global.environment "local") (eq .Values.global.environment "testing") }}
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "manual"
+      {{ end }}
+      resources:
+        requests:
+          storage: {{ .Values.global.storage }}
