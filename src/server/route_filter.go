@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -27,8 +28,10 @@ func validateTokenMiddleware(req *restful.Request, resp *restful.Response, chain
 		func(token *jwt.Token) (interface{}, error) {
 			return []byte(SecretKey), nil
 		})
+
 	if err == nil {
-		if token.Valid {
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			fmt.Println(claims["sub"])
 			chain.ProcessFilter(req, resp)
 		} else {
 			resp.WriteHeader(http.StatusUnauthorized)
