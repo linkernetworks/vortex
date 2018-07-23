@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kube-state-metrics
-  namespace: monitoring
+  namespace: vortex
 spec:
   selector:
     matchLabels:
@@ -15,7 +15,7 @@ spec:
       labels:
         k8s-app: kube-state-metrics
     spec:
-      serviceAccountName: default
+      serviceAccountName: vortex-admin
       containers:
       - name: kube-state-metrics
         image: sdnvortex/kube-state-metrics:develop
