@@ -6,15 +6,18 @@ import (
 	prometheus "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
+// PrometheusConfig is the structure for Prometheus Config
 type PrometheusConfig struct {
 	Url string `json:"url"`
 }
 
+// Service is the structure for Service
 type Service struct {
 	Url string
 	API prometheus.API
 }
 
+// New will reture a new service
 func New(url string) *Service {
 	conf := api.Config{
 		Address:      url,

@@ -1,5 +1,6 @@
 package entity
 
+// NICNetworkTrafficMetrics is the structure for NIC metwork traffic metrics
 type NICNetworkTrafficMetrics struct {
 	ReceiveBytesTotal    int `json:"receiveBytesTotal"`
 	TransmitBytesTotal   int `json:"transmitBytesTotal"`
@@ -7,6 +8,7 @@ type NICNetworkTrafficMetrics struct {
 	TransmitPacketsTotal int `json:"transmitPacketsTotal"`
 }
 
+// NICMetrics is the structure for NIC metrics
 type NICMetrics struct {
 	Default           bool                     `json:"default"`
 	Type              string                   `json:"type"`
@@ -15,6 +17,7 @@ type NICMetrics struct {
 	NICNetworkTraffic NICNetworkTrafficMetrics `json:"nicNetworkTraffic"`
 }
 
+// NICOverviewMetrics is the structure for NIC overview metrics
 type NICOverviewMetrics struct {
 	Name    string `json:"name"`
 	Default bool   `json:"default"`
@@ -22,6 +25,7 @@ type NICOverviewMetrics struct {
 	PCIID   string `json:"pciID"`
 }
 
+// NodeResourceMetrics is the structure for node resource metrics
 type NodeResourceMetrics struct {
 	CPURequests                 float32 `json:"cpuRequests"`
 	CPULimits                   float32 `json:"cpuLimits"`
@@ -37,6 +41,7 @@ type NodeResourceMetrics struct {
 	CapacityEphemeralStorage    float32 `json:"capacityEphemeralStorage"`
 }
 
+// NodeDetailMetrics is the structure for node detail metrics
 type NodeDetailMetrics struct {
 	Hostname          string            `json:"hostname"`
 	CreatedAt         int               `json:"createAt"`
@@ -48,10 +53,12 @@ type NodeDetailMetrics struct {
 	Labels            map[string]string `json:"labels"`
 }
 
+// NodeNICsMetrics is the structure for node NICs metrics
 type NodeNICsMetrics struct {
 	NICs []NICOverviewMetrics `json:"nics"`
 }
 
+// NodeMetrics is the structure for node metrics
 type NodeMetrics struct {
 	Detail   NodeDetailMetrics     `json:"detail"`
 	Resource NodeResourceMetrics   `json:"resource"`

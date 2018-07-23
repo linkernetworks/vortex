@@ -20,6 +20,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// Container is the structure for container
 type Container struct {
 	Config     config.Config
 	Redis      *redis.Service
@@ -29,12 +30,15 @@ type Container struct {
 	Validator  *validator.Validate
 }
 
+// ServiceDiscoverResponse is the structure for Service Discover Response
 type ServiceDiscoverResponse struct {
 	Container map[string]Service `json:"services"`
 }
 
+// Service is the interface
 type Service interface{}
 
+// New will create container
 func New(cf config.Config) *Container {
 	// setup logger configuration
 	logger.Setup(cf.Logger)
@@ -75,6 +79,7 @@ func New(cf config.Config) *Container {
 	return sp
 }
 
+// NewForTesting will test container for creating a container
 func NewForTesting(cf config.Config) *Container {
 	// setup logger configuration
 	logger.Setup(cf.Logger)
@@ -106,6 +111,7 @@ func NewForTesting(cf config.Config) *Container {
 	return sp
 }
 
+// NewContainer will new a container
 func NewContainer(configPath string) *Container {
 	cf := config.MustRead(configPath)
 	return New(cf)

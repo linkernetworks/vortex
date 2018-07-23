@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 )
 
+// ListResource will list resource
 func ListResource(sp *serviceprovider.Container, resource model.LabelName, expression Expression) ([]string, error) {
 	results, err := getElements(sp, expression)
 	if err != nil {
@@ -23,6 +24,7 @@ func ListResource(sp *serviceprovider.Container, resource model.LabelName, expre
 	return resourceList, nil
 }
 
+// ListNodeNICs will list node's NICs
 func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetrics, error) {
 	nicList := entity.NodeNICsMetrics{}
 	expression := Expression{}
@@ -51,6 +53,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 	return nicList, nil
 }
 
+// GetPod will get pod
 func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
 	pod := entity.PodMetrics{}
 	pod.Labels = map[string]string{}
@@ -101,6 +104,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	return pod, nil
 }
 
+// GetContainer will get container
 func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMetrics, error) {
 	container := entity.ContainerMetrics{}
 
@@ -229,6 +233,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	return container, nil
 }
 
+// GetService will get service by serviceprovider.Container
 func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics, error) {
 	service := entity.ServiceMetrics{}
 	service.Labels = map[string]string{}
@@ -277,6 +282,7 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 	return service, nil
 }
 
+// GetController willl get container
 func GetController(sp *serviceprovider.Container, id string) (entity.ControllerMetrics, error) {
 	controller := entity.ControllerMetrics{}
 	controller.Labels = map[string]string{}
@@ -323,6 +329,7 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 	return controller, nil
 }
 
+// GetNode will get node metrics
 func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, error) {
 	node := entity.NodeMetrics{}
 	node.Detail.Labels = map[string]string{}

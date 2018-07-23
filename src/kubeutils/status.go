@@ -8,6 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// GetNonCompletedPods will get non conpleted pods
 func GetNonCompletedPods(sp *serviceprovider.Container, query bson.M) ([]entity.Pod, error) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
