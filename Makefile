@@ -91,8 +91,9 @@ apps.init-helm:
 
 .PHONY: apps.launch-apps
 apps.launch-apps:
-	helm install --debug --wait --set global.environment=testing deploy/helm/foundation/mongodb
-	helm install --debug --wait --set global.environment=testing deploy/helm/apps/prometheus/
+	helm install --debug --wait --set global.environment=testing deploy/helm/foundation
+	helm install --debug --wait --set global.environment=testing deploy/helm/apps/charts/prometheus
+	helm install --debug --wait --set global.environment=testing deploy/helm/apps/charts/vortex-server
 
 .PHONY: apps.teardown
 apps.teardown:

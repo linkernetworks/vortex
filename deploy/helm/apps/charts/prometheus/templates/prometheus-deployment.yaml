@@ -4,18 +4,14 @@ metadata:
   labels:
     name: prometheus-deployment
   name: prometheus
-  namespace: monitoring
+  namespace: vortex
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       labels:
         app: prometheus
     spec:
-      initContainers:
-      - name: init-kube-state-metrics
-        image: busybox
-        command: ["sh", "-c", "until nslookup kube-state-metrics.monitoring.svc.cluster.local; do echo waiting for kube-state-metrics; sleep 2; done;"]
       containers:
       - image: prom/prometheus:v2.2.1
         name: prometheus
@@ -26,7 +22,7 @@ spec:
         - "--storage.tsdb.path=/prometheus"
         - "--storage.tsdb.retention=24h"
         ports:
-        - containerPort: 9090
+        - containerPort: {{ .Values.service.ports.targetPort }}
           protocol: TCP
         volumeMounts:
         - mountPath: "/prometheus"
