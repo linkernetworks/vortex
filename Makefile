@@ -92,7 +92,7 @@ apps.init-helm:
 .PHONY: apps.launch-apps
 apps.launch-apps:
 	helm install --debug --set global.environment=testing deploy/helm/foundation
-	helm install --debug --set global.environment=testing deploy/helm/apps
+	helm install --debug --set global.environment=testing deploy/helm/apps/prmetheus
 
 .PHONY: apps.teardown
 apps.teardown:
