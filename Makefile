@@ -92,16 +92,17 @@ apps.init-helm:
 	helm init
 	kubectl create serviceaccount --namespace kube-system tiller
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-	kubectl apply -f deploy/kubernetes/apps/vortex/00-namespace.yaml
-	kubectl apply -f deploy/kubernetes/apps/vortex/01-rbac.yaml
-	kubectl apply -f deploy/kubernetes/apps/vortex/02-serviceaccount.yaml
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
 .PHONY: apps.launch-apps
 apps.launch-apps:
-	helm install --name foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name prometheus --debug --wait --set global.environment=local deploy/helm/apps/charts/prometheus
-	helm install --name vortex-server --debug --wait --set global.environment=local deploy/helm/apps/charts/vortex-server
+	helm install --name vortex-foundation --debug --set global.environment=testing deploy/helm/foundation
+	helm install --name vortex-apps --debug --set global.environment=testing deploy/helm/apps/
+
+.PHONY: apps.delete-apps
+apps.delete-apps:
+	helm delete --purge vortex-foundation
+	helm delete --purge vortex-apps
 
 .PHONY: apps.teardown
 apps.teardown:

@@ -33,6 +33,7 @@ teardown() {
     WAIT_LIMIT=40
     until kubectl get pods ${podName} -o jsonpath="{.status.phase}" | grep "Running" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
        sleep 2
+       kubectl get pods ${podName}
        NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
     done
     [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
