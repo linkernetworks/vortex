@@ -1,4 +1,4 @@
-git## vortex server version
+## vortex server version
 SERVER_VERSION = v0.1.4
 ## Folder content generated files
 BUILD_FOLDER = ./build
