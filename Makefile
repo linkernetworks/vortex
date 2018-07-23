@@ -1,4 +1,4 @@
-## vortex server version
+git## vortex server version
 SERVER_VERSION = v0.1.4
 ## Folder content generated files
 BUILD_FOLDER = ./build
@@ -92,7 +92,7 @@ apps.init-helm:
 .PHONY: apps.launch-apps
 apps.launch-apps:
 	helm install --debug --wait --set global.environment=testing deploy/helm/foundation
-	helm install --debug --wait --set global.environment=testing deploy/helm/apps
+	helm install --debug --wait --set global.environment=testing deploy/helm/apps/charts/prometheus
 
 .PHONY: apps.teardown
 apps.teardown:
