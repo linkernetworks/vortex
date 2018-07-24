@@ -1,6 +1,6 @@
 package errors
 
-// ErrInvalidVLAN is the sturcture
+// ErrInvalidVLAN is the structure
 type ErrInvalidVLAN struct {
 	message string
 }
