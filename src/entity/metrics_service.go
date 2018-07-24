@@ -11,6 +11,6 @@ type ServiceMetrics struct {
 	Type        string            `json:"type"`
 	CreateAt    int               `json:"createAt"`
 	ClusterIP   string            `json:"clusterIP"`
-	Ports       []v1.ServicePort  `json: "ports"`
+	Ports       []v1.ServicePort  `json:"ports"`
 	Labels      map[string]string `json:"labels"`
 }

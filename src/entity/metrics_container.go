@@ -23,7 +23,7 @@ type ContainerDetailMetrics struct {
 	Node          string   `json:"node"`
 	Image         string   `json:"image"`
 	Command       []string `json:"command"`
-	vNIC          string   `json:"vNic"`
+	VNIC          string   `json:"vNic"`
 }
 
 // ContainerMetrics is the structure for Container Metrics

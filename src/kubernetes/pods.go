@@ -42,5 +42,4 @@ func (kc *KubeCtl) IsPodCompleted(pod *corev1.Pod) bool {
 	default:
 		return true
 	}
-	return true
 }
