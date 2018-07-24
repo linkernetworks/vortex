@@ -12,7 +12,7 @@ import (
 func TestCompositeServiceHandler(t *testing.T) {
 	data := 0
 	var handler = func(*web.NativeContext) {
-		data += 1
+		data++
 	}
 
 	req, err := http.NewRequest("POST", "http://here.com/v1/signin", nil)
@@ -27,7 +27,7 @@ func TestCompositeServiceHandler(t *testing.T) {
 func TestRESTfulServiceHandler(t *testing.T) {
 	data := 0
 	var handler = func(*web.Context) {
-		data += 1
+		data++
 	}
 
 	routeHandler := RESTfulServiceHandler(nil, handler)
