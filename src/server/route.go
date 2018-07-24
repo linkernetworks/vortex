@@ -47,8 +47,8 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 }
 func newAuthenticateService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/auth").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, authenticateHandler)))
+	webService.Path("/v1/login").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, loginHandler)))
 	return webService
 }
 
