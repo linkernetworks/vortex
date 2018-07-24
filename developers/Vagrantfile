@@ -18,7 +18,7 @@ echo "=== Install Vortex Server Environment ==="
 sudo mkdir -p "/etc/systemd/system/docker.service.d/"
 sudo cp "/tmp/override.conf" "/etc/systemd/system/docker.service.d/override.conf"
 sudo apt-get update
-sudo apt-get install -y git build-essential nfs-common ntp
+sudo apt-get install -y git build-essential nfs-common ntp jq bats httpie
 
 # Install Docker
 # kubernetes official max validated version: 17.03.2~ce-0~ubuntu-xenial
@@ -79,6 +79,9 @@ export PATH=/home/$USER/protoc/bin:$PATH:$GOROOT/bin:$GOPATH/bin
 # setup golang dir
 mkdir -p /home/$USER/go/src
 rm -rf /home/$USER/go1.10.2.linux-amd64.tar.gz
+sudo add-apt-repository ppa:duggan/bats --yes
+sudo apt-get update -qq
+sudo apt-get install -qq bats
 
 # Install protoc
 # Env for proto

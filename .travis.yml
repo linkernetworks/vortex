@@ -5,6 +5,8 @@ sudo: required
 services:
   - docker
 
+dist: xenial
+
 go:
   - "1.10.x"
 
@@ -17,8 +19,10 @@ notifications:
 
 before_install:
   - go get -u github.com/kardianos/govendor
-  - sudo apt-get install -y git build-essential openvswitch-switch socat
-  - docker run -d -v /run/openvswitch/db.sock:/var/run/openvswitch/db.sock -p 50051:50051 sdnvortex/network-controller:v0.3.0 /go/bin/server -tcp=0.0.0.0:50051
+  - sudo apt-get install -y git build-essential openvswitch-switch socat jq httpie
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bats
 
 install:
   - make pre-build
@@ -28,6 +32,7 @@ before_script:
   - sudo mount --make-rshared /
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
+  - sudo mount --make-rshared /var/run
     # # Download kubectl, which is a requirement for using minikube.
   - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
     # # Download minikube.
@@ -42,7 +47,7 @@ before_script:
     # # Download Helm.
   - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
     # # Install nsenter
-  - git clone https://github.com/jetstack/ubuntu-nsenter.git && docker build -t ubuntu-nsenter ubuntu-nsenter/ && docker run -v /usr/local/bin:/hostbin ubuntu-nsenter cp /nsenter /hostbin/nsenter
+  - docker run -v /usr/local/bin:/hostbin hwchiu/ubuntu-nsenter cp /nsenter /hostbin/nsenter
 
 script:
   - kubectl cluster-info
@@ -61,8 +66,12 @@ script:
   - make apps.launch-apps
   # # Check if prometheus is ready
   - until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n vortex prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; kubectl get pods --all-namespaces; done
+  - until [ `kubectl  -n vortex get --no-headers pods | awk '{c[$3]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex get pods;  done
+  - kubectl -n vortex describe daemonset/network-controller-server-tcp
+  - kubectl -n vortex describe daemonset/network-controller-server-unix
   # # Start to test and produce the coverage report
   - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
+  - make src.test-bats
   # # Build the docker image if need it
   # - if [ "$TRAVIS_BRANCH" == "develop" ]; then docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile . ; fi
 

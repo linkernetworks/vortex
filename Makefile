@@ -75,6 +75,11 @@ src.test-coverage-vagrant:
 
 ## check build env #############################
 
+.PHONY: src.test-bats
+src.test-bats:
+	cd tests; \
+	bats .;
+
 .PHONY: check-govendor
 check-govendor:
 	$(info check govendor)
@@ -91,13 +96,12 @@ apps.init-helm:
 
 .PHONY: apps.launch-apps
 apps.launch-apps:
-	helm install --name foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name prometheus --debug --wait --set global.environment=local deploy/helm/apps/charts/prometheus
-	helm install --name vortex-server --debug --wait --set global.environment=local deploy/helm/apps/charts/vortex-server
+	helm install --name vortex-foundation --debug --set global.environment=testing deploy/helm/foundation
+	helm install --name vortex-apps --debug --set global.environment=testing deploy/helm/apps/
 
 .PHONY: apps.teardown
 apps.teardown:
-	helm ls --short | xargs -L1 helm delete
+	helm ls --short | xargs -i helm delete --purge {}
 
 ## dockerfiles/ ########################################
 
