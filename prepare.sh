@@ -35,14 +35,6 @@ wgetfiles(){
     echo "---- download file end `date` ----"
 }
 
-prepareenv() {
-    govendorsync &
-    dockerimages &
-    aptget &
-    wgetfiles &
-    wait 
-}
-
 startk8s() {
   sudo mount --make-rshared /
   sudo mount --make-rshared /sys
@@ -57,9 +49,18 @@ startk8s() {
   until [ `kubectl get --all-namespaces --no-headers pods | awk '{c[$4]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl get --all-namespaces pods;  done
 }
 
+prepareenv() {
+    govendorsync &
+    dockerimages &
+    aptget &
+    wgetfiles
+    startk8s &
+    wait 
+}
+
 if [ $1 == "prepare" ]; then
     prepareenv
 fi
 if [ $1 == "k8s" ]; then
-    startk8s
+    echo "yo"
 fi
