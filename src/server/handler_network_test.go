@@ -20,6 +20,8 @@ import (
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	corev1 "k8s.io/api/core/v1"
 )
 
 func init() {
@@ -30,6 +32,7 @@ type NetworkTestSuite struct {
 	suite.Suite
 	wc      *restful.Container
 	session *mongo.Session
+	sp      *serviceprovider.Container
 }
 
 func (suite *NetworkTestSuite) SetupSuite() {
@@ -42,6 +45,8 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 	service := newNetworkService(sp)
 	suite.wc.Add(service)
+
+	suite.sp = sp
 }
 
 func (suite *NetworkTestSuite) TearDownSuite() {}
@@ -194,7 +199,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		network   entity.Network
 		errorCode int
 	}{
-		{"DeleteNetwork", entity.Network{
+		{"NetworkNotExis", entity.Network{
 			ID:         bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
@@ -223,7 +228,39 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 				},
 			},
 			http.StatusBadRequest},
+		{"PodStillUse", entity.Network{
+			ID:         bson.NewObjectId(),
+			Type:       entity.FakeNetworkType,
+			Name:       namesgenerator.GetRandomName(0),
+			VLANTags:   []int32{},
+			BridgeName: namesgenerator.GetRandomName(0),
+			Nodes: []entity.Node{
+				entity.Node{
+					Name:          namesgenerator.GetRandomName(0),
+					PhyInterfaces: []entity.PhyInterface{},
+				},
+			},
+		},
+			http.StatusBadRequest},
 	}
+
+	//Create the Pod using the network.
+	pod := entity.Pod{
+		ID: bson.NewObjectId(),
+		Networks: []entity.PodNetwork{
+			{
+				Name: testCases[2].network.Name,
+			},
+		},
+	}
+	suite.session.Insert(entity.PodCollectionName, pod)
+	defer suite.session.Remove(entity.PodCollectionName, "_id", pod.ID)
+
+	k8sPod := corev1.Pod{
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+		}}
+	suite.sp.KubeCtl.CreatePod(&k8sPod, "default")
 
 	for _, tc := range testCases {
 		suite.T().Run(tc.cases, func(t *testing.T) {
