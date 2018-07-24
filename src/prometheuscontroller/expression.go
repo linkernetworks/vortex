@@ -386,8 +386,6 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 				node.Resource.AllocatableMemory = float32(result.Value)
 			case "pods":
 				node.Resource.AllocatablePods = float32(result.Value)
-			case "ephemeral_storage":
-				node.Resource.AllocatableEphemeralStorage = float32(result.Value)
 			}
 
 		case "kube_node_status_capacity":
@@ -398,8 +396,6 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 				node.Resource.CapacityMemory = float32(result.Value)
 			case "pods":
 				node.Resource.CapacityPods = float32(result.Value)
-			case "ephemeral_storage":
-				node.Resource.CapacityEphemeralStorage = float32(result.Value)
 			}
 		}
 	}

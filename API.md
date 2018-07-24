@@ -565,11 +565,9 @@ Response Data:
    "allocatableCPU": 2,
    "allocatableMemory": 4038615000,
    "allocatablePods": 110,
-   "allocatableEphemeralStorage": 9306748000,
    "capacityCPU": 2,
    "capacityMemory": 4143472600,
    "capacityPods": 110,
-   "capacityEphemeralStorage": 10340831000
   },
   "nics": {
    "cni0": {
