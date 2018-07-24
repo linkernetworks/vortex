@@ -19,8 +19,11 @@ pre-build:
 
 .PHONY: env-prepare
 env-prepare:
-	./prepare.sh
+	./prepare.sh prepare
 
+.PHONY: env-k8s
+env-k8s:
+	./prepare.sh k8s
 
 .PHONY: build
 build: pre-build
