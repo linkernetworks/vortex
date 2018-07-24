@@ -15,7 +15,7 @@ spec:
       labels:
         k8s-app: kube-state-metrics
     spec:
-      serviceAccountName: vortex-admin
+      serviceAccountName: prometheus
       containers:
       - name: kube-state-metrics
         image: sdnvortex/kube-state-metrics:develop

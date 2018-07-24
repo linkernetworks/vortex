@@ -13,6 +13,7 @@ spec:
         prometheus.io/scrape: 'true'
     spec:
       hostPID: true
+      serviceAccountName: prometheus
       containers:
       - name:  node-exporter
         image: sdnvortex/node-exporter:latest
