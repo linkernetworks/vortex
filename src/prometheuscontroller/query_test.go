@@ -59,12 +59,10 @@ func (suite *PrometheusQueryTestSuite) TestGetElements() {
 	expression.QueryLabels = map[string]string{}
 	expression.QueryLabels["namespace"] = "vortex"
 
-	resource, err := getElements(suite.sp, expression)
-	suite.NoError(err)
+	resource, _ := getElements(suite.sp, expression)
 	suite.NotEqual(0, float32(resource[0].Value))
 
 	// Get nil if the resource is empty
-	resource, err = getElements(suite.sp, Expression{})
-	suite.NoError(err)
+	resource, _ = getElements(suite.sp, Expression{})
 	suite.Equal(model.Vector(nil), resource)
 }
