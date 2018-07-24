@@ -99,11 +99,6 @@ apps.launch-apps:
 	helm install --name vortex-foundation --debug --set global.environment=testing deploy/helm/foundation
 	helm install --name vortex-apps --debug --set global.environment=testing deploy/helm/apps/
 
-.PHONY: apps.delete-apps
-apps.delete-apps:
-	helm delete --purge vortex-foundation
-	helm delete --purge vortex-apps
-
 .PHONY: apps.teardown
 apps.teardown:
 	helm ls --short | xargs -L1 helm delete
