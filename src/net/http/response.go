@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// The Structure to contain the Error Message from the HTTP response
+// ErrorPayload is the Structure to contain the Error Message from the HTTP response
 // Contains the Error Messagess (At most two errors)
 type ErrorPayload struct {
 	XMLName         xml.Name `json:"-" xml:"response"`
@@ -15,7 +15,7 @@ type ErrorPayload struct {
 	PreviousMessage string   `json:"previousMessage,omitempty" xml:"previousMessage,omitempty"`
 }
 
-// Return the ErrorPayload message according the parameters (errors)
+// NewErrorPayload will return the ErrorPayload message according the parameters (errors)
 // The ErrorPayload contains at most error messages
 func NewErrorPayload(errs ...error) ErrorPayload {
 	payload := ErrorPayload{Error: true}
@@ -30,7 +30,7 @@ func NewErrorPayload(errs ...error) ErrorPayload {
 	return payload
 }
 
-// The function to get the error from the request and ErrorPayload
+// EncodeErrorPayload is the function to get the error from the request and ErrorPayload
 // It should contains the errorType and error content
 func EncodeErrorPayload(req *http.Request, payload ErrorPayload) (out []byte, contentType string, encErr error) {
 	contentType = req.Header.Get("content-type")
@@ -48,7 +48,7 @@ func EncodeErrorPayload(req *http.Request, payload ErrorPayload) (out []byte, co
 	return out, contentType, encErr
 }
 
-// Write the error status and error code to the http request and return the written byte count of the http request
+// WriteStatusAndError will write the error status and error code to the http request and return the written byte count of the http request
 func WriteStatusAndError(req *http.Request, resp http.ResponseWriter, status int, errs ...error) (int, error) {
 	payload := NewErrorPayload(errs...)
 	out, contentType, encErr := EncodeErrorPayload(req, payload)
@@ -62,42 +62,42 @@ func WriteStatusAndError(req *http.Request, resp http.ResponseWriter, status int
 	return resp.Write(out)
 }
 
-// Set the status code http.StatusForbidden to the HTTP response message
+// Forbidden will set the status code http.StatusForbidden to the HTTP response message
 func Forbidden(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusForbidden, errs...)
 }
 
-// Set the status code http.StatusBadRequest to the HTTP response message
+// BadRequest will set the status code http.StatusBadRequest to the HTTP response message
 func BadRequest(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusBadRequest, errs...)
 }
 
-// Set the status code http.StatusOK to the HTTP response message
+// OK will set the status code http.StatusOK to the HTTP response message
 func OK(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusOK, errs...)
 }
 
-// Set the status code http.StatusNotFound to the HTTP response message
+// NotFound will set the status code http.StatusNotFound to the HTTP response message
 func NotFound(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusNotFound, errs...)
 }
 
-// Set the status code http.StatusUnauthorized to the HTTP response message
+// Unauthorized will set the status code http.StatusUnauthorized to the HTTP response message
 func Unauthorized(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusUnauthorized, errs...)
 }
 
-// Set the status code http.StatusInternalServerError to the HTTP response message
+// InternalServerError will set the status code http.StatusInternalServerError to the HTTP response message
 func InternalServerError(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusInternalServerError, errs...)
 }
 
-// Set the status code http.StatusConflict to the HTTP response message
+// Conflict will set the status code http.StatusConflict to the HTTP response message
 func Conflict(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusConflict, errs...)
 }
 
-// Set the status code http.StatusUnprocessableEntity to the HTTP response message
+// UnprocessableEntity will set the status code http.StatusUnprocessableEntity to the HTTP response message
 func UnprocessableEntity(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusUnprocessableEntity, errs...)
 }
