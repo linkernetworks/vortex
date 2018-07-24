@@ -17,6 +17,11 @@ all: build test
 pre-build:
 	$(MAKE) govendor-sync
 
+.PHONY: env-prepare
+env-prepare:
+	./prepare.sh
+
+
 .PHONY: build
 build: pre-build
 	$(MAKE) src.build
@@ -49,7 +54,7 @@ src.build:
 
 .PHONY: src.test
 src.test:
-	$(GO) test -v -race ./src/...
+	$(GO) test -race ./src/...
 
 .PHONY: src.install
 src.install:
@@ -58,7 +63,7 @@ src.install:
 .PHONY: src.test-coverage
 src.test-coverage:
 	$(MKDIR_P) $(BUILD_FOLDER)/src/
-	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
+	$(GO) test -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
 	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
 
 .PHONY: src.test-coverage-minikube
