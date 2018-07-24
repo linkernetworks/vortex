@@ -27,18 +27,16 @@ type NICOverviewMetrics struct {
 
 // NodeResourceMetrics is the structure for node resource metrics
 type NodeResourceMetrics struct {
-	CPURequests                 float32 `json:"cpuRequests"`
-	CPULimits                   float32 `json:"cpuLimits"`
-	MemoryRequests              float32 `json:"memoryRequests"`
-	MemoryLimits                float32 `json:"memoryLimits"`
-	AllocatableCPU              float32 `json:"allocatableCPU"`
-	AllocatableMemory           float32 `json:"allocatableMemory"`
-	AllocatablePods             float32 `json:"allocatablePods"`
-	AllocatableEphemeralStorage float32 `json:"allocatableEphemeralStorage"`
-	CapacityCPU                 float32 `json:"capacityCPU"`
-	CapacityMemory              float32 `json:"capacityMemory"`
-	CapacityPods                float32 `json:"capacityPods"`
-	CapacityEphemeralStorage    float32 `json:"capacityEphemeralStorage"`
+	CPURequests       float32 `json:"cpuRequests"`
+	CPULimits         float32 `json:"cpuLimits"`
+	MemoryRequests    float32 `json:"memoryRequests"`
+	MemoryLimits      float32 `json:"memoryLimits"`
+	AllocatableCPU    float32 `json:"allocatableCPU"`
+	AllocatableMemory float32 `json:"allocatableMemory"`
+	AllocatablePods   float32 `json:"allocatablePods"`
+	CapacityCPU       float32 `json:"capacityCPU"`
+	CapacityMemory    float32 `json:"capacityMemory"`
+	CapacityPods      float32 `json:"capacityPods"`
 }
 
 // NodeDetailMetrics is the structure for node detail metrics
