@@ -6,6 +6,7 @@ import (
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/kubeutils"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"gopkg.in/mgo.v2/bson"
 
@@ -65,23 +66,14 @@ func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	pods := []entity.Pod{}
-	err := session.FindAll(entity.PodCollectionName, bson.M{"volumes.name": volume.Name}, &pods)
+	pods, err := kubeutils.GetNonCompletedPods(sp, bson.M{"volumes.name": volume.Name})
 	if err != nil {
-		return fmt.Errorf("load the database fail:%v", err)
+		return err
 	}
 
 	usedPod := []string{}
 	for _, pod := range pods {
-		//Check the pod's status, report error if at least one pod is running.
-		currentPod, err := sp.KubeCtl.GetPod(pod.Name, namespace)
-		if err != nil {
-			continue
-		}
-
-		if !sp.KubeCtl.IsPodCompleted(currentPod) {
-			usedPod = append(usedPod, pod.Name)
-		}
+		usedPod = append(usedPod, pod.Name)
 	}
 	if len(usedPod) != 0 {
 		podNames := strings.Join(usedPod, ",")
