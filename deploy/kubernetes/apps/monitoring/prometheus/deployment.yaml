@@ -12,7 +12,7 @@ spec:
       labels:
         app: prometheus
     spec:
-      serviceAccountName: vortex-admin
+      serviceAccountName: prometheus
       containers:
       - image: prom/prometheus:v2.2.1
         name: prometheus
