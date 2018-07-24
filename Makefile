@@ -101,7 +101,7 @@ apps.launch-apps:
 
 .PHONY: apps.teardown
 apps.teardown:
-	helm ls --short | xargs -L1 helm delete
+	helm ls --short | xargs -i helm delete --purge {}
 
 ## dockerfiles/ ########################################
 
