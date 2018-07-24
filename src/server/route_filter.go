@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -9,9 +8,6 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/linkernetworks/logger"
 )
-
-// SessionKey will be the cookie name defined in the http header
-const SessionKey = "ses"
 
 // FIXME using ldconfig go build to give a secretkey
 const (
@@ -31,7 +27,8 @@ func validateTokenMiddleware(req *restful.Request, resp *restful.Response, chain
 
 	if err == nil {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			fmt.Println(claims["sub"])
+			// save to requests attributes
+			req.SetAttribute("UserID", claims["sub"])
 			chain.ProcessFilter(req, resp)
 		} else {
 			resp.WriteHeader(http.StatusUnauthorized)
