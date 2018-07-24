@@ -6,16 +6,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// PodCollectionName's const
 const (
 	PodCollectionName string = "pods"
 )
 
+// Container is the structure for init Container info
 type Container struct {
 	Name    string   `bson:"name" json:"name" validate:"required,k8sname"`
 	Image   string   `bson:"image" json:"image" validate:"required"`
 	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
 }
 
+// PodNetwork is the structure for pod network info
 type PodNetwork struct {
 	Name       string `bson:"name" json:"name"`
 	IfName     string `bson:"ifName" json:"ifName"`
@@ -25,11 +28,13 @@ type PodNetwork struct {
 	BridgeName string `bson:"bridgeName" json:"bridgeName"` //its from the entity.Network entity
 }
 
+// PodVolume is the structure for pof volume info 
 type PodVolume struct {
 	Name      string `bson:"name" json:"name" validate:"required"`
 	MountPath string `bson:"mountPath" json:"mountPath" validate:"required"`
 }
 
+// Pod is the structure for pod info
 type Pod struct {
 	ID         bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
 	Name       string            `bson:"name" json:"name" validate:"required,k8sname"`
@@ -41,7 +46,7 @@ type Pod struct {
 	Networks   []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 }
 
-//GetCollection - get model mongo collection name.
+// GetCollection - get model mongo collection name.
 func (m Pod) GetCollection() string {
 	return PodCollectionName
 }

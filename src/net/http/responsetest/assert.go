@@ -12,10 +12,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// AssertStatusEqual will assert equal status
 func AssertStatusEqual(t *testing.T, resp *httptest.ResponseRecorder, status int) {
 	assert.Equal(t, status, resp.Code)
 }
 
+// AssertErrorMessage will assert error message
 func AssertErrorMessage(t *testing.T, resp *httptest.ResponseRecorder, msg string) (err error) {
 	var payload = response.ErrorPayload{}
 	var out = resp.Body.Bytes()
@@ -31,6 +33,7 @@ func AssertErrorMessage(t *testing.T, resp *httptest.ResponseRecorder, msg strin
 	return err
 }
 
+// AssertError will assert error
 func AssertError(t *testing.T, resp *httptest.ResponseRecorder) (err error) {
 	var payload = response.ErrorPayload{}
 	var out = resp.Body.Bytes()

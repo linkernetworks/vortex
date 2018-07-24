@@ -13,19 +13,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// the const for the provisioner or storageclass of nfs
 const (
 	NFSProvisionerPrefix  string = "nfs-provisioner-"
 	NFSStorageClassPrefix string = "nfs-storageclass-"
 )
 
+// NFSStorageProvider is the structure for NFS storage provider
 type NFSStorageProvider struct {
 	entity.Storage
 }
 
+// ValidateBeforeCreating will validate the nfs storage provider before creating
 func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage *entity.Storage) error {
 	path := storage.PATH
 	if path == "" || path[0] != '/' {
-		return fmt.Errorf("Invalid NFS export path %s\n", path)
+		return fmt.Errorf("Invalid NFS export path %s", path)
 	}
 	return nil
 }
@@ -97,6 +100,7 @@ func getStorageClass(name string, provisioner string, storage *entity.Storage) *
 	}
 }
 
+// CreateStorage will create storage depandent on NFS storage srovider
 func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	namespace := "default"
 	name := NFSProvisionerPrefix + storage.ID.Hex()
@@ -113,6 +117,7 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 	return err
 }
 
+// DeleteStorage will delete stroage
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	namespace := "default"
 	deployName := NFSProvisionerPrefix + storage.ID.Hex()

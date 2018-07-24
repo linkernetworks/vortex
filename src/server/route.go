@@ -7,6 +7,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
+// AppRoute will add router
 func (a *App) AppRoute() *mux.Router {
 	router := mux.NewRouter()
 

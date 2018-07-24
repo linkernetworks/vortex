@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
+// App is the structure to set config & service provider of APP
 type App struct {
 	Config          config.Config
 	ServiceProvider *serviceprovider.Container
