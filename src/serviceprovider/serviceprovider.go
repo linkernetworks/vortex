@@ -46,8 +46,8 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to redis: %s", cf.Redis.Addr())
 	redisService := redis.New(cf.Redis)
 
-	logger.Infof("Connecting to mongodb: %s", cf.Mongo.URL)
-	mongo := mongo.New(cf.Mongo.URL)
+	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
+	mongo := mongo.New(cf.Mongo.Url)
 
 	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.URL)
 	prometheus := prometheusprovider.New(cf.Prometheus.URL)
