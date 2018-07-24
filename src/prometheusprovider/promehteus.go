@@ -8,12 +8,12 @@ import (
 
 // PrometheusConfig is the structure for Prometheus Config
 type PrometheusConfig struct {
-	Url string `json:"url"`
+	URL string `json:"url"`
 }
 
 // Service is the structure for Service
 type Service struct {
-	Url string
+	URL string
 	API prometheus.API
 }
 
@@ -33,7 +33,7 @@ func New(url string) *Service {
 	newAPI := prometheus.NewAPI(client)
 
 	return &Service{
-		Url: url,
+		URL: url,
 		API: newAPI,
 	}
 }

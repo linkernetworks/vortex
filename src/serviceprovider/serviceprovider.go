@@ -49,8 +49,8 @@ func New(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
-	prometheus := prometheusprovider.New(cf.Prometheus.Url)
+	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.URL)
+	prometheus := prometheusprovider.New(cf.Prometheus.URL)
 
 	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	k8s, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -90,8 +90,8 @@ func NewForTesting(cf config.Config) *Container {
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
 
-	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.Url)
-	prometheus := prometheusprovider.New(cf.Prometheus.Url)
+	logger.Infof("Connecting to prometheus: %s", cf.Prometheus.URL)
+	prometheus := prometheusprovider.New(cf.Prometheus.URL)
 
 	clientset := fakeclientset.NewSimpleClientset()
 
