@@ -41,6 +41,7 @@ func getStorageClassName(session *mongo.Session, storageName string) (string, er
 	return storage.StorageClassName, err
 }
 
+// CreateVolume is a function to create volume
 func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	namespace := "default"
 	session := sp.Mongo.NewSession()
@@ -57,6 +58,7 @@ func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	return err
 }
 
+// DeleteVolume is a function to delete volume
 func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 	namespace := "default"
 	//Check the pod

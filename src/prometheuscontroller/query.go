@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Expression is the structure for expression
 type Expression struct {
 	Metrics     []string          `json:"metrics"`
 	QueryLabels map[string]string `json:"queryLabels"`

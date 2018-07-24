@@ -6,10 +6,12 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// the const for ServiceCollectionName
 const (
 	ServiceCollectionName string = "services"
 )
 
+// ServicePort is the structure for service port
 type ServicePort struct {
 	Name       string `bson:"name" json:"name" validate:"required,k8sname"`
 	Port       int32  `bson:"port" json:"port" validate:"required"`
@@ -17,6 +19,7 @@ type ServicePort struct {
 	NodePort   int32  `bson:"nodePort" json:"nodePort" validate:"max=32767,min=30000"`
 }
 
+// Service is the structure for service
 type Service struct {
 	ID        bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
 	Name      string            `bson:"name" json:"name" validate:"required,k8sname"`

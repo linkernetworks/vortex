@@ -6,17 +6,21 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// StorageType is string
 type StorageType string
 
+// The const for storage type
 const (
 	NFSStorageType  = "nfs"
 	FakeStorageType = "fake"
 )
 
+// The const for StorageCollectionName
 const (
 	StorageCollectionName string = "storage"
 )
 
+// Storage is the Storage info
 type Storage struct {
 	ID               bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
 	Type             StorageType   `bson:"type" json:"type" validate:"required"`
@@ -28,7 +32,7 @@ type Storage struct {
 	CreatedAt        *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
-//GetCollection - get model mongo collection name.
+// GetCollection - get model mongo collection name.
 func (m Storage) GetCollection() string {
 	return StorageCollectionName
 }

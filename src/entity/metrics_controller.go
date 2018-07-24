@@ -1,5 +1,6 @@
 package entity
 
+// ControllerMetrics is the structure for Controller Metrics
 type ControllerMetrics struct {
 	ControllerName string            `json:"controllerName"`
 	Type           string            `json:"type"`

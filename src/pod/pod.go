@@ -15,8 +15,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// VolumeNamePrefix will set prefix of volumename
 const VolumeNamePrefix = "volume-"
 
+// CheckPodParameter will Check Pod's Parameter
 func CheckPodParameter(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -196,6 +198,7 @@ func generateAffinity(nodeNames []string) *corev1.Affinity {
 	}
 }
 
+// CreatePod will Create Pod
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -250,6 +253,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	return err
 }
 
+// DeletePod will delete pod
 func DeletePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	return sp.KubeCtl.DeletePod(pod.Name, pod.Namespace)
 }

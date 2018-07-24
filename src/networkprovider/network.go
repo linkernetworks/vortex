@@ -8,11 +8,13 @@ import (
 	"github.com/linkernetworks/vortex/src/utils"
 )
 
+// NetworkProvider is the structure for Network Provider
 type NetworkProvider interface {
 	CreateNetwork(sp *serviceprovider.Container) error
 	DeleteNetwork(sp *serviceprovider.Container) error
 }
 
+// GetNetworkProvider will get network provider if you gave *entity.Network
 func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	switch network.Type {
 	case entity.OVSKernelspaceNetworkType:
@@ -32,6 +34,7 @@ func GetNetworkProvider(network *entity.Network) (NetworkProvider, error) {
 	}
 }
 
+// GenerateBridgeName will generate bridge name
 func GenerateBridgeName(datapathType, networkName string) string {
 	tmp := fmt.Sprintf("%s%s", datapathType, networkName)
 	str := utils.SHA256String(tmp)

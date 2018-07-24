@@ -5,7 +5,7 @@ import (
 	"github.com/linkernetworks/logger"
 )
 
-// will be the cookie name defined in the http header
+// SessionKey will be the cookie name defined in the http header
 const SessionKey = "ses"
 
 func globalLogging(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {

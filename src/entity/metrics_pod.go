@@ -1,5 +1,6 @@
 package entity
 
+// PodMetrics is the structure for Pod metrics
 type PodMetrics struct {
 	PodName      string            `json:"podName"`
 	Namespace    string            `json:"namespace"`
