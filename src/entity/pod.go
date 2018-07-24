@@ -23,7 +23,7 @@ type PodNetwork struct {
 	Name       string `bson:"name" json:"name"`
 	IfName     string `bson:"ifName" json:"ifName"`
 	VlanTag    *int32 `bson:"vlanTag" json:"vlanTag"`
-	IPAddress  string `bson:"ipAddress json:"ipAddress"`
+	IPAddress  string `bson:"ipAddress" json:"ipAddress"`
 	Netmask    string `bson:"netmask" json:"netmask"`
 	BridgeName string `bson:"bridgeName" json:"bridgeName"` //its from the entity.Network entity
 }
