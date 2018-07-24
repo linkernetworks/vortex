@@ -72,6 +72,7 @@ script:
   # # Start to test and produce the coverage report
   - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
   - make src.test-bats
+  - sudo docker images
   # # Build the docker image if need it
   # - if [ "$TRAVIS_BRANCH" == "develop" ]; then docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile . ; fi
 
