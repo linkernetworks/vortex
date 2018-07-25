@@ -52,6 +52,7 @@ type Pod struct {
 	Volumes       []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
 	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never`
+	Capability    bool              `bson:"capability" json:"Capability" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.

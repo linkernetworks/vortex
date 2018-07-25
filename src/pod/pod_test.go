@@ -334,5 +334,16 @@ func (suite *PodTestSuite) TestGenerateAffinity() {
 	suite.Nil(affinity.NodeAffinity)
 	affinity = generateAffinity([]string{"123"})
 	suite.NotNil(affinity.NodeAffinity)
+}
 
+func (suite *PodTestSuite) TestGenerateContainerSecurityContext() {
+	pod := &entity.Pod{}
+	security := generateContainerSecurity(pod)
+	suite.Nil(security.Privileged)
+	suite.Nil(security.Capabilities)
+
+	pod.Capability = true
+	security = generateContainerSecurity(pod)
+	suite.NotNil(security.Privileged)
+	suite.NotNil(security.Capabilities)
 }
