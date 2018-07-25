@@ -15,9 +15,9 @@ const (
 // User is the structure for user info
 type User struct {
 	ID          bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
-	UUID        uuid.UUID     `bson:"uuid" json:"uuid" validate:"required,uuid4"`
+	UUID        uuid.UUID     `bson:"uuid" json:"uuid" validate:"required"`
 	JWT         string        `bson:"jwt" json:"jwt" validate:"-"`
-	UserName    string        `bson:"username" json:"username" validate:"required"`
+	Username    string        `bson:"username" json:"username" validate:"required"`
 	Email       string        `bson:"email" json:"email" validate:"required,email"`
 	Password    string        `bson:"password" json:"password" validate:"required"`
 	FirstName   string        `bson:"firstname" json:"firstName" validate:"required"`
