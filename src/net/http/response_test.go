@@ -86,6 +86,7 @@ func TestSetStatus(t *testing.T) {
 		{"InternalServerError", InternalServerError, http.StatusInternalServerError},
 		{"Conflict", Conflict, http.StatusConflict},
 		{"UnprocessableEntity", UnprocessableEntity, http.StatusUnprocessableEntity},
+		{"MethodNotAllow", MethodNotAllow, http.StatusMethodNotAllowed},
 	}
 
 	for _, tc := range testCases {
