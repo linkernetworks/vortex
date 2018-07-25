@@ -26,4 +26,7 @@ helm/**/requirements.lock
 vendor/*
 !vendor/vendor.json
 
+# debug.test
+**/debug.test
+
 build/
