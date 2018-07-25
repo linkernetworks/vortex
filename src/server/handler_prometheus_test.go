@@ -83,6 +83,13 @@ func (suite *PrometheusTestSuite) TestListPodMetrics() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/pods?node=.*&namespace=.*&controller=.*", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
 func (suite *PrometheusTestSuite) TestGetPodMetrics() {
@@ -104,6 +111,13 @@ func (suite *PrometheusTestSuite) TestListContainerMetrics() {
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/containers?node=.*&namespace=.*&pod=.*", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
@@ -129,6 +143,13 @@ func (suite *PrometheusTestSuite) TestListServiceMetrics() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services?namespace=.*", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
 func (suite *PrometheusTestSuite) TestGetServiceMetrics() {
@@ -150,6 +171,13 @@ func (suite *PrometheusTestSuite) TestListControllerMetrics() {
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/controllers?namespace=.*", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
