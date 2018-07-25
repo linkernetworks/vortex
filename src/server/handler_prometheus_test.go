@@ -41,7 +41,7 @@ func TestPrometheusSuite(t *testing.T) {
 	suite.Run(t, new(PrometheusTestSuite))
 }
 
-func (suite *PrometheusTestSuite) TestListNodeMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListNodeMetrics() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/nodes/", nil)
 	suite.NoError(err)
 
@@ -50,7 +50,7 @@ func (suite *PrometheusTestSuite) TestListNodeMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestGetNodeMetricsStatus() {
+func (suite *PrometheusTestSuite) TestGetNodeMetrics() {
 	nodes, err := suite.sp.KubeCtl.GetNodes()
 	suite.NoError(err)
 	nodeName := nodes[0].GetName()
@@ -63,7 +63,7 @@ func (suite *PrometheusTestSuite) TestGetNodeMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListNodeNicsMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListNodeNicsMetrics() {
 	nodes, err := suite.sp.KubeCtl.GetNodes()
 	suite.NoError(err)
 	nodeName := nodes[0].GetName()
@@ -76,7 +76,7 @@ func (suite *PrometheusTestSuite) TestListNodeNicsMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListPodMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListPodMetrics() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/pods/", nil)
 	suite.NoError(err)
 
@@ -85,7 +85,7 @@ func (suite *PrometheusTestSuite) TestListPodMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestGetPodMetricsStatus() {
+func (suite *PrometheusTestSuite) TestGetPodMetrics() {
 	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
@@ -99,7 +99,7 @@ func (suite *PrometheusTestSuite) TestGetPodMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListContainerMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListContainerMetrics() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/containers/", nil)
 	suite.NoError(err)
 
@@ -108,7 +108,7 @@ func (suite *PrometheusTestSuite) TestListContainerMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestGetContainerMetricsStatus() {
+func (suite *PrometheusTestSuite) TestGetContainerMetrics() {
 	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
@@ -122,7 +122,7 @@ func (suite *PrometheusTestSuite) TestGetContainerMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListServiceMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListServiceMetrics() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services", nil)
 	suite.NoError(err)
 
@@ -131,7 +131,7 @@ func (suite *PrometheusTestSuite) TestListServiceMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestGetServiceMetricsStatus() {
+func (suite *PrometheusTestSuite) TestGetServiceMetrics() {
 	namespace := "vortex"
 	services, err := suite.sp.KubeCtl.GetServices(namespace)
 	suite.NoError(err)
@@ -145,7 +145,7 @@ func (suite *PrometheusTestSuite) TestGetServiceMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListControllerMetricsStatus() {
+func (suite *PrometheusTestSuite) TestListControllerMetrics() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/controllers/", nil)
 	suite.NoError(err)
 
@@ -154,7 +154,7 @@ func (suite *PrometheusTestSuite) TestListControllerMetricsStatus() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestGetControllerMetricsStatus() {
+func (suite *PrometheusTestSuite) TestGetControllerMetrics() {
 	namespace := "vortex"
 	deployments, err := suite.sp.KubeCtl.GetDeployments(namespace)
 	suite.NoError(err)
