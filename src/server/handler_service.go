@@ -11,6 +11,7 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/service"
 	"github.com/linkernetworks/vortex/src/web"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -42,7 +43,11 @@ func createServiceHandler(ctx *web.Context) {
 	s.CreatedAt = timeutils.Now()
 
 	if err := service.CreateService(sp, &s); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsAlreadyExists(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 	if err := session.Insert(entity.ServiceCollectionName, &s); err != nil {
@@ -75,7 +80,11 @@ func deleteServiceHandler(ctx *web.Context) {
 	}
 
 	if err := service.DeleteService(sp, &s); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsAlreadyExists(err) {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
