@@ -271,12 +271,12 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 
 	}
 
+	// get service port config
 	kc := sp.KubeCtl
 	object, err := kc.GetService(service.ServiceName, service.Namespace)
 	if err != nil {
 		return entity.ServiceMetrics{}, err
 	}
-
 	service.Ports = object.Spec.Ports
 
 	return service, nil
