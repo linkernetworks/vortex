@@ -34,10 +34,20 @@ func listContainerMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["pod"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, "container", expression)
+	containerNameList, err := pc.ListResource(sp, "container", expression)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
+	}
+
+	containerList := map[string]entity.ContainerMetrics{}
+	for _, containerName := range containerNameList {
+		container, err := pc.GetContainer(sp, containerName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		containerList[containerName] = container
 	}
 
 	resp.WriteEntity(containerList)
@@ -85,13 +95,23 @@ func listPodMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["created_by_name"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, "pod", expression)
+	podNameList, err := pc.ListResource(sp, "pod", expression)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	resp.WriteEntity(containerList)
+	podList := map[string]entity.PodMetrics{}
+	for _, podName := range podNameList {
+		pod, err := pc.GetPod(sp, podName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		podList[podName] = pod
+	}
+
+	resp.WriteEntity(podList)
 }
 
 func getPodMetricsHandler(ctx *web.Context) {
@@ -123,13 +143,23 @@ func listControllerMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, "deployment", expression)
+	controllerNameList, err := pc.ListResource(sp, "deployment", expression)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	resp.WriteEntity(containerList)
+	controllerList := map[string]entity.ControllerMetrics{}
+	for _, controllerName := range controllerNameList {
+		controller, err := pc.GetController(sp, controllerName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		controllerList[controllerName] = controller
+	}
+
+	resp.WriteEntity(controllerList)
 }
 
 func getControllerMetricsHandler(ctx *web.Context) {
@@ -161,13 +191,23 @@ func listServiceMetricsHandler(ctx *web.Context) {
 		expression.QueryLabels["namespace"] = ".*"
 	}
 
-	containerList, err := pc.ListResource(sp, "service", expression)
+	serviceNameList, err := pc.ListResource(sp, "service", expression)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	}
 
-	resp.WriteEntity(containerList)
+	serviceList := map[string]entity.ServiceMetrics{}
+	for _, serviceName := range serviceNameList {
+		service, err := pc.GetService(sp, serviceName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		serviceList[serviceName] = service
+	}
+
+	resp.WriteEntity(serviceList)
 }
 
 func getServiceMetricsHandler(ctx *web.Context) {

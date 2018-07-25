@@ -7,10 +7,10 @@
         }
     },
     "mongo": {
-        "url": "mongodb://localhost:27017/vortex_test"
+        "url": "mongodb://172.17.8.100:31717/vortex_test"
     },
     "prometheus": {
-        "url": "http://localhost:30003"
+        "url": "http://172.17.8.100:30003"
     },
     "logger": {
         "dir": "./logs",
