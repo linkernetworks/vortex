@@ -199,7 +199,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		network   entity.Network
 		errorCode int
 	}{
-		{"NetworkNotExis", entity.Network{
+		{"NetworkDeleteFail", entity.Network{
 			ID:         bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
@@ -241,7 +241,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 				},
 			},
 		},
-			http.StatusBadRequest},
+			http.StatusMethodNotAllowed},
 	}
 
 	//Create the Pod using the network.

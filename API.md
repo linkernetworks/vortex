@@ -397,7 +397,9 @@ For each Pod, we have fileds need to handle.
     - vlanTag: the vlan tag for `ifName` interface.
     - ipADdress: the IPv4 address of the `ifName` interface.
     - netmask: the IPv4 netmask of the `ifName` interface.
- 
+7. restartPolicy: the attribute how the pod restart is container, it should be a string and only valid for those following strings.
+    - Always,OnFailure,Never
+
 Example:
 
 Request Data:
