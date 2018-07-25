@@ -104,6 +104,14 @@ func generateClientCommand(network entity.PodNetwork) (command []string) {
 	if network.VlanTag != nil {
 		command = append(command, "-v="+strconv.Itoa((int)(*network.VlanTag)))
 	}
+	// Support one command with one add route in first version
+	if network.Routes != nil {
+		if network.Routes[0].Gateway != "" {
+			command = append(command, "--net="+network.Routes[0].DstCIDR, "-g="+network.Routes[0].Gateway)
+		} else {
+			command = append(command, "--net="+network.Routes[0].DstCIDR)
+		}
+	}
 	return
 }
 
