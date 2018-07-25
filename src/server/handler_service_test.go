@@ -107,7 +107,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusContinue, httpWriter)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 
 	err = svc.DeleteService(suite.sp, &service)
 	suite.NoError(err)
