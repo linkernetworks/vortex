@@ -46,15 +46,14 @@ startk8s() {
   make apps.init-helm
   JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lname=tiller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; echo "wait the tiller to be available"; done
   make apps.launch-apps
-  until [ `kubectl get --all-namespaces --no-headers pods | awk '{c[$4]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl get --all-namespaces pods;  done
+  until [ `kubectl get --all-namespaces --no-headers pods | awk '{c[$4]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex logs deploy/vortex-server; kubectl -n vortex describe deploy/vortex-server;  done
 }
 
 prepareenv() {
     govendorsync &
     dockerimages &
     aptget &
-    wgetfiles
-    startk8s &
+    wgetfiles &
     wait 
 }
 
@@ -62,5 +61,5 @@ if [ $1 == "prepare" ]; then
     prepareenv
 fi
 if [ $1 == "k8s" ]; then
-    echo "yo"
+    startk8s 
 fi

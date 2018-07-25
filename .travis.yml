@@ -13,6 +13,11 @@ go:
 env:
   - CHANGE_MINIKUBE_NONE_USER=true
 
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/.cache/govendor
+
 notifications:
   slack:
     secure: k4ElQjxzBFlHcSHny92pauJNsb6HDvK4BVnmc0wwm9SViQLHj/8yoRlfkUahQ6oAvnl2FaT5DN7gpWDxg5JDsEwvvtJfcqWzv0WIG911fCUlWEZ358DVcs59MOml2A13P6k7fbIxLSQD7yD4LJbnHg61ZFcj2yxy3H3KI3KUOvOrQCNk/ptIKAPahLLmlX4x6nO3bKT9zXOWZKzqSoERMBNuhdEU6BDggaQTxryz8uPoNJe1cb6WYcqqV7CXX/UTB1m0sVoJceAre5ukehp0uv+b0wjYSKm8bviZcFyy2W9eafnYeqyJht7U4Tqlw/l6xDbS3jPmFE7rMyGUDxkz92ZOr72xca7dRBSo6TXpJ4yHl4J/fHeHfMS1Di3OHHp/T4FgPykpbm+2lCCCR79bZ5XjnhDOimO35fzn+c8lHHqEgsdYK0cgmhbRs51A0lPjiWseosQ0tNQ/STd5FL+KDidJ+qHcahVSO0Afwwl7s573GuXDegAKCMJ09TMKSEVvXa8yZFqoo9UG+g+L6a0Mm71pymn+eEhAPXpl8ZzM2qjmTYdaIA/XLHHet49AkNdY7/27o+itXgA/Vh0DAcOHeTO1fJ17sVCP2R72KGRahWLRV5PpeiNnK7Xg2ZXuYaqA//gyjyzz3fVoImGHgjA80gS/xqPy79LxR3K5LR2TJjw=
