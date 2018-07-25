@@ -275,18 +275,6 @@
 			"versionExact": "v0.3.0"
 		},
 		{
-			"checksumSHA1": "V89FgGKA+7A70mAedEvmhDSCIyQ=",
-			"path": "github.com/linkernetworks/oauth/entity",
-			"revision": "a7fe484fc0cf65696dd9479eb8bad1b2dd416ca9",
-			"revisionTime": "2018-05-31T10:18:20Z"
-		},
-		{
-			"checksumSHA1": "4/IfV+Mt6oezQKrcgEI1jX2n0G8=",
-			"path": "github.com/linkernetworks/oauth/util",
-			"revision": "a7fe484fc0cf65696dd9479eb8bad1b2dd416ca9",
-			"revisionTime": "2018-05-31T10:18:20Z"
-		},
-		{
 			"checksumSHA1": "gPGlywe21cA6SuD6R1xbTntW1fc=",
 			"path": "github.com/linkernetworks/redis",
 			"revision": "5d54c7e9d23f75032121cf5aaa8b27e8914a5c10",
