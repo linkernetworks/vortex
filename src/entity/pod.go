@@ -35,7 +35,7 @@ type PodNetwork struct {
 	BridgeName string     `bson:"bridgeName" json:"bridgeName"` //its from the entity.Network entity
 }
 
-// PodVolume is the structure for pof volume info
+// PodVolume is the structure for pod volume info
 type PodVolume struct {
 	Name      string `bson:"name" json:"name" validate:"required"`
 	MountPath string `bson:"mountPath" json:"mountPath" validate:"required"`
