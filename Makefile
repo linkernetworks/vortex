@@ -96,8 +96,8 @@ apps.init-helm:
 
 .PHONY: apps.launch-apps
 apps.launch-apps:
-	helm install --name vortex-foundation --debug --set global.environment=testing deploy/helm/foundation
-	helm install --name vortex-apps --debug --set global.environment=testing deploy/helm/apps/
+	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
+	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
 
 .PHONY: apps.teardown
 apps.teardown:
