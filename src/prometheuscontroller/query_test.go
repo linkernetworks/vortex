@@ -48,7 +48,7 @@ func (suite *PrometheusQueryTestSuite) TestQuery() {
 	suite.NotEqual(0, float32(resource[0].Value))
 
 	// Get nil if the resource is empty
-	resource, err = query(suite.sp, "")
+	resource, _ = query(suite.sp, "")
 	suite.Equal(model.Vector(nil), resource)
 }
 
@@ -63,6 +63,6 @@ func (suite *PrometheusQueryTestSuite) TestGetElements() {
 	suite.NotEqual(0, float32(resource[0].Value))
 
 	// Get nil if the resource is empty
-	resource, err = getElements(suite.sp, Expression{})
+	resource, _ = getElements(suite.sp, Expression{})
 	suite.Equal(model.Vector(nil), resource)
 }

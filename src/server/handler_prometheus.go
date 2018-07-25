@@ -55,8 +55,6 @@ func listContainerMetricsHandler(ctx *web.Context) {
 
 func getContainerMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	container := entity.ContainerMetrics{}
 	id := req.PathParameter("id")
 
 	container, err := pc.GetContainer(sp, id)
@@ -116,8 +114,6 @@ func listPodMetricsHandler(ctx *web.Context) {
 
 func getPodMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	pod := entity.PodMetrics{}
 	id := req.PathParameter("id")
 
 	pod, err := pc.GetPod(sp, id)
@@ -164,8 +160,6 @@ func listControllerMetricsHandler(ctx *web.Context) {
 
 func getControllerMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	controller := entity.ControllerMetrics{}
 	id := req.PathParameter("id")
 
 	controller, err := pc.GetController(sp, id)
@@ -212,8 +206,6 @@ func listServiceMetricsHandler(ctx *web.Context) {
 
 func getServiceMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	service := entity.ServiceMetrics{}
 	id := req.PathParameter("id")
 
 	service, err := pc.GetService(sp, id)
@@ -252,8 +244,6 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 func listNodeNicsMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	nicList := entity.NodeNICsMetrics{}
 	id := req.PathParameter("id")
 
 	nicList, err := pc.ListNodeNICs(sp, id)
@@ -267,8 +257,6 @@ func listNodeNicsMetricsHandler(ctx *web.Context) {
 
 func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
-	node := entity.NodeMetrics{}
 	id := req.PathParameter("id")
 
 	node, err := pc.GetNode(sp, id)

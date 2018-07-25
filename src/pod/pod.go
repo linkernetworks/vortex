@@ -160,7 +160,6 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 func generateNetwork(session *mongo.Session, pod *entity.Pod) ([]string, []corev1.Container, error) {
 
 	networks := []entity.Network{}
-	containers := []corev1.Container{}
 	for i, v := range pod.Networks {
 		network := entity.Network{}
 		if err := session.FindOne(entity.NetworkCollectionName, bson.M{"name": v.Name}, &network); err != nil {
