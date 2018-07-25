@@ -33,7 +33,7 @@ func loginHandler(ctx *web.Context) {
 		return
 	}
 
-	resp.WriteEntity(ActionResponse{
+	resp.WriteEntity(response.ActionResponse{
 		Error:   false,
 		Message: tokenString,
 	})

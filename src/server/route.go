@@ -44,6 +44,7 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listUserHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getUserHandler)))
+	return webService
 }
 func newAuthenticateService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
