@@ -16,6 +16,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Filter(globalLogging)
 
 	container.Add(newVersionService(a.ServiceProvider))
+	container.Add(newUserService(a.ServiceProvider))
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
@@ -31,6 +32,16 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/version").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, versionHandler)))
+	return webService
+}
+
+func newUserService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/users").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createUserHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listUserHandler)))
+	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getUserHandler)))
 	return webService
 }
 
