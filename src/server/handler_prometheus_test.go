@@ -76,7 +76,7 @@ func (suite *PrometheusTestSuite) TestListNodeNicsMetrics() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
-func (suite *PrometheusTestSuite) TestListPodMetrics() {
+func (suite *PrometheusTestSuite) TestListPodMetricsStatus() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/pods/", nil)
 	suite.NoError(err)
 
