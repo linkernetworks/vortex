@@ -201,7 +201,7 @@ func deleteNetworkHandler(ctx *web.Context) {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
 	} else if len(ret) != 0 {
-		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The Network %s still used by some Pods, please close those Pod first", network.Name))
+		response.MethodNotAllow(req.Request, resp.ResponseWriter, fmt.Errorf("The Network %s still used by some Pods, please close those Pod first", network.Name))
 		return
 	}
 

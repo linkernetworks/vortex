@@ -103,6 +103,11 @@ func Conflict(req *http.Request, resp http.ResponseWriter, errs ...error) (int, 
 	return WriteStatusAndError(req, resp, http.StatusConflict, errs...)
 }
 
+// MethodNotAllow will set the status code http.StatusMethodNotAllowed, to the HTTP response message
+func MethodNotAllow(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
+	return WriteStatusAndError(req, resp, http.StatusMethodNotAllowed, errs...)
+}
+
 // UnprocessableEntity will set the status code http.StatusUnprocessableEntity to the HTTP response message
 func UnprocessableEntity(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusUnprocessableEntity, errs...)
