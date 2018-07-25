@@ -1,6 +1,13 @@
 # Vortex API
 
 ## Table of Contents
+* [User](#user)
+   + [Sign Up](#signup)
+   + [Sign In](#signin)
+   + [Create User](#create-user)
+   + [List User](#list-user)
+   + [Get User](#get-user)
+   + [Delete User](#delete-user)
 * [Network](#network)
    + [Create Network](#create-network)
    + [List Network](#list-network)
@@ -40,6 +47,197 @@
 
 
 
+## User
+
+### Signup
+
+**POST /v1/user/signup**
+
+No need to give a role, server will assign a "user" role.
+
+Example:
+
+```json
+{
+  "loginCredential":{
+    "email":"guest@linkernetworks.com",
+    "password":"password"
+  },
+  "username":"John Doe",
+  "firstName":"John",
+  "lastName":"Doe",
+  "phoneNumber":"0911111111"
+}
+```
+
+Response Data:
+
+```json
+{
+    "id": "5b5b418c760aab15e771bde2",
+    "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
+    "jwt": "",
+    "loginCredential": {
+        "email": "guest@linkernetworks.com",
+        "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
+    },
+    "username": "John Doe",
+    "role": "user",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "0911111111",
+    "createdAt": "2018-07-28T00:00:12.632011379+08:00"
+}
+```
+
+### Signin
+
+**POST /v1/users/signin**
+
+Example:
+
+```json
+{
+    "email":"hello@linkernetworks.com",
+    "password":"password"
+}
+```
+
+Response Data:
+
+```json
+{
+    "error": false,
+    "message": "MY_JWT_TOKEN"
+}
+```
+
+
+### Create User
+
+**POST /v1/user**
+
+Example:
+
+role can only be "root", "user", "guest".
+```json
+{
+  "loginCredential":{
+    "email":"guest@linkernetworks.com",
+    "password":"password"
+  },
+  "role": "guest",
+  "username":"John Doe",
+  "firstName":"John",
+  "lastName":"Doe",
+  "phoneNumber":"0911111111"
+}
+```
+
+Response Data:
+
+```json
+{
+    "id": "5b5b418c760aab15e771bde2",
+    "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
+    "jwt": "",
+    "loginCredential": {
+        "email": "guest@linkernetworks.com",
+        "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
+    },
+    "username": "John Doe",
+    "role": "guest",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "0911111111",
+    "createdAt": "2018-07-28T00:00:12.632011379+08:00"
+}
+```
+
+### List User
+
+Request 
+
+```
+GET /v1/users
+```
+
+
+Response Data:
+
+```json
+[
+    {
+        "id": "5b5b4173760aab15e771bde0",
+        "uuid": "52870ee9-4bfd-44ea-8cca-a9ce7826b1bd",
+        "jwt": "",
+        "loginCredential": {
+            "email": "root@linkernetworks.com",
+            "password": "$2a$14$CQasyFUsBuqwmmpk/i9t9.9j2BTyPzK3PyWATMgb/7g8do57c9oHe"
+        },
+        "username": "John Doe",
+        "role": "root",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phoneNumber": "0911111111",
+        "createdAt": "2018-07-27T23:59:47.564+08:00"
+    },
+    {
+        "id": "5b5b4184760aab15e771bde1",
+        "uuid": "a4604f7d-06a8-4226-9792-765e72b14f9c",
+        "jwt": "",
+        "loginCredential": {
+            "email": "user@linkernetworks.com",
+            "password": "$2a$14$SzULcUvWqsCy6XeelPdsRutCDJkdsrM4mi2HXpXPEaEugV.jJsMNC"
+        },
+        "username": "John Doe",
+        "role": "user",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phoneNumber": "0911111111",
+        "createdAt": "2018-07-28T00:00:04.261+08:00"
+    },
+    {
+        "id": "5b5b418c760aab15e771bde2",
+        "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
+        "jwt": "",
+        "loginCredential": {
+            "email": "guest@linkernetworks.com",
+            "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
+        },
+        "username": "John Doe",
+        "role": "guest",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phoneNumber": "0911111111",
+        "createdAt": "2018-07-28T00:00:12.632+08:00"
+    }
+]
+```
+
+### Get User
+
+TODO 
+
+
+### Delete User
+
+Request
+
+```
+DELETE /v1/users/5b5aba2d7a3172bca6f1e280
+```
+
+Response Data
+
+``` json
+{
+    "error": false,
+    "message": "User Deleted Success"
+}
+```
+
+
 ## Network
 
 ### Create Network
@@ -47,40 +245,6 @@
 **POST /v1/networks**
 
 Example:
-
-```
-  curl -X POST \
-  http://172.17.8.100:7890/v1/networks \
-  -H 'Content-Type: application/json' \
-  -d '{
-   "type":"system",
-   "isDPDKPort":false,
-   "name":"my network-3",
-   "vlanTags":[
-      100,
-      200
-   ],
-   "routes":[
-      {
-         "dstCIDR":"224.0.0.0/4",
-         "gateway":"0.0.0.0"
-      }
-   ],
-   "bridgeName":"ovsbr0",
-   "nodes":[
-      {
-         "name":"vortex-dev",
-         "physicalInterfaces":[
-            {
-               "name":"eth0",
-               "pciID":""
-            }
-         ]
-      }
-   ]
-}
-'
-```
 
 Request Data:
 
@@ -277,12 +441,6 @@ In the NFS server, there're two parametes we need to provide, the `server IP add
 
 Example:
 
-```
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"type":"nfs","name":"My First Storage","ip":"172.17.8.100","path":"/nfs"}' \
-     http://localhost:7890/v1/storage
-```
-
 Request Data:
 ```json
 {
@@ -291,7 +449,7 @@ Request Data:
     "ip":"172.17.8.100",
     "path":"/nfs"
 }
-
+```
 Response Data:
 
 ```json
@@ -364,12 +522,6 @@ capacity: The capacity of the volume,
 
 Example:
 
-```
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"storageName":"My First Storage","name":"My Log","accessMode":"ReadWriteMany","capacity":"300Gi"}' \
-     http://localhost:7890/v1/storage
-```
-
 Request Data:
 ```json
 {
@@ -378,6 +530,7 @@ Request Data:
 	"accessMode":"ReadWriteMany",
 	"capacity":"300Gi"
 }
+```
 
 Response Data:
 

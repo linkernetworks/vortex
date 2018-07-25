@@ -2,12 +2,17 @@
 SERVER_VERSION = v0.1.6
 ## Folder content generated files
 BUILD_FOLDER = ./build
-UNAME := $(shell uname)
-
+PROJECT_URL  = github.com/linkernetworks/vortex
 ## command
 GO           = go
 GO_VENDOR    = govendor
 MKDIR_P      = mkdir -p
+
+## Random Alphanumeric String
+SECRET_KEY   = $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+
+## UNAME
+UNAME := $(shell uname)
 
 ################################################
 
@@ -46,7 +51,9 @@ govendor-sync:
 src.build:
 	$(GO) build -v ./src/...
 	$(MKDIR_P) $(BUILD_FOLDER)/src/cmd/vortex/
-	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortex/vortex -ldflags="-X github.com/linkernetworks/vortex/src/version.version=$(SERVER_VERSION)" ./src/cmd/vortex/...
+	$(GO) build -v -o $(BUILD_FOLDER)/src/cmd/vortex/vortex \
+	-ldflags="-X $(PROJECT_URL)/src/version.version=$(SERVER_VERSION) -X $(PROJECT_URL)/src/server/backend.SecretKey=$(SECRET_KEY)" \
+	./src/cmd/vortex/...
 
 .PHONY: src.test
 src.test:
