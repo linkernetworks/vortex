@@ -15,6 +15,12 @@ type ErrorPayload struct {
 	PreviousMessage string   `json:"previousMessage,omitempty" xml:"previousMessage,omitempty"`
 }
 
+// ActionResponse is the structure for Response action
+type ActionResponse struct {
+	Error   bool   `json:"error"`
+	Message string `json:"message"`
+}
+
 // NewErrorPayload will return the ErrorPayload message according the parameters (errors)
 // The ErrorPayload contains at most error messages
 func NewErrorPayload(errs ...error) ErrorPayload {
