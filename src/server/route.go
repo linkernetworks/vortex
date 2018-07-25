@@ -32,7 +32,7 @@ func (a *App) AppRoute() *mux.Router {
 func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/version").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Filter(validateTokenMiddleware)
+	//	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, versionHandler)))
 	return webService
 }
