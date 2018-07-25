@@ -76,7 +76,7 @@ func (suite *UserTestSuite) TestCreateUser() {
 
 	// load data to check
 	retUser := entity.User{}
-	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"_id": user.ID}, &retUser)
+	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"email": user.Email}, &retUser)
 	suite.NoError(err)
 	suite.NotEqual("", retUser.ID)
 	suite.Equal(user.Username, retUser.Username)
@@ -93,7 +93,7 @@ func (suite *UserTestSuite) TestCreateUser() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 }
 
 func (suite *UserTestSuite) TestCreateUserFail() {
