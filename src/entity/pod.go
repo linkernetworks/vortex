@@ -43,14 +43,15 @@ type PodVolume struct {
 
 // Pod is the structure for pod info
 type Pod struct {
-	ID         bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
-	Name       string            `bson:"name" json:"name" validate:"required,k8sname"`
-	Namespace  string            `bson:"namespace" json:"namespace" validate:"required"`
-	Labels     map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
-	Containers []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
-	CreatedAt  *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
-	Volumes    []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
-	Networks   []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
+	ID            bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
+	Name          string            `bson:"name" json:"name" validate:"required,k8sname"`
+	Namespace     string            `bson:"namespace" json:"namespace" validate:"required"`
+	Labels        map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
+	Containers    []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
+	CreatedAt     *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
+	Volumes       []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
+	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
+	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never`
 }
 
 // GetCollection - get model mongo collection name.
