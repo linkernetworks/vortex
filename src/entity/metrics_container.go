@@ -28,8 +28,7 @@ type ContainerDetailMetrics struct {
 
 // ContainerMetrics is the structure for Container Metrics
 type ContainerMetrics struct {
-	Detail            ContainerDetailMetrics   `json:"detail"`
-	Status            ContainerStatusMetrics   `json:"status"`
-	Resource          ContainerResourceMetrics `json:"resource"`
-	NICNetworkTraffic NICNetworkTrafficMetrics `json:"nicNetworkTraffic"`
+	Detail   ContainerDetailMetrics   `json:"detail"`
+	Status   ContainerStatusMetrics   `json:"status"`
+	Resource ContainerResourceMetrics `json:"resource"`
 }
