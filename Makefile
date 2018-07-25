@@ -49,7 +49,7 @@ src.build:
 
 .PHONY: src.test
 src.test:
-	$(GO) test -v -race ./src/...
+	$(GO) test -v ./src/...
 
 .PHONY: src.install
 src.install:
@@ -58,7 +58,7 @@ src.install:
 .PHONY: src.test-coverage
 src.test-coverage:
 	$(MKDIR_P) $(BUILD_FOLDER)/src/
-	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
+	$(GO) test -v -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
 	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
 
 .PHONY: src.test-coverage-minikube
