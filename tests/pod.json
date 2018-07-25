@@ -35,5 +35,6 @@
 		}	
 	],
 	"volumes":[],
-    "restaryPolicy":"Always"
+    "restaryPolicy":"Always",
+    "capability": true
 }
