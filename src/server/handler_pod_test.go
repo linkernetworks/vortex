@@ -61,14 +61,14 @@ func (suite *PodTestSuite) TestCreatePod() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
-		Name:       tName,
-		Namespace:  namespace,
-		Labels:     map[string]string{},
-		Containers: containers,
-		Volumes:    []entity.PodVolume{},
-		Networks:   []entity.PodNetwork{},
+		Name:          tName,
+		Namespace:     namespace,
+		Labels:        map[string]string{},
+		Containers:    containers,
+		Volumes:       []entity.PodVolume{},
+		Networks:      []entity.PodNetwork{},
+		RestartPolicy: "Never",
 	}
-
 	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
 	suite.NoError(err)
 
