@@ -57,6 +57,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
 	pod := entity.PodMetrics{}
 	pod.Labels = map[string]string{}
+	pod.NICs = map[string]entity.NICShortMetrics{}
 
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
@@ -98,6 +99,58 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 
 		case "kube_pod_container_status_restarts_total":
 			pod.RestartCount = pod.RestartCount + int(result.Value)
+		}
+	}
+
+	// network interface
+	expression = Expression{}
+	expression.Metrics = []string{"container_network_receive_bytes_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
+
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range results {
+		nic := entity.NICShortMetrics{}
+		nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
+		pod.NICs[string(result.Metric["interface"])] = nic
+	}
+
+	// network traffic
+	expression = Expression{}
+	expression.Metrics = []string{"container_network_receive_bytes_total", "container_network_transmit_bytes_total", "container_network_receive_packets_total", "container_network_transmit_packets_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
+
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "container_network_receive_bytes_total":
+			nic := pod.NICs[string(result.Metric["interface"])]
+			nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
+			pod.NICs[string(result.Metric["interface"])] = nic
+
+		case "container_network_transmit_bytes_total":
+			nic := pod.NICs[string(result.Metric["interface"])]
+			nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
+			pod.NICs[string(result.Metric["interface"])] = nic
+
+		case "container_network_receive_packets_total":
+			nic := pod.NICs[string(result.Metric["interface"])]
+			nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
+			pod.NICs[string(result.Metric["interface"])] = nic
+
+		case "container_network_transmit_packets_total":
+			nic := pod.NICs[string(result.Metric["interface"])]
+			nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
+			pod.NICs[string(result.Metric["interface"])] = nic
+
 		}
 	}
 
@@ -170,6 +223,17 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
+	expression = Expression{}
+	expression.Metrics = []string{"container_last_seen"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
+	results, err = getElements(sp, expression)
+	if err != nil {
+		return container, err
+	}
+	if len(results) == 0 {
+		return container, err
+	}
+
 	// resource
 	results, err = query(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
 	if err != nil {
@@ -187,34 +251,6 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	}
 
 	container.Resource.MemoryUsageBytes = float32(results[0].Value)
-
-	// network traffic
-	expression = Expression{}
-	expression.Metrics = []string{"container_network_receive_bytes_total", "container_network_transmit_bytes_total", "container_network_receive_packets_total", "container_network_transmit_packets_total"}
-	expression.QueryLabels = map[string]string{"exported_name": "k8s_POD_" + id + ".*"}
-
-	results, err = getElements(sp, expression)
-	if err != nil {
-		return container, err
-	}
-
-	for _, result := range results {
-		switch result.Metric["__name__"] {
-
-		case "container_network_receive_bytes_total":
-			container.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
-
-		case "container_network_transmit_bytes_total":
-			container.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
-
-		case "container_network_receive_packets_total":
-			container.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
-
-		case "container_network_transmit_packets_total":
-			container.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
-
-		}
-	}
 
 	// command
 	kc := sp.KubeCtl
