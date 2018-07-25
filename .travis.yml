@@ -18,62 +18,62 @@ cache:
 env:
   - CHANGE_MINIKUBE_NONE_USER=true
 
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/.cache/govendor
+
 notifications:
   slack:
     secure: k4ElQjxzBFlHcSHny92pauJNsb6HDvK4BVnmc0wwm9SViQLHj/8yoRlfkUahQ6oAvnl2FaT5DN7gpWDxg5JDsEwvvtJfcqWzv0WIG911fCUlWEZ358DVcs59MOml2A13P6k7fbIxLSQD7yD4LJbnHg61ZFcj2yxy3H3KI3KUOvOrQCNk/ptIKAPahLLmlX4x6nO3bKT9zXOWZKzqSoERMBNuhdEU6BDggaQTxryz8uPoNJe1cb6WYcqqV7CXX/UTB1m0sVoJceAre5ukehp0uv+b0wjYSKm8bviZcFyy2W9eafnYeqyJht7U4Tqlw/l6xDbS3jPmFE7rMyGUDxkz92ZOr72xca7dRBSo6TXpJ4yHl4J/fHeHfMS1Di3OHHp/T4FgPykpbm+2lCCCR79bZ5XjnhDOimO35fzn+c8lHHqEgsdYK0cgmhbRs51A0lPjiWseosQ0tNQ/STd5FL+KDidJ+qHcahVSO0Afwwl7s573GuXDegAKCMJ09TMKSEVvXa8yZFqoo9UG+g+L6a0Mm71pymn+eEhAPXpl8ZzM2qjmTYdaIA/XLHHet49AkNdY7/27o+itXgA/Vh0DAcOHeTO1fJ17sVCP2R72KGRahWLRV5PpeiNnK7Xg2ZXuYaqA//gyjyzz3fVoImGHgjA80gS/xqPy79LxR3K5LR2TJjw=
 
 before_install:
   - go get -u github.com/kardianos/govendor
-  - sudo apt-get install -y git build-essential openvswitch-switch socat jq httpie
-  - sudo add-apt-repository ppa:duggan/bats --yes
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq bats
 
 install:
-  - make pre-build
+  - make env-prepare
 
 before_script:
     # Make root mounted as rshared to fix kube-dns issues.
-  - sudo mount --make-rshared /
+    #  - sudo mount --make-rshared /
     # Make /sys mounted as rshared to support cadvisor
-  - sudo mount --make-rshared /sys
-  - sudo mount --make-rshared /var/run
+    #  - sudo mount --make-rshared /sys
+    #  - sudo mount --make-rshared /var/run
     # # Download kubectl, which is a requirement for using minikube.
-  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+    #- curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
     # # Download minikube.
-  - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
-  - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
+    #- curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+    #  - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
     # # Fix the kubectl context, as it's often stale.
-  - minikube update-context
+    #  - minikube update-context
     # # Wait for Kubernetes to be up and ready.
-  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+    #  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
     # # Enable rbac.
-  - kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+    #  - kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
     # # Download Helm.
-  - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
+    #- curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
     # # Install nsenter
   - docker run -v /usr/local/bin:/hostbin hwchiu/ubuntu-nsenter cp /nsenter /hostbin/nsenter
+  - make env-k8s
 
 script:
-  - kubectl cluster-info
+  - make build
   # Verify kube-addon-manager.
   # # kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
-  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
+  #- JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
   # # Wait for kube-dns to be ready.
-  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
-  - make build
+  #- JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
+  # - make build
   # # Initial helm
-  - make apps.init-helm
+  #- make apps.init-helm
   # # Check if tiller is ready
-  - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lname=tiller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; echo "wait the tiller to be available"; done
-  - helm version
+  #- JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lname=tiller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; echo "wait the tiller to be available"; done
+  #- helm version
   # # Launch apps (mongodb, prometheus)
-  - make apps.launch-apps
+  #- make apps.launch-apps
   # # Check if prometheus is ready
-  - until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n vortex prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; kubectl get pods --all-namespaces; done
-  - until [ `kubectl  -n vortex get --no-headers pods | awk '{c[$3]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex get pods;  done
-  - kubectl -n vortex describe daemonset/network-controller-server-tcp
-  - kubectl -n vortex describe daemonset/network-controller-server-unix
+  #- until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n vortex prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; kubectl get pods --all-namespaces; done
+  #- until [ `kubectl get --all-namespaces --no-headers pods | awk '{c[$4]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl get --all-namespaces pods;  done
   # # Start to test and produce the coverage report
   - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
   - make src.test-bats

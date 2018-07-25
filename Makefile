@@ -17,6 +17,14 @@ all: build test
 pre-build:
 	$(MAKE) govendor-sync
 
+.PHONY: env-prepare
+env-prepare:
+	./prepare.sh prepare
+
+.PHONY: env-k8s
+env-k8s:
+	./prepare.sh k8s
+
 .PHONY: build
 build: pre-build
 	$(MAKE) src.build
@@ -49,7 +57,7 @@ src.build:
 
 .PHONY: src.test
 src.test:
-	$(GO) test -v -race ./src/...
+	$(GO) test -race ./src/...
 
 .PHONY: src.install
 src.install:
@@ -58,13 +66,19 @@ src.install:
 .PHONY: src.test-coverage
 src.test-coverage:
 	$(MKDIR_P) $(BUILD_FOLDER)/src/
-	$(GO) test -v -race -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
+	date
+	$(GO) test -coverprofile=$(BUILD_FOLDER)/src/coverage.txt -covermode=atomic ./src/...
+	date
 	$(GO) tool cover -html=$(BUILD_FOLDER)/src/coverage.txt -o $(BUILD_FOLDER)/src/coverage.html
+	date
 
 .PHONY: src.test-coverage-minikube
 src.test-coverage-minikube:
+	date
 	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
+	date
 	$(MAKE) src.test-coverage
+	date
 	mv config/testing.json.bak config/testing.json
 
 .PHONY: src.test-coverage-vagrant
