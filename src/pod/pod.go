@@ -249,7 +249,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Containers:     containers,
 			Volumes:        volumes,
 			Affinity:       generateAffinity(nodeNames),
-			RestartPolicy:  corev1.RestartPolicyOnFailure,
+			RestartPolicy:  corev1.RestartPolicy(pod.RestartPolicy),
 		},
 	}
 
