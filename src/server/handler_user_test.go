@@ -200,63 +200,62 @@ func (suite *UserTestSuite) TestGetUserWithInvalidID() {
 }
 
 func (suite *UserTestSuite) TestListUser() {
-	/*
-		users := []entity.User{}
-		count := 3
-		for i := 0; i < count; i++ {
-			mailAccount := namesgenerator.GetRandomName(i)
-			users = append(users, entity.User{
-				ID:          bson.NewObjectId(),
-				Username:    "John Doe",
-				Email:       mailAccount + "@linkernetworks.com",
-				Password:    "p@ssw0rd",
-				FirstName:   "John",
-				LastName:    "Doe",
-				PhoneNumber: "0911123456",
-			})
-		}
+	users := []entity.User{}
+	count := 3
+	for i := 0; i < count; i++ {
+		mailAccount := namesgenerator.GetRandomName(i)
+		users = append(users, entity.User{
+			ID:          bson.NewObjectId(),
+			Username:    "John Doe",
+			Email:       mailAccount + "@linkernetworks.com",
+			Password:    "p@ssw0rd",
+			FirstName:   "John",
+			LastName:    "Doe",
+			PhoneNumber: "0911123456",
+		})
+	}
 
-		for _, u := range users {
-			suite.session.C(entity.UserCollectionName).Insert(u)
-			defer suite.session.Remove(entity.UserCollectionName, "email", u.Email)
-		}
+	for _, u := range users {
+		suite.session.C(entity.UserCollectionName).Insert(u)
+		defer suite.session.Remove(entity.UserCollectionName, "email", u.Email)
+	}
 
-		testCases := []struct {
-			page       string
-			pageSize   string
-			expectSize int
-		}{
-			{"", "", count},
-			{"1", "1", count},
-			{"1", "3", count},
-		}
+	testCases := []struct {
+		page       string
+		pageSize   string
+		expectSize int
+	}{
+		{"", "", count},
+		{"1", "1", count},
+		{"1", "3", count},
+	}
 
-		for _, tc := range testCases {
-			caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
-			suite.T().Run(caseName, func(t *testing.T) {
-				// list data by default page and page_size
-				url := "http://localhost:7890/v1/users/"
-				if tc.page != "" || tc.pageSize != "" {
-					url = "http://localhost:7890/v1/users?"
-					url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
-				}
-				httpRequest, err := http.NewRequest("GET", url, nil)
-				suite.NoError(err)
+	for _, tc := range testCases {
+		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
+		suite.T().Run(caseName, func(t *testing.T) {
+			// list data by default page and page_size
+			url := "http://localhost:7890/v1/users/"
+			if tc.page != "" || tc.pageSize != "" {
+				url = "http://localhost:7890/v1/users?"
+				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
+			}
+			httpRequest, err := http.NewRequest("GET", url, nil)
+			suite.NoError(err)
 
-				httpWriter := httptest.NewRecorder()
-				suite.wc.Dispatch(httpWriter, httpRequest)
-				assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+			httpWriter := httptest.NewRecorder()
+			suite.wc.Dispatch(httpWriter, httpRequest)
+			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
-				retUsers := []entity.User{}
-				err = json.Unmarshal(httpWriter.Body.Bytes(), &retUsers)
-				suite.NoError(err)
-				suite.Equal(tc.expectSize, len(retUsers))
-				for i, u := range retUsers {
-					suite.Equal(users[i].Username, u.Username)
-					suite.Equal(users[i].Email, u.Email)
-				}
-			})
-		}*/
+			retUsers := []entity.User{}
+			err = json.Unmarshal(httpWriter.Body.Bytes(), &retUsers)
+			suite.NoError(err)
+			suite.Equal(tc.expectSize, len(retUsers))
+			for i, u := range retUsers {
+				suite.Equal(users[i].Username, u.Username)
+				suite.Equal(users[i].Email, u.Email)
+			}
+		})
+	}
 }
 
 func (suite *UserTestSuite) TestListUserWithInvalidPage() {
