@@ -231,7 +231,8 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		return container, err
 	}
 	if len(results) == 0 {
-		return container, err
+		// container doesn't exit
+		return container, nil
 	}
 
 	// resource
