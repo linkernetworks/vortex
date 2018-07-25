@@ -161,7 +161,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 }
 
-func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceDPDKNetwork() {
+func (suite *NetworkControllerTestSuite) TestCreateOVSDPDKNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		Type:       entity.OVSUserspaceNetworkType,
