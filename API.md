@@ -20,6 +20,12 @@ Example:
       100,
       200
    ],
+   "routes":[
+      {
+         "dstCIDR":"224.0.0.0/4",
+         "gateway":"0.0.0.0"
+      }
+   ],
    "bridgeName":"ovsbr0",
    "nodes":[
       {
@@ -46,6 +52,12 @@ Request Data:
    "vlanTags":[
       100,
       200
+   ],
+   "routes":[
+      {
+         "dstCIDR":"224.0.0.0/4",
+         "gateway":"0.0.0.0"
+      }
    ],
    "bridgeName":"ovsbr0",
    "nodes":[
@@ -93,6 +105,12 @@ Response Data:
         "vlanTags": [
             100,
             200
+        ],
+        "routes":[
+           {
+              "dstCIDR":"224.0.0.0/4",
+              "gateway":"0.0.0.0"
+           }
         ],
         "bridgeName": "",
         "nodes": [
@@ -145,6 +163,12 @@ Response Data:
     "vlanTags": [
         100,
         200
+    ],
+    "routes":[
+       {
+          "dstCIDR":"224.0.0.0/4",
+          "gateway":"0.0.0.0"
+       }
     ],
     "bridgeName": "ovsbr0",
     "nodes": [
