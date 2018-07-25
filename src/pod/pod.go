@@ -15,6 +15,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var allCapabilities = []corev1.Capability{"NET_ADMIN", "SYS_ADMIN", "NET_RAW"}
+
 // VolumeNamePrefix will set prefix of volumename
 const VolumeNamePrefix = "volume-"
 
@@ -182,6 +184,20 @@ func generateNetwork(session *mongo.Session, pod *entity.Pod) ([]string, []corev
 	return nodes, containers, err
 }
 
+func generateContainerSecurity(pod *entity.Pod) *corev1.SecurityContext {
+	if !pod.Capability {
+		return &corev1.SecurityContext{}
+	}
+
+	privileged := true
+	return &corev1.SecurityContext{
+		Privileged: &privileged,
+		Capabilities: &corev1.Capabilities{
+			Add: allCapabilities,
+		},
+	}
+}
+
 func generateAffinity(nodeNames []string) *corev1.Affinity {
 	if len(nodeNames) == 0 {
 		return &corev1.Affinity{}
@@ -230,12 +246,14 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	})
 
 	var containers []corev1.Container
+	securityContext := generateContainerSecurity(pod)
 	for _, container := range pod.Containers {
 		containers = append(containers, corev1.Container{
-			Name:         container.Name,
-			Image:        container.Image,
-			Command:      container.Command,
-			VolumeMounts: volumeMounts,
+			Name:            container.Name,
+			Image:           container.Image,
+			Command:         container.Command,
+			VolumeMounts:    volumeMounts,
+			SecurityContext: securityContext,
 		})
 	}
 

@@ -67,6 +67,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 		Containers:    containers,
 		Volumes:       []entity.PodVolume{},
 		Networks:      []entity.PodNetwork{},
+		Capability:    true,
 		RestartPolicy: "Never",
 	}
 	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
