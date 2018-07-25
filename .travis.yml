@@ -10,6 +10,11 @@ dist: xenial
 go:
   - "1.10.x"
 
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/.cache/govendor
+
 env:
   - CHANGE_MINIKUBE_NONE_USER=true
 
