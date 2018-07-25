@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 
@@ -24,11 +25,11 @@ func createUserHandler(ctx *web.Context) {
 		return
 	}
 
-	uuid4, _ := uuid.NewV4()
-	user.UUID = uuid4
+	user.UUID = uuid.Must(uuid.NewV4())
+
 	encryptedPassword, err := hashPassword(user.Password)
 	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	user.Password = encryptedPassword
@@ -39,17 +40,26 @@ func createUserHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
+	// make email to be a unique key
+	session.C(entity.UserCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"email"},
+		Unique: true,
+	})
 	defer session.Close()
 
 	user.ID = bson.NewObjectId()
 	user.CreatedAt = timeutils.Now()
 
 	if err := session.Insert(entity.UserCollectionName, &user); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Email: %s already existed", user.Email))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
-	resp.WriteEntity(ActionResponse{
+	resp.WriteEntity(response.ActionResponse{
 		Error:   false,
 		Message: "User Created Success",
 	})
@@ -84,7 +94,7 @@ func deleteUserHandler(ctx *web.Context) {
 		}
 	}
 
-	resp.WriteEntity(ActionResponse{
+	resp.WriteEntity(response.ActionResponse{
 		Error:   false,
 		Message: "User Deleted Success",
 	})
