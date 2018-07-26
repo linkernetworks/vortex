@@ -236,7 +236,7 @@ SHELL
 
   config.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--cpus", 2]
-      v.customize ["modifyvm", :id, "--memory", 4096]
+      v.customize ["modifyvm", :id, "--memory", 5120]
       v.customize ['modifyvm', :id, '--nicpromisc1', 'allow-all']
   end
 end
