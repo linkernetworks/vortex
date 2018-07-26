@@ -161,6 +161,38 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 }
 
+func (suite *NetworkControllerTestSuite) TestCreateOVSDPDKNetwork() {
+	tName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		Type:       entity.OVSUserspaceNetworkType,
+		IsDPDKPort: true,
+		Name:       tName,
+		VLANTags:   []int32{0, 2048, 4095},
+		BridgeName: tName,
+		Nodes: []entity.Node{
+			entity.Node{
+				Name: suite.nodeName,
+				PhyInterfaces: []entity.PhyInterface{
+					entity.PhyInterface{
+						Name:  suite.ifName,
+						PCIID: "0000:00:08.0",
+					},
+				},
+			},
+		},
+	}
+
+	nodeIP, err := suite.kubectl.GetNodeInternalIP(suite.nodeName)
+	suite.NoError(err)
+	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
+	suite.NoError(err)
+	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	suite.NoError(err)
+
+	//TODO we need support the list function to check the ovs is existed
+	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
+}
+
 func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
