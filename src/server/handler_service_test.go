@@ -99,6 +99,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/services", bodyReader)
@@ -106,7 +107,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 
 	err = svc.DeleteService(suite.sp, &service)
 	suite.NoError(err)
