@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	pv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"golang.org/x/net/context"
 )
@@ -19,8 +20,7 @@ type Expression struct {
 	Time        *string           `json:"time"`
 }
 
-func query(sp *serviceprovider.Container, expression string) (interface{}, error) {
-
+func query(sp *serviceprovider.Container, expression string) (model.Vector, error) {
 	api := sp.Prometheus.API
 
 	testTime := time.Now()
@@ -34,14 +34,34 @@ func query(sp *serviceprovider.Container, expression string) (interface{}, error
 	}
 
 	if result.Type() == model.ValVector || result.Type() == model.ValMatrix {
-		return result, nil
+		return result.(model.Vector), nil
 	} else {
 		return nil, fmt.Errorf("the type of the return result can not be identify")
 	}
 
 }
 
-func getElements(sp *serviceprovider.Container, expression Expression) (interface{}, error) {
+func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix, error) {
+	api := sp.Prometheus.API
+
+	rangeSet := pv1.Range{Start: time.Now().Add(-time.Minute * 2), End: time.Now(), Step: time.Second * 10}
+	result, err := api.QueryRange(context.Background(), expression, rangeSet)
+
+	// https://github.com/prometheus/client_golang/blob/d6a9817c4afc94d51115e4a30d449056a3fbf547/api/prometheus/v1/api.go#L316
+	// this api always return the err no matter what
+	// so we should use result==nil to determine whether it is a true error
+	if result == nil {
+		return nil, err
+	}
+
+	// logger.Infof("%v", result.(model.Matrix)[0])
+	// logger.Infof("%v", result.(model.Matrix)[0])
+
+	return result.(model.Matrix), nil
+
+}
+
+func getElements(sp *serviceprovider.Container, expression Expression) (model.Vector, error) {
 	// append the metrics
 	var metrics string
 	str := `__name__=~"{{metrics}}"`
@@ -73,11 +93,16 @@ func getElements(sp *serviceprovider.Container, expression Expression) (interfac
 	if expression.Value != nil {
 		str = fmt.Sprintf("%s==%v", str, *expression.Value)
 	}
-
+	//TODO
 	// return the historical result
-	if expression.Time != nil {
-		str = fmt.Sprintf("%s[%v]", str, *expression.Time)
-	}
+	// if expression.Time != nil {
+	// 	str = fmt.Sprintf("%s[%v]", str, *expression.Time)
+	// 	results, err := queryRange(sp, str)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
+	// 	}
+	// 	return results, nil
+	// }
 
 	results, err := query(sp, str)
 	if err != nil {
