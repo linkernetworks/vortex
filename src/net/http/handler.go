@@ -16,7 +16,11 @@ type NativeContextHandler func(*web.NativeContext)
 func CompositeServiceHandler(sp *serviceprovider.Container, handler NativeContextHandler) http.HandlerFunc {
 	return func(resp http.ResponseWriter, req *http.Request) {
 		logger.Infoln(req.Method, req.URL)
-		ctx := web.NativeContext{sp, req, resp}
+		ctx := web.NativeContext{
+			ServiceProvider: sp,
+			Request:         req,
+			Response:        resp,
+		}
 		handler(&ctx)
 	}
 }
@@ -27,7 +31,11 @@ type RESTfulContextHandler func(*web.Context)
 // RESTfulServiceHandler is the wrapper to combine the RESTfulContextHandler with our serviceprovider object
 func RESTfulServiceHandler(sp *serviceprovider.Container, handler RESTfulContextHandler) restful.RouteFunction {
 	return func(req *restful.Request, resp *restful.Response) {
-		ctx := web.Context{sp, req, resp}
+		ctx := web.Context{
+			ServiceProvider: sp,
+			Request:         req,
+			Response:        resp,
+		}
 		handler(&ctx)
 	}
 }
