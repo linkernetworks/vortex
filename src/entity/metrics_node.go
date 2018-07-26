@@ -1,5 +1,13 @@
 package entity
 
+import "github.com/prometheus/common/model"
+
+// SamplePair pairs a SampleValue with a Timestamp.
+type SamplePair struct {
+	Timestamp model.Time        `json:"timestamp"`
+	Value     model.SampleValue `json:"value"`
+}
+
 // NICNetworkTrafficMetrics is the structure for NIC metwork traffic metrics
 type NICNetworkTrafficMetrics struct {
 	ReceiveBytesTotal    int `json:"receiveBytesTotal"`

@@ -16,9 +16,10 @@ type Expression struct {
 	QueryLabels map[string]string `json:"queryLabels"`
 	SumBy       []string          `json:"sumBy"`
 	Value       *int              `json:"value"`
+	Time        *string           `json:"time"`
 }
 
-func query(sp *serviceprovider.Container, expression string) (model.Vector, error) {
+func query(sp *serviceprovider.Container, expression string) (interface{}, error) {
 
 	api := sp.Prometheus.API
 
@@ -32,15 +33,15 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 		return nil, err
 	}
 
-	switch {
-	case result.Type() == model.ValVector:
-		return result.(model.Vector), nil
-	default:
+	if result.Type() == model.ValVector || result.Type() == model.ValMatrix {
+		return result, nil
+	} else {
 		return nil, fmt.Errorf("the type of the return result can not be identify")
 	}
+
 }
 
-func getElements(sp *serviceprovider.Container, expression Expression) (model.Vector, error) {
+func getElements(sp *serviceprovider.Container, expression Expression) (interface{}, error) {
 	// append the metrics
 	var metrics string
 	str := `__name__=~"{{metrics}}"`
@@ -71,6 +72,11 @@ func getElements(sp *serviceprovider.Container, expression Expression) (model.Ve
 	// the result should equal to expression.Value
 	if expression.Value != nil {
 		str = fmt.Sprintf("%s==%v", str, *expression.Value)
+	}
+
+	// return the historical result
+	if expression.Time != nil {
+		str = fmt.Sprintf("%s[%v]", str, *expression.Time)
 	}
 
 	results, err := query(sp, str)

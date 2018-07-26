@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/prometheus/common/model"
@@ -17,7 +18,7 @@ func ListResource(sp *serviceprovider.Container, resource model.LabelName, expre
 	}
 
 	resourceList := []string{}
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		resourceList = append(resourceList, string(result.Metric[resource]))
 	}
 
@@ -36,7 +37,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 		return nicList, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		nic := entity.NICOverviewMetrics{}
 		nic.Name = string(result.Metric["device"])
 		nic.Type = string(result.Metric["type"])
@@ -68,7 +69,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		return pod, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_info":
@@ -112,7 +113,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		return pod, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		nic := entity.NICShortMetrics{}
 		nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
 		pod.NICs[string(result.Metric["interface"])] = nic
@@ -128,7 +129,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		return pod, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "container_network_receive_bytes_total":
@@ -171,7 +172,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		return container, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_container_info":
@@ -198,7 +199,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		return container, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_container_status_ready":
@@ -223,6 +224,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
+	// check if container info exits in cadvisor or not (may be terminate)
 	expression = Expression{}
 	expression.Metrics = []string{"container_last_seen"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
@@ -230,8 +232,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	if err != nil {
 		return container, err
 	}
-	if len(results) == 0 {
-		// container doesn't exit
+	if len(results.(model.Vector)) == 0 {
 		return container, nil
 	}
 
@@ -240,18 +241,24 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	if err != nil {
 		return container, err
 	}
-	container.Resource.CPUUsagePercentage = float32(results[0].Value)
+	container.Resource.CPUUsagePercentage = float32(results.(model.Vector)[0].Value)
 
+	// memory usage in past 2 mins
 	expression = Expression{}
 	expression.Metrics = []string{"container_memory_usage_bytes"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
+	timeString := "2m"
+	expression.Time = &timeString
 
 	results, err = getElements(sp, expression)
 	if err != nil {
 		return container, err
 	}
 
-	container.Resource.MemoryUsageBytes = float32(results[0].Value)
+	for _, value := range results.(model.Matrix)[0].Values {
+		pair := entity.SamplePair{Timestamp: value.Timestamp, Value: value.Value}
+		container.Resource.MemoryUsageBytes = append(container.Resource.MemoryUsageBytes, pair)
+	}
 
 	// command
 	kc := sp.KubeCtl
@@ -263,6 +270,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	for _, obj := range pod.Spec.Containers {
 		if obj.Name == id {
 			container.Detail.Command = obj.Command
+			logger.Infof("%v", obj)
 			break
 		}
 	}
@@ -284,7 +292,7 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 		return service, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_service_info":
@@ -334,7 +342,7 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 		return controller, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_deployment_metadata_generation":
@@ -382,7 +390,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		return node, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "kube_node_info":
@@ -449,7 +457,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		return node, err
 	}
 
-	node.Detail.Status = string(results[0].Metric["condition"])
+	node.Detail.Status = string(results.(model.Vector)[0].Metric["condition"])
 
 	// resource
 	expression = Expression{}
@@ -462,7 +470,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		return node, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 		case "kube_pod_container_resource_requests":
 			switch result.Metric["resource"] {
@@ -491,7 +499,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		return node, err
 	}
 
-	for _, result := range results {
+	for _, result := range results.(model.Vector) {
 		switch result.Metric["__name__"] {
 
 		case "node_network_receive_bytes_total":
