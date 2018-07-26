@@ -20,7 +20,7 @@
         }
     },
     "prometheus": {
-        "url": "http://prometheus.monitoring.svc.cluster.local:9090"
+        "url": "http://prometheus.vortex.svc.cluster.local:9090"
     },
     "logger": {
         "dir": "./logs",
