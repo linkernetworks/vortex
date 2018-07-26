@@ -1,5 +1,45 @@
 # Vortex API
 
+## Table of Contents
+* [Network](#network)
+   + [Create Network](#create-network)
+   + [List Network](#list-network)
+   + [Get Network](#get-network)
+   + [Get Network Status](#get-network-status)
+   + [Delete Network](#delete-network)
+* [Storage](#storage)
+   + [Create Storage](#create-storage)
+   + [List Storage](#list-storage)
+   + [Remove Storage](#remove-storage)
+* [Volume](#volume)
+   + [Create Volume](#create-volume)
+   + [List Volume](#list-volume)
+   + [Remove Volume](#remove-volume)
+* [Pod](#pod)
+   + [Create Pod](#create-pod)
+   + [List Pods](#list-pods)
+   + [Get Pod](#get-pod)
+   + [Delete Pod](#delete-pod)
+* [Resouce Monitoring](#resouce-monitoring)
+   + [List Nodes](#list-nodes)
+   + [Get Node](#get-node)
+   + [List NICs of certain node](#list-nics-of-certain-node)
+   + [List Pod](#list-pod)
+   + [Get Pod](#get-pod-1)
+   + [List Containers](#list-containers)
+   + [Get Container](#get-container)
+   + [List Services](#list-services)
+   + [Get Service](#get-service)
+   + [List Controllers](#list-controllers)
+   + [Get Controller](#get-controller)
+* [Service](#service)
+   + [Create Service](#create-service)
+   + [List Services](#list-services-1)
+   + [Get Service](#get-service-1)
+   + [Delete Service](#delete-service)
+
+
+
 ## Network
 
 ### Create Network
@@ -19,6 +59,12 @@ Example:
    "vlanTags":[
       100,
       200
+   ],
+   "routes":[
+      {
+         "dstCIDR":"224.0.0.0/4",
+         "gateway":"0.0.0.0"
+      }
    ],
    "bridgeName":"ovsbr0",
    "nodes":[
@@ -46,6 +92,12 @@ Request Data:
    "vlanTags":[
       100,
       200
+   ],
+   "routes":[
+      {
+         "dstCIDR":"224.0.0.0/4",
+         "gateway":"0.0.0.0"
+      }
    ],
    "bridgeName":"ovsbr0",
    "nodes":[
@@ -93,6 +145,12 @@ Response Data:
         "vlanTags": [
             100,
             200
+        ],
+        "routes":[
+           {
+              "dstCIDR":"224.0.0.0/4",
+              "gateway":"0.0.0.0"
+           }
         ],
         "bridgeName": "",
         "nodes": [
@@ -145,6 +203,12 @@ Response Data:
     "vlanTags": [
         100,
         200
+    ],
+    "routes":[
+       {
+          "dstCIDR":"224.0.0.0/4",
+          "gateway":"0.0.0.0"
+       }
     ],
     "bridgeName": "ovsbr0",
     "nodes": [
