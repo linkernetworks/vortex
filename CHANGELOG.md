@@ -1,5 +1,52 @@
 # Change Log
 
+## [v0.1.5](https://github.com/linkernetworks/vortex/tree/v0.1.5) (2018-07-26)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.4...v0.1.5)
+
+**Closed issues:**
+
+- Add add route feature [\#154](https://github.com/linkernetworks/vortex/issues/154)
+
+**Merged pull requests:**
+
+- \[Release\] bump into v0.1.5 [\#182](https://github.com/linkernetworks/vortex/pull/182) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-221: Change prometheus dns [\#181](https://github.com/linkernetworks/vortex/pull/181) ([WakeupTsai](https://github.com/WakeupTsai))
+-  \[Task\] VX-219 Add test for listing user from restful [\#180](https://github.com/linkernetworks/vortex/pull/180) ([John-Lin](https://github.com/John-Lin))
+-  \[Task\] VX-218 Add test for adding a dpdk network [\#179](https://github.com/linkernetworks/vortex/pull/179) ([John-Lin](https://github.com/John-Lin))
+- Update API.md - Add route part & ToC [\#178](https://github.com/linkernetworks/vortex/pull/178) ([sufuf3](https://github.com/sufuf3))
+-  \[Bug\] VX-217 fix error handling for k8s [\#177](https://github.com/linkernetworks/vortex/pull/177) ([John-Lin](https://github.com/John-Lin))
+- fix test [\#176](https://github.com/linkernetworks/vortex/pull/176) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-216: Move network traffic to pod struct [\#175](https://github.com/linkernetworks/vortex/pull/175) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[WIP\] \[Task\] Support the capability for pods, we only have two options, god or nobody [\#174](https://github.com/linkernetworks/vortex/pull/174) ([hwchiu](https://github.com/hwchiu))
+- \[BUG\] Remove src/prometheuscontroller/debug.test [\#173](https://github.com/linkernetworks/vortex/pull/173) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-214: Improve unit test for query situation [\#172](https://github.com/linkernetworks/vortex/pull/172) ([WakeupTsai](https://github.com/WakeupTsai))
+- Remove test race [\#171](https://github.com/linkernetworks/vortex/pull/171) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-214: Unit test for prometheus handler [\#170](https://github.com/linkernetworks/vortex/pull/170) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] Support the restart policy for creating Pod [\#169](https://github.com/linkernetworks/vortex/pull/169) ([hwchiu](https://github.com/hwchiu))
+- Add route entity & update generateClientCommand [\#168](https://github.com/linkernetworks/vortex/pull/168) ([sufuf3](https://github.com/sufuf3))
+- Cache the govendor/gobuild for travis testing. [\#167](https://github.com/linkernetworks/vortex/pull/167) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-212: List all the detail of the resource instead of just name [\#166](https://github.com/linkernetworks/vortex/pull/166) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Upgrade\] upgrade networkcontroller to v0.4.0 [\#165](https://github.com/linkernetworks/vortex/pull/165) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-211: Fix the mongo docker image tag [\#164](https://github.com/linkernetworks/vortex/pull/164) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] \[VX-210\] add user CRUD [\#162](https://github.com/linkernetworks/vortex/pull/162) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Check the pod status when deleting the network. [\#160](https://github.com/linkernetworks/vortex/pull/160) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-207: Improve go report \(prometheus part\) [\#159](https://github.com/linkernetworks/vortex/pull/159) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-208: Remove EphemeralStorage resource from node struct [\#158](https://github.com/linkernetworks/vortex/pull/158) ([WakeupTsai](https://github.com/WakeupTsai))
+- Fix misspell, go\_vet & golint [\#157](https://github.com/linkernetworks/vortex/pull/157) ([sufuf3](https://github.com/sufuf3))
+- fix golint [\#156](https://github.com/linkernetworks/vortex/pull/156) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-204: Change prometheus's service account to prometheus under vortex namespace [\#155](https://github.com/linkernetworks/vortex/pull/155) ([WakeupTsai](https://github.com/WakeupTsai))
+- Fix golint for types & functions need comment [\#153](https://github.com/linkernetworks/vortex/pull/153) ([sufuf3](https://github.com/sufuf3))
+- add helm binary for Vagrant [\#152](https://github.com/linkernetworks/vortex/pull/152) ([John-Lin](https://github.com/John-Lin))
+- add service account name [\#151](https://github.com/linkernetworks/vortex/pull/151) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-203: Modify the YAML in kubernetes folder. [\#150](https://github.com/linkernetworks/vortex/pull/150) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Bug\] VX-202: Change prometheus's service account to vortex-admin [\#149](https://github.com/linkernetworks/vortex/pull/149) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[DEBUG\] VX-201: Use helm install vortex-server [\#148](https://github.com/linkernetworks/vortex/pull/148) ([WakeupTsai](https://github.com/WakeupTsai))
+- JWT POC for API [\#147](https://github.com/linkernetworks/vortex/pull/147) ([John-Lin](https://github.com/John-Lin))
+- \[Hotfix\] ovs-vsctl with permission [\#146](https://github.com/linkernetworks/vortex/pull/146) ([John-Lin](https://github.com/John-Lin))
+-  \[Bug\] VX-200 dpdk initial [\#145](https://github.com/linkernetworks/vortex/pull/145) ([John-Lin](https://github.com/John-Lin))
+- \[Release\] add changelog [\#142](https://github.com/linkernetworks/vortex/pull/142) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-189 Use bats to provide integration test. [\#122](https://github.com/linkernetworks/vortex/pull/122) ([hwchiu](https://github.com/hwchiu))
+
 ## [v0.1.4](https://github.com/linkernetworks/vortex/tree/v0.1.4) (2018-07-20)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.3...v0.1.4)
 
