@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Instant query at a single point in time
 func query(sp *serviceprovider.Container, expression string) (model.Vector, error) {
 	api := sp.Prometheus.API
 
@@ -29,6 +30,7 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 	return nil, fmt.Errorf("the type of the return result can not be identify")
 }
 
+// Query over a range of time
 func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix, error) {
 	api := sp.Prometheus.API
 

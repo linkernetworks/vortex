@@ -3,58 +3,85 @@ package prometheuscontroller
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 // Expression is the structure for expression
 type Expression struct {
 	Metrics     []string          `json:"metrics"`
 	QueryLabels map[string]string `json:"queryLabels"`
-	SumBy       []string          `json:"sumBy"`
-	Value       *int              `json:"value"`
-	Time        *string           `json:"time"`
+	SumByLabels []string          `json:"sumByLabels"`
 }
 
-func basicExpr(expression Expression) (string, error) {
-	var str string
-
-	// append the metrics
-	var metrics string
-	for _, metric := range expression.Metrics {
-		metrics = fmt.Sprintf("%s%s|", metrics, metric)
-	}
-	str = fmt.Sprintf(`__name__=~"%s"`, strings.TrimSuffix(metrics, "|"))
-
-	// add the query labels
-	var labels string
-	for key, value := range expression.QueryLabels {
-		labels = fmt.Sprintf(`,%s=~"%s"`, key, value)
-	}
-	str = fmt.Sprintf("{%s%s}", str, labels)
-
-	// use sum by if need it
-	if expression.SumBy != nil {
-		var sumby string
-		for _, sumLabel := range expression.SumBy {
-			sumby = fmt.Sprintf("%s%s,", sumby, sumLabel)
-		}
-		str = fmt.Sprintf("sum by(%s)(%s)", strings.TrimSuffix(sumby, ","), str)
+// Create basic expression with metrics
+func basicExpr(metrics []string) (string, error) {
+	if metrics == nil {
+		return "", fmt.Errorf("no metrics be assigned")
 	}
 
-	// durations over the last [] time
-	if expression.Time != nil {
-		str = fmt.Sprintf("%s[%v]", str, *expression.Time)
+	var tmp string
+	for _, metric := range metrics {
+		tmp = fmt.Sprintf("%s%s|", tmp, metric)
+	}
+	expr := fmt.Sprintf(`__name__=~"%s"`, strings.TrimSuffix(tmp, "|"))
+
+	return expr, nil
+}
+
+// Append the query labels for expression
+func queryExpr(expr string, queryLabels map[string]string) string {
+	if queryLabels == nil {
+		return expr
 	}
 
-	// the result should equal to expression.Value
-	if expression.Value != nil {
-		str = fmt.Sprintf("%s==%v", str, *expression.Value)
+	var tmp string
+	for key, value := range queryLabels {
+		tmp = fmt.Sprintf(`,%s=~"%s"`, key, value)
+	}
+	expr = fmt.Sprintf("{%s%s}", expr, tmp)
+
+	return expr
+}
+
+// Append the sum by syntax with labels
+func sumByExpr(expr string, sumByLabels []string) string {
+	if sumByLabels == nil {
+		return expr
 	}
 
-	return str, nil
+	var tmp string
+	for _, sumLabel := range sumByLabels {
+		tmp = fmt.Sprintf("%s%s,", tmp, sumLabel)
+	}
+	expr = fmt.Sprintf("sum by(%s)(%s)", strings.TrimSuffix(tmp, ","), expr)
 
-	// results, err := query(sp, str)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
-	// }
-	// return results, nil
+	return expr
+}
+
+// Append the sum syntax
+func sumExpr(expr string) string {
+	expr = fmt.Sprintf("sum(%s)", expr)
+
+	return expr
+}
+
+// Append a duration for expression
+func durationExpr(expr string, duration time.Duration) string {
+	expr = fmt.Sprintf("%s[%v]", expr, duration)
+
+	return expr
+}
+
+// Append the rate syntax
+func rateExpr(expr string) string {
+	expr = fmt.Sprintf("rate(%s)", expr)
+
+	return expr
+}
+
+// Assign a value for expression
+func equalExpr(expr string, value float64) string {
+	expr = fmt.Sprintf("%s==%v", expr, value)
+
+	return expr
 }

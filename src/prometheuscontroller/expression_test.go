@@ -42,10 +42,10 @@ func TestPrometheusExprSuite(t *testing.T) {
 func (suite *PrometheusExprTestSuite) TestGetElements() {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "vortex"
+	expression.QueryLabels = map[string]string{"namespace": "vortex"}
 
-	str, err := basicExpr(expression)
+	str, err := basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(suite.sp, str)
 	suite.NoError(err)
 	suite.NotEqual(0, float32(results[0].Value))
