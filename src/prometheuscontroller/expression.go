@@ -11,7 +11,8 @@ import (
 
 // ListResource will list resource
 func ListResource(sp *serviceprovider.Container, resource model.LabelName, expression Expression) ([]string, error) {
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +32,8 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 	expression.Metrics = []string{"node_network_interface"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return nicList, err
 	}
@@ -63,7 +65,8 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
 	expression.QueryLabels = map[string]string{"pod": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return pod, err
 	}
@@ -107,7 +110,8 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	expression.Metrics = []string{"container_network_receive_bytes_total"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return pod, err
 	}
@@ -123,7 +127,8 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	expression.Metrics = []string{"container_network_receive_bytes_total", "container_network_transmit_bytes_total", "container_network_receive_packets_total", "container_network_transmit_packets_total"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return pod, err
 	}
@@ -166,7 +171,8 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	expression.Metrics = []string{"kube_pod_container_info", "kube_pod_container_status_restarts_total"}
 	expression.QueryLabels = map[string]string{"container": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return container, err
 	}
@@ -193,7 +199,8 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	ValueInt := 1
 	expression.Value = &ValueInt
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return container, err
 	}
@@ -227,7 +234,9 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	expression = Expression{}
 	expression.Metrics = []string{"container_last_seen"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
-	results, err = getElements(sp, expression)
+
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return container, err
 	}
@@ -256,7 +265,8 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	// timeString := "2m"
 	// expression.Time = &timeString
 
-	// results, err = getElements(sp, expression)
+	// str, err := basicExpr(expression)
+	// results, err := query(sp, str)
 	// if err != nil {
 	// 	return container, err
 	// }
@@ -292,7 +302,8 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 	expression.Metrics = []string{"kube_service_info", "kube_service_created", "kube_service_labels", "kube_service_spec_type"}
 	expression.QueryLabels = map[string]string{"service": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return service, err
 	}
@@ -342,7 +353,8 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 	expression.Metrics = []string{"kube_deployment_metadata_generation", "kube_deployment_created", "kube_deployment_labels", "kube_deployment_spec_replicas", "kube_deployment_status_replicas", "kube_deployment_status_replicas_available"}
 	expression.QueryLabels = map[string]string{"deployment": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return controller, err
 	}
@@ -390,7 +402,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.Metrics = []string{"kube_node_info", "kube_node_created", "node_network_interface", "kube_node_labels", "kube_node_status_capacity", "kube_node_status_allocatable"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	results, err := getElements(sp, expression)
+	str, err := basicExpr(expression)
+	results, err := query(sp, str)
 	if err != nil {
 		return node, err
 	}
@@ -457,7 +470,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	ValueInt := 1
 	expression.Value = &ValueInt
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return node, err
 	}
@@ -470,7 +484,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.QueryLabels = map[string]string{"node": id}
 	expression.SumBy = []string{"__name__", "resource"}
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return node, err
 	}
@@ -499,7 +514,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.Metrics = []string{"node_network_receive_bytes_total", "node_network_transmit_bytes_total", "node_network_receive_packets_total", "node_network_transmit_packets_total"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	results, err = getElements(sp, expression)
+	str, err = basicExpr(expression)
+	results, err = query(sp, str)
 	if err != nil {
 		return node, err
 	}

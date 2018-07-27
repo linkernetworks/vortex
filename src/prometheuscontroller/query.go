@@ -33,12 +33,10 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 		return nil, err
 	}
 
-	if result.Type() == model.ValVector || result.Type() == model.ValMatrix {
+	if result.Type() == model.ValVector {
 		return result.(model.Vector), nil
-	} else {
-		return nil, fmt.Errorf("the type of the return result can not be identify")
 	}
-
+	return nil, fmt.Errorf("the type of the return result can not be identify")
 }
 
 func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix, error) {
@@ -54,59 +52,53 @@ func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix,
 		return nil, err
 	}
 
-	// logger.Infof("%v", result.(model.Matrix)[0])
-	// logger.Infof("%v", result.(model.Matrix)[0])
-
-	return result.(model.Matrix), nil
-
+	if result.Type() == model.ValMatrix {
+		return result.(model.Matrix), nil
+	}
+	return nil, fmt.Errorf("the type of the return result can not be identify")
 }
 
-func getElements(sp *serviceprovider.Container, expression Expression) (model.Vector, error) {
+func basicExpr(expression Expression) (string, error) {
+	var str string
+
 	// append the metrics
 	var metrics string
-	str := `__name__=~"{{metrics}}"`
 	for _, metric := range expression.Metrics {
 		metrics = fmt.Sprintf("%s%s|", metrics, metric)
 	}
-	rule := strings.NewReplacer("{{metrics}}", strings.TrimSuffix(metrics, "|"))
-	str = rule.Replace(str)
+	str = fmt.Sprintf(`__name__=~"%s"`, strings.TrimSuffix(metrics, "|"))
 
 	// add the query labels
-	labels := expression.QueryLabels
-	for key, value := range labels {
-		str = fmt.Sprintf(`%s,%s=~"%s"`, str, key, value)
+	var labels string
+	for key, value := range expression.QueryLabels {
+		labels = fmt.Sprintf(`,%s=~"%s"`, key, value)
 	}
-	str = fmt.Sprintf("{%s}", str)
+	str = fmt.Sprintf("{%s%s}", str, labels)
 
 	// use sum by if need it
-	var sumby string
 	if expression.SumBy != nil {
-		str = fmt.Sprintf("sum by({{sumby}})(%s)", str)
+		var sumby string
 		for _, sumLabel := range expression.SumBy {
 			sumby = fmt.Sprintf("%s%s,", sumby, sumLabel)
 		}
-		rule = strings.NewReplacer("{{sumby}}", strings.TrimSuffix(sumby, ","))
-		str = rule.Replace(str)
+		str = fmt.Sprintf("sum by(%s)(%s)", strings.TrimSuffix(sumby, ","), str)
+	}
+
+	// durations over the last [] time
+	if expression.Time != nil {
+		str = fmt.Sprintf("%s[%v]", str, *expression.Time)
 	}
 
 	// the result should equal to expression.Value
 	if expression.Value != nil {
 		str = fmt.Sprintf("%s==%v", str, *expression.Value)
 	}
-	//TODO
-	// return the historical result
-	// if expression.Time != nil {
-	// 	str = fmt.Sprintf("%s[%v]", str, *expression.Time)
-	// 	results, err := queryRange(sp, str)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
-	// 	}
-	// 	return results, nil
-	// }
 
-	results, err := query(sp, str)
-	if err != nil {
-		return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
-	}
-	return results, nil
+	return str, nil
+
+	// results, err := query(sp, str)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("%v, can not query the expression: %s", err, str)
+	// }
+	// return results, nil
 }
