@@ -24,7 +24,7 @@ make apps.init-helm
 ### Using helm deploy apps
 This will deploy mongodb and prometheus in your cluster
 ```
-make apps.launch-apps
+make apps.launch
 ```
 If you wnat to deploy certain chart, you can type
 ```
