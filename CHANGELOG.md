@@ -1,5 +1,19 @@
 # Change Log
 
+## [v0.1.6](https://github.com/linkernetworks/vortex/tree/v0.1.6) (2018-07-27)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.5...v0.1.6)
+
+**Merged pull requests:**
+
+- \[Release\] bump version v0.1.6 [\#193](https://github.com/linkernetworks/vortex/pull/193) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] return when created  [\#192](https://github.com/linkernetworks/vortex/pull/192) ([John-Lin](https://github.com/John-Lin))
+- Johnlin/remove dockerfiles [\#191](https://github.com/linkernetworks/vortex/pull/191) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] fix ovs dpdk test [\#188](https://github.com/linkernetworks/vortex/pull/188) ([John-Lin](https://github.com/John-Lin))
+- add clean db command [\#187](https://github.com/linkernetworks/vortex/pull/187) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Support hostnetwork option when creating Pod [\#186](https://github.com/linkernetworks/vortex/pull/186) ([hwchiu](https://github.com/hwchiu))
+- Create LICENSE [\#185](https://github.com/linkernetworks/vortex/pull/185) ([John-Lin](https://github.com/John-Lin))
+- \[Lint\] fix golint [\#184](https://github.com/linkernetworks/vortex/pull/184) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.1.5](https://github.com/linkernetworks/vortex/tree/v0.1.5) (2018-07-26)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.4...v0.1.5)
 
