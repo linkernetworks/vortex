@@ -464,6 +464,8 @@ For each Pod, we have fileds need to handle.
 7. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
 8. restartPolicy: the attribute how the pod restart is container, it should be a string and only valid for those following strings.
     - Always,OnFailure,Never
+9. hostNetwork: the bool option to run the Pod in the host network namespace, if it's true, all values in the networks will be ignored.
+
 
 Example:
 
