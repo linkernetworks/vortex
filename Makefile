@@ -107,7 +107,8 @@ apps.init-helm:
 .PHONY: apps.launch
 apps.launch:
 	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
+	helm install --name vortex-apps --debug --wait --set global.environment=local --set vortex-server.image.tag=$(SERVER_VERSION)  deploy/helm/apps/
+
 
 .PHONY: apps.upgrade
 apps.upgrade:
