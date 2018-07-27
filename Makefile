@@ -1,5 +1,5 @@
 ## vortex server version
-SERVER_VERSION = v0.1.5
+SERVER_VERSION = v0.1.6
 ## Folder content generated files
 BUILD_FOLDER = ./build
 
@@ -96,10 +96,15 @@ apps.init-helm:
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
-.PHONY: apps.launch-apps
-apps.launch-apps:
+.PHONY: apps.launch
+apps.launch:
 	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
 	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
+
+.PHONY: apps.upgrade
+apps.upgrade:
+	helm upgrade vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
+	helm upgrade vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
 
 .PHONY: apps.teardown
 apps.teardown:
