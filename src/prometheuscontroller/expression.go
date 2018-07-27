@@ -14,9 +14,9 @@ type Expression struct {
 }
 
 // Create basic expression with metrics
-func basicExpr(metrics []string) (string, error) {
+func basicExpr(metrics []string) string {
 	if metrics == nil {
-		return "", fmt.Errorf("no metrics be assigned")
+		return ""
 	}
 
 	var tmp string
@@ -25,7 +25,7 @@ func basicExpr(metrics []string) (string, error) {
 	}
 	expr := fmt.Sprintf(`__name__=~"%s"`, strings.TrimSuffix(tmp, "|"))
 
-	return expr, nil
+	return expr
 }
 
 // Append the query labels for expression

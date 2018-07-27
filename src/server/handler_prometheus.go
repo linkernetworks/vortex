@@ -8,6 +8,71 @@ import (
 	"github.com/linkernetworks/vortex/src/web"
 )
 
+func getContainerMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	id := req.PathParameter("id")
+
+	container, err := pc.GetContainer(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(container)
+}
+
+func getPodMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	id := req.PathParameter("id")
+
+	pod, err := pc.GetPod(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(pod)
+}
+
+func getServiceMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	id := req.PathParameter("id")
+
+	service, err := pc.GetService(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(service)
+}
+
+func getControllerMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	id := req.PathParameter("id")
+
+	controller, err := pc.GetController(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(controller)
+}
+
+func getNodeMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	id := req.PathParameter("id")
+
+	node, err := pc.GetNode(sp, id)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	resp.WriteEntity(node)
+}
+
 func listContainerMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
@@ -43,19 +108,6 @@ func listContainerMetricsHandler(ctx *web.Context) {
 	}
 
 	resp.WriteEntity(containerList)
-}
-
-func getContainerMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("id")
-
-	container, err := pc.GetContainer(sp, id)
-	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	resp.WriteEntity(container)
 }
 
 func listPodMetricsHandler(ctx *web.Context) {
@@ -96,19 +148,6 @@ func listPodMetricsHandler(ctx *web.Context) {
 	resp.WriteEntity(podList)
 }
 
-func getPodMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("id")
-
-	pod, err := pc.GetPod(sp, id)
-	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	resp.WriteEntity(pod)
-}
-
 func listServiceMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
@@ -136,19 +175,6 @@ func listServiceMetricsHandler(ctx *web.Context) {
 	}
 
 	resp.WriteEntity(serviceList)
-}
-
-func getServiceMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("id")
-
-	service, err := pc.GetService(sp, id)
-	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	resp.WriteEntity(service)
 }
 
 func listControllerMetricsHandler(ctx *web.Context) {
@@ -180,26 +206,10 @@ func listControllerMetricsHandler(ctx *web.Context) {
 	resp.WriteEntity(controllerList)
 }
 
-func getControllerMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("id")
-
-	controller, err := pc.GetController(sp, id)
-	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	resp.WriteEntity(controller)
-}
-
 func listNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	query := query.New(req.Request.URL.Query())
-	queryLabels := map[string]string{}
-
-	nodeNameList, err := pc.ListNodeName(sp, queryLabels)
+	nodeNameList, err := pc.ListNodeName(sp, map[string]string{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -229,17 +239,4 @@ func listNodeNicsMetricsHandler(ctx *web.Context) {
 	}
 
 	resp.WriteEntity(nicList)
-}
-
-func getNodeMetricsHandler(ctx *web.Context) {
-	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("id")
-
-	node, err := pc.GetNode(sp, id)
-	if err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	resp.WriteEntity(node)
 }

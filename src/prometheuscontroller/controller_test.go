@@ -8,7 +8,6 @@ import (
 
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -37,23 +36,78 @@ func TestPrometheusExpressionSuite(t *testing.T) {
 	suite.Run(t, new(PrometheusExpressionTestSuite))
 }
 
-func (suite *PrometheusExpressionTestSuite) TestListResource() {
-	labelName := model.LabelName("container")
-	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "vortex"
+func (suite *PrometheusExpressionTestSuite) TestListContainer() {
+	queryLabels := map[string]string{"namespace": "vortex"}
 
-	resourceList, err := ListResource(suite.sp, labelName, expression)
+	containerNameList, err := ListContainerName(suite.sp, queryLabels)
 	suite.NoError(err)
-	suite.NotEqual(0, len(resourceList))
+	suite.NotEqual(0, len(containerNameList))
 }
 
-func (suite *PrometheusExpressionTestSuite) TestListResourceFail() {
-	labelName := model.LabelName("")
-	expression := Expression{}
+func (suite *PrometheusExpressionTestSuite) TestListContainerFail() {
+	queryLabels := map[string]string{"": ""}
 
-	_, err := ListResource(suite.sp, labelName, expression)
+	_, err := ListContainerName(suite.sp, queryLabels)
+	suite.Error(err)
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListPod() {
+	queryLabels := map[string]string{"namespace": "vortex"}
+
+	podNameList, err := ListPodName(suite.sp, queryLabels)
+	suite.NoError(err)
+	suite.NotEqual(0, len(podNameList))
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListPodFail() {
+	queryLabels := map[string]string{"": ""}
+
+	_, err := ListPodName(suite.sp, queryLabels)
+	suite.Error(err)
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListService() {
+	queryLabels := map[string]string{"namespace": "vortex"}
+
+	serviceNameList, err := ListServiceName(suite.sp, queryLabels)
+	suite.NoError(err)
+	suite.NotEqual(0, len(serviceNameList))
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListServiceFail() {
+	queryLabels := map[string]string{"": ""}
+
+	_, err := ListServiceName(suite.sp, queryLabels)
+	suite.Error(err)
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListController() {
+	queryLabels := map[string]string{"namespace": "vortex"}
+
+	controllerNameList, err := ListControllerName(suite.sp, queryLabels)
+	suite.NoError(err)
+	suite.NotEqual(0, len(controllerNameList))
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListControllerFail() {
+	queryLabels := map[string]string{"": ""}
+
+	_, err := ListControllerName(suite.sp, queryLabels)
+	suite.Error(err)
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListNode() {
+	queryLabels := map[string]string{}
+
+	nodeNameList, err := ListNodeName(suite.sp, queryLabels)
+	suite.NoError(err)
+	suite.NotEqual(0, len(nodeNameList))
+}
+
+func (suite *PrometheusExpressionTestSuite) TestListNodeFail() {
+	queryLabels := map[string]string{"": ""}
+
+	_, err := ListNodeName(suite.sp, queryLabels)
 	suite.Error(err)
 }
 

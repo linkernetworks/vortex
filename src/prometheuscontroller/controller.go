@@ -14,7 +14,7 @@ func ListContainerName(sp *serviceprovider.Container, queryLabels map[string]str
 	expression.Metrics = []string{"kube_pod_container_info"}
 	expression.QueryLabels = queryLabels
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -35,7 +35,7 @@ func ListPodName(sp *serviceprovider.Container, queryLabels map[string]string) (
 	expression.Metrics = []string{"kube_pod_info"}
 	expression.QueryLabels = queryLabels
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -50,13 +50,13 @@ func ListPodName(sp *serviceprovider.Container, queryLabels map[string]string) (
 	return podList, nil
 }
 
-// ListService will list service name
+// ListServiceName will list service name
 func ListServiceName(sp *serviceprovider.Container, queryLabels map[string]string) ([]string, error) {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_service_info"}
 	expression.QueryLabels = queryLabels
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -71,13 +71,13 @@ func ListServiceName(sp *serviceprovider.Container, queryLabels map[string]strin
 	return serviceList, nil
 }
 
-// ListController will list controller name
+// ListControllerName will list controller name
 func ListControllerName(sp *serviceprovider.Container, queryLabels map[string]string) ([]string, error) {
 	expression := Expression{}
-	expression.Metrics = []string{"kube_controller_info"}
+	expression.Metrics = []string{"kube_deployment_metadata_generation"}
 	expression.QueryLabels = queryLabels
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -92,13 +92,13 @@ func ListControllerName(sp *serviceprovider.Container, queryLabels map[string]st
 	return controllerList, nil
 }
 
-// ListNode will list node name
+// ListNodeName will list node name
 func ListNodeName(sp *serviceprovider.Container, queryLabels map[string]string) ([]string, error) {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_node_info"}
 	expression.QueryLabels = queryLabels
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -120,7 +120,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 	expression.Metrics = []string{"node_network_interface"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -151,10 +151,17 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	pod.NICs = map[string]entity.NICShortMetrics{}
 
 	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_info", "kube_pod_created", "kube_pod_labels", "kube_pod_owner", "kube_pod_status_phase", "kube_pod_container_info", "kube_pod_container_status_restarts_total"}
+	expression.Metrics = []string{
+		"kube_pod_info",
+		"kube_pod_created",
+		"kube_pod_labels",
+		"kube_pod_owner",
+		"kube_pod_status_phase",
+		"kube_pod_container_info",
+		"kube_pod_container_status_restarts_total"}
 	expression.QueryLabels = map[string]string{"pod": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -196,11 +203,10 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	}
 
 	// network interface
-	expression = Expression{}
 	expression.Metrics = []string{"container_network_receive_bytes_total"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
 
-	str, err = basicExpr(expression.Metrics)
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err = query(sp, str)
 	if err != nil {
@@ -214,11 +220,14 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 	}
 
 	// network traffic
-	expression = Expression{}
-	expression.Metrics = []string{"container_network_receive_bytes_total", "container_network_transmit_bytes_total", "container_network_receive_packets_total", "container_network_transmit_packets_total"}
+	expression.Metrics = []string{
+		"container_network_receive_bytes_total",
+		"container_network_transmit_bytes_total",
+		"container_network_receive_packets_total",
+		"container_network_transmit_packets_total"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
 
-	str, err = basicExpr(expression.Metrics)
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err = query(sp, str)
 	if err != nil {
@@ -260,10 +269,12 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 
 	// basic info
 	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_container_info", "kube_pod_container_status_restarts_total"}
+	expression.Metrics = []string{
+		"kube_pod_container_info",
+		"kube_pod_container_status_restarts_total"}
 	expression.QueryLabels = map[string]string{"container": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -286,11 +297,10 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	}
 
 	// status
-	expression = Expression{}
 	expression.Metrics = []string{"kube_pod_container_status.*"}
 	expression.QueryLabels = map[string]string{"container": id}
 
-	str, err = basicExpr(expression.Metrics)
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = equalExpr(str, 1)
 
@@ -324,53 +334,6 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
-	// check if container info exits in cadvisor or not (may be terminate)
-	expression = Expression{}
-	expression.Metrics = []string{"container_last_seen"}
-	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
-
-	str, err = basicExpr(expression.Metrics)
-	str = queryExpr(str, expression.QueryLabels)
-	results, err = query(sp, str)
-	if err != nil {
-		return container, err
-	}
-	if len(results) == 0 {
-		return container, nil
-	}
-	// TODO:
-	// resource
-	// results, err = query(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
-	// if err != nil {
-	// 	return container, err
-	// }
-	// container.Resource.CPUUsagePercentage = float32(results[0].Value)
-
-	_, err = queryRange(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
-	if err != nil {
-		return container, err
-	}
-
-	//container.Resource.CPUUsagePercentage = float32(results[0].Value)
-
-	// memory usage in past 2 mins
-	// expression = Expression{}
-	// expression.Metrics = []string{"container_memory_usage_bytes"}
-	// expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
-	// timeString := "2m"
-	// expression.Time = &timeString
-
-	// str, err := basicExpr(expression)
-	// results, err := query(sp, str)
-	// if err != nil {
-	// 	return container, err
-	// }
-
-	// for _, value := range results.(model.Matrix)[0].Values {
-	// 	pair := entity.SamplePair{Timestamp: value.Timestamp, Value: value.Value}
-	// 	container.Resource.MemoryUsageBytes = append(container.Resource.MemoryUsageBytes, pair)
-	// }
-
 	// command
 	kc := sp.KubeCtl
 	pod, err := kc.GetPod(container.Detail.Pod, container.Detail.Namespace)
@@ -385,6 +348,26 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
+	if container.Status.Status == "waiting" || container.Status.Status == "terminated" {
+		return container, nil
+	}
+
+	// TODO: memory resource
+	//
+	// results, err = query(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
+	// if err != nil {
+	// 	return container, err
+	// }
+	// container.Resource.CPUUsagePercentage = float32(results[0].Value)
+
+	// TODO: cpu resource
+	//
+	// _, err = queryRange(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
+	// if err != nil {
+	// 	return container, err
+	// }
+	//container.Resource.CPUUsagePercentage = float32(results[0].Value)
+
 	return container, nil
 }
 
@@ -393,11 +376,16 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 	service := entity.ServiceMetrics{}
 	service.Labels = map[string]string{}
 
+	// basic info
 	expression := Expression{}
-	expression.Metrics = []string{"kube_service_info", "kube_service_created", "kube_service_labels", "kube_service_spec_type"}
+	expression.Metrics = []string{
+		"kube_service_info",
+		"kube_service_created",
+		"kube_service_labels",
+		"kube_service_spec_type"}
 	expression.QueryLabels = map[string]string{"service": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -425,7 +413,6 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 				}
 			}
 		}
-
 	}
 
 	// get service port config
@@ -445,11 +432,18 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 	controller.Labels = map[string]string{}
 	controller.Type = "deployment"
 
+	// basic info
 	expression := Expression{}
-	expression.Metrics = []string{"kube_deployment_metadata_generation", "kube_deployment_created", "kube_deployment_labels", "kube_deployment_spec_replicas", "kube_deployment_status_replicas", "kube_deployment_status_replicas_available"}
+	expression.Metrics = []string{
+		"kube_deployment_metadata_generation",
+		"kube_deployment_created",
+		"kube_deployment_labels",
+		"kube_deployment_spec_replicas",
+		"kube_deployment_status_replicas",
+		"kube_deployment_status_replicas_available"}
 	expression.QueryLabels = map[string]string{"deployment": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -482,7 +476,6 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 				}
 			}
 		}
-
 	}
 
 	return controller, nil
@@ -496,10 +489,16 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	// basic info
 	expression := Expression{}
-	expression.Metrics = []string{"kube_node_info", "kube_node_created", "node_network_interface", "kube_node_labels", "kube_node_status_capacity", "kube_node_status_allocatable"}
+	expression.Metrics = []string{
+		"kube_node_info",
+		"kube_node_created",
+		"node_network_interface",
+		"kube_node_labels",
+		"kube_node_status_capacity",
+		"kube_node_status_allocatable"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	str, err := basicExpr(expression.Metrics)
+	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err := query(sp, str)
 	if err != nil {
@@ -566,15 +565,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.Metrics = []string{"kube_node_status_condition"}
 	expression.QueryLabels = map[string]string{"node": id, "status": "true"}
 
-	str, err = basicExpr(expression.Metrics)
-	if err != nil {
-		return node, err
-	}
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	if err != nil {
-		return node, err
-	}
-
 	str = equalExpr(str, 1)
 	results, err = query(sp, str)
 	if err != nil {
@@ -585,11 +577,13 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	// resource
 	expression = Expression{}
-	expression.Metrics = []string{"kube_pod_container_resource_limits", "kube_pod_container_resource_requests"}
+	expression.Metrics = []string{
+		"kube_pod_container_resource_limits",
+		"kube_pod_container_resource_requests"}
 	expression.QueryLabels = map[string]string{"node": id}
 	expression.SumByLabels = []string{"__name__", "resource"}
 
-	str, err = basicExpr(expression.Metrics)
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = sumByExpr(str, expression.SumByLabels)
 	results, err = query(sp, str)
@@ -618,10 +612,14 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	// network traffic
 	expression = Expression{}
-	expression.Metrics = []string{"node_network_receive_bytes_total", "node_network_transmit_bytes_total", "node_network_receive_packets_total", "node_network_transmit_packets_total"}
+	expression.Metrics = []string{
+		"node_network_receive_bytes_total",
+		"node_network_transmit_bytes_total",
+		"node_network_receive_packets_total",
+		"node_network_transmit_packets_total"}
 	expression.QueryLabels = map[string]string{"node": id}
 
-	str, err = basicExpr(expression.Metrics)
+	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	results, err = query(sp, str)
 	if err != nil {

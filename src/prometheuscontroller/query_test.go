@@ -43,11 +43,23 @@ func TestPrometheusQuerySuite(t *testing.T) {
 func (suite *PrometheusQueryTestSuite) TestQuery() {
 	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
 
-	result, err := query(suite.sp, queryStr)
+	results, err := query(suite.sp, queryStr)
 	suite.NoError(err)
-	suite.NotEqual(0, float32(result[0].Value))
+	suite.NotEqual(0, float32(results[0].Value))
 
-	// Get nil if the result is empty
-	result, _ = query(suite.sp, "")
-	suite.Equal(model.Vector(nil), result)
+	// Get nil if the results is empty
+	results, _ = query(suite.sp, "")
+	suite.Equal(model.Vector(nil), results)
+}
+
+func (suite *PrometheusQueryTestSuite) TestQueryRange() {
+	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
+
+	results, err := queryRange(suite.sp, queryStr)
+	suite.NoError(err)
+	suite.NotEqual(0, float32(results[0].Values[0].Value))
+
+	// Get nil if the results is empty
+	results, _ = queryRange(suite.sp, "")
+	suite.Equal(model.Matrix(nil), results)
 }
