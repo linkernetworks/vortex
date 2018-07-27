@@ -109,7 +109,7 @@ apps.teardown:
 
 .PHONY: dockerfiles.build
 dockerfiles.build:
-	docker build --tag sdnvortex/vortex:$(SERVER_VERSION) --file ./dockerfiles/Dockerfile .
+	docker build --tag sdnvortex/vortex:$(SERVER_VERSION) .
 
 ## git tag version ########################################
 
