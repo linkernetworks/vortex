@@ -35,7 +35,7 @@ func queryExpr(expr string, queryLabels map[string]string) string {
 
 	var tmp string
 	for key, value := range queryLabels {
-		tmp = fmt.Sprintf(`,%s=~"%s"`, key, value)
+		tmp = fmt.Sprintf(`%s,%s=~"%s"`, tmp, key, value)
 	}
 	expr = fmt.Sprintf("{%s%s}", expr, tmp)
 

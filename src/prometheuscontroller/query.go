@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	pv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
@@ -38,7 +37,6 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix, error) {
 	api := sp.Prometheus.API
 
-	logger.Infof("%v", expression)
 	rangeSet := pv1.Range{Start: time.Now().Add(-time.Minute * timeGap), End: time.Now(), Step: time.Second * queryResolution}
 	result, err := api.QueryRange(context.Background(), expression, rangeSet)
 
