@@ -66,12 +66,14 @@ src.test-coverage-minikube:
 	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
 	$(MAKE) src.test-coverage
 	mv config/testing.json.bak config/testing.json
+	kubectl exec mongo-0 -n vortex -- mongo vortex_test --eval 'printjson(db.dropDatabase())'
 
 .PHONY: src.test-coverage-vagrant
 src.test-coverage-vagrant:
 	sed -i.bak "s/localhost:9090/172.17.8.100:30003/g; s/localhost:27017/172.17.8.100:31717/g" config/testing.json
 	$(MAKE) src.test-coverage
 	mv config/testing.json.bak config/testing.json
+	kubectl exec mongo-0 -n vortex -- mongo vortex_test --eval 'printjson(db.dropDatabase())'
 
 ## check build env #############################
 
