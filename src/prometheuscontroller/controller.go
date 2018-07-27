@@ -86,7 +86,7 @@ func ListControllerName(sp *serviceprovider.Container, queryLabels map[string]st
 
 	controllerList := []string{}
 	for _, result := range results {
-		controllerList = append(controllerList, string(result.Metric["controller"]))
+		controllerList = append(controllerList, string(result.Metric["deployment"]))
 	}
 
 	return controllerList, nil
