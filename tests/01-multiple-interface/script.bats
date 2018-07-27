@@ -13,6 +13,11 @@ load init
     [ $status = 0 ]
 }
 
+@test "Check OVS port" {
+    run sudo ovs-vsctl get Interface ${ethName} ofport
+    [ $status = 0 ]
+}
+
 @test "Create Pod" {
     http -v --check-status 127.0.0.1:32326/v1/pods < pod.json
     [ $? = 0 ]
