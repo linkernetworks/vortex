@@ -51,19 +51,3 @@ func (suite *PrometheusQueryTestSuite) TestQuery() {
 	result, _ = query(suite.sp, "")
 	suite.Equal(model.Vector(nil), result)
 }
-
-func (suite *PrometheusQueryTestSuite) TestGetElements() {
-	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "vortex"
-
-	str, err := basicExpr(expression)
-	results, err := query(suite.sp, str)
-	suite.NoError(err)
-	suite.NotEqual(0, float32(results[0].Value))
-
-	// Get nil if the result is empty
-	results, _ = query(suite.sp, "")
-	suite.Equal(model.Vector(nil), results)
-}
