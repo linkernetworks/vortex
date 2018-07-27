@@ -36,5 +36,6 @@
 	],
 	"volumes":[],
     "restaryPolicy":"Always",
-    "capability": true
+    "capability": true,
+    "hostNetwork":false
 }

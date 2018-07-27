@@ -231,9 +231,16 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		return err
 	}
 
-	nodeNames, initContainers, err := generateNetwork(session, pod)
-	if err != nil {
-		return err
+	nodeNames := []string{}
+	initContainers := []corev1.Container{}
+	hostNetwork := false
+	if pod.HostNetwork {
+		hostNetwork = true
+	} else {
+		nodeNames, initContainers, err = generateNetwork(session, pod)
+		if err != nil {
+			return err
+		}
 	}
 
 	volumes = append(volumes, corev1.Volume{
@@ -268,6 +275,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Volumes:        volumes,
 			Affinity:       generateAffinity(nodeNames),
 			RestartPolicy:  corev1.RestartPolicy(pod.RestartPolicy),
+			HostNetwork:    hostNetwork,
 		},
 	}
 
