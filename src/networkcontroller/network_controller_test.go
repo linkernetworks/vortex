@@ -186,7 +186,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSDPDKNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	err = nc.CreateOVSDPDKNetwork(tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
