@@ -33,6 +33,11 @@ load init
     [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
 }
 
+@test "Check pod network interface" {
+    run bash -c "kubectl exec -it ${podName} ifconfig eth12 | grep 1.2.3.4"
+    [ $status = 0 ]
+}
+
 @test "List Pod" {
    run bash -c "http http://127.0.0.1:32326/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
    [ "$output" = "${podName}" ]
