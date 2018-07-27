@@ -1,17 +1,6 @@
 #!/usr/bin/env bats
 
-load data
-setup() {
-    sed -i "s/@NODENAME@/${nodeName}/" networks.json
-    sed -i "s/@NETWORKNAME@/${networkName}/" networks.json
-    sed -i "s/@NETWORKNAME@/${networkName}/" pod.json
-    sed -i "s/@PODNAME@/${podName}/" pod.json
-}
-
-teardown() {
-    git checkout networks.json
-    git checkout pod.json
-}
+load init
 
 @test "Create network" {
     http -v --check-status 127.0.0.1:32326/v1/networks < networks.json
