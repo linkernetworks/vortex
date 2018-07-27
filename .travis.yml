@@ -76,18 +76,7 @@ script:
   - kubectl -n vortex describe daemonset/network-controller-server-unix
   # # Start to test and produce the coverage report
   - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
-  - make src.test-bats
-  # # Build the docker image if need it
-  # - if [ "$TRAVIS_BRANCH" == "develop" ]; then docker build --tag sdnvortex/vortex --file ./dockerfiles/Dockerfile . ; fi
-
-# before_deploy:
-#   - echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin
-
-# deploy:
-#   provider: script
-#   script: docker tag sdnvortex/vortex sdnvortex/vortex:develop && docker push sdnvortex/vortex:develop
-#   on:
-#     branch: develop
+  #- make src.test-bats
 
 after_success:
   - cp build/src/coverage.txt coverage.txt
