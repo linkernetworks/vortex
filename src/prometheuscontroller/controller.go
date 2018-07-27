@@ -679,52 +679,72 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	}
 
 	for _, result := range resultMatrix {
-		nic := node.NICs[string(result.Metric["interface"])]
+		nic := node.NICs[string(result.Metric["device"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.ReceiveBytesTotal = append(nic.NICNetworkTraffic.ReceiveBytesTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		node.NICs[string(result.Metric["device"])] = nic
+	}
+
+	// network traffic transmit bytes
+	expression.Metrics = []string{"node_network_transmit_bytes_total"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return node, err
+	}
+
+	for _, result := range resultMatrix {
+		nic := node.NICs[string(result.Metric["device"])]
 		for _, pair := range result.Values {
 			nic.NICNetworkTraffic.TransmitBytesTotal = append(nic.NICNetworkTraffic.TransmitBytesTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
 		}
 		node.NICs[string(result.Metric["device"])] = nic
 	}
 
-	// expression = Expression{}
-	// expression.Metrics = []string{
-	// 	"node_network_receive_bytes_total",
-	// 	"node_network_transmit_bytes_total",
-	// 	"node_network_receive_packets_total",
-	// 	"node_network_transmit_packets_total"}
-	// expression.QueryLabels = map[string]string{"node": id}
+	// network traffic receive packets
+	expression.Metrics = []string{"node_network_receive_packets_total"}
+	expression.QueryLabels = map[string]string{"node": id}
 
-	// str = basicExpr(expression.Metrics)
-	// str = queryExpr(str, expression.QueryLabels)
-	// results, err = query(sp, str)
-	// if err != nil {
-	// 	return node, err
-	// }
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return node, err
+	}
 
-	// for _, result := range results {
-	// 	switch result.Metric["__name__"] {
+	for _, result := range resultMatrix {
+		nic := node.NICs[string(result.Metric["device"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.ReceivePacketsTotal = append(nic.NICNetworkTraffic.ReceivePacketsTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		node.NICs[string(result.Metric["device"])] = nic
+	}
 
-	// 	case "node_network_receive_bytes_total":
-	// 		nic := node.NICs[string(result.Metric["device"])]
-	// 		nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
-	// 		node.NICs[string(result.Metric["device"])] = nic
+	// network traffic transmit packets
+	expression.Metrics = []string{"node_network_transmit_packets_total"}
+	expression.QueryLabels = map[string]string{"node": id}
 
-	// 	case "node_network_transmit_bytes_total":
-	// 		nic := node.NICs[string(result.Metric["device"])]
-	// 		nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
-	// 		node.NICs[string(result.Metric["device"])] = nic
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return node, err
+	}
 
-	// 	case "node_network_receive_packets_total":
-	// 		nic := node.NICs[string(result.Metric["device"])]
-	// 		nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
-	// 		node.NICs[string(result.Metric["device"])] = nic
-
-	// 	case "node_network_transmit_packets_total":
-	// 		nic := node.NICs[string(result.Metric["device"])]
-	// 		nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
-	// 		node.NICs[string(result.Metric["device"])] = nic
-	// 	}
-	// }
+	for _, result := range resultMatrix {
+		nic := node.NICs[string(result.Metric["device"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.TransmitPacketsTotal = append(nic.NICNetworkTraffic.TransmitPacketsTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		node.NICs[string(result.Metric["device"])] = nic
+	}
 
 	return node, nil
 }
