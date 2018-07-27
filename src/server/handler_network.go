@@ -63,11 +63,7 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 		return
 	}
-
-	resp.WriteEntity(response.ActionResponse{
-		Error:   false,
-		Message: "Create success",
-	})
+	resp.WriteEntity(network)
 }
 
 func listNetworkHandler(ctx *web.Context) {

@@ -53,11 +53,7 @@ func createVolume(ctx *web.Context) {
 		}
 		return
 	}
-
-	resp.WriteEntity(response.ActionResponse{
-		Error:   false,
-		Message: "Create success",
-	})
+	resp.WriteEntity(v)
 }
 
 func deleteVolume(ctx *web.Context) {

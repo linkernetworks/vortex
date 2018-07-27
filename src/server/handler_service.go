@@ -58,11 +58,7 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
-
-	resp.WriteEntity(response.ActionResponse{
-		Error:   false,
-		Message: "Create success",
-	})
+	resp.WriteEntity(s)
 }
 
 func deleteServiceHandler(ctx *web.Context) {

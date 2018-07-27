@@ -58,11 +58,7 @@ func createUserHandler(ctx *web.Context) {
 		}
 		return
 	}
-
-	resp.WriteEntity(response.ActionResponse{
-		Error:   false,
-		Message: "User Created Success",
-	})
+	resp.WriteEntity(user)
 }
 
 func deleteUserHandler(ctx *web.Context) {
