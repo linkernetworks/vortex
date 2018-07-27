@@ -53,8 +53,6 @@ before_script:
   - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
     # # Install nsenter
   - docker run -v /usr/local/bin:/hostbin hwchiu/ubuntu-nsenter cp /nsenter /hostbin/nsenter
-
-script:
   - kubectl cluster-info
   # Verify kube-addon-manager.
   # # kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
@@ -75,9 +73,15 @@ script:
   - kubectl -n vortex describe daemonset/network-controller-server-tcp
   - kubectl -n vortex describe daemonset/network-controller-server-unix
   # # Start to test and produce the coverage report
-  - sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
   #- make src.test-bats
 
-after_success:
-  - cp build/src/coverage.txt coverage.txt
-  - bash <(curl -s https://codecov.io/bash)
+jobs:
+  include:
+    - stage: "Tests"
+      - name: "Unit Test"
+        script: sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
+        after_success:
+          - cp build/src/coverage.txt coverage.txt
+          - bash <(curl -s https://codecov.io/bash)
+      - name: "Integration Tests"
+      - script: sudo make dockerfiles.build && sudo make src.test-bats
