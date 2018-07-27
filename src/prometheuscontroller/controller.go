@@ -219,45 +219,84 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		pod.NICs[string(result.Metric["interface"])] = nic
 	}
 
-	// network traffic
-	expression.Metrics = []string{
-		"container_network_receive_bytes_total",
-		"container_network_transmit_bytes_total",
-		"container_network_receive_packets_total",
-		"container_network_transmit_packets_total"}
+	// network traffic receive bytes
+	expression.Metrics = []string{"container_network_receive_bytes_total"}
 	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	results, err = query(sp, str)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err := queryRange(sp, str)
 	if err != nil {
 		return pod, err
 	}
 
-	for _, result := range results {
-		switch result.Metric["__name__"] {
-
-		case "container_network_receive_bytes_total":
-			nic := pod.NICs[string(result.Metric["interface"])]
-			nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
-			pod.NICs[string(result.Metric["interface"])] = nic
-
-		case "container_network_transmit_bytes_total":
-			nic := pod.NICs[string(result.Metric["interface"])]
-			nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
-			pod.NICs[string(result.Metric["interface"])] = nic
-
-		case "container_network_receive_packets_total":
-			nic := pod.NICs[string(result.Metric["interface"])]
-			nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
-			pod.NICs[string(result.Metric["interface"])] = nic
-
-		case "container_network_transmit_packets_total":
-			nic := pod.NICs[string(result.Metric["interface"])]
-			nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
-			pod.NICs[string(result.Metric["interface"])] = nic
-
+	for _, result := range resultMatrix {
+		nic := pod.NICs[string(result.Metric["interface"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.ReceiveBytesTotal = append(nic.NICNetworkTraffic.ReceiveBytesTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
 		}
+		pod.NICs[string(result.Metric["interface"])] = nic
+	}
+
+	// network traffic transmit bytes
+	expression.Metrics = []string{"container_network_transmit_bytes_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range resultMatrix {
+		nic := pod.NICs[string(result.Metric["interface"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.TransmitBytesTotal = append(nic.NICNetworkTraffic.TransmitBytesTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		pod.NICs[string(result.Metric["interface"])] = nic
+	}
+
+	// network traffic receive packet
+	expression.Metrics = []string{"container_network_receive_packets_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range resultMatrix {
+		nic := pod.NICs[string(result.Metric["interface"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.ReceivePacketsTotal = append(nic.NICNetworkTraffic.ReceivePacketsTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		pod.NICs[string(result.Metric["interface"])] = nic
+	}
+
+	// network traffic receive packet
+	expression.Metrics = []string{"container_network_transmit_packets_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_pod_name": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return pod, err
+	}
+
+	for _, result := range resultMatrix {
+		nic := pod.NICs[string(result.Metric["interface"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.TransmitPacketsTotal = append(nic.NICNetworkTraffic.TransmitPacketsTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+		}
+		pod.NICs[string(result.Metric["interface"])] = nic
 	}
 
 	return pod, nil
@@ -352,21 +391,38 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		return container, nil
 	}
 
-	// TODO: memory resource
-	//
-	// results, err = query(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
-	// if err != nil {
-	// 	return container, err
-	// }
-	// container.Resource.CPUUsagePercentage = float32(results[0].Value)
+	// Memory resource
+	expression.Metrics = []string{"container_memory_usage_bytes"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
 
-	// TODO: cpu resource
-	//
-	// _, err = queryRange(sp, `sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"`+id+`"}[1m])) * 100`)
-	// if err != nil {
-	// 	return container, err
-	// }
-	//container.Resource.CPUUsagePercentage = float32(results[0].Value)
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+
+	resultMatrix, err := queryRange(sp, str)
+	if err != nil {
+		return container, err
+	}
+
+	for _, pair := range resultMatrix[0].Values {
+		container.Resource.MemoryUsageBytes = append(container.Resource.MemoryUsageBytes, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+	}
+
+	// CPU resource
+	expression.Metrics = []string{"container_cpu_usage_seconds_total"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	str = multiplyExpr(sumExpr(rateExpr(durationExpr(str, "1m"))), 100)
+
+	resultMatrix, err = queryRange(sp, str)
+	if err != nil {
+		return container, err
+	}
+
+	for _, pair := range resultMatrix[0].Values {
+		container.Resource.CPUUsagePercentage = append(container.Resource.CPUUsagePercentage, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
+	}
 
 	return container, nil
 }
@@ -610,46 +666,65 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		}
 	}
 
-	// network traffic
-	expression = Expression{}
-	expression.Metrics = []string{
-		"node_network_receive_bytes_total",
-		"node_network_transmit_bytes_total",
-		"node_network_receive_packets_total",
-		"node_network_transmit_packets_total"}
+	// network traffic receive bytes
+	expression.Metrics = []string{"node_network_receive_bytes_total"}
 	expression.QueryLabels = map[string]string{"node": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	results, err = query(sp, str)
+	str = rateExpr(durationExpr(str, "1m"))
+	resultMatrix, err := queryRange(sp, str)
 	if err != nil {
 		return node, err
 	}
 
-	for _, result := range results {
-		switch result.Metric["__name__"] {
-
-		case "node_network_receive_bytes_total":
-			nic := node.NICs[string(result.Metric["device"])]
-			nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
-			node.NICs[string(result.Metric["device"])] = nic
-
-		case "node_network_transmit_bytes_total":
-			nic := node.NICs[string(result.Metric["device"])]
-			nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
-			node.NICs[string(result.Metric["device"])] = nic
-
-		case "node_network_receive_packets_total":
-			nic := node.NICs[string(result.Metric["device"])]
-			nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
-			node.NICs[string(result.Metric["device"])] = nic
-
-		case "node_network_transmit_packets_total":
-			nic := node.NICs[string(result.Metric["device"])]
-			nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
-			node.NICs[string(result.Metric["device"])] = nic
+	for _, result := range resultMatrix {
+		nic := node.NICs[string(result.Metric["interface"])]
+		for _, pair := range result.Values {
+			nic.NICNetworkTraffic.TransmitBytesTotal = append(nic.NICNetworkTraffic.TransmitBytesTotal, entity.SamplePair{Timestamp: pair.Timestamp, Value: pair.Value})
 		}
+		node.NICs[string(result.Metric["device"])] = nic
 	}
+
+	// expression = Expression{}
+	// expression.Metrics = []string{
+	// 	"node_network_receive_bytes_total",
+	// 	"node_network_transmit_bytes_total",
+	// 	"node_network_receive_packets_total",
+	// 	"node_network_transmit_packets_total"}
+	// expression.QueryLabels = map[string]string{"node": id}
+
+	// str = basicExpr(expression.Metrics)
+	// str = queryExpr(str, expression.QueryLabels)
+	// results, err = query(sp, str)
+	// if err != nil {
+	// 	return node, err
+	// }
+
+	// for _, result := range results {
+	// 	switch result.Metric["__name__"] {
+
+	// 	case "node_network_receive_bytes_total":
+	// 		nic := node.NICs[string(result.Metric["device"])]
+	// 		nic.NICNetworkTraffic.ReceiveBytesTotal = int(result.Value)
+	// 		node.NICs[string(result.Metric["device"])] = nic
+
+	// 	case "node_network_transmit_bytes_total":
+	// 		nic := node.NICs[string(result.Metric["device"])]
+	// 		nic.NICNetworkTraffic.TransmitBytesTotal = int(result.Value)
+	// 		node.NICs[string(result.Metric["device"])] = nic
+
+	// 	case "node_network_receive_packets_total":
+	// 		nic := node.NICs[string(result.Metric["device"])]
+	// 		nic.NICNetworkTraffic.ReceivePacketsTotal = int(result.Value)
+	// 		node.NICs[string(result.Metric["device"])] = nic
+
+	// 	case "node_network_transmit_packets_total":
+	// 		nic := node.NICs[string(result.Metric["device"])]
+	// 		nic.NICNetworkTraffic.TransmitPacketsTotal = int(result.Value)
+	// 		node.NICs[string(result.Metric["device"])] = nic
+	// 	}
+	// }
 
 	return node, nil
 }

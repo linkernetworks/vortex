@@ -10,10 +10,10 @@ type SamplePair struct {
 
 // NICNetworkTrafficMetrics is the structure for NIC metwork traffic metrics
 type NICNetworkTrafficMetrics struct {
-	ReceiveBytesTotal    int `json:"receiveBytesTotal"`
-	TransmitBytesTotal   int `json:"transmitBytesTotal"`
-	ReceivePacketsTotal  int `json:"receivePacketsTotal"`
-	TransmitPacketsTotal int `json:"transmitPacketsTotal"`
+	ReceiveBytesTotal    []SamplePair `json:"receiveBytesTotal"`
+	TransmitBytesTotal   []SamplePair `json:"transmitBytesTotal"`
+	ReceivePacketsTotal  []SamplePair `json:"receivePacketsTotal"`
+	TransmitPacketsTotal []SamplePair `json:"transmitPacketsTotal"`
 }
 
 // NICMetrics is the structure for NIC metrics
