@@ -96,8 +96,8 @@ apps.init-helm:
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
-.PHONY: apps.launch-apps
-apps.launch-apps:
+.PHONY: apps.launch
+apps.launch:
 	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
 	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
 
