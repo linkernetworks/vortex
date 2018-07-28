@@ -66,7 +66,12 @@ SHELL
 $vortex_dev_toolkits = <<SHELL
 set -e -x -u
 echo "=== Install Development Toolkit ==="
-sudo apt-get install -y vim cmake tcpdump unzip tig
+
+# vim 8 ppa
+sudo add-apt-repository ppa:jonathonf/vim
+sudo apt update -qq
+sudo apt-get -qq install -y vim cmake tcpdump unzip tig
+
 # Install Golang
 wget --quiet https://storage.googleapis.com/golang/go1.10.2.linux-amd64.tar.gz
 sudo tar -zxf go1.10.2.linux-amd64.tar.gz -C /usr/local/
@@ -91,14 +96,12 @@ if [ ! -d "${PROTOC_TARGET}" ]; then curl -fsSL "$PROTOC_RELEASE" > "${PROTOC_TA
 if [ -f "${PROTOC_TARGET}.zip" ]; then unzip "${PROTOC_TARGET}.zip" -d "${PROTOC_TARGET}"; fi
 go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
 
-# Install vim environment
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-vim +PluginInstall +qall
+# YouCompleteMe requirement
+sudo apt-get -qq install -y python-dev python3-dev
 
-# init YouCompleteMe vim plugin
-sudo apt-get install -y python-dev python3-dev
-cd ~/.vim/bundle/YouCompleteMe
-./install.py --go-completer
+# Install vim plug
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # Install govendor package manager
 go get -u github.com/kardianos/govendor
