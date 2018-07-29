@@ -57,6 +57,7 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 # Install helm
 curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
+rm -rf /home/$USER/helm-v2.9.1-linux-amd64.tar.gz
 
 # clone the project
 git clone https://github.com/linkernetworks/vortex.git
@@ -71,6 +72,7 @@ echo "=== Install Development Toolkit ==="
 sudo add-apt-repository ppa:jonathonf/vim
 sudo apt update -qq
 sudo apt-get -qq install -y vim cmake tcpdump unzip tig
+vim +PlugInstall +qall
 
 # Install Golang
 wget --quiet https://storage.googleapis.com/golang/go1.10.2.linux-amd64.tar.gz
@@ -95,6 +97,7 @@ PROTOC_TARGET="${HOME}/protoc"
 if [ ! -d "${PROTOC_TARGET}" ]; then curl -fsSL "$PROTOC_RELEASE" > "${PROTOC_TARGET}.zip"; fi
 if [ -f "${PROTOC_TARGET}.zip" ]; then unzip "${PROTOC_TARGET}.zip" -d "${PROTOC_TARGET}"; fi
 go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+rm -rf /home/$USER/protoc.zip
 
 # YouCompleteMe requirement
 sudo apt-get -qq install -y python-dev python3-dev
