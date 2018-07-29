@@ -72,6 +72,15 @@ echo "=== Install Development Toolkit ==="
 sudo add-apt-repository ppa:jonathonf/vim
 sudo apt update -qq
 sudo apt-get -qq install -y vim cmake tcpdump unzip tig
+
+# YouCompleteMe requirement
+sudo apt-get -qq install -y python-dev python3-dev
+
+# Install vim plug
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# Install vim plugin
 vim +PlugInstall +qall
 
 # Install Golang
@@ -98,13 +107,6 @@ if [ ! -d "${PROTOC_TARGET}" ]; then curl -fsSL "$PROTOC_RELEASE" > "${PROTOC_TA
 if [ -f "${PROTOC_TARGET}.zip" ]; then unzip "${PROTOC_TARGET}.zip" -d "${PROTOC_TARGET}"; fi
 go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
 rm -rf /home/$USER/protoc.zip
-
-# YouCompleteMe requirement
-sudo apt-get -qq install -y python-dev python3-dev
-
-# Install vim plug
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # Install govendor package manager
 go get -u github.com/kardianos/govendor
