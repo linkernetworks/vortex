@@ -23,7 +23,7 @@ Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' 
 " Color Theme
 Plug 'dracula/vim', { 'as': 'dracula' }
 
-Plugin 'rstacruz/sparkup'
+Plug 'rstacruz/sparkup'
 " Initialize plugin system
 call plug#end()
 
