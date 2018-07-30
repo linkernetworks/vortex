@@ -16,107 +16,41 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type PrometheusExpressionTestSuite struct {
+type PrometheusExprTestSuite struct {
 	suite.Suite
-	sp *serviceprovider.Container
+	sp            *serviceprovider.Container
+	containerName string
 }
 
-func (suite *PrometheusExpressionTestSuite) SetupSuite() {
+func (suite *PrometheusExprTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	suite.sp = serviceprovider.New(cf)
+	suite.containerName = "cadvisor"
 }
 
-func (suite *PrometheusExpressionTestSuite) TearDownSuite() {
+func (suite *PrometheusExprTestSuite) TearDownSuite() {
 }
 
-func TestPrometheusExpressionSuite(t *testing.T) {
+func TestPrometheusExprSuite(t *testing.T) {
 	if _, defined := os.LookupEnv("TEST_PROMETHEUS"); !defined {
 		t.SkipNow()
 		return
 	}
-	suite.Run(t, new(PrometheusExpressionTestSuite))
+	suite.Run(t, new(PrometheusExprTestSuite))
 }
 
-func (suite *PrometheusExpressionTestSuite) TestListResource() {
-	labelName := model.LabelName("container")
+func (suite *PrometheusExprTestSuite) TestGetElements() {
 	expression := Expression{}
 	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "vortex"
+	expression.QueryLabels = map[string]string{"namespace": "vortex"}
 
-	resourceList, err := ListResource(suite.sp, labelName, expression)
+	str := basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	results, err := query(suite.sp, str)
 	suite.NoError(err)
-	suite.NotEqual(0, len(resourceList))
-}
+	suite.NotEqual(0, float32(results[0].Value))
 
-func (suite *PrometheusExpressionTestSuite) TestListResourceFail() {
-	labelName := model.LabelName("")
-	expression := Expression{}
-
-	_, err := ListResource(suite.sp, labelName, expression)
-	suite.Error(err)
-}
-
-func (suite *PrometheusExpressionTestSuite) TestListNodeNICs() {
-	nodes, err := suite.sp.KubeCtl.GetNodes()
-	suite.NoError(err)
-	nodeName := nodes[0].GetName()
-
-	nicList, err := ListNodeNICs(suite.sp, nodeName)
-	suite.NoError(err)
-	suite.NotEqual(0, len(nicList.NICs))
-}
-
-func (suite *PrometheusExpressionTestSuite) TestGetPod() {
-	namespace := "vortex"
-	pods, err := suite.sp.KubeCtl.GetPods(namespace)
-	suite.NoError(err)
-	podName := pods[0].GetName()
-
-	pod, err := GetPod(suite.sp, podName)
-	suite.NoError(err)
-	suite.Equal(podName, pod.PodName)
-}
-
-func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
-	namespace := "vortex"
-	pods, err := suite.sp.KubeCtl.GetPods(namespace)
-	suite.NoError(err)
-	containerName := pods[0].Status.ContainerStatuses[0].Name
-
-	container, err := GetContainer(suite.sp, containerName)
-	suite.NoError(err)
-	suite.Equal(containerName, container.Detail.ContainerName)
-}
-
-func (suite *PrometheusExpressionTestSuite) TestGetService() {
-	namespace := "vortex"
-	services, err := suite.sp.KubeCtl.GetServices(namespace)
-	suite.NoError(err)
-	serviceName := services[0].GetName()
-
-	service, err := GetService(suite.sp, serviceName)
-	suite.NoError(err)
-	suite.Equal(serviceName, service.ServiceName)
-}
-
-func (suite *PrometheusExpressionTestSuite) TestGetController() {
-	namespace := "vortex"
-	deployments, err := suite.sp.KubeCtl.GetDeployments(namespace)
-	suite.NoError(err)
-	deploymentName := deployments[0].GetName()
-
-	controller, err := GetController(suite.sp, deploymentName)
-	suite.NoError(err)
-	suite.Equal(deploymentName, controller.ControllerName)
-}
-
-func (suite *PrometheusExpressionTestSuite) TestGetNode() {
-	nodes, err := suite.sp.KubeCtl.GetNodes()
-	suite.NoError(err)
-	nodeName := nodes[0].GetName()
-
-	node, err := GetNode(suite.sp, nodeName)
-	suite.NoError(err)
-	suite.Equal(nodeName, node.Detail.Hostname)
+	// Get nil if the result is empty
+	results, _ = query(suite.sp, "")
+	suite.Equal(model.Vector(nil), results)
 }

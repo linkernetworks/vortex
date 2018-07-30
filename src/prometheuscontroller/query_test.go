@@ -43,26 +43,23 @@ func TestPrometheusQuerySuite(t *testing.T) {
 func (suite *PrometheusQueryTestSuite) TestQuery() {
 	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
 
-	resource, err := query(suite.sp, queryStr)
+	results, err := query(suite.sp, queryStr)
 	suite.NoError(err)
-	suite.NotEqual(0, float32(resource[0].Value))
+	suite.NotEqual(0, float32(results[0].Value))
 
-	// Get nil if the resource is empty
-	resource, _ = query(suite.sp, "")
-	suite.Equal(model.Vector(nil), resource)
+	// Get nil if the results is empty
+	results, _ = query(suite.sp, "")
+	suite.Equal(model.Vector(nil), results)
 }
 
-func (suite *PrometheusQueryTestSuite) TestGetElements() {
-	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{}
-	expression.QueryLabels["namespace"] = "vortex"
+func (suite *PrometheusQueryTestSuite) TestQueryRange() {
+	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
 
-	resource, err := getElements(suite.sp, expression)
+	results, err := queryRange(suite.sp, queryStr)
 	suite.NoError(err)
-	suite.NotEqual(0, float32(resource[0].Value))
+	suite.NotEqual(0, float32(results[0].Values[0].Value))
 
-	// Get nil if the resource is empty
-	resource, _ = getElements(suite.sp, Expression{})
-	suite.Equal(model.Vector(nil), resource)
+	// Get nil if the results is empty
+	results, _ = queryRange(suite.sp, "")
+	suite.Equal(model.Matrix(nil), results)
 }
