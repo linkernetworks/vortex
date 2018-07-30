@@ -48,10 +48,8 @@ func (suite *PrometheusExprTestSuite) TestBasicExpr() {
 func (suite *PrometheusExprTestSuite) TestQueryExpr() {
 	queryLabels := map[string]string{}
 	queryLabels["aKey"] = "aValue"
-	queryLabels["bKey"] = "bValue"
-	queryLabels["cKey"] = "cValue"
 	str := queryExpr("TEST_STRING", queryLabels)
-	suite.Equal(`{TEST_STRING,aKey=~"aValue",bKey=~"bValue",cKey=~"cValue"}`, str)
+	suite.Equal(`{TEST_STRING,aKey=~"aValue"}`, str)
 
 	str = queryExpr("TEST_STRING", nil)
 	suite.Equal("TEST_STRING", str)
