@@ -6,12 +6,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// PodCollectionName's const
 const (
+	// PodCollectionName's const
 	PodCollectionName string = "pods"
-	PodHostNetwork           = "host"
-	PodClusterNetwork        = "cluster"
-	PodCustomNetwork         = "custom"
+	// The network type for the Pod
+	// host means the pod use the hostNetwork (share the network with the host machine)
+	PodHostNetwork = "host"
+	// cluster means use the cluster Network, maybe the flannel network
+	PodClusterNetwork = "cluster"
+	// custom means the custom netwokr we created before, it support the OVS and DPDK network for additional network interface card
+	PodCustomNetwork = "custom"
 )
 
 // Container is the structure for init Container info

@@ -14,5 +14,5 @@
 	"volumes":[],
     "restaryPolicy":"Always",
     "capability": true,
-    "hostNetwork": true
+    "networkType": "host"
 }
