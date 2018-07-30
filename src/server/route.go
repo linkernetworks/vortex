@@ -17,7 +17,6 @@ func (a *App) AppRoute() *mux.Router {
 
 	container.Add(newVersionService(a.ServiceProvider))
 	container.Add(newUserService(a.ServiceProvider))
-	container.Add(newAuthenticateService(a.ServiceProvider))
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
@@ -44,12 +43,9 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listUserHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getUserHandler)))
-	return webService
-}
-func newAuthenticateService(sp *serviceprovider.Container) *restful.WebService {
-	webService := new(restful.WebService)
-	webService.Path("/v1/login").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, loginHandler)))
+	// Authenticate handlers Sign Up / Sign In
+	webService.Route(webService.POST("/signup").To(handler.RESTfulServiceHandler(sp, signUpUserHandler)))
+	webService.Route(webService.POST("/signin").To(handler.RESTfulServiceHandler(sp, signInUserHandler)))
 	return webService
 }
 

@@ -1,4 +1,4 @@
-package server
+package backend
 
 import (
 	"testing"
@@ -7,7 +7,8 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	tokenString, err := generateToken("234243353535330")
+	roles := "admin"
+	tokenString, err := GenerateToken("234243353535330", roles)
 	assert.NotNil(t, tokenString)
 	assert.NoError(t, err)
 }
