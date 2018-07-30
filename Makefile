@@ -2,6 +2,7 @@
 SERVER_VERSION = v0.1.6
 ## Folder content generated files
 BUILD_FOLDER = ./build
+UNAME := $(shell uname)
 
 ## command
 GO           = go
@@ -108,7 +109,11 @@ apps.upgrade:
 
 .PHONY: apps.teardown
 apps.teardown:
+ifeq ($(UNAME), Linux)
 	helm ls --short | xargs -i helm delete --purge {}
+else ifeq ($(UNAME), Darwin)
+	helm ls --short | xargs helm delete --purge
+endif
 
 ## dockerfiles/ ########################################
 
