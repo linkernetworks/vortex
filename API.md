@@ -250,40 +250,46 @@ Request Data:
 
 ```json
 {
-   "type":"system",
-   "isDPDKPort":false,
-   "name":"my network-3",
-   "vlanTags":[
-      100,
-      200
-   ],
-   "routes":[
-      {
-         "dstCIDR":"224.0.0.0/4",
-         "gateway":"0.0.0.0"
-      }
-   ],
-   "bridgeName":"ovsbr0",
-   "nodes":[
-      {
-         "name":"vortex-dev",
-         "physicalInterfaces":[
-            {
-               "name":"eth0",
-               "pciID":""
-            }
-         ]
-      }
-   ]
+  "type":"system",
+  "isDPDKPort":false,
+  "name":"my-net",
+  "vlanTags":[],
+  "nodes":[
+    {
+      "name":"vortex-dev",
+      "physicalInterfaces":[
+        {
+          "name":"eth0"
+        }
+      ]
+    }
+  ]
 }
 ```
 
 Response Data:
 
 ```json
+
 {
-  "error": false,
-  "message": "Create success"
+    "id": "5b5ed39484281d0001ac6735",
+    "type": "system",
+    "isDPDKPort": false,
+    "name": "my-net",
+    "vlanTags": [],
+    "bridgeName": "system-62fc3f",
+    "nodes": [
+        {
+            "name": "vortex-dev",
+            "physicalInterfaces": [
+                {
+                    "name": "eth0",
+                    "pciID": ""
+                }
+            ]
+        }
+    ],
+    "createdAt": "2018-07-30T09:00:04.740082091Z"
 }
 ```
 
