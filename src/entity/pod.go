@@ -9,6 +9,9 @@ import (
 // PodCollectionName's const
 const (
 	PodCollectionName string = "pods"
+	PodHostNetwork           = "host"
+	PodClusterNetwork        = "cluster"
+	PodCustomNetwork         = "custom"
 )
 
 // Container is the structure for init Container info
@@ -54,6 +57,7 @@ type Pod struct {
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
 	HostNetwork   bool              `bson:"hostNetwork" json:"hostNetwork" validate:"-"`
+	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=Host|Cluster|Custom`
 }
 
 // GetCollection - get model mongo collection name.

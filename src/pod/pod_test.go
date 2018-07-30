@@ -152,9 +152,10 @@ func (suite *PodTestSuite) TestCreatePod() {
 
 	podName := namesgenerator.GetRandomName(0)
 	pod := &entity.Pod{
-		ID:         bson.NewObjectId(),
-		Name:       podName,
-		Containers: containers,
+		ID:          bson.NewObjectId(),
+		Name:        podName,
+		Containers:  containers,
+		NetworkType: entity.PodHostNetwork,
 	}
 
 	err := CreatePod(suite.sp, pod)
