@@ -51,7 +51,7 @@ type Pod struct {
 	CreatedAt     *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 	Volumes       []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
 	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
-	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never`
+	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never"`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
 	HostNetwork   bool              `bson:"hostNetwork" json:"hostNetwork" validate:"-"`
 }
