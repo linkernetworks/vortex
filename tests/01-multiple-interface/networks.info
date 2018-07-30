@@ -8,7 +8,7 @@
 		{	
 			"name": "@NODENAME@",
 			"physicalInterfaces": [{
-				"name":"eth10"	
+				"name":"@ETHNAME@"
 			}]
 		}
 	]

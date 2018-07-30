@@ -1,17 +1,6 @@
 #!/usr/bin/env bats
 
-load data
-setup() {
-    sed -i "s/@NODENAME@/${nodeName}/" networks.json
-    sed -i "s/@NETWORKNAME@/${networkName}/" networks.json
-    sed -i "s/@NETWORKNAME@/${networkName}/" pod.json
-    sed -i "s/@PODNAME@/${podName}/" pod.json
-}
-
-teardown() {
-    git checkout networks.json
-    git checkout pod.json
-}
+load init
 
 @test "Create network" {
     http -v --check-status 127.0.0.1:32326/v1/networks < networks.json
@@ -21,6 +10,11 @@ teardown() {
 @test "List network" {
     run bash -c "http http://127.0.0.1:32326/v1/networks/ 2>/dev/null | jq -r '.[] | select(.name == \"${networkName}\").name'"
     [ "$output" = "${networkName}" ]
+    [ $status = 0 ]
+}
+
+@test "Check OVS port" {
+    run sudo ovs-vsctl get Interface ${ethName} ofport
     [ $status = 0 ]
 }
 
@@ -37,6 +31,11 @@ teardown() {
        NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
     done
     [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
+}
+
+@test "Check pod network interface" {
+    run bash -c "kubectl exec -it ${podName} ifconfig eth12 | grep 1.2.3.4"
+    [ $status = 0 ]
 }
 
 @test "List Pod" {
