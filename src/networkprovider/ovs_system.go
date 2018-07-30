@@ -13,9 +13,6 @@ type kernelspaceNetworkProvider struct {
 }
 
 func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(knp.VlanTags); err != nil {
-		return err
-	}
 	for _, node := range knp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {

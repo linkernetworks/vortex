@@ -20,6 +20,7 @@ import (
 
 func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	// uuid := req.Attribute("UserID").(string)
 
 	p := entity.Pod{}
 	if err := req.ReadEntity(&p); err != nil {
@@ -64,6 +65,19 @@ func createPodHandler(ctx *web.Context) {
 		return
 	}
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
+	// create by who
+	// user, err := backend.FindUserByUUID(session, uuid)
+	// if err != nil {
+	// 	switch err {
+	// 	case mgo.ErrNotFound:
+	// 		response.Forbidden(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	default:
+	// 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	}
+	// }
+	// p.CreatedBy = user
 }
 
 func deletePodHandler(ctx *web.Context) {

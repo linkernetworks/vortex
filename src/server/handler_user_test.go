@@ -408,6 +408,9 @@ func (suite *UserTestSuite) TestListUser() {
 			retUsers := []entity.User{}
 			err = json.Unmarshal(httpWriter.Body.Bytes(), &retUsers)
 			suite.NoError(err)
+			// Pop out the first test user. test user is generated in main_test.go
+			// the propose of test user is for others api to get a JWT token
+			_, retUsers = retUsers[0], retUsers[1:]
 			suite.Equal(tc.expectSize, len(retUsers))
 			for i, u := range retUsers {
 				suite.Equal(users[i].Username, u.Username)

@@ -20,6 +20,7 @@ import (
 
 func createServiceHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	// uuid := req.Attribute("UserID").(string)
 
 	s := entity.Service{}
 	if err := req.ReadEntity(&s); err != nil {
@@ -59,6 +60,19 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// create by who
+	// user, err := backend.FindUserByUUID(session, uuid)
+	// if err != nil {
+	// 	switch err {
+	// 	case mgo.ErrNotFound:
+	// 		response.Forbidden(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	default:
+	// 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	}
+	// }
+	// s.CreatedBy = user
 	resp.WriteHeaderAndEntity(http.StatusCreated, s)
 }
 

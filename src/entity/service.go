@@ -27,6 +27,7 @@ type Service struct {
 	Type      string            `bson:"type" json:"type" validate:"oneof=ClusterIP NodePort"`
 	Selector  map[string]string `bson:"selector" json:"selector" validate:"required"`
 	Ports     []ServicePort     `bson:"ports" json:"ports" validate:"required"`
+	CreatedBy User              `bson:"createdBy" json:"createdBy" validate:"-"`
 	CreatedAt *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 

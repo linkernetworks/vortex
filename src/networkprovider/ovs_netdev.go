@@ -13,9 +13,6 @@ type userspaceNetworkProvider struct {
 }
 
 func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(unp.VlanTags); err != nil {
-		return err
-	}
 	for _, node := range unp.Nodes {
 		nodeIP, err := sp.KubeCtl.GetNodeInternalIP(node.Name)
 		if err != nil {

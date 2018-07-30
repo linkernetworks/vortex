@@ -12,6 +12,7 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 
 	mgo "gopkg.in/mgo.v2"
@@ -20,6 +21,7 @@ import (
 
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	uuid := req.Attribute("UserID").(string)
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
@@ -64,6 +66,19 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// create by who
+	user, err := backend.FindUserByUUID(session, uuid)
+	if err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			response.Forbidden(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+	}
+	network.CreatedBy = user
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 

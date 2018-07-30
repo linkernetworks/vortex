@@ -20,6 +20,7 @@ import (
 
 func createVolume(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	// uuid := req.Attribute("UserID").(string)
 
 	v := entity.Volume{}
 	if err := req.ReadEntity(&v); err != nil {
@@ -58,6 +59,19 @@ func createVolume(ctx *web.Context) {
 		}
 		return
 	}
+	// create by who
+	// user, err := backend.FindUserByUUID(session, uuid)
+	// if err != nil {
+	// 	switch err {
+	// 	case mgo.ErrNotFound:
+	// 		response.Forbidden(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	default:
+	// 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+	// 		return
+	// 	}
+	// }
+	// v.CreatedBy = user
 	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 

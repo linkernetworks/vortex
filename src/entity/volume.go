@@ -22,6 +22,7 @@ type Volume struct {
 	StorageName string                            `bson:"storageName" json:"storageName" validate:"required"`
 	AccessMode  corev1.PersistentVolumeAccessMode `bson:"accessMode" json:"accessMode" validate:"required"`
 	Capacity    string                            `bson:"capacity" json:"capacity" validate:"required"`
+	CreatedBy   User                              `bson:"createdBy" json:"createdBy" validate:"-"`
 	CreatedAt   *time.Time                        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 

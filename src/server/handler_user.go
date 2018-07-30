@@ -30,7 +30,7 @@ func signUpUserHandler(ctx *web.Context) {
 
 	user.UUID = uuid.Must(uuid.NewV4()).String()
 
-	encryptedPassword, err := hashPassword(user.LoginCredential.Password)
+	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
@@ -128,7 +128,7 @@ func createUserHandler(ctx *web.Context) {
 
 	user.UUID = uuid.Must(uuid.NewV4()).String()
 
-	encryptedPassword, err := hashPassword(user.LoginCredential.Password)
+	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
