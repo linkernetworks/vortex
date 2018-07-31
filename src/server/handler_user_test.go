@@ -153,7 +153,7 @@ func (suite *UserTestSuite) TestSignInUser() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
 	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
 
 	// do Sign In
