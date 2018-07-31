@@ -2,7 +2,7 @@ package entity
 
 // ContainerResourceMetrics is the sructure for Container Resource Metrics
 type ContainerResourceMetrics struct {
-	CPUUsagePercentage float32      `json:"cpuUsagePercentage"`
+	CPUUsagePercentage []SamplePair `json:"cpuUsagePercentage"`
 	MemoryUsageBytes   []SamplePair `json:"memoryUsageBytes"`
 }
 

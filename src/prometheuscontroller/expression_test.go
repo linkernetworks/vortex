@@ -6,9 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,9 +21,6 @@ type PrometheusExprTestSuite struct {
 }
 
 func (suite *PrometheusExprTestSuite) SetupSuite() {
-	cf := config.MustRead("../../config/testing.json")
-	suite.sp = serviceprovider.New(cf)
-	suite.containerName = "cadvisor"
 }
 
 func (suite *PrometheusExprTestSuite) TearDownSuite() {
@@ -39,18 +34,57 @@ func TestPrometheusExprSuite(t *testing.T) {
 	suite.Run(t, new(PrometheusExprTestSuite))
 }
 
-func (suite *PrometheusExprTestSuite) TestGetElements() {
+func (suite *PrometheusExprTestSuite) TestBasicExpr() {
 	expression := Expression{}
-	expression.Metrics = []string{"kube_pod_container_info"}
-	expression.QueryLabels = map[string]string{"namespace": "vortex"}
+	expression.Metrics = []string{"a", "b", "c"}
 
 	str := basicExpr(expression.Metrics)
-	str = queryExpr(str, expression.QueryLabels)
-	results, err := query(suite.sp, str)
-	suite.NoError(err)
-	suite.NotEqual(0, float32(results[0].Value))
+	suite.Equal(`__name__=~"a|b|c"`, str)
 
-	// Get nil if the result is empty
-	results, _ = query(suite.sp, "")
-	suite.Equal(model.Vector(nil), results)
+	str = basicExpr(nil)
+	suite.Equal("", str)
+}
+
+func (suite *PrometheusExprTestSuite) TestQueryExpr() {
+	queryLabels := map[string]string{}
+	queryLabels["aKey"] = "aValue"
+	str := queryExpr("TEST_STRING", queryLabels)
+	suite.Equal(`{TEST_STRING,aKey=~"aValue"}`, str)
+
+	str = queryExpr("TEST_STRING", nil)
+	suite.Equal("TEST_STRING", str)
+}
+
+func (suite *PrometheusExprTestSuite) TestSumByExpr() {
+	sumByLabels := []string{"a", "b", "c"}
+	str := sumByExpr("TEST_STRING", sumByLabels)
+	suite.Equal(`sum by(a,b,c)(TEST_STRING)`, str)
+}
+
+func (suite *PrometheusExprTestSuite) TestSumExpr() {
+	str := sumExpr("TEST_STRING")
+	suite.Equal(`sum(TEST_STRING)`, str)
+}
+
+func (suite *PrometheusExprTestSuite) TestDurationExpr() {
+	var duration = "1h"
+	str := durationExpr("TEST_STRING", duration)
+	suite.Equal(`TEST_STRING[1h]`, str)
+}
+
+func (suite *PrometheusExprTestSuite) TestRateExpr() {
+	var str = rateExpr("TEST_STRING")
+	suite.Equal(`rate(TEST_STRING)`, str)
+}
+
+func (suite *PrometheusExprTestSuite) TestEqualExpr() {
+	var value = 1234.567
+	str := equalExpr("TEST_STRING", value)
+	suite.Equal(`TEST_STRING==1234.567`, str)
+}
+
+func (suite *PrometheusExprTestSuite) TestMultiplyExpr() {
+	value := 1234.567
+	str := multiplyExpr("TEST_STRING", value)
+	suite.Equal(`TEST_STRING*1234.567`, str)
 }

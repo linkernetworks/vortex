@@ -3,7 +3,6 @@ package prometheuscontroller
 import (
 	"fmt"
 	"strings"
-	"time"
 )
 
 // Expression is the structure for expression
@@ -36,7 +35,7 @@ func queryExpr(expr string, queryLabels map[string]string) string {
 
 	var tmp string
 	for key, value := range queryLabels {
-		tmp = fmt.Sprintf(`,%s=~"%s"`, key, value)
+		tmp = fmt.Sprintf(`%s,%s=~"%s"`, tmp, key, value)
 	}
 	expr = fmt.Sprintf("{%s%s}", expr, tmp)
 
@@ -66,7 +65,7 @@ func sumExpr(expr string) string {
 }
 
 // Append a duration for expression
-func durationExpr(expr string, duration time.Duration) string {
+func durationExpr(expr string, duration string) string {
 	expr = fmt.Sprintf("%s[%v]", expr, duration)
 
 	return expr
@@ -79,9 +78,16 @@ func rateExpr(expr string) string {
 	return expr
 }
 
-// Assign a value for expression
+// Assign a value which result equal to
 func equalExpr(expr string, value float64) string {
 	expr = fmt.Sprintf("%s==%v", expr, value)
+
+	return expr
+}
+
+// Assign a value which result multiplied by
+func multiplyExpr(expr string, value float64) string {
+	expr = fmt.Sprintf("%s*%v", expr, value)
 
 	return expr
 }
