@@ -30,6 +30,7 @@ type NICMetrics struct {
 type NICOverviewMetrics struct {
 	Name    string `json:"name"`
 	Default bool   `json:"default"`
+	DPDK    bool   `json:"dpdk"`
 	Type    string `json:"type"`
 	PCIID   string `json:"pciID"`
 }
