@@ -588,6 +588,11 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 				return node, err
 			}
 			nic.Default = defaultValue
+			dpdkValue, err := strconv.ParseBool(string(result.Metric["dpdk"]))
+			if err != nil {
+				return node, err
+			}
+			nic.DPDK = dpdkValue
 			nic.Type = string(result.Metric["type"])
 			nic.IP = string(result.Metric["ip_address"])
 			nic.PCIID = string(result.Metric["pci_id"])

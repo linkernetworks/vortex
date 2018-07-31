@@ -19,6 +19,7 @@ type NICNetworkTrafficMetrics struct {
 // NICMetrics is the structure for NIC metrics
 type NICMetrics struct {
 	Default           bool                     `json:"default"`
+	DPDK              bool                     `json:"dpdk"`
 	Type              string                   `json:"type"`
 	IP                string                   `json:"ip"`
 	PCIID             string                   `json:"pciID"`
