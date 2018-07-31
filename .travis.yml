@@ -72,8 +72,6 @@ before_script:
   - until [ `kubectl  -n vortex get --no-headers pods | awk '{c[$3]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex get pods;  done
   - kubectl -n vortex describe daemonset/network-controller-server-tcp
   - kubectl -n vortex describe daemonset/network-controller-server-unix
-  # # Start to test and produce the coverage report
-  #- make src.test-bats
 
 jobs:
   include:
