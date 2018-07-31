@@ -103,7 +103,7 @@ func newContainerService(sp *serviceprovider.Container) *restful.WebService {
 func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/pods").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	// webService.Filter(validateTokenMiddleware)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createPodHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deletePodHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listPodHandler)))

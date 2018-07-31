@@ -11,6 +11,7 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/pod"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -20,7 +21,11 @@ import (
 
 func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	// uuid := req.Attribute("UserID").(string)
+	uuid, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("User ID is empty"))
+		return
+	}
 
 	p := entity.Pod{}
 	if err := req.ReadEntity(&p); err != nil {
@@ -56,6 +61,19 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// create by who
+	user, err := backend.FindUserByUUID(session, uuid)
+	if err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			response.Forbidden(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+	}
+	p.CreatedBy = user
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
@@ -64,7 +82,6 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 	// create by who
 	// user, err := backend.FindUserByUUID(session, uuid)
 	// if err != nil {
@@ -78,6 +95,7 @@ func createPodHandler(ctx *web.Context) {
 	// 	}
 	// }
 	// p.CreatedBy = user
+	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
 func deletePodHandler(ctx *web.Context) {
