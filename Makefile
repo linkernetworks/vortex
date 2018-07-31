@@ -87,7 +87,7 @@ src.test-coverage-vagrant:
 
 .PHONY: src.test-bats
 src.test-bats:
-	cd tests; \
+	cd tests/01-multiple-interface;\
 	bats .;
 
 .PHONY: check-govendor
@@ -107,7 +107,8 @@ apps.init-helm:
 .PHONY: apps.launch
 apps.launch:
 	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
+	helm install --name vortex-apps --debug --wait --set global.environment=local --set vortex-server.image.tag=$(SERVER_VERSION)  deploy/helm/apps/
+
 
 .PHONY: apps.upgrade
 apps.upgrade:
