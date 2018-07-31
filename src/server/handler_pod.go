@@ -23,7 +23,7 @@ func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 	uuid, ok := req.Attribute("UserID").(string)
 	if !ok {
-		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("User ID is empty"))
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
 	}
 
@@ -66,7 +66,7 @@ func createPodHandler(ctx *web.Context) {
 	if err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			response.Forbidden(req.Request, resp.ResponseWriter, err)
+			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
 			return
 		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)

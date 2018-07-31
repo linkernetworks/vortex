@@ -186,7 +186,7 @@ func (suite *UserTestSuite) TestSignInFailedUser() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusForbidden, httpWriter)
+	assertResponseCode(suite.T(), http.StatusUnauthorized, httpWriter)
 }
 
 func (suite *UserTestSuite) TestCreateUser() {

@@ -90,7 +90,7 @@ func signInUserHandler(ctx *web.Context) {
 	if err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to login. Incorrect authentication credentials"))
+			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: Failed to login. Incorrect authentication credentials"))
 			return
 		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -100,7 +100,7 @@ func signInUserHandler(ctx *web.Context) {
 
 	// when authenticating not pass
 	if !passed {
-		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to login. Incorrect authentication credentials"))
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: Failed to login. Incorrect authentication credentials"))
 		return
 	}
 
