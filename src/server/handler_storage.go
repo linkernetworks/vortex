@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 
 	"github.com/linkernetworks/logger"
@@ -65,7 +66,7 @@ func createStorage(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(storage)
+	resp.WriteHeaderAndEntity(http.StatusCreated, storage)
 }
 
 func listStorage(ctx *web.Context) {

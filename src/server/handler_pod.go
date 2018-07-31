@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
@@ -57,7 +58,7 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(p)
+	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
 func deletePodHandler(ctx *web.Context) {

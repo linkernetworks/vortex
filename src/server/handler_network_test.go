@@ -82,8 +82,7 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	//assertResponseCode(t, http.StatusOK, httpWriter)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
 	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
 
 	//We use the new write but empty input

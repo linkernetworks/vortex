@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
@@ -53,7 +54,7 @@ func createVolume(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(v)
+	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 
 func deleteVolume(ctx *web.Context) {

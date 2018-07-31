@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -65,7 +66,7 @@ func signUpUserHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(user)
+	resp.WriteHeaderAndEntity(http.StatusCreated, user)
 }
 
 func signInUserHandler(ctx *web.Context) {
@@ -198,7 +199,7 @@ func deleteUserHandler(ctx *web.Context) {
 	})
 }
 
-// listUserHandler is to list all registed users on vortex server. The role must to have admin permission to access it.
+// listUserHandler is to list all registered users on vortex server. The role must to have admin permission to access it.
 func listUserHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
