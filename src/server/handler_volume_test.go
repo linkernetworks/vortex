@@ -27,10 +27,11 @@ func init() {
 
 type VolumeTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
-	storage entity.Storage
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	storage   entity.Storage
+	JWTBearer string
 }
 
 func (suite *VolumeTestSuite) SetupSuite() {
@@ -44,6 +45,10 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 	service := newVolumeService(suite.sp)
 	suite.wc.Add(service)
+
+	token, _ := loginGetToken(suite.sp, suite.wc)
+	suite.JWTBearer = "Bearer " + token
+
 	//init a Storage
 	suite.storage = entity.Storage{
 		ID:   bson.NewObjectId(),
@@ -81,6 +86,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -105,6 +111,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/volume", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -130,6 +137,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
@@ -168,6 +176,7 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -182,6 +191,7 @@ func (suite *VolumeTestSuite) TestDeleteVolumeWithInvalidID() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -227,6 +237,7 @@ func (suite *VolumeTestSuite) TestListVolume() {
 			httpRequest, err := http.NewRequest("GET", url, nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -249,6 +260,7 @@ func (suite *VolumeTestSuite) TestListVolumeWithInvalidPage() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/volume?page=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -256,6 +268,7 @@ func (suite *VolumeTestSuite) TestListVolumeWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/volume?page_size=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -263,6 +276,7 @@ func (suite *VolumeTestSuite) TestListVolumeWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/volume?page=-1", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
