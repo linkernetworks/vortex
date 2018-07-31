@@ -44,8 +44,7 @@ func (suite *ServiceTestSuite) SetupSuite() {
 	suite.wc.Add(service)
 }
 
-func (suite *ServiceTestSuite) TearDownSuite() {
-}
+func (suite *ServiceTestSuite) TearDownSuite() {}
 
 func TestServiceSuite(t *testing.T) {
 	suite.Run(t, new(ServiceTestSuite))
@@ -84,7 +83,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
 	defer suite.session.Remove(entity.ServiceCollectionName, "name", service.Name)
 
 	//load data to check

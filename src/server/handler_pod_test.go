@@ -81,7 +81,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
 	defer suite.session.Remove(entity.PodCollectionName, "name", pod.Name)
 
 	//load data to check

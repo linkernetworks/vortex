@@ -48,8 +48,7 @@ func (suite *StorageTestSuite) SetupSuite() {
 	suite.session = sp.Mongo.NewSession()
 }
 
-func (suite *StorageTestSuite) TearDownSuite() {
-}
+func (suite *StorageTestSuite) TearDownSuite() {}
 
 func TestStorageSuite(t *testing.T) {
 	suite.Run(t, new(StorageTestSuite))
@@ -80,7 +79,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	defer suite.session.Remove(entity.StorageCollectionName, "name", tName)
-	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
 	//Empty data
 	//We use the new write but empty input
 	httpWriter = httptest.NewRecorder()
