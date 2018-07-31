@@ -61,6 +61,7 @@ type Pod struct {
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
 	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=Host|Cluster|Custom`
+	NodeAffinity  []string          `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.

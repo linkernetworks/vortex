@@ -37,5 +37,6 @@
 	"volumes":[],
     "restaryPolicy":"Always",
     "capability": true,
-    "networkType": "custom"
+    "networkType": "custom",
+	"nodeAffinity": []
 }

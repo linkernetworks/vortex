@@ -70,6 +70,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 		Capability:    true,
 		RestartPolicy: "Never",
 		NetworkType:   entity.PodHostNetwork,
+		NodeAffinity:  []string{},
 	}
 	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
 	suite.NoError(err)
@@ -159,6 +160,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 		Capability:    true,
 		RestartPolicy: "Never",
 		NetworkType:   entity.PodHostNetwork,
+		NodeAffinity:  []string{},
 	}
 
 	err := p.CreatePod(suite.sp, &pod)
