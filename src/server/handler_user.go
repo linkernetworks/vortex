@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -65,7 +66,7 @@ func signUpUserHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(user)
+	resp.WriteHeaderAndEntity(http.StatusCreated, user)
 }
 
 func signInUserHandler(ctx *web.Context) {

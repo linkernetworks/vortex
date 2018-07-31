@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
@@ -63,7 +64,7 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(network)
+	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 
 func listNetworkHandler(ctx *web.Context) {

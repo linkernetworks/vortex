@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
@@ -58,7 +59,7 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
-	resp.WriteEntity(s)
+	resp.WriteHeaderAndEntity(http.StatusCreated, s)
 }
 
 func deleteServiceHandler(ctx *web.Context) {
