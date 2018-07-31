@@ -40,6 +40,7 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
+	suite.sp = sp
 	//init session
 	suite.session = sp.Mongo.NewSession()
 	//init restful container
@@ -47,7 +48,6 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	service := newNetworkService(sp)
 	suite.wc.Add(service)
 
-	suite.sp = sp
 	token, _ := loginGetToken(suite.sp, suite.wc)
 	suite.JWTBearer = "Bearer " + token
 }
