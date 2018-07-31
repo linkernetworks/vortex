@@ -78,19 +78,6 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
-	// create by who
-	// user, err := backend.FindUserByUUID(session, uuid)
-	// if err != nil {
-	// 	switch err {
-	// 	case mgo.ErrNotFound:
-	// 		response.Forbidden(req.Request, resp.ResponseWriter, err)
-	// 		return
-	// 	default:
-	// 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-	// 		return
-	// 	}
-	// }
-	// s.CreatedBy = user
 	resp.WriteHeaderAndEntity(http.StatusCreated, s)
 }
 
