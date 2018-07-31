@@ -243,7 +243,7 @@ func (suite *PodTestSuite) TestGetPodWithInvalidID() {
 }
 
 func (suite *PodTestSuite) TestListPod() {
-	/*namespace := "default"
+	namespace := "default"
 	pods := []entity.Pod{}
 	count := 3
 	for i := 0; i < count; i++ {
@@ -302,7 +302,7 @@ func (suite *PodTestSuite) TestListPod() {
 				suite.Equal(len(pods[i].Containers), len(p.Containers))
 			}
 		})
-	}*/
+	}
 }
 
 func (suite *PodTestSuite) TestListPodWithInvalidPage() {
