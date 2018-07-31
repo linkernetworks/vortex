@@ -857,87 +857,80 @@ Response Data:
    {
     "name": "cni0",
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "pciID": ""
    },
    {
     "name": "docker0",
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "pciID": ""
    },
    {
+    "name": "dpdk0",
+    "default": false,
+    "dpdk": true,
+    "type": "virtual",
+    "pciID": "0000:00:11.0"
+   },
+   {
+    "name": "dpdk1",
+    "default": false,
+    "dpdk": true,
+    "type": "virtual",
+    "pciID": "0000:00:12.0"
+   },
+   {
+    "name": "enp0s10",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:0a.0"
+   },
+   {
+    "name": "enp0s16",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:10.0"
+   },
+   {
     "name": "enp0s8",
     "default": false,
+    "dpdk": false,
     "type": "physical",
     "pciID": "0000:00:08.0"
    },
    {
+    "name": "enp0s9",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:09.0"
+   },
+   {
     "name": "flannel.1",
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "pciID": ""
    },
    {
     "name": "lo",
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "pciID": ""
    },
    {
-    "name": "veth0756b817",
+    "name": "veth67bb7a60",
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "pciID": ""
-   },
-   {
-    "name": "veth0ee29e7",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "veth1fd22c92",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "veth22ed2ac7",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "veth256ca549",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "veth7da58df2",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "vethbd37bcbc",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "vethddeea13c",
-    "default": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "enp0s3",
-    "default": true,
-    "type": "physical",
-    "pciID": "0000:00:03.0"
-   }
+   } ...
   ]
  }
 ```
@@ -1002,6 +995,11 @@ Response Data:
   ],
   "nics": {
    "eth0": {
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "ip": "10.244.0.1/24",
+    "pciID": "",
     "nicNetworkTraffic": {
      "receiveBytesTotal": [
       {
