@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/volume"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -20,7 +21,11 @@ import (
 
 func createVolume(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	// uuid := req.Attribute("UserID").(string)
+	uuid, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("User ID is empty"))
+		return
+	}
 
 	v := entity.Volume{}
 	if err := req.ReadEntity(&v); err != nil {
@@ -51,6 +56,19 @@ func createVolume(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
 	}
+	// create by who
+	user, err := backend.FindUserByUUID(session, uuid)
+	if err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			response.Forbidden(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+	}
+	v.CreatedBy = user
 	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", v.Name))
@@ -72,6 +90,7 @@ func createVolume(ctx *web.Context) {
 	// 	}
 	// }
 	// v.CreatedBy = user
+	resp.WriteEntity(v)
 	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 
