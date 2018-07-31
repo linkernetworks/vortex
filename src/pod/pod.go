@@ -240,7 +240,9 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	case entity.PodCustomNetwork:
 		tmp := []string{}
 		tmp, initContainers, err = generateNetwork(session, pod)
-		nodeNames = utils.Intersection(nodeNames, tmp)
+		if len(tmp) != 0 {
+			nodeNames = utils.Intersection(nodeNames, tmp)
+		}
 	case entity.PodClusterNetwork:
 		//For cluster network, we won't set the nodeAffinity and any netwokr options.
 	default:
