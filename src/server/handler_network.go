@@ -21,7 +21,11 @@ import (
 
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	uuid := req.Attribute("UserID").(string)
+	uuid, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("User ID is empty"))
+		return
+	}
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
@@ -58,14 +62,6 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
-	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
-		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
-		} else {
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		}
-		return
-	}
 	// create by who
 	user, err := backend.FindUserByUUID(session, uuid)
 	if err != nil {
@@ -79,6 +75,14 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 	}
 	network.CreatedBy = user
+	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 
