@@ -60,7 +60,7 @@ type Pod struct {
 	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never"`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
-	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=host|cluster|custom`
+	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
 	NodeAffinity  []string          `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
 }
 
