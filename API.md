@@ -808,6 +808,7 @@ Response Data:
   "nics": {
    "cni0": {
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "ip": "10.244.0.1/24",
     "pciID": "",
@@ -876,14 +877,14 @@ Response Data:
     "name": "dpdk0",
     "default": false,
     "dpdk": true,
-    "type": "virtual",
+    "type": "physical",
     "pciID": "0000:00:11.0"
    },
    {
     "name": "dpdk1",
     "default": false,
     "dpdk": true,
-    "type": "virtual",
+    "type": "physical",
     "pciID": "0000:00:12.0"
    },
    {
