@@ -27,6 +27,7 @@ before_install:
     - sudo apt-get install -y socat openvswitch-switch
     - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
     - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+    - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
 
 before_script:
     # Make root mounted as rshared to fix kube-dns issues.
@@ -37,8 +38,6 @@ before_script:
   - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
-    # Download Helm.
-  - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
     # Install nsenter
   - docker run -v /usr/local/bin:/hostbin hwchiu/ubuntu-nsenter cp /nsenter /hostbin/nsenter
     # Initial helm
@@ -58,10 +57,11 @@ jobs:
     - stage: "Tests"
       name: "Unit Test"
       script: make pre-build && sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
+      after_success:
+        - cp build/src/coverage.txt coverage.txt
+        - bash <(curl -s https://codecov.io/bash)
     - name: "Integration Tests"
       install: sudo apt-get install -y socat jq httpie && sudo add-apt-repository ppa:duggan/bats --yes && sudo apt-get update -q && sudo apt-get install -qq bats
-      script: sudo make src.test-bats
-
-after_success:
-  - cp build/src/coverage.txt coverage.txt
-  - bash <(curl -s https://codecov.io/bash)
+      script:
+        - ls build/src/cmd/vortex/vortex
+        - sudo make src.test-bats
