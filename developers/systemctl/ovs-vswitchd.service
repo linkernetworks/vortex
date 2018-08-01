@@ -1,7 +1,7 @@
 [Unit]
 Description=Open vSwitch Forwarding Unit
 After=ovsdb-server.service network-pre.target systemd-udev-settle.service
-Before=network.target network.service
+Before=network.target network.service kubelet.service
 Requires=ovsdb-server.service
 ReloadPropagatedFrom=ovsdb-server.service
 AssertPathIsReadWrite=/var/run/openvswitch/db.sock
@@ -19,3 +19,7 @@ ExecReload=/usr/share/openvswitch/scripts/ovs-ctl --no-ovsdb-server \
           --ovs-user=${OVS_USER_ID} \
           restart $OPTIONS
 TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
+RequiresBy=ovsdb-server.service

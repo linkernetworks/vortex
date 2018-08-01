@@ -1,7 +1,7 @@
 [Unit]
 Description=Open vSwitch Database Unit
 After=syslog.target network-pre.target
-Before=network.target network.service
+Before=network.target network.service kubelet.service
 Wants=ovs-delete-transient-ports.service
 
 [Service]
@@ -15,3 +15,6 @@ ExecStop=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd stop
 ExecReload=/usr/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd \
            --ovs-user=${OVS_USER_ID} \
            --no-monitor restart $OPTIONS
+
+[Install]
+WantedBy=multi-user.target
