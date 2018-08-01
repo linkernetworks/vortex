@@ -6,9 +6,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// PodCollectionName's const
 const (
+	// PodCollectionName's const
 	PodCollectionName string = "pods"
+	// The network type for the Pod
+	// host means the pod use the hostNetwork (share the network with the host machine)
+	PodHostNetwork = "host"
+	// cluster means use the cluster Network, maybe the flannel network
+	PodClusterNetwork = "cluster"
+	// custom means the custom netwokr we created before, it support the OVS and DPDK network for additional network interface card
+	PodCustomNetwork = "custom"
 )
 
 // Container is the structure for init Container info
@@ -53,7 +60,8 @@ type Pod struct {
 	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never"`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
-	HostNetwork   bool              `bson:"hostNetwork" json:"hostNetwork" validate:"-"`
+	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=host|cluster|custom`
+	NodeAffinity  []string          `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.

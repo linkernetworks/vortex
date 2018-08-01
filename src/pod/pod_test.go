@@ -152,9 +152,10 @@ func (suite *PodTestSuite) TestCreatePod() {
 
 	podName := namesgenerator.GetRandomName(0)
 	pod := &entity.Pod{
-		ID:         bson.NewObjectId(),
-		Name:       podName,
-		Containers: containers,
+		ID:          bson.NewObjectId(),
+		Name:        podName,
+		Containers:  containers,
+		NetworkType: entity.PodHostNetwork,
 	}
 
 	err := CreatePod(suite.sp, pod)
@@ -346,4 +347,96 @@ func (suite *PodTestSuite) TestGenerateContainerSecurityContext() {
 	security = generateContainerSecurity(pod)
 	suite.NotNil(security.Privileged)
 	suite.NotNil(security.Capabilities)
+}
+
+func (suite *PodTestSuite) TestCreatePodWithNetworkTypes() {
+
+	networkName := namesgenerator.GetRandomName(0)
+	bName := namesgenerator.GetRandomName(0)
+	network := entity.Network{
+		ID:         bson.NewObjectId(),
+		Name:       networkName,
+		BridgeName: bName,
+		Nodes: []entity.Node{
+			{Name: "node1"},
+			{Name: "node2"},
+			{Name: "node3"},
+		},
+	}
+	session := suite.sp.Mongo.NewSession()
+	defer session.Close()
+
+	session.Insert(entity.NetworkCollectionName, network)
+	defer session.Remove(entity.NetworkCollectionName, "name", network.Name)
+
+	//For each case, we need to check the
+	//HostNetwork object
+	//NodeAffinity object
+	//Create Success
+	testCases := []struct {
+		caseName      string
+		pod           *entity.Pod
+		rHostNetwork  bool     //result of hostNetwork
+		rNodeAffinity []string //result of rNodeAffinity
+	}{
+		{
+			"hostNetwork",
+			&entity.Pod{
+				ID:           bson.NewObjectId(),
+				Name:         namesgenerator.GetRandomName(0),
+				Containers:   []entity.Container{},
+				NetworkType:  entity.PodHostNetwork,
+				NodeAffinity: []string{"node1", "node2"},
+			},
+			true,
+			[]string{"node1", "node2"},
+		},
+		{
+			"clusterNetwork",
+			&entity.Pod{
+				ID:           bson.NewObjectId(),
+				Name:         namesgenerator.GetRandomName(0),
+				Containers:   []entity.Container{},
+				NetworkType:  entity.PodClusterNetwork,
+				NodeAffinity: []string{"node1", "node2"},
+			},
+			false,
+			[]string{"node1", "node2"},
+		},
+		{
+			"customNetwork",
+			&entity.Pod{
+				ID:          bson.NewObjectId(),
+				Name:        namesgenerator.GetRandomName(0),
+				Containers:  []entity.Container{},
+				NetworkType: entity.PodCustomNetwork,
+				Networks: []entity.PodNetwork{
+					{
+						Name: networkName,
+					},
+				},
+				NodeAffinity: []string{"node1", "node5"},
+			},
+			false,
+			[]string{"node1"},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.T().Run(tc.caseName, func(t *testing.T) {
+			err := CreatePod(suite.sp, tc.pod)
+			suite.NoError(err)
+
+			pod, err := suite.sp.KubeCtl.GetPod(tc.pod.Name, tc.pod.Namespace)
+			suite.NotNil(pod)
+			suite.NoError(err)
+
+			suite.Equal(tc.rHostNetwork, pod.Spec.HostNetwork)
+			suite.Equal(tc.rNodeAffinity, pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0].Values)
+
+			err = DeletePod(suite.sp, tc.pod)
+			suite.NoError(err)
+
+		})
+	}
 }

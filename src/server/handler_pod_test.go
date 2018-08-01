@@ -69,7 +69,8 @@ func (suite *PodTestSuite) TestCreatePod() {
 		Networks:      []entity.PodNetwork{},
 		Capability:    true,
 		RestartPolicy: "Never",
-		HostNetwork:   false,
+		NetworkType:   entity.PodHostNetwork,
+		NodeAffinity:  []string{},
 	}
 	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
 	suite.NoError(err)
@@ -152,10 +153,14 @@ func (suite *PodTestSuite) TestDeletePod() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
-		ID:         bson.NewObjectId(),
-		Name:       tName,
-		Namespace:  namespace,
-		Containers: containers,
+		ID:            bson.NewObjectId(),
+		Name:          tName,
+		Namespace:     namespace,
+		Containers:    containers,
+		Capability:    true,
+		RestartPolicy: "Never",
+		NetworkType:   entity.PodHostNetwork,
+		NodeAffinity:  []string{},
 	}
 
 	err := p.CreatePod(suite.sp, &pod)

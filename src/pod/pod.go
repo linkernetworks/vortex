@@ -231,16 +231,26 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 		return err
 	}
 
-	nodeNames := []string{}
+	nodeAffinity := pod.NodeAffinity
 	initContainers := []corev1.Container{}
 	hostNetwork := false
-	if pod.HostNetwork {
+	switch pod.NetworkType {
+	case entity.PodHostNetwork:
 		hostNetwork = true
-	} else {
-		nodeNames, initContainers, err = generateNetwork(session, pod)
-		if err != nil {
-			return err
+	case entity.PodCustomNetwork:
+		tmp := []string{}
+		tmp, initContainers, err = generateNetwork(session, pod)
+		if len(tmp) != 0 {
+			nodeAffinity = utils.Intersection(nodeAffinity, tmp)
 		}
+	case entity.PodClusterNetwork:
+		//For cluster network, we won't set the nodeAffinity and any network options.
+	default:
+		err = fmt.Errorf("UnSupported Pod NetworkType %s", pod.NetworkType)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	volumes = append(volumes, corev1.Volume{
@@ -273,7 +283,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			InitContainers: initContainers,
 			Containers:     containers,
 			Volumes:        volumes,
-			Affinity:       generateAffinity(nodeNames),
+			Affinity:       generateAffinity(nodeAffinity),
 			RestartPolicy:  corev1.RestartPolicy(pod.RestartPolicy),
 			HostNetwork:    hostNetwork,
 		},
