@@ -87,8 +87,15 @@ src.test-coverage-vagrant:
 
 .PHONY: src.test-bats
 src.test-bats:
-	cd tests/01-multiple-interface;\
-	bats .;
+	@for i in `dir tests`; do \
+		cd tests/$$i;\
+		bats .;\
+		cd - > /dev/null;\
+	done
+##	cd tests/01-multiple-interface;\
+##	bats .; \
+##	cd -;\
+##	pwd
 
 .PHONY: check-govendor
 check-govendor:

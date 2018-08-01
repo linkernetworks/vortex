@@ -3,7 +3,7 @@
 load init
 
 @test "Create Pod" {
-    http -v --check-status 127.0.0.1:32326/v1/pods < pod.json
+    http -v --check-status 127.0.0.1:7890/v1/pods < pod.json
     [ $? = 0 ]
     #Wait the Pod
     #jsonpath="{.status.phase}"
@@ -18,7 +18,7 @@ load init
 }
 
 @test "List Pod" {
-   run bash -c "http http://127.0.0.1:32326/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
+   run bash -c "http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
    [ "$output" = "${podName}" ]
    [ $status = 0 ]
 }
@@ -29,7 +29,7 @@ load init
     [ "$output" = "true" ]
 }
 @test "Delete Pod" {
-    run bash -c 'http http://127.0.0.1:32326/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
-    run http DELETE http://127.0.0.1:32326/v1/pods/${output} 2>/dev/null
+    run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
+    run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
     [ $status = 0 ]
 }

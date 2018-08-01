@@ -64,5 +64,5 @@ jobs:
       install: sudo apt-get install -y socat jq httpie && sudo add-apt-repository ppa:duggan/bats --yes && sudo apt-get update -q && sudo apt-get install -qq bats
       script:
         - make build
-        - ls build/src/cmd/vortex/vortex
+        - ./build/src/cmd/vortex/vortex -config config/bats.json -port 7890 &
         - sudo make src.test-bats
