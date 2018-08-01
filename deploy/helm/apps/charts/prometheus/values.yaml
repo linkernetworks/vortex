@@ -19,7 +19,7 @@ cadvisor:
     housekeeping_interval: 10s
 kube-state-metrics:
   image:
-    tag: develop
+    tag: v1.3.1
 node-exporter:
   image:
     tag: 1.0.1
