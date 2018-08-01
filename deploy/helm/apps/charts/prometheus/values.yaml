@@ -22,5 +22,5 @@ kube-state-metrics:
     tag: develop
 node-exporter:
   image:
-    tag: develop
+    tag: 1.0.0
 
