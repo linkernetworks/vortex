@@ -646,6 +646,7 @@ Request Data:
   "capability":true,
   "networkType":"host",
   "nodeAffinity":[]
+  ]
 }
 ```
 
