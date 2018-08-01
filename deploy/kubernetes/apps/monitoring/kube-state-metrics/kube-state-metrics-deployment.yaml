@@ -18,7 +18,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name: kube-state-metrics
-        image: sdnvortex/kube-state-metrics:develop
+        image: quay.io/coreos/kube-state-metrics:v1.3.1
         ports:
         - name: http-metrics
           containerPort: 8080

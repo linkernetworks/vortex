@@ -5,6 +5,7 @@ metadata:
   name: pv-manual
 spec:
   storageClassName: manual
+  persistentVolumeReclaimPolicy: Delete
   capacity:
     storage: 10Gi
   accessModes:
