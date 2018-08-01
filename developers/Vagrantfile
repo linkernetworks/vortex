@@ -177,6 +177,11 @@ sudo ln -sf ${DPDK_DIR}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko /lib/modules/
 sudo depmod -a
 echo "uio" | sudo tee -a /etc/modules
 echo "igb_uio" | sudo tee -a /etc/modules
+# Setting  rc.local config for binding dpdk port after reboot
+sudo sed -i '/exit 0/d' /etc/rc.local
+echo "ifconfig ${NET_IF_NAME} down" | sudo tee -a /etc/rc.local
+echo "${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}" | sudo tee -a /etc/rc.local
+echo "exit 0" | sudo tee -a /etc/rc.local
 
 # Bind secondary network adapter
 # Note that this NIC setup does not persist across reboots
