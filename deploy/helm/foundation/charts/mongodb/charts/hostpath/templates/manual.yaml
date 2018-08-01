@@ -5,6 +5,7 @@ metadata:
   name: pv-manual
 spec:
   storageClassName: manual
+  persistentVolumeReclaimPolicy: Delete
   capacity:
     storage: {{ .Values.global.storage }}
   accessModes:
