@@ -804,6 +804,7 @@ Response Data:
   "nics": {
    "cni0": {
     "default": false,
+    "dpdk": false,
     "type": "virtual",
     "ip": "10.244.0.1/24",
     "pciID": "",
