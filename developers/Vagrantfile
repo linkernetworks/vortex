@@ -136,6 +136,7 @@ sudo sysctl -w vm.nr_hugepages=1024
 
 sudo cp /tmp/ovs-vswitchd.service /etc/systemd/system/ovs-vswitchd.service
 sudo cp /tmp/ovsdb-server.service /etc/systemd/system/ovsdb-server.service
+sudo cp /tmp/dpdkbind.service /etc/systemd/system/dpdkbind.service
 
 # Name of network interface provisioned for DPDK to bind
 export NET_IF_NAME=enp0s18
@@ -177,16 +178,13 @@ sudo ln -sf ${DPDK_DIR}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko /lib/modules/
 sudo depmod -a
 echo "uio" | sudo tee -a /etc/modules
 echo "igb_uio" | sudo tee -a /etc/modules
-# Setting  rc.local config for binding dpdk port after reboot
-sudo sed -i '/exit 0/d' /etc/rc.local
-echo "ifconfig ${NET_IF_NAME} down" | sudo tee -a /etc/rc.local
-echo "${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}" | sudo tee -a /etc/rc.local
-echo "exit 0" | sudo tee -a /etc/rc.local
 
 # Bind secondary network adapter
-# Note that this NIC setup does not persist across reboots
-sudo ifconfig ${NET_IF_NAME} down
-sudo ${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}
+# Note that this NIC setup will binding dpdk port after reboot
+echo "ExecStart=/sbin/ifconfig ${NET_IF_NAME} down" | sudo tee -a /etc/systemd/system/dpdkbind.service
+echo "ExecStart=${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}" | sudo tee -a /etc/systemd/system/dpdkbind.service
+sudo systemctl enable dpdkbind
+sudo systemctl start dpdkbind
 sudo ${DPDK_DIR}/usertools/dpdk-devbind.py --status
 
 #### Install Open vSwitch with DPDK
@@ -235,6 +233,7 @@ SHELL
   if dpdk_ovs_env == true
      config.vm.provision "file", source: "systemctl/ovs-vswitchd.service", destination: "/tmp/ovs-vswitchd.service"
      config.vm.provision "file", source: "systemctl/ovsdb-server.service", destination: "/tmp/ovsdb-server.service"
+     config.vm.provision "file", source: "systemctl/dpdkbind.service", destination: "/tmp/dpdkbind.service"
      config.vm.provision "shell", privileged: false, inline: $ovs_dpdk
   else
      config.vm.provision "shell", privileged: false, inline: $apt_openvswitch

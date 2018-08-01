@@ -1,0 +1,10 @@
+[Unit]
+Description=Binding dpdk port after reboot
+After=multi-user.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
