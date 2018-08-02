@@ -65,7 +65,11 @@ jobs:
       install:
           - sudo add-apt-repository ppa:duggan/bats --yes 
           - sudo apt-get update -q
-          - sudo apt-get install -qqy httpie bats
+          - sudo apt-get install -qqy httpie bats nfs-kernel-server 
+          - mkdir -p /tmp/nfs
+          - echo "/tmp/nfs *(rw,sync,no_root_squash)" | sudo tee /etc/exports
+          - sudo exportfs -r
+          - sudo showmount -e
       script:
         - make build
         - sudo make src.test-bats
