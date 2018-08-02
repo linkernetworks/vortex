@@ -8,11 +8,15 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - protocol: TCP
-      port: {{ .Values.service.ports.port }}
-      targetPort: {{ .Values.service.ports.targetPort }}
-      nodePort: {{ .Values.service.ports.nodePort }}
+    - name: apiserver
+      protocol: TCP
+      port: {{ .Values.service.ports.apiserverPort }}
+      targetPort: {{ .Values.service.ports.apiserverTargetPort }}
+      nodePort: {{ .Values.service.ports.apiserverNodePort }}
+    - name: webapp
+      protocol: TCP
+      port: {{ .Values.service.ports.webappPort }}
+      targetPort: {{ .Values.service.ports.webappTargetPort }}
+      nodePort: {{ .Values.service.ports.webappNodePort }}
   selector:
     app: vortex-server
-  
-
