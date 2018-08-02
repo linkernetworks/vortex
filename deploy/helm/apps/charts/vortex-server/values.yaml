@@ -4,13 +4,17 @@ global:
 
 replicaCount: 1
 image:
-  tag: v0.1.7
+  apiserverTag: v0.1.7
+  webappTag: develop
 
 service:
   ports:
-    port: 7890
-    targetPort: 7890
-    nodePort: 32326
+    apiserverPort: 7890
+    apiserverTargetPort: 7890
+    apiserverNodePort: 32326
+    webappPort: 8080
+    webappTargetPort: 8080
+    webappNodePort: 32767
 
 auth:
   enabled: false

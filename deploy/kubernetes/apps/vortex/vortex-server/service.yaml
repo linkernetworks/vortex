@@ -9,9 +9,14 @@ spec:
   selector:
     app: vortex-server
   ports:
-    - protocol: TCP
+    - name: apiserver
+      protocol: TCP
       port: 7890
       targetPort: 7890
       nodePort: 32326
-      name: vortex-server
+    - name: webapp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32767
   type: NodePort
