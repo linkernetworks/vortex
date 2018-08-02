@@ -12,7 +12,7 @@
 	"networks":[
 	],
 	"volumes":[],
-    "restaryPolicy":"Always",
+    "restartPolicy":"Always",
     "capability": true,
     "networkType": "host",
 	"nodeAffinity": []

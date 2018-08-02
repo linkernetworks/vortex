@@ -87,8 +87,11 @@ src.test-coverage-vagrant:
 
 .PHONY: src.test-bats
 src.test-bats:
-	cd tests; \
-	bats .;
+	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
+	echo $$(mminikube ip)
+	./build/src/cmd/vortex/vortex -config config/testing.json -port 7890 &
+	@cd tests;\
+	./test.sh
 
 .PHONY: check-govendor
 check-govendor:
@@ -107,7 +110,8 @@ apps.init-helm:
 .PHONY: apps.launch
 apps.launch:
 	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
+	helm install --name vortex-apps --debug --wait --set global.environment=local --set vortex-server.image.tag=$(SERVER_VERSION)  deploy/helm/apps/
+
 
 .PHONY: apps.upgrade
 apps.upgrade:

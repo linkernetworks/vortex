@@ -35,7 +35,7 @@
 		}	
 	],
 	"volumes":[],
-    "restaryPolicy":"Always",
+    "restartPolicy":"Always",
     "capability": true,
     "networkType": "custom",
 	"nodeAffinity": []
