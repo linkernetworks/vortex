@@ -16,11 +16,7 @@ cache:
     - $GOPATH/.cache/govendor
 
 env:
-  - MINIKUBE_WANTUPDATENOTIFICATION=false
-  - MINIKUBE_WANTREPORTERRORPROMPT=false
-  - MINIKUBE_HOME=$HOME
-  - CHANGE_MINIKUBE_NONE_USER=true
-  - KUBECONFIG=$HOME/.kube/config
+  - MINIKUBE_WANTUPDATENOTIFICATION=false MINIKUBE_WANTREPORTERRORPROMPT=false MINIKUBE_HOME=$HOME CHANGE_MINIKUBE_NONE_USER=true KUBECONFIG=$HOME/.kube/config
 
 notifications:
   slack:
@@ -40,7 +36,7 @@ before_script:
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
-  - sudo minikube start --vm-driver=none --bootstrapper=kubeadm --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
+  - sudo minikube start --vm-driver=none --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
