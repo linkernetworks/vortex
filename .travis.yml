@@ -67,5 +67,4 @@ jobs:
           - sudo apt-get install -qqy jq httpie bats
       script:
         - make build
-        - ./build/src/cmd/vortex/vortex -config config/bats.json -port 7890 &
         - sudo make src.test-bats
