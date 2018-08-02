@@ -61,7 +61,10 @@ jobs:
         - cp build/src/coverage.txt coverage.txt
         - bash <(curl -s https://codecov.io/bash)
     - name: "Integration Tests"
-      install: sudo apt-get install -y socat jq httpie && sudo add-apt-repository ppa:duggan/bats --yes && sudo apt-get update -q && sudo apt-get install -qq bats
+      install:
+          - sudo add-apt-repository ppa:duggan/bats --yes 
+          - sudo apt-get update -q
+          - sudo apt-get install -qqy jq httpie bats
       script:
         - make build
         - ./build/src/cmd/vortex/vortex -config config/bats.json -port 7890 &
