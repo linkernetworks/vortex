@@ -26,7 +26,7 @@ before_install:
     - go get -u github.com/kardianos/govendor
     - sudo apt-get install -y socat openvswitch-switch
     - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-    - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+    - curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.2/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
     - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
 
 before_script:
@@ -35,7 +35,7 @@ before_script:
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
-  - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
+  - sudo minikube start --vm-driver=none --bootstrapper=kubeadm --kubernetes-version=v1.11.0 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
