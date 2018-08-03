@@ -36,7 +36,7 @@ before_script:
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
-  - sudo minikube start --v 10 --logtostderr --vm-driver=none --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
+  - minikube delete && rm -rf ~/.minikube && sudo minikube start --v 10 --logtostderr --vm-driver=none --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
