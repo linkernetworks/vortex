@@ -43,6 +43,38 @@ load init
     [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
 }
 
+@test "Create Pod" {
+    http -v --check-status 127.0.0.1:7890/v1/pods < pod.json
+    [ $? = 0 ]
+}
+
+@test "List Pod" {
+   run bash -c "http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
+   [ "$output" = "${podName}" ]
+   [ $status = 0 ]
+
+   NEXT_WAIT_TIME=0
+   WAIT_LIMIT=40
+   until kubectl get pods ${podName} -o jsonpath="{.status.phase}" | grep "Running" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
+      sleep 2
+      kubectl get pods ${podName}
+      NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
+   done
+   [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
+}
+
+@test "Test NFS" {
+    kubectl exec ${podName} touch /tmp/testing
+    find /tmp/nfs | grep testing
+    [ $? = 0 ]
+}
+
+@test "Delete Pod" {
+    run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
+    run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
+    [ $status = 0 ]
+}
+
 @test "Delete Volume" {
     run bash -c 'http http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
     http -v --check-status DELETE http://127.0.0.1:7890/v1/volume/${output}
@@ -53,34 +85,4 @@ load init
     run bash -c 'http http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
     http -v --check-status DELETE http://127.0.0.1:7890/v1/storage/${output}
     [ $? = 0 ]
-}
-
-@test "Create Pod" {
-    skip
-    http -v --check-status 127.0.0.1:7890/v1/pods < pod.json
-    [ $? = 0 ]
-    #Wait the Pod
-    #jsonpath="{.status.phase}"
-    NEXT_WAIT_TIME=0
-    WAIT_LIMIT=40
-    until kubectl get pods ${podName} -o jsonpath="{.status.phase}" | grep "Running" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
-       sleep 2
-       kubectl get pods ${podName}
-       NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
-    done
-    [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
-}
-
-@test "List Pod" {
-   skip
-   run bash -c "http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
-   [ "$output" = "${podName}" ]
-   [ $status = 0 ]
-}
-
-@test "Delete Pod" {
-    skip
-    run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
-    run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
-    [ $status = 0 ]
 }

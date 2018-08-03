@@ -15,5 +15,7 @@ if [ -z "$podName" ]; then
     sed -i  "s/@NFSIP@/${nfsIP}/" storage.json
     sed -i  "s/@NFSSTORAGENAME@/${nfsstorageName}/" storage.json
     sed -i  "s/@STORAGENAME@/${nfsstorageName}/" volume.json
+    sed -i  "s/@VOLUMENAME@/${volumeName}/" volume.json
     sed -i  "s/@PODNAME@/${podName}/" pod.json
+    sed -i  "s/@VOLUMENAME@/${volumeName}/" pod.json
 fi

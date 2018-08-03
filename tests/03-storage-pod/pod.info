@@ -11,7 +11,12 @@
 	],
 	"networks":[
 	],
-	"volumes":[],
+	"volumes":[
+        {
+            "name":"@VOLUMENAME@",
+            "mountPath":"/tmp"
+        }
+    ],
     "restartPolicy":"Always",
     "capability": true,
     "networkType": "cluster",
