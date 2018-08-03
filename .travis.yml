@@ -2,8 +2,8 @@ language: go
 
 sudo: required
 
-services:
-  - docker
+# services:
+#   - docker
 
 dist: xenial
 
@@ -24,18 +24,24 @@ notifications:
 
 before_install:
     - go get -u github.com/kardianos/govendor
-    - sudo apt-get install -y socat openvswitch-switch
-    - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-    - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+    - wget https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.11.1/crictl-v1.11.1-linux-amd64.tar.gz && sudo tar zxvf crictl-v1.11.1-linux-amd64.tar.gz -C /usr/local/bin
+
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    - sudo apt-get update && sudo apt-get install -y socat openvswitch-switch docker-ce=17.03.2~ce-0~ubuntu-xenial
+    - sudo usermod -aG docker $USER
+
+    - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && sudo cp kubectl /usr/local/bin/ && rm kubectl
+    - curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.2/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
     - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz > helm-v2.9.1-linux-amd64.tar.gz && tar -zxvf helm-v2.9.1-linux-amd64.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm
 
 before_script:
     # Make root mounted as rshared to fix kube-dns issues.
-  - sudo mount --make-rshared /
+# - sudo mount --make-rshared /
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
-  - sudo minikube start --vm-driver=none --bootstrapper=localkube --kubernetes-version=v1.9.0 --extra-config=apiserver.Authorization.Mode=RBAC
+  - rm -rf ~/.minikube && sudo minikube start --v 10 --logtostderr --vm-driver=none --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
@@ -62,7 +68,7 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
     - name: "Integration Tests"
       install:
-          - sudo add-apt-repository ppa:duggan/bats --yes 
+          - sudo add-apt-repository ppa:duggan/bats --yes
           - sudo apt-get update -q
           - sudo apt-get install -qqy jq httpie bats
       script:
