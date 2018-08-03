@@ -7,7 +7,6 @@ load init
     [ $? = 0 ]
 }
 
-
 @test "List Storage" {
     run bash -c 'http http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
     id=${output}
@@ -23,6 +22,31 @@ load init
        NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
     done
     [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
+}
+
+@test "Create Volume" {
+    http -v --check-status 127.0.0.1:7890/v1/volume < volume.json
+    [ $? = 0 ]
+}
+
+@test "List Volume" {
+    run bash -c 'http http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
+    id=${output}
+    NEXT_WAIT_TIME=0
+    WAIT_LIMIT=40
+    pvcName="pvc-${id}"
+    until kubectl get pvc ${pvcName} -o jsonpath="{.status.phase}" | grep "Bound" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
+       sleep 2
+       kubectl get pvc ${pvcName}
+       NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
+    done
+    [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
+}
+
+@test "Delete Volume" {
+    run bash -c 'http http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
+    http -v --check-status DELETE http://127.0.0.1:7890/v1/volume/${output}
+    [ $? = 0 ]
 }
 
 @test "Delete Storage" {
