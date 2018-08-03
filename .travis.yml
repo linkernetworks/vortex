@@ -64,7 +64,8 @@ jobs:
       install:
           - sudo add-apt-repository ppa:duggan/bats --yes 
           - sudo apt-get update -q
-          - sudo apt-get install -qqy jq httpie bats yq
+          - sudo apt-get install -qqy jq httpie bats
+          - sudo pip install yq
       script:
         - make build
         - sudo make src.test-bats
