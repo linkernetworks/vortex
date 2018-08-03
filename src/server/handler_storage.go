@@ -151,6 +151,7 @@ func deleteStorage(ctx *web.Context) {
 		return
 	}
 
+	fmt.Println("id", bson.ObjectIdHex(id))
 	if err := session.Remove(entity.StorageCollectionName, "_id", bson.ObjectIdHex(id)); err != nil {
 		switch err {
 		case mgo.ErrNotFound:

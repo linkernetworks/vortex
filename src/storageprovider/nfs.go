@@ -58,7 +58,7 @@ func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 					},
 				},
 				Spec: v1.PodSpec{
-					ServiceAccountName: "nfs-client-provisioner",
+					ServiceAccountName: "vortex-admin",
 					Containers: []v1.Container{
 						{
 							Name:            name,
@@ -102,7 +102,7 @@ func getStorageClass(name string, provisioner string, storage *entity.Storage) *
 
 // CreateStorage will create storage depandent on NFS storage srovider
 func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
-	namespace := "default"
+	namespace := "vortex"
 	name := NFSProvisionerPrefix + storage.ID.Hex()
 	storageClassName := NFSStorageClassPrefix + storage.ID.Hex()
 	//Create deployment
@@ -119,7 +119,7 @@ func (nfs NFSStorageProvider) CreateStorage(sp *serviceprovider.Container, stora
 
 // DeleteStorage will delete stroage
 func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
-	namespace := "default"
+	namespace := "vortex"
 	deployName := NFSProvisionerPrefix + storage.ID.Hex()
 	storageName := NFSStorageClassPrefix + storage.ID.Hex()
 

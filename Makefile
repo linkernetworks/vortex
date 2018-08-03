@@ -88,7 +88,6 @@ src.test-coverage-vagrant:
 .PHONY: src.test-bats
 src.test-bats:
 	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
-	echo $$(mminikube ip)
 	./build/src/cmd/vortex/vortex -config config/testing.json -port 7890 &
 	@cd tests;\
 	./test.sh
