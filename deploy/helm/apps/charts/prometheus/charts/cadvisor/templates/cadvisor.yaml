@@ -17,7 +17,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name: cadvisor
-        image: google/cadvisor:latest
+        image: google/cadvisor:{{ .Values.controller.imageTag }}
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -37,7 +37,7 @@ spec:
             protocol: TCP
         args:
           - --profiling
-          - --housekeeping_interval={{ .Values.config.housekeeping_interval }}
+          - --housekeeping_interval={{ .Values.controller.housekeeping_interval }}
           - --disable_metrics=disk
       terminationGracePeriodSeconds: 30
       volumes:

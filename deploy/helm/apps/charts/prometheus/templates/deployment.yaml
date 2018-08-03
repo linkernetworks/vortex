@@ -6,7 +6,7 @@ metadata:
   name: prometheus
   namespace: vortex
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.controller.replicaCount }}
   template:
     metadata:
       labels:
@@ -14,16 +14,16 @@ spec:
     spec:
       serviceAccountName: prometheus
       containers:
-      - image: prom/prometheus:v2.2.1
+      - image: prom/prometheus:{{ .Values.controller.imageTag }}
         name: prometheus
         command:
         - "/bin/prometheus"
         args:
         - "--config.file=/etc/prometheus/prometheus.yml"
         - "--storage.tsdb.path=/prometheus"
-        - "--storage.tsdb.retention=24h"
+        - "--storage.tsdb.retention={{ .Values.controller.retention }}"
         ports:
-        - containerPort: {{ .Values.service.ports.targetPort }}
+        - containerPort: 9090
           protocol: TCP
         volumeMounts:
         - mountPath: "/prometheus"

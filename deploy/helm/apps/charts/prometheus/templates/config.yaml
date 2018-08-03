@@ -7,7 +7,7 @@ data:
   # https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
   prometheus.yml: |
     global:
-      scrape_interval: {{ .Values.config.scrapeInterval }}
+      scrape_interval: {{ .Values.controller.scrapeInterval }}
       scrape_timeout: 5s
     scrape_configs:
 

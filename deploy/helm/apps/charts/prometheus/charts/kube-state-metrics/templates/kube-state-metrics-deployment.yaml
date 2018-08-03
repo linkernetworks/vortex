@@ -1,6 +1,4 @@
 apiVersion: apps/v1
-# Kubernetes versions after 1.9.0 should use apps/v1
-# Kubernetes versions before 1.8.0 should use apps/v1beta1 or extensions/v1beta1
 kind: Deployment
 metadata:
   name: kube-state-metrics
@@ -18,7 +16,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name: kube-state-metrics
-        image: quay.io/coreos/kube-state-metrics:{{ .Values.image.tag }}
+        image: quay.io/coreos/kube-state-metrics:{{ .Values.controller.imageTag }}
         ports:
         - name: http-metrics
           containerPort: 8080
@@ -31,9 +29,6 @@ spec:
       - name: addon-resizer
         image: k8s.gcr.io/addon-resizer:1.7
         resources:
-          limits:
-            cpu: 100m
-            memory: 30Mi
           requests:
             cpu: 100m
             memory: 30Mi

@@ -1,0 +1,61 @@
+# vortex/deploy/helm/apps
+apps:
+  # vortex/deploy/helm/apps/charts/vortex-server
+  vortex-server:
+    controller:
+      replicaCount: 1
+      nodeSelector:
+        glusterfs: false
+    replicaCount: 1
+    controller:
+      apiserverImageTag: v0.1.7
+      webappImageTag: v0.1.0
+    service:
+      ports:
+        apiserverNodePort: 32326
+        webappNodePort: 32767
+  # vortex/deploy/helm/apps/charts/network-controller
+  network-controller:
+    controller:
+      imageTag: v0.4.0
+  # vortex/deploy/helm/apps/charts/prometheus
+  prometheus:
+    controller:
+      replicaCount: 1
+      imageTag: v2.2.1
+      scrapeInterval: 5s
+      retention: 1h
+    service:
+      nodePort: true
+    # vortex/deploy/helm/apps/charts/prometheus/charts/cadvisor
+    cadvisor:
+      controller:
+        imageTag: v0.27.4
+        housekeeping_interval: 10s
+    # vortex/deploy/helm/apps/charts/prometheus/charts/kube-state-metrics
+    kube-state-metrics:
+      controller:
+        imageTag: v1.3.1
+    # vortex/deploy/helm/apps/charts/prometheus/charts/node-exporter
+    node-exporter:
+      controller:
+        imageTag: v1.0.1
+
+# vortex/deploy/helm/services
+services:
+  # vortex/deploy/helm/services/charts/mongodb
+  mongodb:
+    controller:
+      replicaCount: 1
+      cpu: 100m
+      image:
+        tag: 4.1.1-xenial
+      pvc:
+        localVolume: true
+        reclaimPolicy: Delete
+        accessModes: ReadWriteOnce
+        storageClass: mongo
+        storage: 1Gi
+    service:
+      nodePort: true
+      

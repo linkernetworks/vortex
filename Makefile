@@ -109,14 +109,13 @@ apps.init-helm:
 
 .PHONY: apps.launch
 apps.launch:
-	helm install --name vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm install --name vortex-apps --debug --wait --set global.environment=local --set vortex-server.image.tag=$(SERVER_VERSION)  deploy/helm/apps/
-
+	yq -y .services deploy/helm/config/development.yaml | helm install --name vortex-services --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm install --name vortex-apps --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.upgrade
 apps.upgrade:
-	helm upgrade vortex-foundation --debug --wait --set global.environment=local deploy/helm/foundation
-	helm upgrade vortex-apps --debug --wait --set global.environment=local deploy/helm/apps/
+	yq -y .services deploy/helm/config/development.yaml | helm upgrade vortex-services --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm  upgrade vortex-apps --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.teardown
 apps.teardown:
