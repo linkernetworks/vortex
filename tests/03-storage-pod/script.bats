@@ -73,6 +73,14 @@ load init
     run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
     run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
     [ $status = 0 ]
+    NEXT_WAIT_TIME=0
+    WAIT_LIMIT=100
+    until kubectl get pods ${podName} 2>&1 | grep "No resources" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
+      sleep 2
+      kubectl get pods
+      NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
+   done
+   [ $NEXT_WAIT_TIME != $WAIT_LIMIT ]
 }
 
 @test "Delete Volume" {
