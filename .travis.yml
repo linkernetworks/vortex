@@ -24,7 +24,7 @@ notifications:
 
 before_install:
     - go get -u github.com/kardianos/govendor
-    # - wget https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.11.1/crictl-v1.11.1-linux-amd64.tar.gz && sudo tar zxvf crictl-v1.11.1-linux-amd64.tar.gz -C /usr/local/bin
+    - wget https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.11.1/crictl-v1.11.1-linux-amd64.tar.gz && sudo tar zxvf crictl-v1.11.1-linux-amd64.tar.gz -C /usr/local/bin
     - sudo apt-get install -y socat openvswitch-switch
     - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && sudo cp kubectl /usr/local/bin/ && rm kubectl
     - curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.2/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
@@ -36,7 +36,7 @@ before_script:
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
-  - sudo minikube start --v 10 --logtostderr --vm-driver=none --kubernetes-version=v1.10.0 --extra-config=apiserver.Authorization.Mode=RBAC
+  - sudo minikube start --v 10 --logtostderr --vm-driver=none --kubernetes-version=v1.11.1 --extra-config=apiserver.Authorization.Mode=RBAC
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
