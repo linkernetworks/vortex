@@ -10,13 +10,13 @@ spec:
   ports:
     - name: apiserver
       protocol: TCP
-      port: {{ .Values.service.ports.apiserverPort }}
-      targetPort: {{ .Values.service.ports.apiserverTargetPort }}
+      port: 7890
+      targetPort: 7890
       nodePort: {{ .Values.service.ports.apiserverNodePort }}
     - name: webapp
       protocol: TCP
-      port: {{ .Values.service.ports.webappPort }}
-      targetPort: {{ .Values.service.ports.webappTargetPort }}
+      port: 8080
+      targetPort: 8080
       nodePort: {{ .Values.service.ports.webappNodePort }}
   selector:
     app: vortex-server

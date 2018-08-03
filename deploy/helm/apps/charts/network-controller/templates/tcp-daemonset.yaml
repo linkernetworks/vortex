@@ -17,7 +17,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: network-controller-server-tcp
-        image: sdnvortex/network-controller:{{ .Values.image.tag }}
+        image: sdnvortex/network-controller:{{ .Values.controller.imageTag }}
         securityContext:
           privileged: true
         command: ["/go/bin/server"]

@@ -16,7 +16,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name:  node-exporter
-        image: sdnvortex/node-exporter:{{ .Values.image.tag }}
+        image: sdnvortex/node-exporter:{{ .Values.controller.imageTag }}
         ports:
           - name: http-metrics
             containerPort: 9100

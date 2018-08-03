@@ -5,19 +5,21 @@ metadata:
   name: mongo
   namespace: vortex
 spec:
-  {{ if eq .Values.global.environment "develop" }}
-  type: ClusterIP
-  ports:
-  - port: {{ .Values.service.ports.port }} 
-    targetPort: {{ .Values.service.ports.targetPort }}
-  {{ else if or (eq .Values.global.environment "local") (eq .Values.global.environment "testing") }}
-  type: NodePort
-  ports:
-  - port: {{ .Values.service.ports.port }}
-    nodePort: {{ .Values.service.ports.nodePort }}
-    targetPort: {{ .Values.service.ports.targetPort }}
-    protocol: TCP
-  {{ end }}
   selector:
     service: mongo
+  {{- if .Values.service.nodePort }}
+  type: NodePort
+  ports:
+  - port: 27017
+    nodePort: 31717
+    targetPort: 27017
+    protocol: TCP
+  {{- else }}
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+  {{- end }}
+
   

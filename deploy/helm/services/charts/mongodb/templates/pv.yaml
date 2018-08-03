@@ -1,0 +1,16 @@
+{{- if .Values.controller.pvc.localVolume }}
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo
+spec:
+  storageClassName: {{ .Values.controller.pvc.storageClass }}
+  persistentVolumeReclaimPolicy: {{ .Values.controller.pvc.reclaimPolicy }}
+  capacity:
+    storage: {{ .Values.controller.pvc.storage }}
+  accessModes:
+    - {{ .Values.controller.pvc.accessModes }}
+  hostPath:
+    path: "/data"
+{{- end }}
