@@ -75,7 +75,7 @@ func (suite *StorageTestSuite) TestValidateBeforeCreating() {
 }
 
 func (suite *StorageTestSuite) TestCreateStorage() {
-	namespace := "default"
+	namespace := "vortex"
 	storage := entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
@@ -96,7 +96,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 }
 
 func (suite *StorageTestSuite) TestDeleteStorage() {
-	namespace := "default"
+	namespace := "vortex"
 	storage := &entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: entity.NFSStorageType,
