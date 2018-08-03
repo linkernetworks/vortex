@@ -4,10 +4,12 @@ apps:
   vortex-server:
     controller:
       replicaCount: 1
+      nodeSelector:
+        glusterfs: false
     replicaCount: 1
     controller:
       apiserverImageTag: v0.1.7
-      webappImageTag: 0.1.0
+      webappImageTag: v0.1.0
     service:
       ports:
         apiserverNodePort: 32326
@@ -37,7 +39,7 @@ apps:
     # vortex/deploy/helm/apps/charts/prometheus/charts/node-exporter
     node-exporter:
       controller:
-        imageTag: 1.0.1
+        imageTag: v1.0.1
 
 # vortex/deploy/helm/services
 services:

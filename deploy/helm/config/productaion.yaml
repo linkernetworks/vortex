@@ -5,7 +5,7 @@ apps:
     controller:
       replicaCount: 1
       nodeSelector:
-        glusterfs: false
+        glusterfs: true
     replicaCount: 1
     controller:
       apiserverImageTag: v0.1.7
@@ -26,7 +26,7 @@ apps:
       scrapeInterval: 5s
       retention: 1h
     service:
-      nodePort: true
+      nodePort: false
     # vortex/deploy/helm/apps/charts/prometheus/charts/cadvisor
     cadvisor:
       controller:
@@ -51,11 +51,11 @@ services:
       image:
         tag: 4.1.1-xenial
       pvc:
-        localVolume: true
-        reclaimPolicy: Delete
-        accessModes: ReadWriteOnce
+        localVolume: false
+        reclaimPolicy: Retain
+        accessModes: ReadWriteMany
         storageClass: mongo
-        storage: 1Gi
+        storage: 100Gi
     service:
-      nodePort: true
+      nodePort: false
       
