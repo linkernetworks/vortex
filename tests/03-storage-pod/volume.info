@@ -1,0 +1,42 @@
+{
+	"name": "@PODNAME@",
+	"labels":{},
+	"namespace":"default",
+	"containers":[
+		{
+			"name":"first-container",
+			"image":"busybox",
+            "command":["sleep","3600"]
+		}
+	],
+	"networks":[
+		{
+			"name":"@NETWORKNAME@",
+			"ifName":"eth12",
+			"vlan":0,
+			"ipAddress":"1.2.3.4",
+			"netmask":"255.255.255.0",
+			"vlanTag":123
+		},
+				{
+			"name":"@NETWORKNAME@",
+			"ifName":"eth13",
+			"vlan":0,
+			"ipAddress":"1.2.4.5",
+			"netmask":"255.255.255.0",
+			"vlanTag":124
+		},
+				{
+			"name":"@NETWORKNAME@",
+			"ifName":"eth15",
+			"vlan":0,
+			"ipAddress":"15.2.4.5",
+			"netmask":"255.255.255.0"
+		}	
+	],
+	"volumes":[],
+    "restartPolicy":"Always",
+    "capability": true,
+    "networkType": "custom",
+	"nodeAffinity": []
+}

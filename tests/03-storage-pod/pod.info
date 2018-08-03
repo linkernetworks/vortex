@@ -1,0 +1,19 @@
+{
+	"name": "@PODNAME@",
+	"labels":{},
+	"namespace":"default",
+	"containers":[
+		{
+			"name":"first-container",
+			"image":"busybox",
+            "command":["sleep","3600"]
+		}
+	],
+	"networks":[
+	],
+	"volumes":[],
+    "restartPolicy":"Always",
+    "capability": true,
+    "networkType": "cluster",
+	"nodeAffinity": []
+}
