@@ -4,8 +4,8 @@ if [ -z "$podName" ]; then
     export podName="test-pod-$name"
     export nfsstorageName="test-nfs-storage-$name"
     export volumeName="test-nfs-volume-$name"
-    #nfsIP=`kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}"`
-    nfsIP="172.17.8.100"
+    nfsIP=`kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}"`
+    #nfsIP="172.17.8.100"
 
     for i in storage volume pod; do
         rm -f $i.json
