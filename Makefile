@@ -109,13 +109,13 @@ apps.init-helm:
 
 .PHONY: apps.launch
 apps.launch:
-	yq -y .services deploy/helm/config/develop.yaml | helm install --name vortex-services --debug --wait -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/develop.yaml | helm install --name vortex-apps --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+	yq -y .services deploy/helm/config/development.yaml | helm install --name vortex-services --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm install --name vortex-apps --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.upgrade
 apps.upgrade:
-	yq -y .services deploy/helm/config/develop.yaml | helm upgrade vortex-services --debug -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/develop.yaml | helm  upgrade vortex-apps --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+	yq -y .services deploy/helm/config/development.yaml | helm upgrade vortex-services --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm  upgrade vortex-apps --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.teardown
 apps.teardown:
