@@ -32,7 +32,7 @@ before_install:
 
 before_script:
     # Make root mounted as rshared to fix kube-dns issues.
-  - sudo mount --make-rshared /
+# - sudo mount --make-rshared /
     # Make /sys mounted as rshared to support cadvisor
   - sudo mount --make-rshared /sys
     # Download kubectl, which is a requirement for using minikube.
