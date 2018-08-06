@@ -1,5 +1,49 @@
 # Change Log
 
+## [Unreleased](https://github.com/linkernetworks/vortex/tree/HEAD)
+
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.8...HEAD)
+
+**Merged pull requests:**
+
+- \[Release\] bump version to v0.1.8 [\#221](https://github.com/linkernetworks/vortex/pull/221) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.1.8](https://github.com/linkernetworks/vortex/tree/v0.1.8) (2018-08-06)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.7...v0.1.8)
+
+**Merged pull requests:**
+
+- remove unused package [\#220](https://github.com/linkernetworks/vortex/pull/220) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Support the NFS Testing in the travisCI  environment. [\#219](https://github.com/linkernetworks/vortex/pull/219) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-244: Organize the helm folder [\#218](https://github.com/linkernetworks/vortex/pull/218) ([WakeupTsai](https://github.com/WakeupTsai))
+-  \[Task\] VX-239 add vortex portal webapp [\#216](https://github.com/linkernetworks/vortex/pull/216) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Use the travisCI job to testing the unit-test and integration-test in the same time. [\#215](https://github.com/linkernetworks/vortex/pull/215) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-237: Change the persistentVolumeReclaimPolicy of pv and the image of kube-state-metrics [\#214](https://github.com/linkernetworks/vortex/pull/214) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] bug in validator tags [\#213](https://github.com/linkernetworks/vortex/pull/213) ([John-Lin](https://github.com/John-Lin))
+- bump version to v0.1.7 [\#211](https://github.com/linkernetworks/vortex/pull/211) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.1.7](https://github.com/linkernetworks/vortex/tree/v0.1.7) (2018-08-01)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.6...v0.1.7)
+
+**Merged pull requests:**
+
+- \[Bug\] VX-235: Modify the API.md [\#210](https://github.com/linkernetworks/vortex/pull/210) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Bug\] VX-236 start ovs after boot and before kubelet service [\#209](https://github.com/linkernetworks/vortex/pull/209) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-235: Get the dpdk interface in node-exporter [\#208](https://github.com/linkernetworks/vortex/pull/208) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] created return 201 [\#206](https://github.com/linkernetworks/vortex/pull/206) ([John-Lin](https://github.com/John-Lin))
+-  \[TASK\] Support the PodNetworkType and NodeAffinity filed in the pod entity. [\#205](https://github.com/linkernetworks/vortex/pull/205) ([hwchiu](https://github.com/hwchiu))
+-  \[Bug\] VX-232 fix pod validator syntax [\#203](https://github.com/linkernetworks/vortex/pull/203) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] fix doc [\#202](https://github.com/linkernetworks/vortex/pull/202) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-228: Fix the bug that Darwin OS doesn't have the i option in xargs command [\#201](https://github.com/linkernetworks/vortex/pull/201) ([WakeupTsai](https://github.com/WakeupTsai))
+- use vim plug for development [\#200](https://github.com/linkernetworks/vortex/pull/200) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] Change the timeout to 10 seconds [\#199](https://github.com/linkernetworks/vortex/pull/199) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-220: Query historical data from prometheus. [\#198](https://github.com/linkernetworks/vortex/pull/198) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Bug\] VX-226 Fix the bug from changing the name in makefile. [\#197](https://github.com/linkernetworks/vortex/pull/197) ([WakeupTsai](https://github.com/WakeupTsai))
+- add changelog [\#195](https://github.com/linkernetworks/vortex/pull/195) ([John-Lin](https://github.com/John-Lin))
+- \[TASK\] Remove the bats testing in the travis now. [\#194](https://github.com/linkernetworks/vortex/pull/194) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-225: Refactor the prometheus [\#190](https://github.com/linkernetworks/vortex/pull/190) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-222 Johnlin/user jwt auth [\#183](https://github.com/linkernetworks/vortex/pull/183) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.1.6](https://github.com/linkernetworks/vortex/tree/v0.1.6) (2018-07-27)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.5...v0.1.6)
 
