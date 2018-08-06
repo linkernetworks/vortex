@@ -181,8 +181,7 @@ echo "igb_uio" | sudo tee -a /etc/modules
 
 # Bind secondary network adapter
 # Note that this NIC setup will binding dpdk port after reboot
-echo "ExecStart=/sbin/ifconfig ${NET_IF_NAME} down" | sudo tee -a /etc/systemd/system/dpdkbind.service
-echo "ExecStart=${DPDK_DIR}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}" | sudo tee -a /etc/systemd/system/dpdkbind.service
+echo 'NET_IF_NAME='${NET_IF_NAME} | sudo tee -a /etc/default/dpdkbind
 sudo systemctl enable dpdkbind
 sudo systemctl start dpdkbind
 sudo ${DPDK_DIR}/usertools/dpdk-devbind.py --status
