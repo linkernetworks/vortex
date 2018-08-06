@@ -1,0 +1,13 @@
+[Unit]
+Description=Binding dpdk port after reboot
+After=multi-user.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+EnvironmentFile=-/etc/default/dpdkbind
+ExecStart=/sbin/ifconfig "$NET_IF_NAME" down
+ExecStart=/usr/src/dpdk-stable-17.11.2/usertools/dpdk-devbind.py --bind=igb_uio "$NET_IF_NAME"
