@@ -25,3 +25,8 @@
     [ $status = 0 ]
     [[ ${lines[0]} != "No resources found." ]]
 }
+
+@test "Check NFS server setting" {
+    showmount -e | grep /tmp/nfs ; echo $?
+    [ $? = 0 ]
+}
