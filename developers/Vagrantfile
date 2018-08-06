@@ -60,6 +60,13 @@ curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.t
 rm -rf /home/$USER/helm-v2.9.1-linux-amd64.tar.gz
 sudo pip install yq
 
+# Install NFS Server
+sudo apt-get install -qqy nfs-kernel-server
+mkdir -p /tmp/nfs
+echo "/tmp/nfs *(rw,sync,no_root_squash)" | sudo tee /etc/exports
+sudo exportfs -r
+sudo showmount -e
+
 # clone the project
 git clone https://github.com/linkernetworks/vortex.git
 SHELL
