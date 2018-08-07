@@ -13,7 +13,7 @@ type kernelspaceNetworkProvider struct {
 }
 
 func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(knp.VLANTags); err != nil {
+	if err := entity.ValidateVLANTags(knp.VlanTags); err != nil {
 		return err
 	}
 	for _, node := range knp.Nodes {
@@ -25,7 +25,7 @@ func (knp kernelspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Containe
 			nodeIP,
 			knp.BridgeName,
 			node.PhyInterfaces,
-			knp.VLANTags,
+			knp.VlanTags,
 		); err != nil {
 			return err
 		}

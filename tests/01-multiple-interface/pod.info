@@ -29,7 +29,6 @@
 				{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth15",
-			"vlanTag":null,
 			"ipAddress":"15.2.4.5",
 			"netmask":"255.255.255.0",
             "routes":[]

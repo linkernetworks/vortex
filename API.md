@@ -645,10 +645,9 @@ Request Data:
   {
       "name":"MyNetwork2",
       "ifName":"eth12",
-      "vlanTag":null,
+      "vlanTag":0,
       "ipAddress":"1.2.3.4",
-      "netmask":"255.255.255.0",
-      "rotues":[]
+      "netmask":"255.255.255.0"
   },
   "volumes":[
   ],
