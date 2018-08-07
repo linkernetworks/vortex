@@ -16,6 +16,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Filter(globalLogging)
 
 	container.Add(newVersionService(a.ServiceProvider))
+	container.Add(newRegistryService(a.ServiceProvider))
 	container.Add(newUserService(a.ServiceProvider))
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageService(a.ServiceProvider))
@@ -33,6 +34,14 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Path("/v1/version").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	//	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, versionHandler)))
+	return webService
+}
+
+func newRegistryService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/registry").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	//	webService.Filter(validateTokenMiddleware)
+	webService.Route(webService.POST("/auth").To(handler.RESTfulServiceHandler(sp, registryBasicAuthHandler)))
 	return webService
 }
 

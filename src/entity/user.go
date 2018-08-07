@@ -11,6 +11,12 @@ const (
 	UserCollectionName string = "users"
 )
 
+// RegistryBasicAuthCredential is the structure for a user login credential
+type RegistryBasicAuthCredential struct {
+	Username string `bson:"username" json:"username" validate:"required"`
+	Password string `bson:"password" json:"password" validate:"required"`
+}
+
 // LoginCredential is the structure for a user login credential
 type LoginCredential struct {
 	Email    string `bson:"email" json:"email" validate:"required,email"`
