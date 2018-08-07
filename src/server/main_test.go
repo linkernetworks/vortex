@@ -55,14 +55,14 @@ func init() {
 
 func TestMain(m *testing.M) {
 	v := m.Run()
-	if v == 0 && failedDropTestDatabase() {
-		os.Exit(1)
+	if v != 0 {
+		dropTestDatabase()
 	}
 	os.Exit(v)
 }
 
 // Drop test database
-func failedDropTestDatabase() bool {
+func dropTestDatabase() bool {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 	session := sp.Mongo.NewSession()
