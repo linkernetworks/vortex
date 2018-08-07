@@ -103,7 +103,7 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 	network := entity.Network{
 		Type:       entity.OVSKernelspaceNetworkType,
 		Name:       tName,
-		VLANTags:   []int32{0, 2048, 4095},
+		VlanTags:   []int32{0, 2048, 4095},
 		BridgeName: tName,
 		Nodes: []entity.Node{
 			entity.Node{
@@ -122,7 +122,7 @@ func (suite *NetworkControllerTestSuite) TestCreateNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VlanTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
@@ -135,7 +135,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 		Type:       entity.OVSUserspaceNetworkType,
 		IsDPDKPort: false,
 		Name:       tName,
-		VLANTags:   []int32{0, 2048, 4095},
+		VlanTags:   []int32{0, 2048, 4095},
 		BridgeName: tName,
 		Nodes: []entity.Node{
 			entity.Node{
@@ -154,7 +154,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VlanTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
@@ -167,7 +167,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSDPDKNetwork() {
 		Type:       entity.OVSUserspaceNetworkType,
 		IsDPDKPort: true,
 		Name:       tName,
-		VLANTags:   []int32{0, 2048, 4095},
+		VlanTags:   []int32{0, 2048, 4095},
 		BridgeName: tName,
 		Nodes: []entity.Node{
 			entity.Node{
@@ -186,7 +186,7 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSDPDKNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSDPDKNetwork(tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	err = nc.CreateOVSDPDKNetwork(tName, network.Nodes[0].PhyInterfaces, network.VlanTags)
 	suite.NoError(err)
 
 	//TODO we need support the list function to check the ovs is existed
@@ -198,7 +198,7 @@ func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 	network := entity.Network{
 		Type:       entity.OVSKernelspaceNetworkType,
 		Name:       tName,
-		VLANTags:   []int32{0, 2048, 4095},
+		VlanTags:   []int32{0, 2048, 4095},
 		BridgeName: tName,
 		Nodes: []entity.Node{
 			entity.Node{
@@ -217,7 +217,7 @@ func (suite *NetworkControllerTestSuite) TestDeleteNetwork() {
 	suite.NoError(err)
 	nc, err := New(net.JoinHostPort(nodeIP, DEFAULT_CONTROLLER_PORT))
 	suite.NoError(err)
-	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VLANTags)
+	err = nc.CreateOVSNetwork("system", tName, network.Nodes[0].PhyInterfaces, network.VlanTags)
 	suite.NoError(err)
 
 	err = nc.DeleteOVSNetwork(tName)

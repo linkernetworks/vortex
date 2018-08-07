@@ -15,10 +15,10 @@
 			"ifName":"eth12",
 			"vlanTag":123,
 			"ipAddress":"1.2.3.4",
-			"netmask":"255.255.255.0",
+            "netmask":"255.255.255.0",
             "routes": []
 		},
-				{
+		{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth13",
 			"vlanTag":124,
@@ -26,7 +26,7 @@
 			"netmask":"255.255.255.0",
             "routes": []
 		},
-				{
+		{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth15",
 			"ipAddress":"15.2.4.5",
