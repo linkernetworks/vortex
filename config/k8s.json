@@ -22,6 +22,9 @@
     "prometheus": {
         "url": "http://prometheus.vortex.svc.cluster.local:9090"
     },
+    "registry": {
+        "url": "https://dockerhub.pw"
+    },
     "logger": {
         "dir": "./logs",
         "level": "debug",

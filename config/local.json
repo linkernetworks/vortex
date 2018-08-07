@@ -12,6 +12,9 @@
     "prometheus": {
         "url": "http://localhost:30003"
     },
+    "registry": {
+        "url": "https://dockerhub.pw"
+    },
     "logger": {
         "dir": "./logs",
         "level": "debug",
