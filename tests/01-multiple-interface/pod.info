@@ -13,26 +13,26 @@
 		{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth12",
-			"vlan":0,
+			"vlanTag":123,
 			"ipAddress":"1.2.3.4",
-			"netmask":"255.255.255.0",
-			"vlanTag":123
+            "netmask":"255.255.255.0",
+            "routes": []
 		},
-				{
+		{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth13",
-			"vlan":0,
+			"vlanTag":124,
 			"ipAddress":"1.2.4.5",
 			"netmask":"255.255.255.0",
-			"vlanTag":124
+            "routes": []
 		},
-				{
+		{
 			"name":"@NETWORKNAME@",
 			"ifName":"eth15",
-			"vlan":0,
 			"ipAddress":"15.2.4.5",
-			"netmask":"255.255.255.0"
-		}	
+			"netmask":"255.255.255.0",
+            "routes":[]
+		}
 	],
 	"volumes":[],
     "restartPolicy":"Always",

@@ -645,7 +645,7 @@ Request Data:
   {
       "name":"MyNetwork2",
       "ifName":"eth12",
-      "vlan":0,
+      "vlanTag":0,
       "ipAddress":"1.2.3.4",
       "netmask":"255.255.255.0"
   },

@@ -40,7 +40,7 @@ type Network struct {
 	Type       NetworkType   `bson:"type" json:"type" validate:"required"`
 	IsDPDKPort bool          `bson:"isDPDKPort" json:"isDPDKPort" validate:"-"`
 	Name       string        `bson:"name" json:"name" validate:"required"`
-	VLANTags   []int32       `bson:"vlanTags" json:"vlanTags" validate:"required,dive,max=4095,min=0"`
+	VlanTags   []int32       `bson:"vlanTags" json:"vlanTags" validate:"required,dive,max=4095,min=0"`
 	BridgeName string        `bson:"bridgeName" json:"bridgeName" validate:"-"`
 	Nodes      []Node        `bson:"nodes" json:"nodes" validate:"required,dive,required"`
 	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`

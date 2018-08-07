@@ -13,7 +13,7 @@ type userspaceNetworkProvider struct {
 }
 
 func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container) error {
-	if err := entity.ValidateVLANTags(unp.VLANTags); err != nil {
+	if err := entity.ValidateVLANTags(unp.VlanTags); err != nil {
 		return err
 	}
 	for _, node := range unp.Nodes {
@@ -26,7 +26,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 				nodeIP,
 				unp.BridgeName,
 				node.PhyInterfaces,
-				unp.VLANTags,
+				unp.VlanTags,
 			); err != nil {
 				return err
 			}
@@ -35,7 +35,7 @@ func (unp userspaceNetworkProvider) CreateNetwork(sp *serviceprovider.Container)
 				nodeIP,
 				unp.BridgeName,
 				node.PhyInterfaces,
-				unp.VLANTags,
+				unp.VlanTags,
 			); err != nil {
 				return err
 			}
