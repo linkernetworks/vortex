@@ -6,13 +6,9 @@ apps:
       replicaCount: 1
       nodeSelector:
         glusterfs: true
-<<<<<<< HEAD
     replicaCount: 1
     controller:
       apiserverImageTag: v0.1.10
-=======
-      apiserverImageTag: v0.1.9
->>>>>>> pull resource setting out
       webappImageTag: v0.1.0
       portalCPU: 200m
       serverCPU: 100m
