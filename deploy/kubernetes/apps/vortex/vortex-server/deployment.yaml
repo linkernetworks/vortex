@@ -22,7 +22,7 @@ spec:
         ports:
         - containerPort: 8080
       - name: vortex-server
-        image: sdnvortex/vortex:v0.1.11
+        image: sdnvortex/vortex:v0.1.12
         ports:
         - containerPort: 7890
 
