@@ -8,7 +8,7 @@ apps:
         glusterfs: false
     replicaCount: 1
     controller:
-      apiserverImageTag: v0.1.9
+      apiserverImageTag: v0.1.10
       webappImageTag: v0.1.0
     service:
       ports:
