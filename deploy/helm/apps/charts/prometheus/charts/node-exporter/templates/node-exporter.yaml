@@ -47,5 +47,8 @@ spec:
           - --no-collector.wifi
           - --no-collector.xfs
           - --no-collector.zfs
+        resources:
+          requests:
+            cpu: {{ .Values.controller.cpu }}
       hostNetwork: true
         

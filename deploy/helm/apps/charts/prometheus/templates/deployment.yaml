@@ -32,11 +32,7 @@ spec:
           name: config-volume
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
-          limits:
-            cpu: 500m
-            memory: 2500Mi
+            cpu: {{ .Values.controller.cpu }}
       volumes:
       - emptyDir: {}
         name: data

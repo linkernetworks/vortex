@@ -28,6 +28,9 @@ spec:
           volumeMounts:
             - name: mongodb
               mountPath: /data/db
+          resources:
+            requests:
+              cpu: {{ .Values.controller.cpu }}
   volumeClaimTemplates:
   - metadata:
       name: mongodb

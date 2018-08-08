@@ -27,6 +27,9 @@ spec:
           name: docker-sock
         - mountPath: /var/run/openvswitch/
           name: ovs-data
+        resources:
+          requests:
+            cpu: {{ .Values.controller.tcpCPU }}
       volumes:
       - name: docker-sock
         hostPath:
