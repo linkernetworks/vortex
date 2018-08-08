@@ -30,8 +30,7 @@ func (kc *KubeCtl) CreatePod(pod *corev1.Pod, namespace string) (*corev1.Pod, er
 
 // DeletePod will delete the pod by the pod name
 func (kc *KubeCtl) DeletePod(name string, namespace string) error {
-	options := metav1.DeleteOptions{}
-	return kc.Clientset.CoreV1().Pods(namespace).Delete(name, &options)
+	return kc.Clientset.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
 // IsPodCompleted will check that pod is completed

@@ -30,6 +30,5 @@ func (kc *KubeCtl) CreateService(service *corev1.Service, namespace string) (*co
 
 // DeleteService will delete the service by the service name
 func (kc *KubeCtl) DeleteService(name string, namespace string) error {
-	options := metav1.DeleteOptions{}
-	return kc.Clientset.CoreV1().Services(namespace).Delete(name, &options)
+	return kc.Clientset.CoreV1().Services(namespace).Delete(name, &metav1.DeleteOptions{})
 }
