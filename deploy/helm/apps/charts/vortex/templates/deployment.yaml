@@ -21,7 +21,13 @@ spec:
         image: sdnvortex/vortex-portal:{{ .Values.controller.webappImageTag }}
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: {{ .Values.controller.portalCPU }}
       - name: vortex-server
         image: sdnvortex/vortex:{{ .Values.controller.apiserverImageTag }}
         ports:
         - containerPort: 7890
+        resources:
+          requests:
+            cpu: {{ .Values.controller.serverCPU }}

@@ -30,8 +30,7 @@ spec:
         image: k8s.gcr.io/addon-resizer:1.7
         resources:
           requests:
-            cpu: 100m
-            memory: 30Mi
+            cpu: {{ .Values.controller.cpu }}
         env:
           - name: MY_POD_NAME
             valueFrom:

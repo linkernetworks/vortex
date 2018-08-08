@@ -39,6 +39,9 @@ spec:
           - --profiling
           - --housekeeping_interval={{ .Values.controller.housekeeping_interval }}
           - --disable_metrics=disk
+        resources:
+          requests:
+            cpu: {{ .Values.controller.cpu }}
       terminationGracePeriodSeconds: 30
       volumes:
       - name: rootfs

@@ -32,6 +32,9 @@ spec:
           name: ovs-sock
         - mountPath: /tmp/
           name: grpc-sock
+        resources:
+          requests:
+            cpu: {{ .Values.controller.unixCPU }}
       volumes:
       - name: docker-ns
         hostPath:
