@@ -14,8 +14,8 @@ apps:
       apiserverImageTag: v0.1.9
 >>>>>>> pull resource setting out
       webappImageTag: v0.1.0
-      portalCPU: 20m
-      serverCPU: 10m
+      portalCPU: 50m
+      serverCPU: 100m
     service:
       ports:
         apiserverNodePort: 32326
@@ -24,8 +24,8 @@ apps:
   network-controller:
     controller:
       imageTag: v0.4.0
-      tcpCPU: 20m
-      unixCPU: 10m
+      tcpCPU: 50m
+      unixCPU: 50m
   # vortex/deploy/helm/apps/charts/prometheus
   prometheus:
     controller:
@@ -33,7 +33,7 @@ apps:
       imageTag: v2.2.1
       scrapeInterval: 5s
       retention: 1h
-      cpu: 10m
+      cpu: 50m
     service:
       nodePort: true
     # vortex/deploy/helm/apps/charts/prometheus/charts/cadvisor
@@ -41,17 +41,17 @@ apps:
       controller:
         imageTag: v0.27.4
         housekeeping_interval: 10s
-        cpu: 20m
+        cpu: 100m
     # vortex/deploy/helm/apps/charts/prometheus/charts/kube-state-metrics
     kube-state-metrics:
       controller:
         imageTag: v1.3.1
-        cpu: 10m
+        cpu: 20m
     # vortex/deploy/helm/apps/charts/prometheus/charts/node-exporter
     node-exporter:
       controller:
         imageTag: v1.0.1
-        cpu: 10m
+        cpu: 20m
 
 # vortex/deploy/helm/services
 services:
@@ -59,7 +59,7 @@ services:
   mongodb:
     controller:
       replicaCount: 1
-      cpu: 10m
+      cpu: 50m
       image:
         tag: 4.1.1-xenial
       pvc:
