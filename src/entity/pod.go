@@ -28,7 +28,7 @@ type Container struct {
 // PodRoute is the structure for add IP routing table
 type PodRoute struct {
 	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
-	Gateway string `bson:"gateway" json:"gateway" validate:"ipv4"`
+	Gateway string `bson:"gateway" json:"gateway" validate:"omitempty,ipv4"`
 }
 
 // PodNetwork is the structure for pod network info
@@ -58,13 +58,13 @@ type Pod struct {
 	Namespace     string            `bson:"namespace" json:"namespace" validate:"required"`
 	Labels        map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
 	Containers    []Container       `bson:"containers" json:"containers" validate:"required,dive,required"`
-	CreatedAt     *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 	Volumes       []PodVolume       `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
 	Networks      []PodNetwork      `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 	RestartPolicy string            `bson:"restartPolicy" json:"restartPolicy" validate:"required,eq=Always|eq=OnFailure|eq=Never"`
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
 	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
 	NodeAffinity  []string          `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
+	CreatedAt     *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
 // GetCollection - get model mongo collection name.
