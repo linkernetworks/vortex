@@ -168,7 +168,6 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 //[]string => a list of nodes and it will apply on nodeaffinity
 //[]corev1.Container => a list of init container we will apply on pod
 func generateNetwork(session *mongo.Session, pod *entity.Pod) ([]string, []corev1.Container, error) {
-
 	networks := []entity.Network{}
 	for i, v := range pod.Networks {
 		network := entity.Network{}
@@ -238,7 +237,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	case entity.PodHostNetwork:
 		hostNetwork = true
 	case entity.PodCustomNetwork:
-		tmp := []string{}
+		var tmp []string
 		tmp, initContainers, err = generateNetwork(session, pod)
 		if len(tmp) != 0 {
 			nodeAffinity = utils.Intersection(nodeAffinity, tmp)

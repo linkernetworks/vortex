@@ -24,6 +24,10 @@ func registryBasicAuthHandler(ctx *web.Context) {
 
 	client := &http.Client{}
 	registryReq, err := http.NewRequest("GET", sp.Config.Registry.URL+"/v2", nil)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
 	registryReq.SetBasicAuth(credential.Username, credential.Password)
 	registryResp, err := client.Do(registryReq)
 	if err != nil {

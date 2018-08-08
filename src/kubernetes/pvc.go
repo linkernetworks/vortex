@@ -30,6 +30,5 @@ func (kc *KubeCtl) CreatePVC(pvc *corev1.PersistentVolumeClaim, namespace string
 
 // DeletePVC will delete the PVC by the PVC name
 func (kc *KubeCtl) DeletePVC(name string, namespace string) error {
-	options := metav1.DeleteOptions{}
-	return kc.Clientset.CoreV1().PersistentVolumeClaims(namespace).Delete(name, &options)
+	return kc.Clientset.CoreV1().PersistentVolumeClaims(namespace).Delete(name, &metav1.DeleteOptions{})
 }
