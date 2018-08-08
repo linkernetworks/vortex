@@ -555,8 +555,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		"kube_node_created",
 		"node_network_interface",
 		"kube_node_labels",
-		"kube_node_status_capacity",
-		"kube_node_status_allocatable"}
+		"kube_node_status_capacity.*",
+		"kube_node_status_allocatable.*"}
 	expression.QueryLabels = map[string]string{"node": id}
 
 	str := basicExpr(expression.Metrics)
@@ -604,25 +604,23 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 			nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
 			node.NICs[string(result.Metric["device"])] = nic
 
-		case "kube_node_status_allocatable":
-			switch result.Metric["resource"] {
-			case "cpu":
-				node.Resource.AllocatableCPU = float32(result.Value)
-			case "memory":
-				node.Resource.AllocatableMemory = float32(result.Value)
-			case "pods":
-				node.Resource.AllocatablePods = float32(result.Value)
-			}
+		case "kube_node_status_allocatable_cpu_cores":
+			node.Resource.AllocatableCPU = float32(result.Value)
 
-		case "kube_node_status_capacity":
-			switch result.Metric["resource"] {
-			case "cpu":
-				node.Resource.CapacityCPU = float32(result.Value)
-			case "memory":
-				node.Resource.CapacityMemory = float32(result.Value)
-			case "pods":
-				node.Resource.CapacityPods = float32(result.Value)
-			}
+		case "kube_node_status_allocatable_memory_bytes":
+			node.Resource.AllocatableMemory = float32(result.Value)
+
+		case "kube_node_status_allocatable_pods":
+			node.Resource.AllocatablePods = float32(result.Value)
+
+		case "kube_node_status_capacity_cpu_cores":
+			node.Resource.CapacityCPU = float32(result.Value)
+
+		case "kube_node_status_capacity_memory_bytes":
+			node.Resource.CapacityMemory = float32(result.Value)
+
+		case "kube_node_status_capacity_pods":
+			node.Resource.CapacityPods = float32(result.Value)
 		}
 	}
 
@@ -644,8 +642,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	// resource
 	expression = Expression{}
 	expression.Metrics = []string{
-		"kube_pod_container_resource_limits",
-		"kube_pod_container_resource_requests"}
+		"kube_pod_container_resource_limits.*",
+		"kube_pod_container_resource_requests.*"}
 	expression.QueryLabels = map[string]string{"node": id}
 	expression.SumByLabels = []string{"__name__", "resource"}
 
@@ -659,20 +657,17 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	for _, result := range results {
 		switch result.Metric["__name__"] {
-		case "kube_pod_container_resource_requests":
-			switch result.Metric["resource"] {
-			case "cpu":
-				node.Resource.CPURequests = float32(result.Value)
-			case "memory":
-				node.Resource.MemoryRequests = float32(result.Value)
-			}
-		case "kube_pod_container_resource_limits":
-			switch result.Metric["resource"] {
-			case "cpu":
-				node.Resource.CPULimits = float32(result.Value)
-			case "memory":
-				node.Resource.MemoryLimits = float32(result.Value)
-			}
+		case "kube_pod_container_resource_requests_cpu_cores":
+			node.Resource.CPURequests = float32(result.Value)
+
+		case "kube_pod_container_resource_requests_memory_bytes":
+			node.Resource.MemoryRequests = float32(result.Value)
+
+		case "kube_pod_container_resource_limits_cpu_cores":
+			node.Resource.CPULimits = float32(result.Value)
+
+		case "kube_pod_container_resource_limits_memory_bytes":
+			node.Resource.MemoryLimits = float32(result.Value)
 		}
 	}
 
