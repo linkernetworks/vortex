@@ -1,12 +1,35 @@
 # Change Log
 
-## [Unreleased](https://github.com/linkernetworks/vortex/tree/HEAD)
-
-[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.8...HEAD)
+## [v0.1.11](https://github.com/linkernetworks/vortex/tree/v0.1.11) (2018-08-08)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.10...v0.1.11)
 
 **Merged pull requests:**
 
+- Upgrade network controller v0.4.0 [\#233](https://github.com/linkernetworks/vortex/pull/233) ([John-Lin](https://github.com/John-Lin))
+- \[BUG\] Mount the ovs directory for tcp-network-controller [\#232](https://github.com/linkernetworks/vortex/pull/232) ([hwchiu](https://github.com/hwchiu))
+- \[Bug\] remove required [\#231](https://github.com/linkernetworks/vortex/pull/231) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-256: Modify the metrics name in get node handler [\#230](https://github.com/linkernetworks/vortex/pull/230) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Release\] bump version to v0.1.10 [\#229](https://github.com/linkernetworks/vortex/pull/229) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-254: Pull resource setting out from yaml [\#228](https://github.com/linkernetworks/vortex/pull/228) ([WakeupTsai](https://github.com/WakeupTsai))
+
+## [v0.1.10](https://github.com/linkernetworks/vortex/tree/v0.1.10) (2018-08-08)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.9...v0.1.10)
+
+**Merged pull requests:**
+
+- \[Release\] bump version to 0.1.9 [\#226](https://github.com/linkernetworks/vortex/pull/226) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] johnlin/podnetwork validator [\#224](https://github.com/linkernetworks/vortex/pull/224) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.1.9](https://github.com/linkernetworks/vortex/tree/v0.1.9) (2018-08-07)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.8...v0.1.9)
+
+**Merged pull requests:**
+
+-  \[Task\] VX-252 registry basic auth proxy [\#225](https://github.com/linkernetworks/vortex/pull/225) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Install the nfs-server in the vagrant environment. [\#223](https://github.com/linkernetworks/vortex/pull/223) ([hwchiu](https://github.com/hwchiu))
+- \[Release\] add changelogs [\#222](https://github.com/linkernetworks/vortex/pull/222) ([John-Lin](https://github.com/John-Lin))
 - \[Release\] bump version to v0.1.8 [\#221](https://github.com/linkernetworks/vortex/pull/221) ([John-Lin](https://github.com/John-Lin))
+- Add systemd for binding dpdk port after reboot [\#212](https://github.com/linkernetworks/vortex/pull/212) ([sufuf3](https://github.com/sufuf3))
 
 ## [v0.1.8](https://github.com/linkernetworks/vortex/tree/v0.1.8) (2018-08-06)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.7...v0.1.8)
