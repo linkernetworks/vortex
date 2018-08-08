@@ -1,6 +1,6 @@
 package entity
 
-// NICMetrics is the structure for NIC metrics
+// NICShortMetrics is the structure for NIC metrics
 type NICShortMetrics struct {
 	NICNetworkTraffic NICNetworkTrafficMetrics `json:"nicNetworkTraffic"`
 }

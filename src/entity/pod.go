@@ -7,14 +7,14 @@ import (
 )
 
 const (
-	// PodCollectionName's const
+	// PodCollectionName is a const string
 	PodCollectionName string = "pods"
-	// The network type for the Pod
+	// PodHostNetwork is the network type for the Pod
 	// host means the pod use the hostNetwork (share the network with the host machine)
 	PodHostNetwork = "host"
-	// cluster means use the cluster Network, maybe the flannel network
+	// PodClusterNetwork is cluster which means use the cluster Network, maybe the flannel network
 	PodClusterNetwork = "cluster"
-	// custom means the custom netwokr we created before, it support the OVS and DPDK network for additional network interface card
+	// PodCustomNetwork is custom which means the custom netwokr we created before, it support the OVS and DPDK network for additional network interface card
 	PodCustomNetwork = "custom"
 )
 

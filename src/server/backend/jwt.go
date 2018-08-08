@@ -6,6 +6,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// GenerateToken is for generating token
 func GenerateToken(userUUID string, role string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims{
