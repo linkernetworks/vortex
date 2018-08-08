@@ -28,7 +28,7 @@ type Container struct {
 // PodRoute is the structure for add IP routing table
 type PodRoute struct {
 	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
-	Gateway string `bson:"gateway" json:"gateway" validate:"required,ipv4"`
+	Gateway string `bson:"gateway" json:"gateway" validate:"ipv4"`
 }
 
 // PodNetwork is the structure for pod network info
