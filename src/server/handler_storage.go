@@ -15,6 +15,7 @@ import (
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 func createStorage(ctx *web.Context) {
@@ -54,7 +55,11 @@ func createStorage(ctx *web.Context) {
 	}
 
 	if err := storageProvider.CreateStorage(sp, &storage); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsAlreadyExists(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Name: %s already existed", storage.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
