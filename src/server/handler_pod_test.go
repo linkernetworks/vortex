@@ -104,7 +104,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 
 	err = p.DeletePod(suite.sp, &retPod)
 	suite.NoError(err)
