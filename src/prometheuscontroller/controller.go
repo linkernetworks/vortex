@@ -183,6 +183,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 			pod.Namespace = string(result.Metric["namespace"])
 			pod.CreateByKind = string(result.Metric["created_by_kind"])
 			pod.CreateByName = string(result.Metric["created_by_name"])
+			pod.UID = string(result.Metric["uid"])
 
 		case "kube_pod_created":
 			pod.CreateAt = int(result.Value)
