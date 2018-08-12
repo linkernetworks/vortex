@@ -13,7 +13,6 @@ func CreateNamespace(sp *serviceprovider.Container, namespace *entity.Namespace)
 	n := corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   namespace.Name,
-			Labels: namespace.Labels,
 		},
 	}
 	_, err := sp.KubeCtl.CreateNamespace(&n)

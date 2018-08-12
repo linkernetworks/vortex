@@ -15,7 +15,6 @@ const (
 type Namespace struct {
 	ID        bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
 	Name      string            `bson:"name" json:"name" validate:"required,k8sname"`
-	Labels    map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
 	CreatedAt *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 

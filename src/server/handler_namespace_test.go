@@ -57,7 +57,6 @@ func (suite *NamespaceTestSuite) TestCreateNamespace() {
 	namespace := entity.Namespace{
 		ID:     bson.NewObjectId(),
 		Name:   nsName,
-		Labels: map[string]string{},
 	}
 
 	bodyBytes, err := json.MarshalIndent(namespace, "", "  ")
