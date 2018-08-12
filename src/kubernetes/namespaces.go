@@ -30,6 +30,6 @@ func (kc *KubeCtl) CreateNamespace(namespace *corev1.Namespace) (*corev1.Namespa
 
 // DeleteNamespace will delete the namespace by the namespace name
 func (kc *KubeCtl) DeleteNamespace(name string) error {
-	deletePolicy := metav1.DeletePropagationBackground
-	return kc.Clientset.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
+	foreground := metav1.DeletePropagationForeground
+	return kc.Clientset.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{PropagationPolicy: &foreground})
 }
