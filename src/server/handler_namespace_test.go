@@ -55,8 +55,8 @@ func (suite *NamespaceTestSuite) TestCreateNamespace() {
 
 	nsName := namesgenerator.GetRandomName(0)
 	namespace := entity.Namespace{
-		ID:     bson.NewObjectId(),
-		Name:   nsName,
+		ID:   bson.NewObjectId(),
+		Name: nsName,
 	}
 
 	bodyBytes, err := json.MarshalIndent(namespace, "", "  ")
@@ -92,29 +92,10 @@ func (suite *NamespaceTestSuite) TestCreateNamespace() {
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
+	defer suite.session.Remove(entity.NamespaceCollectionName, "name", namespace.Name)
 
 	err = ns.DeleteNamespace(suite.sp, &namespace)
 	suite.NoError(err)
-}
-
-func (suite *NamespaceTestSuite) TestCreateNamespaceFail() {
-	nsName := namesgenerator.GetRandomName(0)
-	namespace := entity.Namespace{
-		ID:   bson.NewObjectId(),
-		Name: nsName,
-	}
-
-	bodyBytes, err := json.MarshalIndent(namespace, "", "  ")
-	suite.NoError(err)
-
-	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/namespaces", bodyReader)
-	suite.NoError(err)
-
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpWriter := httptest.NewRecorder()
-	suite.wc.Dispatch(httpWriter, httpRequest)
-	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
 
 func (suite *NamespaceTestSuite) TestDeleteNamespace() {
