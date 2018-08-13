@@ -12,6 +12,7 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/pod"
 	"github.com/linkernetworks/vortex/src/web"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -47,7 +48,11 @@ func createPodHandler(ctx *web.Context) {
 	}
 
 	if err := pod.CreatePod(sp, &p); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsAlreadyExists(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
@@ -76,7 +81,11 @@ func deletePodHandler(ctx *web.Context) {
 	}
 
 	if err := pod.DeletePod(sp, &p); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsNotFound(err) {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 

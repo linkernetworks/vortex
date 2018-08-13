@@ -12,6 +12,7 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/volume"
 	"github.com/linkernetworks/vortex/src/web"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -43,8 +44,11 @@ func createVolume(ctx *web.Context) {
 	v.CreatedAt = timeutils.Now()
 	//Generate the metaName for PVC meta name and we will use it future
 	if err := volume.CreateVolume(sp, &v); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
-		return
+		if errors.IsAlreadyExists(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("PVC Name: %s already existed", v.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 	}
 	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
 		if mgo.IsDup(err) {
@@ -72,7 +76,11 @@ func deleteVolume(ctx *web.Context) {
 	}
 
 	if err := volume.DeleteVolume(sp, &v); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if errors.IsNotFound(err) {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 

@@ -77,7 +77,7 @@ func deleteServiceHandler(ctx *web.Context) {
 	}
 
 	if err := service.DeleteService(sp, &s); err != nil {
-		if errors.IsAlreadyExists(err) {
+		if errors.IsNotFound(err) {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
