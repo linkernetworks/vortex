@@ -28,6 +28,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newNamespaceService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
 	container.Add(newAppService(a.ServiceProvider))
+	container.Add(newOVSService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
 	return router
@@ -168,5 +169,12 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	// controller
 	webService.Route(webService.GET("/controllers").To(handler.RESTfulServiceHandler(sp, listControllerMetricsHandler)))
 	webService.Route(webService.GET("/controllers/{id}").To(handler.RESTfulServiceHandler(sp, getControllerMetricsHandler)))
+	return webService
+}
+
+func newOVSService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/services").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.GET("/portstat/${id}").To(handler.RESTfulServiceHandler(sp, getOVSPortStatsHandler)))
 	return webService
 }
