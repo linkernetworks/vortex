@@ -46,6 +46,11 @@
     - [List Services](#list-services)
     - [Get Service](#get-service)
     - [Delete Service](#delete-service)
+  - [Namespace](#namespace)
+    - [Create Namespace](#create-namespace)
+    - [List Namespaces](#list-namespaces)
+    - [Get Namespace](#get-namespace)
+    - [Delete Namespace](#delete-namespace)
 
 
 
@@ -1351,6 +1356,98 @@ Example:
 
 ```
 curl -X DELETE http://localhost:7890/v1/services/5b4edcbc4807c557d9feb69e
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Delete success"
+}
+```
+
+## Namespace
+### Create Namespace
+
+**POST /v1/namespaces**
+
+Example:
+
+```
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"name":"awesome"}' \
+  http://localhost:7890/v1/namespaces
+```
+
+Request Data:
+
+```json
+{
+  "name": "awesome",
+}
+```
+
+Response Data:
+
+```json
+{
+  "id": "5b4edcbc4807c557d9feb69e",
+  "name": "awesome",
+  "createdAt": "2018-07-18T06:22:52.403Z"
+}
+```
+
+### List Namespaces
+
+**GET /v1/namespaces/**
+
+Example:
+
+```
+curl http://localhost:7890/v1/namespaces/
+```
+
+Response Data:
+
+```json
+[
+  {
+   "id": "5b4edcbc4807c557d9feb69e",
+   "name": "awesome",
+   "createdAt": "2018-07-18T06:22:52.403Z"
+  }
+]
+```
+
+### Get Namespace
+
+**GET /v1/namespaces/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/namespaces/5b4edcbc4807c557d9feb69e
+```
+
+Response Data:
+
+```json
+{
+  "id": "5b4edcbc4807c557d9feb69e",
+  "name": "awesome",
+  "createdAt": "2018-07-18T06:22:52.403Z"
+}
+```
+
+### Delete Namespace
+
+**DELETE /v1/namespaces/[id]**
+
+Example:
+
+```
+curl -X DELETE http://localhost:7890/v1/namespaces/5b4edcbc4807c557d9feb69e
 ```
 
 Response Data:

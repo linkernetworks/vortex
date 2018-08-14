@@ -23,6 +23,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newVolumeService(a.ServiceProvider))
 	container.Add(newPodService(a.ServiceProvider))
 	container.Add(newServiceService(a.ServiceProvider))
+	container.Add(newNamespaceService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
@@ -104,6 +105,16 @@ func newServiceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteServiceHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listServiceHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getServiceHandler)))
+	return webService
+}
+
+func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/namespaces").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createNamespaceHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteNamespaceHandler)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNamespaceHandler)))
+	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getNamespaceHandler)))
 	return webService
 }
 
