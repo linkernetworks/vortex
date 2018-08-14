@@ -199,10 +199,10 @@ cd $OVS_DIR
 ./boot.sh
 CFLAGS='-march=native' ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --with-dpdk=$DPDK_BUILD
 make && sudo make install
-sudo mkdir -p /usr/local/etc/openvswitch
-sudo mkdir -p /usr/local/var/run/openvswitch
-sudo mkdir -p /usr/local/var/log/openvswitch
-sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
+sudo mkdir -p /etc/openvswitch
+sudo mkdir -p /var/run/openvswitch
+sudo mkdir -p /var/log/openvswitch
+sudo ovsdb-tool create /etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
 echo 'export PATH=$PATH:/usr/local/share/openvswitch/scripts' | sudo tee -a /root/.bashrc
 sudo systemctl enable ovsdb-server
 sudo systemctl start ovsdb-server
