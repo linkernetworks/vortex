@@ -1,5 +1,5 @@
 ## vortex server version
-SERVER_VERSION = v0.1.12
+SERVER_VERSION = v0.1.13
 ## Folder content generated files
 BUILD_FOLDER = ./build
 PROJECT_URL  = github.com/linkernetworks/vortex
