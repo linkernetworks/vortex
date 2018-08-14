@@ -72,7 +72,7 @@ func (suite *OVSControllerTestSuite) SetupSuite() {
 	})
 	suite.NoError(err)
 
-	defer exec.Command("ovs-vsctl", "add-br", suite.bridgeName).Run()
+	exec.Command("ovs-vsctl", "add-br", suite.bridgeName).Run()
 }
 
 func (suite *OVSControllerTestSuite) TearDownSuite() {
