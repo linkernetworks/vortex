@@ -19,7 +19,7 @@ func CreateNamespace(sp *serviceprovider.Container, namespace *entity.Namespace)
 	return err
 }
 
-// DeleteNamespace willl delete namespace
+// DeleteNamespace will delete namespace
 func DeleteNamespace(sp *serviceprovider.Container, namespace *entity.Namespace) error {
 	return sp.KubeCtl.DeleteNamespace(namespace.Name)
 }
