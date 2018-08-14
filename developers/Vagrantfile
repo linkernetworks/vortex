@@ -2,9 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  unless Vagrant.has_plugin?("vagrant-scp")
-    raise 'Plugin vagrant-reload is not installed!'
-  end
   config.vm.box = "ubuntu/xenial64"
   config.vm.hostname = 'vortex-dev'
   config.vm.define vm_name = 'vortex'
