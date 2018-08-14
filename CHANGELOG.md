@@ -1,5 +1,28 @@
 # Change Log
 
+## [v0.1.13](https://github.com/linkernetworks/vortex/tree/v0.1.13) (2018-08-14)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.12...v0.1.13)
+
+**Merged pull requests:**
+
+- \[Development\] change share path [\#244](https://github.com/linkernetworks/vortex/pull/244) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] registry auth test [\#243](https://github.com/linkernetworks/vortex/pull/243) ([John-Lin](https://github.com/John-Lin))
+- Refined dockerfile [\#242](https://github.com/linkernetworks/vortex/pull/242) ([John-Lin](https://github.com/John-Lin))
+- \[Upgrade\] johnlin/bump webapp [\#240](https://github.com/linkernetworks/vortex/pull/240) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] handle k8s error [\#239](https://github.com/linkernetworks/vortex/pull/239) ([John-Lin](https://github.com/John-Lin))
+- \[Release\] bump version to v0.1.12 [\#237](https://github.com/linkernetworks/vortex/pull/237) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Add namespace crud [\#227](https://github.com/linkernetworks/vortex/pull/227) ([sufuf3](https://github.com/sufuf3))
+
+## [v0.1.12](https://github.com/linkernetworks/vortex/tree/v0.1.12) (2018-08-08)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.11...v0.1.12)
+
+**Merged pull requests:**
+
+- \[Hot-fix\] fix go report ineffAssign [\#238](https://github.com/linkernetworks/vortex/pull/238) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] gateway omitempty [\#236](https://github.com/linkernetworks/vortex/pull/236) ([John-Lin](https://github.com/John-Lin))
+- Fix golint & gofmt [\#235](https://github.com/linkernetworks/vortex/pull/235) ([sufuf3](https://github.com/sufuf3))
+- \[Release\] bump version to v0.1.11 [\#234](https://github.com/linkernetworks/vortex/pull/234) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.1.11](https://github.com/linkernetworks/vortex/tree/v0.1.11) (2018-08-08)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.10...v0.1.11)
 
