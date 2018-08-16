@@ -61,7 +61,7 @@ services:
       pvc:
         volumeType: nfs
         nfsPath: /nfsshare 
-        nfsServer: 10.1.14.86q
+        nfsServer: 10.1.14.86
         reclaimPolicy: Recycle
         accessModes: ReadWriteMany
         storageClass: mongo
