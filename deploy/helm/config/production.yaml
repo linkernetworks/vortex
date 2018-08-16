@@ -59,8 +59,10 @@ services:
       image:
         tag: 4.1.1-xenial
       pvc:
-        localVolume: false
-        reclaimPolicy: Retain
+        volumeType: nfs
+        nfsPath: /nfsshare 
+        nfsServer: 172.17.8.100
+        reclaimPolicy: Recycle
         accessModes: ReadWriteMany
         storageClass: mongo
         storage: 100Gi

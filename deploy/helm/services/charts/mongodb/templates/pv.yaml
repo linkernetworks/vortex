@@ -1,9 +1,7 @@
-{{- if .Values.controller.pvc.localVolume }}
----
-kind: PersistentVolume
 apiVersion: v1
+kind: PersistentVolume
 metadata:
-  name: mongo
+  name: mongo-{{- .Values.controller.pvc.volumeType }}
 spec:
   storageClassName: {{ .Values.controller.pvc.storageClass }}
   persistentVolumeReclaimPolicy: {{ .Values.controller.pvc.reclaimPolicy }}
@@ -11,6 +9,11 @@ spec:
     storage: {{ .Values.controller.pvc.storage }}
   accessModes:
     - {{ .Values.controller.pvc.accessModes }}
+  {{- if eq .Values.controller.pvc.volumeType "local"}}
   hostPath:
     path: "/data"
-{{- end }}
+  {{- else if eq .Values.controller.pvc.volumeType "nfs" }}
+  nfs: 
+    path: {{ .Values.controller.pvc.nfsPath }}
+    server: {{ .Values.controller.pvc.nfsServer }}
+  {{- end }}
