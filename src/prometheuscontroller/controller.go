@@ -107,7 +107,7 @@ func ListNodeName(sp *serviceprovider.Container, queryLabels map[string]string) 
 
 	nodeList := []string{}
 	for _, result := range results {
-		nodeList = append(nodeList, string(result.Metric["node"]))
+		nodeList = append(nodeList, string(result.Metric["exported_node"]))
 	}
 
 	return nodeList, nil
@@ -553,11 +553,10 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.Metrics = []string{
 		"kube_node_info",
 		"kube_node_created",
-		"node_network_interface",
 		"kube_node_labels",
 		"kube_node_status_capacity.*",
 		"kube_node_status_allocatable.*"}
-	expression.QueryLabels = map[string]string{"node": id}
+	expression.QueryLabels = map[string]string{"exported_node": id}
 
 	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -586,24 +585,6 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 				}
 			}
 
-		case "node_network_interface":
-			nic := entity.NICMetrics{}
-			defaultValue, err := strconv.ParseBool(string(result.Metric["default"]))
-			if err != nil {
-				return node, err
-			}
-			nic.Default = defaultValue
-			dpdkValue, err := strconv.ParseBool(string(result.Metric["dpdk"]))
-			if err != nil {
-				return node, err
-			}
-			nic.DPDK = dpdkValue
-			nic.Type = string(result.Metric["type"])
-			nic.IP = string(result.Metric["ip_address"])
-			nic.PCIID = string(result.Metric["pci_id"])
-			nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
-			node.NICs[string(result.Metric["device"])] = nic
-
 		case "kube_node_status_allocatable_cpu_cores":
 			node.Resource.AllocatableCPU = float32(result.Value)
 
@@ -624,10 +605,39 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		}
 	}
 
+	// nics
+	expression = Expression{}
+	expression.Metrics = []string{"node_network_interface"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	results, err = query(sp, str)
+	if err != nil {
+		return node, err
+	}
+
+	nic := entity.NICMetrics{}
+	defaultValue, err := strconv.ParseBool(string(results[0].Metric["default"]))
+	if err != nil {
+		return node, err
+	}
+	nic.Default = defaultValue
+	dpdkValue, err := strconv.ParseBool(string(results[0].Metric["dpdk"]))
+	if err != nil {
+		return node, err
+	}
+	nic.DPDK = dpdkValue
+	nic.Type = string(results[0].Metric["type"])
+	nic.IP = string(results[0].Metric["ip_address"])
+	nic.PCIID = string(results[0].Metric["pci_id"])
+	nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
+	node.NICs[string(results[0].Metric["device"])] = nic
+
 	// status
 	expression = Expression{}
 	expression.Metrics = []string{"kube_node_status_condition"}
-	expression.QueryLabels = map[string]string{"node": id, "status": "true"}
+	expression.QueryLabels = map[string]string{"exported_node": id, "status": "true"}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -644,7 +654,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression.Metrics = []string{
 		"kube_pod_container_resource_limits.*",
 		"kube_pod_container_resource_requests.*"}
-	expression.QueryLabels = map[string]string{"node": id}
+	expression.QueryLabels = map[string]string{"exported_node": id}
 	expression.SumByLabels = []string{"__name__", "resource"}
 
 	str = basicExpr(expression.Metrics)
