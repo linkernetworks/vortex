@@ -41,7 +41,7 @@ apps:
     # vortex/deploy/helm/apps/charts/prometheus/charts/kube-state-metrics
     kube-state-metrics:
       controller:
-        imageTag: v1.3.1
+        imageTag: v1.3.2
         cpu: 100m
     # vortex/deploy/helm/apps/charts/prometheus/charts/node-exporter
     node-exporter:

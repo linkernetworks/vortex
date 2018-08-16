@@ -10,6 +10,7 @@ type PodMetrics struct {
 	PodName      string                     `json:"podName"`
 	Namespace    string                     `json:"namespace"`
 	Node         string                     `json:"node"`
+	UID          string                     `json:"uid"`
 	Status       string                     `json:"status"`
 	CreateAt     int                        `json:"createAt"`
 	CreateByKind string                     `json:"createByKind"`
