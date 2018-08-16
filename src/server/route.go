@@ -174,7 +174,7 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 
 func newOVSService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/services").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.GET("/portstat/${id}").To(handler.RESTfulServiceHandler(sp, getOVSPortStatsHandler)))
+	webService.Path("/v1/ovs").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.GET("/portstat").To(handler.RESTfulServiceHandler(sp, getOVSPortStatsHandler)))
 	return webService
 }
