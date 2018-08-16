@@ -108,21 +108,18 @@ apps.init-helm:
 
 .PHONY: apps.launch
 apps.launch:
-	yq -y .services deploy/helm/config/development.yaml | helm install --name vortex-services --debug --wait -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/development.yaml | helm install --name vortex-apps --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+	yq -y .services deploy/helm/config/${CONFIG}.yaml | helm install --name vortex-services-${CONFIG} --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/${CONFIG}.yaml | helm install --name vortex-apps-${CONFIG} --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.upgrade
 apps.upgrade:
-	yq -y .services deploy/helm/config/development.yaml | helm upgrade vortex-services --debug -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/development.yaml | helm  upgrade vortex-apps --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+	yq -y .services deploy/helm/config/${CONFIG}.yaml | helm upgrade vortex-services-${CONFIG} --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/${CONFIG}.yaml | helm  upgrade vortex-apps-${CONFIG} --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.teardown
 apps.teardown:
-ifeq ($(UNAME), Linux)
-	helm ls --short | xargs -i helm delete --purge {}
-else ifeq ($(UNAME), Darwin)
-	helm ls --short | xargs helm delete --purge
-endif
+	helm delete --purge vortex-services-${CONFIG}
+	helm delete --purge vortex-apps-${CONFIG}
 
 ## dockerfiles/ ########################################
 

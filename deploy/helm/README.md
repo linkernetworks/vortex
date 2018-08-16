@@ -22,10 +22,11 @@ make apps.init-helm
 ```
 
 ### Using helm deploy apps
-This will deploy mongodb and prometheus in your cluster
+This will deploy services and apps in your cluster, and please set the CONFIG variable (could be development, production, or testing) right.
 ```
-make apps.launch
+make CONFIG=development apps.launch
 ```
+
 If you wnat to deploy certain chart, you can type
 ```
 helm install --debug --wait --set global.environment=<environmtneSetting> <chart path>
@@ -34,7 +35,12 @@ helm install --debug --wait --set global.environment=<environmtneSetting> <chart
 helm install --debug --wait --set global.environment=local deploy/helm/apps/prometheus/charts/cadvisor
 ```
 
-### Delete all release
+### Upgrade the releases
 ```
-make apps.teardown
+make CONFIG=development apps.upgrade
+```
+
+### Delete the releases
+```
+make CONFIG=development apps.teardown
 ``` 
