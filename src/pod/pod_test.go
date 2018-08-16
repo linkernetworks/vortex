@@ -156,6 +156,9 @@ func (suite *PodTestSuite) TestCreatePod() {
 		Name:        podName,
 		Containers:  containers,
 		NetworkType: entity.PodHostNetwork,
+		EnvVars: map[string]string{
+			"MY_IP": "1.2.3.4",
+		},
 	}
 
 	err := CreatePod(suite.sp, pod)

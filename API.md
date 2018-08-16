@@ -632,7 +632,7 @@ For each Pod, we have fileds need to handle.
     - Always,OnFailure,Never
 9. networkType: the string options for network type, support "host", "custom" and "cluster".
 10. nodeAffinity: the string array to indicate whchi nodes I want my Pod can run in.
-
+2. envVars: the environment variables for containers and it's map (string to stirng) form.
 
 Example:
 
@@ -641,6 +641,8 @@ Request Data:
 ```json
 {
   "name": "awesome",
+  "labels": {},
+  "envVars":{},
   "containers": [{
     "name": "busybox",
     "image": "busybox",

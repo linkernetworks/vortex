@@ -220,6 +220,18 @@ func generateAffinity(nodeNames []string) *corev1.Affinity {
 	}
 }
 
+func generateEnvVars(pod *entity.Pod) []corev1.EnvVar {
+	envVars := []corev1.EnvVar{}
+
+	for k, v := range pod.EnvVars {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  k,
+			Value: v,
+		})
+	}
+	return envVars
+}
+
 // CreatePod will Create Pod
 func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 	session := sp.Mongo.NewSession()
@@ -263,6 +275,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 
 	var containers []corev1.Container
 	securityContext := generateContainerSecurity(pod)
+	envVars := generateEnvVars(pod)
 	for _, container := range pod.Containers {
 		containers = append(containers, corev1.Container{
 			Name:            container.Name,
@@ -270,6 +283,7 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Command:         container.Command,
 			VolumeMounts:    volumeMounts,
 			SecurityContext: securityContext,
+			Env:             envVars,
 		})
 	}
 

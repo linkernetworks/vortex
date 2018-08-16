@@ -1,6 +1,9 @@
 {
 	"name": "@PODNAME@",
 	"labels":{},
+    "envVars":{
+        "myip":"1.2.3.4"
+    },
 	"namespace":"default",
 	"containers":[
 		{

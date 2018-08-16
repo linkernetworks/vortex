@@ -28,6 +28,11 @@ load init
     [ $status = 0 ]
     [ "$output" = "true" ]
 }
+
+@test "Check Pod Env" {
+    kubectl get pods ${podName} -o jsonpath='{.spec.containers[0].env}' | grep "myip"
+    [ $? = 0 ]
+}
 @test "Delete Pod" {
     run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
     run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
