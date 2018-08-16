@@ -8,8 +8,8 @@ apps:
         glusterfs: false
     replicaCount: 1
     controller:
-      apiserverImageTag: v0.1.13
-      webappImageTag: v0.1.7
+      apiserverImageTag: v0.1.14
+      webappImageTag: v0.1.9
       portalCPU: 50m
       serverCPU: 100m
     service:
@@ -19,7 +19,7 @@ apps:
   # vortex/deploy/helm/apps/charts/network-controller
   network-controller:
     controller:
-      imageTag: v0.4.0
+      imageTag: v0.4.3
       tcpCPU: 50m
       unixCPU: 50m
   # vortex/deploy/helm/apps/charts/prometheus
