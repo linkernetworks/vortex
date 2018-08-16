@@ -24,7 +24,7 @@ make apps.init-helm
 ### Using helm deploy apps
 This will deploy services and apps in your cluster, and please set the CONFIG variable (could be development, production, or testing) right.
 ```
-make CONFIG=development apps.launch
+make apps.launch-dev
 ```
 
 If you wnat to deploy certain chart, you can type
@@ -37,10 +37,10 @@ helm install --debug --wait --set global.environment=local deploy/helm/apps/prom
 
 ### Upgrade the releases
 ```
-make CONFIG=development apps.upgrade
+make apps.upgrade-dev
 ```
 
 ### Delete the releases
 ```
-make CONFIG=development apps.teardown
+make apps.teardown-dev
 ``` 
