@@ -1,7 +1,7 @@
 {
 	"name": "@PODNAME@",
 	"labels":{},
-    "envVars:{},
+    "envVars":{},
 	"namespace":"default",
 	"containers":[
 		{
