@@ -59,7 +59,7 @@ services:
       image:
         tag: 4.1.1-xenial
       pvc:
-        localVolume: true
+        volumeType: local
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
         storageClass: mongo

@@ -106,23 +106,50 @@ apps.init-helm:
 	kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 	kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
-.PHONY: apps.launch
-apps.launch:
-	yq -y .services deploy/helm/config/development.yaml | helm install --name vortex-services --debug --wait -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/development.yaml | helm install --name vortex-apps --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+.PHONY: apps.launch-dev
+apps.launch-dev:
+	yq -y .services deploy/helm/config/development.yaml | helm install --name vortex-services-dev --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm install --name vortex-apps-dev --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
-.PHONY: apps.upgrade
-apps.upgrade:
-	yq -y .services deploy/helm/config/development.yaml | helm upgrade vortex-services --debug -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/development.yaml | helm  upgrade vortex-apps --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+.PHONY: apps.launch-prod
+apps.launch-prod:
+	yq -y .services deploy/helm/config/production.yaml | helm install --name vortex-services-prod --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/production.yaml | helm install --name vortex-apps-prod --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
-.PHONY: apps.teardown
-apps.teardown:
-ifeq ($(UNAME), Linux)
-	helm ls --short | xargs -i helm delete --purge {}
-else ifeq ($(UNAME), Darwin)
-	helm ls --short | xargs helm delete --purge
-endif
+.PHONY: apps.launch-testing
+apps.launch-testing:
+	yq -y .services deploy/helm/config/testing.yaml | helm install --name vortex-services-testing --debug --wait -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/testing.yaml | helm install --name vortex-apps-testing --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+
+.PHONY: apps.upgrade-dev
+apps.upgrade-dev:
+	yq -y .services deploy/helm/config/development.yaml | helm upgrade vortex-services-dev --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/development.yaml | helm  upgrade vortex-apps-dev --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+
+.PHONY: apps.upgrade-prod
+apps.upgrade-prod:
+	yq -y .services deploy/helm/config/production.yaml | helm upgrade vortex-services-prod --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/production.yaml | helm  upgrade vortex-apps-prod --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+
+.PHONY: apps.upgrade-testing
+apps.upgrade-testing:
+	yq -y .services deploy/helm/config/testing.yaml | helm upgrade vortex-services-testing --debug -f - deploy/helm/services
+	yq -y .apps deploy/helm/config/testing.yaml | helm  upgrade vortex-apps-testing --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+
+.PHONY: apps.teardown-dev
+apps.teardown-dev:
+	helm delete --purge vortex-services-dev
+	helm delete --purge vortex-apps-dev
+
+.PHONY: apps.teardown-prod
+apps.teardown-prod:
+	helm delete --purge vortex-services-prod
+	helm delete --purge vortex-apps-prod
+
+.PHONY: apps.teardown-testing
+apps.teardown-testing:
+	helm delete --purge vortex-services-testing
+	helm delete --purge vortex-apps-testing
 
 ## dockerfiles/ ########################################
 

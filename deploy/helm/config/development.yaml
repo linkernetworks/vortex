@@ -59,10 +59,12 @@ services:
       image:
         tag: 4.1.1-xenial
       pvc:
-        localVolume: true
+        volumeType: nfs
+        nfsPath: /nfsshare 
+        nfsServer: 172.17.8.100
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
-        storageClass: mongo
+        storageClass: 
         storage: 1Gi
     service:
       nodePort: true
