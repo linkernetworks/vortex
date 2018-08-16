@@ -64,6 +64,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 		Name:          tName,
 		Namespace:     namespace,
 		Labels:        map[string]string{},
+		EnvVars:       map[string]string{},
 		Containers:    containers,
 		Volumes:       []entity.PodVolume{},
 		Networks:      []entity.PodNetwork{},
