@@ -7,19 +7,27 @@ metadata:
 spec:
   selector:
     service: mongo
-  {{- if .Values.service.nodePort }}
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+
+---
+
+{{- if .Values.service.nodePort }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-external
+  namespace: vortex
+spec:
+  selector:
+    service: mongo
   type: NodePort
   ports:
   - port: 27017
     nodePort: 31717
     targetPort: 27017
     protocol: TCP
-  {{- else }}
-  clusterIP: None
-  type: ClusterIP
-  ports:
-  - port: 27017
-    targetPort: 27017
-  {{- end }}
-
-  
+{{- end }}

@@ -179,7 +179,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 		case "kube_pod_info":
 			pod.PodName = id
 			pod.IP = string(result.Metric["pod_ip"])
-			pod.Node = string(result.Metric["node"])
+			pod.Node = string(result.Metric["exported_node"])
 			pod.Namespace = string(result.Metric["namespace"])
 			pod.CreateByKind = string(result.Metric["created_by_kind"])
 			pod.CreateByName = string(result.Metric["created_by_name"])
@@ -331,7 +331,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		case "kube_pod_container_info":
 			container.Detail.ContainerName = id
 			container.Detail.Pod = string(result.Metric["pod"])
-			container.Detail.Node = string(result.Metric["node"])
+			container.Detail.Node = string(result.Metric["exported_node"])
 			container.Detail.Image = string(result.Metric["image"])
 			container.Detail.Namespace = string(result.Metric["namespace"])
 

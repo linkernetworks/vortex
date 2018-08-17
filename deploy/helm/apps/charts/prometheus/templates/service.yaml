@@ -8,15 +8,27 @@ metadata:
 spec:
   selector:
     app: prometheus
-  {{- if .Values.service.nodePort }}
+  type: ClusterIP
+  ports:
+  - port: 9090
+    targetPort: 9090
+
+---
+
+{{- if .Values.service.nodePort }}
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus-external
+  namespace: vortex
+spec:
+  selector:
+    app: prometheus
   type: NodePort
   ports:
   - port: 9090
     targetPort: 9090
     nodePort: 30003
-  {{- else }}
-  type: ClusterIP
-  ports:
-  - port: 9090
-    targetPort: 9090
-  {{- end }}
+{{- end }}
