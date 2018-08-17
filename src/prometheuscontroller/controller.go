@@ -617,22 +617,25 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		return node, err
 	}
 
-	nic := entity.NICMetrics{}
-	defaultValue, err := strconv.ParseBool(string(results[0].Metric["default"]))
-	if err != nil {
-		return node, err
+	for _, result := range results {
+		nic := entity.NICMetrics{}
+		nic.Type = string(result.Metric["type"])
+		nic.PCIID = string(result.Metric["pci_id"])
+		nic.IP = string(result.Metric["ip_address"])
+		nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
+		defaultValue, err := strconv.ParseBool(string(result.Metric["default"]))
+		if err != nil {
+			return node, err
+		}
+		nic.Default = defaultValue
+		dpdkValue, err := strconv.ParseBool(string(result.Metric["dpdk"]))
+		if err != nil {
+			return node, err
+		}
+		nic.DPDK = dpdkValue
+
+		node.NICs[string(result.Metric["device"])] = nic
 	}
-	nic.Default = defaultValue
-	dpdkValue, err := strconv.ParseBool(string(results[0].Metric["dpdk"]))
-	if err != nil {
-		return node, err
-	}
-	nic.DPDK = dpdkValue
-	nic.Type = string(results[0].Metric["type"])
-	nic.IP = string(results[0].Metric["ip_address"])
-	nic.PCIID = string(results[0].Metric["pci_id"])
-	nic.NICNetworkTraffic = entity.NICNetworkTrafficMetrics{}
-	node.NICs[string(results[0].Metric["device"])] = nic
 
 	// status
 	expression = Expression{}
