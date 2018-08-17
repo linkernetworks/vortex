@@ -21,6 +21,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
+	container.Add(newContainerService(a.ServiceProvider))
 	container.Add(newPodService(a.ServiceProvider))
 	container.Add(newDeploymentService(a.ServiceProvider))
 	container.Add(newServiceService(a.ServiceProvider))
@@ -89,6 +90,13 @@ func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 	return webService
 }
 
+func newContainerService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/containers").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.GET("/logs/{namespace}/{pod}/{id}").To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
+	return webService
+}
+
 func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/pods").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
@@ -142,7 +150,6 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	// container
 	webService.Route(webService.GET("/containers").To(handler.RESTfulServiceHandler(sp, listContainerMetricsHandler)))
 	webService.Route(webService.GET("/containers/{id}").To(handler.RESTfulServiceHandler(sp, getContainerMetricsHandler)))
-	webService.Route(webService.GET("/containers/{namespace}/{pod}/{id}").To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
 	// service
 	webService.Route(webService.GET("/services").To(handler.RESTfulServiceHandler(sp, listServiceMetricsHandler)))
 	webService.Route(webService.GET("/services/{id}").To(handler.RESTfulServiceHandler(sp, getServiceMetricsHandler)))

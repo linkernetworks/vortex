@@ -3,9 +3,10 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/linkernetworks/vortex/src/container"
+	response "github.com/linkernetworks/vortex/src/net/http"
+	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/web"
 )
 
@@ -21,14 +22,38 @@ func getContainerLogsHandler(ctx *web.Context) {
 		refTimestamp = container.NewestTimestamp
 	}
 
-	refLineNum, err := strconv.Atoi(req.QueryParameter("referenceLineNum"))
+	query := query.New(req.Request.URL.Query())
+
+	refLineNum, err := query.Int("referenceLineNum", 0)
 	if err != nil {
-		refLineNum = 0
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
 	}
-	usePreviousLogs := req.QueryParameter("previous") == "true"
-	offsetFrom, err1 := strconv.Atoi(req.QueryParameter("offsetFrom"))
-	offsetTo, err2 := strconv.Atoi(req.QueryParameter("offsetTo"))
-	logFilePosition := req.QueryParameter("logFilePosition")
+
+	tmp, ok := query.Str("previous")
+	usePreviousLogs := tmp == "true"
+	if ok == false {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	logFilePosition, ok := query.Str("logFilePosition")
+	if ok == false {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	offsetFrom, err1 := query.Int("offsetFrom", 0)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	offsetTo, err2 := query.Int("offsetTo", 0)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
 
 	logSelector := container.DefaultSelection
 	if err1 == nil && err2 == nil {
@@ -45,7 +70,7 @@ func getContainerLogsHandler(ctx *web.Context) {
 
 	result, err := container.GetLogDetails(sp, namespace, podID, containerID, logSelector, usePreviousLogs)
 	if err != nil {
-		fmt.Errorf("Failed to get the details of node: %v", err)
+		fmt.Errorf("failed to get the details of node: %v", err)
 		return
 	}
 	resp.WriteHeaderAndEntity(http.StatusOK, result)

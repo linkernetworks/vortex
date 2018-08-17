@@ -4,7 +4,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/kubernetes/dashboard/src/app/backend/resource/logs"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -40,7 +39,7 @@ func mapToLogOptions(container string, logSelector *Selection, previous bool) *v
 		Timestamps: true,
 	}
 
-	if logSelector.LogFilePosition == logs.Beginning {
+	if logSelector.LogFilePosition == Beginning {
 		logOptions.LimitBytes = &byteReadLimit
 	} else {
 		logOptions.TailLines = &lineReadLimit
