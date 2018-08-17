@@ -9,7 +9,7 @@ load init
     #jsonpath="{.status.phase}"
     NEXT_WAIT_TIME=0
     WAIT_LIMIT=40
-    until kubectl get deployments ${deploymentName} -o jsonpath="{.status.phase}" | grep "Running" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
+    until kubectl get deployments ${deploymentName} -o jsonpath="{.status.readyReplicas}" | grep "1" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
        sleep 2
        kubectl get deployments ${deploymentName}
        NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
@@ -24,13 +24,13 @@ load init
 }
 
 @test "Check Deployment Attribute" {
-    run kubectl get deployments ${deploymentName} -o jsonpath='{.spec.hostNetwork}'
+    run kubectl get deployments ${deploymentName} -o jsonpath='{.spec.template.spec.hostNetwork}'
     [ $status = 0 ]
     [ "$output" = "true" ]
 }
 
 @test "Check Deployment Env" {
-    kubectl get deployments ${deploymentName} -o jsonpath='{.spec.containers[0].env}' | grep "myip"
+    kubectl get deployments ${deploymentName} -o jsonpath='{.spec.template.spec.containers[0].env}' | grep "myip"
     [ $? = 0 ]
 }
 @test "Delete Deployment" {

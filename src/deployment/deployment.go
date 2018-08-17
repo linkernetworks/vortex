@@ -314,7 +314,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 					Containers:     containers,
 					Volumes:        volumes,
 					Affinity:       generateAffinity(nodeAffinity),
-					RestartPolicy:  corev1.RestartPolicyNever,
+					RestartPolicy:  corev1.RestartPolicyAlways,
 					HostNetwork:    hostNetwork,
 				},
 			},
