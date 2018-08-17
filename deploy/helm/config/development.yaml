@@ -8,8 +8,8 @@ apps:
         glusterfs: false
     replicaCount: 1
     controller:
-      apiserverImageTag: v0.1.14
-      webappImageTag: v0.1.9
+      apiserverImageTag: v0.1.15
+      webappImageTag: v0.1.10
       portalCPU: 50m
       serverCPU: 100m
     service:

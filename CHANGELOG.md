@@ -1,5 +1,32 @@
 # Change Log
 
+## [v0.1.15](https://github.com/linkernetworks/vortex/tree/v0.1.15) (2018-08-17)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.14...v0.1.15)
+
+**Fixed bugs:**
+
+- When adding ClusterIP service NodePort shouldn't show up in service list [\#253](https://github.com/linkernetworks/vortex/issues/253)
+- Namespace list not showing [\#252](https://github.com/linkernetworks/vortex/issues/252)
+
+**Merged pull requests:**
+
+- \[Bug\] VX-269: Show NICs type [\#254](https://github.com/linkernetworks/vortex/pull/254) ([WakeupTsai](https://github.com/WakeupTsai))
+
+## [v0.1.14](https://github.com/linkernetworks/vortex/tree/v0.1.14) (2018-08-16)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.13...v0.1.14)
+
+**Closed issues:**
+
+- Need a PV for NFS [\#246](https://github.com/linkernetworks/vortex/issues/246)
+
+**Merged pull requests:**
+
+- \[Release\] bump version to v0.1.14 [\#250](https://github.com/linkernetworks/vortex/pull/250) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-268: Use exported\_node to query metric fome node-exporter [\#249](https://github.com/linkernetworks/vortex/pull/249) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] Support the environments for Pod. [\#248](https://github.com/linkernetworks/vortex/pull/248) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-264: Need a PV for NFS \(\#246\) [\#247](https://github.com/linkernetworks/vortex/pull/247) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Release\] johnlin/bump version 0113 [\#245](https://github.com/linkernetworks/vortex/pull/245) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.1.13](https://github.com/linkernetworks/vortex/tree/v0.1.13) (2018-08-14)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.12...v0.1.13)
 
