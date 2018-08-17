@@ -29,8 +29,11 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newMonitoringService(a.ServiceProvider))
 	container.Add(newAppService(a.ServiceProvider))
 	container.Add(newOVSService(a.ServiceProvider))
+	container.Add(newShellService(a.ServiceProvider))
 
+	router.PathPrefix("/v1/sockjs").Handler(CreateAttachHandler("/v1/sockjs"))
 	router.PathPrefix("/v1/").Handler(container)
+
 	return router
 }
 
@@ -184,5 +187,12 @@ func newOVSService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/ovs").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.GET("/portinfos").To(handler.RESTfulServiceHandler(sp, getOVSPortInfoHandler)))
+	return webService
+}
+
+func newShellService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/exec").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.GET("/pod/{namespace}/{pod}/shell/{container}").To(handler.RESTfulServiceHandler(sp, handleExecShell)))
 	return webService
 }
