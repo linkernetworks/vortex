@@ -19,5 +19,5 @@
     "capability": true,
     "networkType": "host",
 	"nodeAffinity": [],
-    "replicas":1
+    "replicas":2
 }

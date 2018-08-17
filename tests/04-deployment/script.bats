@@ -9,7 +9,7 @@ load init
     #jsonpath="{.status.phase}"
     NEXT_WAIT_TIME=0
     WAIT_LIMIT=40
-    until kubectl get deployments ${deploymentName} -o jsonpath="{.status.readyReplicas}" | grep "1" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
+    until kubectl get deployments ${deploymentName} -o jsonpath="{.status.readyReplicas}" | grep "2" || [ $NEXT_WAIT_TIME -eq $WAIT_LIMIT ]; do
        sleep 2
        kubectl get deployments ${deploymentName}
        NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+ 1))
