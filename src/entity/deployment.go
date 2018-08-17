@@ -18,13 +18,6 @@ const (
 	DeploymentCustomNetwork = "custom"
 )
 
-// Container is the structure for init Container info
-type Container struct {
-	Name    string   `bson:"name" json:"name" validate:"required,k8sname"`
-	Image   string   `bson:"image" json:"image" validate:"required"`
-	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
-}
-
 // DeploymentRoute is the structure for add IP routing table
 type DeploymentRoute struct {
 	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
@@ -66,7 +59,7 @@ type Deployment struct {
 	NodeAffinity []string            `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
 	CreatedAt    *time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 
-	Replicas int `bson:"replicas",json:"replicas" validate:"required"`
+	Replicas int32 `bson:"replicas",json:"replicas" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.
