@@ -22,6 +22,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
 	container.Add(newPodService(a.ServiceProvider))
+	container.Add(newDeploymentService(a.ServiceProvider))
 	container.Add(newServiceService(a.ServiceProvider))
 	container.Add(newNamespaceService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
@@ -95,6 +96,16 @@ func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deletePodHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listPodHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getPodHandler)))
+	return webService
+}
+
+func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/deployments").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createDeploymentHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteDeploymentHandler)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listDeploymentHandler)))
+	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getDeploymentHandler)))
 	return webService
 }
 
