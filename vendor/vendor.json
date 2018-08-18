@@ -281,12 +281,6 @@
 			"versionExact": "v0.4.3"
 		},
 		{
-			"checksumSHA1": "gPGlywe21cA6SuD6R1xbTntW1fc=",
-			"path": "github.com/linkernetworks/redis",
-			"revision": "5d54c7e9d23f75032121cf5aaa8b27e8914a5c10",
-			"revisionTime": "2018-06-04T18:46:57Z"
-		},
-		{
 			"checksumSHA1": "8ejg/kxhpSBDPHteEQwFgLqbank=",
 			"path": "github.com/linkernetworks/serviceconfig",
 			"revision": "1a3a6c6228e3e958b2e42535ef173804470f0884",

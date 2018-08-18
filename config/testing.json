@@ -1,11 +1,4 @@
 {
-  "redis": {
-    "host": "localhost",
-    "port": 6379,
-    "public": {
-      "host": "localhost"
-    }
-  },
   "mongo": {
     "url": "mongodb://localhost:27017/vortex_test"
   },
