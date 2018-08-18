@@ -21,9 +21,10 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 
 " Color Theme
-Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'connorholyday/vim-snazzy'
+" Plug 'dracula/vim', { 'as': 'dracula' }
 
-Plug 'rstacruz/sparkup'
+" Plug 'rstacruz/sparkup'
 " Initialize plugin system
 call plug#end()
 
@@ -42,7 +43,7 @@ function! StartUp()
 endfunction
 autocmd VimEnter * call StartUp()
 
-colorscheme dracula
+colorscheme snazzy
 
 set expandtab
 
@@ -52,6 +53,11 @@ set showfulltag showmatch showcmd showmode
 set textwidth=0
 set winaltkeys=no showtabline=2 hlsearch
 set noswapfile
+
+" history
+set history=500
+set shiftround smarttab showcmd noerrorbells nocompatible number expandtab
+set sw=4 ts=4 sts=4
 
 " Trim white space ===========================
 fun! TrimWhitespace()
