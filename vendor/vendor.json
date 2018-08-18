@@ -165,18 +165,6 @@
 			"revisionTime": "2018-06-12T18:59:29Z"
 		},
 		{
-			"checksumSHA1": "w3QCCIYHgZzIXQ+xTl7oLfFrXHs=",
-			"path": "github.com/gomodule/redigo/internal",
-			"revision": "bb5990dc771ab24e169aaea90ee3b9ad50cffce9",
-			"revisionTime": "2018-06-01T13:19:09Z"
-		},
-		{
-			"checksumSHA1": "HgOVOUtWUYHcNe8aipwuEZ7YLow=",
-			"path": "github.com/gomodule/redigo/redis",
-			"revision": "bb5990dc771ab24e169aaea90ee3b9ad50cffce9",
-			"revisionTime": "2018-06-01T13:19:09Z"
-		},
-		{
 			"checksumSHA1": "PKVjAJ/e0p/jWtGpZycgoZBLdb4=",
 			"path": "github.com/google/btree",
 			"revision": "e89373fe6b4a7413d7acd6da1725b83ef713e6e4",
@@ -279,12 +267,6 @@
 			"revisionTime": "2018-08-16T16:19:53Z",
 			"version": "=v0.4.3",
 			"versionExact": "v0.4.3"
-		},
-		{
-			"checksumSHA1": "8ejg/kxhpSBDPHteEQwFgLqbank=",
-			"path": "github.com/linkernetworks/serviceconfig",
-			"revision": "1a3a6c6228e3e958b2e42535ef173804470f0884",
-			"revisionTime": "2018-05-18T07:18:51Z"
 		},
 		{
 			"checksumSHA1": "8bkCE7r0DcTaPDbKbwaI34Bmrbw=",
