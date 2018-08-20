@@ -114,9 +114,6 @@ func newAppService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/apps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createAppHandler)))
-	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteAppHandler)))
-	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listAppHandler)))
-	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getAppHandler)))
 	return webService
 }
 

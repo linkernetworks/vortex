@@ -1,0 +1,38 @@
+{
+    "deployment": {
+        "name": "@DEPLOYMENTNAME@",
+            "labels":{},
+            "envVars":{
+                "myip":"1.2.3.4"
+            },
+            "namespace":"default",
+            "containers":[
+            {
+                "name":"first-container",
+                "image":"busybox",
+                "command":["sleep","3600"]
+            }
+            ],
+            "networks":[
+            ],
+            "volumes":[],
+            "restartPolicy":"Always",
+            "capability": true,
+            "networkType": "host",
+            "nodeAffinity": [],
+            "replicas":2
+    },
+        "service":{
+            "name": "@SERVICENAME@",
+            "namespace":"default",
+            "type":"ClusterIP",
+            "selector":{},
+            "ports":[
+            {
+                "protocol": "TCP",
+                "port": 27017,
+                "targetPort": 27017
+           }
+        ]
+        }
+}

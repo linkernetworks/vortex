@@ -14,11 +14,10 @@ const (
 // Deployment is the structure for deployment info
 type App struct {
 	ID         bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
-	Deployment Deployment    `bson:"deployment" json:"deploymenet" validate:"required"`
+	Deployment Deployment    `bson:"deployment" json:"deployment" validate:"required"`
 	Service    Service       `bson:"service" json:"service" validate:"required"`
 
 	CreatedAt *time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
-	Replicas  int32      `bson:"replicas",json:"replicas" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.
