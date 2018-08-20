@@ -17,7 +17,7 @@
 			"vlanTag":123,
 			"ipAddress":"1.2.3.4",
             "netmask":"255.255.255.0",
-            "routesGw": []
+            "routesGw": [],
             "routeIntf": []
 		},
 		{
@@ -26,7 +26,7 @@
 			"vlanTag":124,
 			"ipAddress":"1.2.4.5",
 			"netmask":"255.255.255.0",
-            "routesGw": []
+            "routesGw": [],
             "routeIntf": []
 		},
 		{
@@ -34,7 +34,7 @@
 			"ifName":"eth15",
 			"ipAddress":"15.2.4.5",
 			"netmask":"255.255.255.0",
-            "routesGw":[]
+            "routesGw":[],
             "routeIntf":[]
 		}
 	],
