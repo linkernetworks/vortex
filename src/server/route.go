@@ -26,6 +26,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newServiceService(a.ServiceProvider))
 	container.Add(newNamespaceService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
+	container.Add(newAppService(a.ServiceProvider))
 
 	router.PathPrefix("/v1/").Handler(container)
 	return router
@@ -106,6 +107,16 @@ func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteDeploymentHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listDeploymentHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getDeploymentHandler)))
+	return webService
+}
+
+func newAppService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/apps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createAppHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteAppHandler)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listAppHandler)))
+	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getAppHandler)))
 	return webService
 }
 
