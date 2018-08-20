@@ -18,10 +18,15 @@ const (
 	DeploymentCustomNetwork = "custom"
 )
 
-// DeploymentRoute is the structure for add IP routing table
-type DeploymentRoute struct {
+// DeploymentRouteGw is the structure for add IP routing table
+type DeploymentRouteGw struct {
 	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
-	Gateway string `bson:"gateway" json:"gateway" validate:"omitempty,ipv4"`
+	Gateway string `bson:"gateway" json:"gateway" validate:"required,ipv4"`
+}
+
+// DeploymentRouteIntf is the structure for add IP routing table via interface
+type DeploymentRouteIntf struct {
+	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
 }
 
 // DeploymentNetwork is the structure for deployment network info
@@ -29,10 +34,11 @@ type DeploymentNetwork struct {
 	Name   string `bson:"name" json:"name" validate:"required"`
 	IfName string `bson:"ifName" json:"ifName" validate:"required"`
 	// can not validate nil
-	VlanTag   *int32            `bson:"vlanTag" json:"vlanTag" validate:"-"`
-	IPAddress string            `bson:"ipAddress" json:"ipAddress" validate:"required,ipv4"`
-	Netmask   string            `bson:"netmask" json:"netmask" validate:"required,ipv4"`
-	Routes    []DeploymentRoute `bson:"routes,omitempty" json:"routes" validate:"required,dive,required"`
+	VlanTag    *int32                `bson:"vlanTag" json:"vlanTag" validate:"-"`
+	IPAddress  string                `bson:"ipAddress" json:"ipAddress" validate:"required,ipv4"`
+	Netmask    string                `bson:"netmask" json:"netmask" validate:"required,ipv4"`
+	RoutesGw   []DeploymentRouteGw   `bson:"routesGw,omitempty" json:"routesGw" validate:"required,dive,required"`
+	RoutesIntf []DeploymentRouteIntf `bson:"routesIntf,omitempty" json:"routesIntf" validate:"required,dive,required"`
 
 	// It's from the entity.Network entity
 	BridgeName string `bson:"bridgeName" json:"bridgeName" validate:"-"`
