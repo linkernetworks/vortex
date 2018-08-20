@@ -30,5 +30,6 @@ func (kc *KubeCtl) GetDeployments(namespace string) ([]*appsv1.Deployment, error
 
 // DeleteDeployment will delete deploy
 func (kc *KubeCtl) DeleteDeployment(name string, namespace string) error {
-	return kc.Clientset.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{})
+	propagation := metav1.DeletePropagationForeground
+	return kc.Clientset.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{PropagationPolicy: &propagation})
 }

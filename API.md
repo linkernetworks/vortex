@@ -29,6 +29,11 @@
     - [List Pods](#list-pods)
     - [Get Pod](#get-pod)
     - [Delete Pod](#delete-pod)
+  - [Deployment](#deploy)
+    - [Create Deployment](#create-deploy)
+    - [List Deployments](#list-deploys)
+    - [Get Deployment](#get-deploy)
+    - [Delete Deployment](#delete-deploy)
   - [Resouce Monitoring](#resouce-monitoring)
     - [List Nodes](#list-nodes)
     - [Get Node](#get-node)
@@ -632,7 +637,7 @@ For each Pod, we have fileds need to handle.
     - Always,OnFailure,Never
 9. networkType: the string options for network type, support "host", "custom" and "cluster".
 10. nodeAffinity: the string array to indicate whchi nodes I want my Pod can run in.
-2. envVars: the environment variables for containers and it's map (string to stirng) form.
+12. envVars: the environment variables for containers and it's map (string to stirng) form.
 
 Example:
 
@@ -655,13 +660,12 @@ Request Data:
       "vlanTag":0,
       "ipAddress":"1.2.3.4",
       "netmask":"255.255.255.0"
-  },
+  }],
   "volumes":[
   ],
   "capability":true,
   "networkType":"host",
   "nodeAffinity":[]
-  ]
 }
 ```
 
@@ -756,6 +760,160 @@ Response Data:
   "message": "Delete success"
 }
 ```
+
+## Deployment
+
+### Create Deployment
+
+**POST /v1/deployments**
+
+For each Deployment, we have fileds need to handle.
+1. name: the name of the Deployment and it should follow the kubernetes yaml rules (Required)
+2. labels: the map (string to stirng) for the kubernetes label
+3. namespace: the namespace of the Deployment.
+4. containers: a array of a container (Required)
+    - name: the name of the container, it also follow kubernetes naming rule.
+    - image: the image of the contaienr.
+    - command: a string array, the command of the container.
+5. volumes: the array of the voluems that we want to mount to Deployment. (Optional)
+    - name: the name of the volume and it should be the volume we created before.
+    - mountPath: the mountPath of the volume and the container can see files under this path.
+6. networks: the array of the network that we want to create in the Deployment (Optional)
+    - name: the name of the network and it should be the network we created before.
+    - ifName: the inteface name you want to create in your container.
+    - vlanTag: the vlan tag for `ifName` interface.
+    - ipADdress: the IPv4 address of the `ifName` interface.
+    - netmask: the IPv4 netmask of the `ifName` interface.
+7. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
+8.
+9. networkType: the string options for network type, support "host", "custom" and "cluster".
+10. nodeAffinity: the string array to indicate whchi nodes I want my Deployment can run in.
+11. envVars: the environment variables for containers and it's map (string to stirng) form.
+12. replicas: the number of the Pods
+
+Example:
+
+Request Data:
+
+```json
+{
+  "name": "awesome",
+  "labels": {},
+  "envVars":{},
+  "containers": [{
+    "name": "busybox",
+    "image": "busybox",
+    "command": ["sleep", "3600"]
+  }],
+  "networks":[
+  {
+      "name":"MyNetwork2",
+      "ifName":"eth12",
+      "vlanTag":0,
+      "ipAddress":"1.2.3.4",
+      "netmask":"255.255.255.0"
+  }],
+  "volumes":[
+  ],
+  "capability":true,
+  "networkType":"host",
+  "nodeAffinity":[],
+  "replicas":1
+}
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Create success"
+}
+```
+
+### List Deployments
+
+**GET /v1/deployments/**
+
+Example:
+
+```
+curl http://localhost:7890/v1/deployments/
+```
+
+Response Data:
+
+```json
+[{
+  "id": "5b459d344807c5707ddad740",
+  "name": "awesome",
+  "containers": [
+   {
+    "name": "busybox",
+    "image": "busybox",
+    "command": [
+     "sleep",
+     "3600"
+    ]
+   }
+  ],
+  "createdAt": "2018-07-11T06:01:24.637Z"
+}]
+```
+
+### Get Deployment
+
+**GET /v1/deployments/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/deployments/5b459d344807c5707ddad740
+```
+
+Response Data:
+
+```json
+{
+  "id": "5b459d344807c5707ddad740",
+  "name": "awesome",
+  "namespace": "default",
+  "labels": null,
+  "containers": [
+   {
+    "name": "busybox",
+    "image": "busybox",
+    "command": [
+     "sleep",
+     "3600"
+    ]
+   }
+  ],
+  "createdAt": "2018-07-11T06:01:24.637Z",
+  "volumes": null,
+  "networks": null
+}
+```
+
+### Delete Deployment
+
+**DELETE /v1/deployments/[id]**
+
+Example:
+
+```
+curl -X DELETE http://localhost:7890/v1/deployments/5b459d344807c5707ddad740
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Delete success"
+}
+```
+
 
 ## Resouce Monitoring
 
