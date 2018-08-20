@@ -9,7 +9,7 @@ apps:
     replicaCount: 1
     controller:
       apiserverImageTag: v0.1.15
-      webappImageTag: v0.1.12
+      webappImageTag: v0.1.13
       portalCPU: 50m
       serverCPU: 100m
     service:
