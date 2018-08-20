@@ -44,8 +44,8 @@ type PodNetwork struct {
 	VlanTag    *int32         `bson:"vlanTag" json:"vlanTag" validate:"-"`
 	IPAddress  string         `bson:"ipAddress" json:"ipAddress" validate:"required,ipv4"`
 	Netmask    string         `bson:"netmask" json:"netmask" validate:"required,ipv4"`
-	RoutesGw   []PodRouteGw   `bson:"routesGw,omitempty" json:"routesGw" validate:"dive"`
-	RoutesIntf []PodRouteIntf `bson:"routesIntf,omitempty" json:"routesIntf" validate:"dive"`
+	RoutesGw   []PodRouteGw   `bson:"routesGw,omitempty" json:"routesGw" validate:"required,dive,required"`
+	RoutesIntf []PodRouteIntf `bson:"routesIntf,omitempty" json:"routesIntf" validate:"required,dive,required"`
 
 	// It's from the entity.Network entity
 	BridgeName string `bson:"bridgeName" json:"bridgeName" validate:"-"`
