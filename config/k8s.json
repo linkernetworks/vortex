@@ -1,18 +1,4 @@
 {
-    "redis": {
-        "host": "redis.default",
-        "port": 6379,
-        "pool": {
-            "maxIdle": 100,
-            "_": "do not limit maxActive connection",
-            "maxActive": 0,
-            "idleTimeout": 60
-        },
-        "public": {
-            "host": "35.189.177.37",
-            "port": 32199
-        }
-    },
     "mongo": {
         "url": "mongodb://mongo.vortex.svc.cluster.local:27017/vortex",
         "public": {

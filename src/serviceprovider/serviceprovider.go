@@ -10,7 +10,6 @@ import (
 	"github.com/linkernetworks/vortex/src/prometheusprovider"
 
 	"github.com/linkernetworks/mongo"
-	"github.com/linkernetworks/redis"
 	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
 
 	"gopkg.in/go-playground/validator.v9"
@@ -23,7 +22,6 @@ import (
 // Container is the structure for container
 type Container struct {
 	Config     config.Config
-	Redis      *redis.Service
 	Mongo      *mongo.Service
 	Prometheus *prometheusprovider.Service
 	KubeCtl    *kubeCtl.KubeCtl
@@ -42,9 +40,6 @@ type Service interface{}
 func New(cf config.Config) *Container {
 	// setup logger configuration
 	logger.Setup(cf.Logger)
-
-	logger.Infof("Connecting to redis: %s", cf.Redis.Addr())
-	redisService := redis.New(cf.Redis)
 
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
@@ -69,7 +64,6 @@ func New(cf config.Config) *Container {
 
 	sp := &Container{
 		Config:     cf,
-		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset),
@@ -83,9 +77,6 @@ func New(cf config.Config) *Container {
 func NewForTesting(cf config.Config) *Container {
 	// setup logger configuration
 	logger.Setup(cf.Logger)
-
-	logger.Infof("Connecting to redis: %s", cf.Redis.Addr())
-	redisService := redis.New(cf.Redis)
 
 	logger.Infof("Connecting to mongodb: %s", cf.Mongo.Url)
 	mongo := mongo.New(cf.Mongo.Url)
@@ -101,7 +92,6 @@ func NewForTesting(cf config.Config) *Container {
 
 	sp := &Container{
 		Config:     cf,
-		Redis:      redisService,
 		Mongo:      mongo,
 		Prometheus: prometheus,
 		KubeCtl:    kubeCtl.New(clientset),
