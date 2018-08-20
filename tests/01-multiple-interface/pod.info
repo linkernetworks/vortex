@@ -18,7 +18,7 @@
 			"ipAddress":"1.2.3.4",
             "netmask":"255.255.255.0",
             "routesGw": [],
-            "routeIntf": []
+            "routesIntf": []
 		},
 		{
 			"name":"@NETWORKNAME@",
@@ -27,7 +27,7 @@
 			"ipAddress":"1.2.4.5",
 			"netmask":"255.255.255.0",
             "routesGw": [],
-            "routeIntf": []
+            "routesIntf": []
 		},
 		{
 			"name":"@NETWORKNAME@",
@@ -35,7 +35,7 @@
 			"ipAddress":"15.2.4.5",
 			"netmask":"255.255.255.0",
             "routesGw":[],
-            "routeIntf":[]
+            "routesIntf":[]
 		}
 	],
 	"volumes":[],
