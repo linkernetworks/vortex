@@ -60,7 +60,7 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
-	pod := entity.Deployment{
+	deploy := entity.Deployment{
 		Name:         tName,
 		Namespace:    namespace,
 		Labels:       map[string]string{},
@@ -73,7 +73,7 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 		NodeAffinity: []string{},
 		Replicas:     1,
 	}
-	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
+	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
@@ -84,15 +84,15 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
-	defer suite.session.Remove(entity.DeploymentCollectionName, "name", pod.Name)
+	defer suite.session.Remove(entity.DeploymentCollectionName, "name", deploy.Name)
 
 	//load data to check
 	retDeployment := entity.Deployment{}
-	err = suite.session.FindOne(entity.DeploymentCollectionName, bson.M{"name": pod.Name}, &retDeployment)
+	err = suite.session.FindOne(entity.DeploymentCollectionName, bson.M{"name": deploy.Name}, &retDeployment)
 	suite.NoError(err)
 	suite.NotEqual("", retDeployment.ID)
-	suite.Equal(pod.Name, retDeployment.Name)
-	suite.Equal(len(pod.Containers), len(retDeployment.Containers))
+	suite.Equal(deploy.Name, retDeployment.Name)
+	suite.Equal(len(deploy.Containers), len(retDeployment.Containers))
 
 	//We use the new write but empty input which will cause the readEntity Error
 	httpWriter = httptest.NewRecorder()
@@ -121,7 +121,7 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFail() {
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
-	pod := entity.Deployment{
+	deploy := entity.Deployment{
 		Name:       tName,
 		Namespace:  namespace,
 		Containers: containers,
@@ -130,7 +130,7 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFail() {
 		},
 	}
 
-	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
+	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
@@ -153,7 +153,7 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
-	pod := entity.Deployment{
+	deploy := entity.Deployment{
 		ID:           bson.NewObjectId(),
 		Name:         tName,
 		Namespace:    namespace,
@@ -164,17 +164,17 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 		Replicas:     1,
 	}
 
-	err := p.CreateDeployment(suite.sp, &pod)
+	err := p.CreateDeployment(suite.sp, &deploy)
 	suite.NoError(err)
 
-	err = suite.session.Insert(entity.DeploymentCollectionName, &pod)
+	err = suite.session.Insert(entity.DeploymentCollectionName, &deploy)
 	suite.NoError(err)
 
-	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
+	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/deployments/"+pod.ID.Hex(), bodyReader)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/deployments/"+deploy.ID.Hex(), bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -182,7 +182,7 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
-	n, err := suite.session.Count(entity.DeploymentCollectionName, bson.M{"_id": pod.ID})
+	n, err := suite.session.Count(entity.DeploymentCollectionName, bson.M{"_id": deploy.ID})
 	suite.NoError(err)
 	suite.Equal(0, n)
 }
@@ -208,7 +208,7 @@ func (suite *DeploymentTestSuite) TestGetDeployment() {
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
-	pod := entity.Deployment{
+	deploy := entity.Deployment{
 		ID:         bson.NewObjectId(),
 		Name:       tName,
 		Namespace:  namespace,
@@ -216,21 +216,21 @@ func (suite *DeploymentTestSuite) TestGetDeployment() {
 	}
 
 	//Create data into mongo manually
-	suite.session.C(entity.DeploymentCollectionName).Insert(pod)
+	suite.session.C(entity.DeploymentCollectionName).Insert(deploy)
 	defer suite.session.Remove(entity.DeploymentCollectionName, "name", tName)
 
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/deployments/"+pod.ID.Hex(), nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/deployments/"+deploy.ID.Hex(), nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
-	pod = entity.Deployment{}
-	err = json.Unmarshal(httpWriter.Body.Bytes(), &pod)
+	deploy = entity.Deployment{}
+	err = json.Unmarshal(httpWriter.Body.Bytes(), &deploy)
 	suite.NoError(err)
-	suite.Equal(tName, pod.Name)
-	suite.Equal(len(containers), len(pod.Containers))
+	suite.Equal(tName, deploy.Name)
+	suite.Equal(len(containers), len(deploy.Containers))
 }
 
 func (suite *DeploymentTestSuite) TestGetDeploymentWithInvalidID() {

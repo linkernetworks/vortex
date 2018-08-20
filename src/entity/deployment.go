@@ -49,7 +49,7 @@ type Deployment struct {
 	ID           bson.ObjectId       `bson:"_id,omitempty" json:"id" validate:"-"`
 	Name         string              `bson:"name" json:"name" validate:"required,k8sname"`
 	Namespace    string              `bson:"namespace" json:"namespace" validate:"required"`
-	Labels       map[string]string   `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,alphanum,endkeys,required,alphanum"`
+	Labels       map[string]string   `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
 	EnvVars      map[string]string   `bson:"envVars,omitempty" json:"envVars" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
 	Containers   []Container         `bson:"containers" json:"containers" validate:"required,dive,required"`
 	Volumes      []DeploymentVolume  `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
