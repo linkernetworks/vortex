@@ -15,7 +15,7 @@ func getContainerLogsHandler(ctx *web.Context) {
 
 	namespace := req.PathParameter("namespace")
 	podID := req.PathParameter("pod")
-	containerID := req.PathParameter("id")
+	containerID := req.PathParameter("container")
 
 	refTimestamp := req.QueryParameter("referenceTimestamp")
 	if refTimestamp == "" {
@@ -30,18 +30,9 @@ func getContainerLogsHandler(ctx *web.Context) {
 		return
 	}
 
-	tmp, ok := query.Str("previous")
+	tmp, _ := query.Str("previous")
 	usePreviousLogs := tmp == "true"
-	if ok == false {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
-
-	logFilePosition, ok := query.Str("logFilePosition")
-	if ok == false {
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
-		return
-	}
+	logFilePosition, _ := query.Str("logFilePosition")
 
 	offsetFrom, err1 := query.Int("offsetFrom", 0)
 	if err != nil {
@@ -71,7 +62,29 @@ func getContainerLogsHandler(ctx *web.Context) {
 	result, err := container.GetLogDetails(sp, namespace, podID, containerID, logSelector, usePreviousLogs)
 	if err != nil {
 		fmt.Errorf("failed to get the details of node: %v", err)
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	resp.WriteHeaderAndEntity(http.StatusOK, result)
+}
+
+func getContainerLogFileHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	namespace := req.PathParameter("namespace")
+	podID := req.PathParameter("pod")
+	containerID := req.PathParameter("container")
+	usePreviousLogs := req.QueryParameter("previous") == "true"
+
+	logStream, err := container.GetLogFile(sp, namespace, podID, containerID, usePreviousLogs)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	err = container.HandleDownload(resp, logStream)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
 }

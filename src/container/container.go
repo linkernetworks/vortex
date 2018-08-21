@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -114,4 +115,14 @@ func ConstructLogDetails(podID string, rawLogs string, container string, logSele
 func isReadLimitReached(bytesLoaded int64, linesLoaded int64, logFilePosition string) bool {
 	return (logFilePosition == Beginning && bytesLoaded >= byteReadLimit) ||
 		(logFilePosition == End && linesLoaded >= lineReadLimit)
+}
+
+func HandleDownload(resp *restful.Response, result io.ReadCloser) error {
+	resp.AddHeader(restful.HEADER_ContentType, "text/plain")
+	defer result.Close()
+	_, err := io.Copy(resp, result)
+	if err != nil {
+		return err
+	}
+	return nil
 }

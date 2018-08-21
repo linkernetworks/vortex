@@ -93,7 +93,8 @@ func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 func newContainerService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/containers").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.GET("/logs/{namespace}/{pod}/{id}").To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
+	webService.Route(webService.GET("/logs/{namespace}/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
+	webService.Route(webService.GET("/logs/file/{namespace}/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerLogFileHandler)))
 	return webService
 }
 
