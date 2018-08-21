@@ -66,7 +66,7 @@ jobs:
           - sudo add-apt-repository ppa:duggan/bats --yes
           - sudo apt-get update -q
           - sudo apt-get install -qqy httpie bats nfs-kernel-server
-          - pip install -U httpie-jwt-auth
+          - sudo pip install -U httpie-jwt-auth
           - mkdir -p /tmp/nfs
           - echo "/tmp/nfs *(rw,sync,no_root_squash)" | sudo tee /etc/exports
           - sudo exportfs -r
