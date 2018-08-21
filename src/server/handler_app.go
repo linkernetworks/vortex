@@ -2,15 +2,12 @@ package server
 
 import (
 	"fmt"
-	"math"
 	"net/http"
-	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/deployment"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
-	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/service"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -34,15 +31,16 @@ func createAppHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	session.C(entity.AppCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"name"},
-		Unique: true,
-	})
 	defer session.Close()
 
 	// Check whether this name has been used
-	p.ID = bson.NewObjectId()
-	p.CreatedAt = timeutils.Now()
+	ID := bson.NewObjectId()
+	p.Deployment.ID = ID
+	p.Service.ID = ID
+
+	time := timeutils.Now()
+	p.Deployment.CreatedAt = time
+	p.Service.CreatedAt = time
 	if err := deployment.CheckDeploymentParameter(sp, &p.Deployment); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
@@ -57,7 +55,6 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
-	//app=test-deployment-7beaa2f71b89499b167
 	p.Service.Selector["app"] = p.Deployment.Name
 	p.Service.Namespace = p.Deployment.Namespace
 	if err := service.CreateService(sp, &p.Service); err != nil {
@@ -69,7 +66,16 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := session.Insert(entity.AppCollectionName, &p); err != nil {
+	if err := session.Insert(entity.DeploymentCollectionName, &p.Deployment); err != nil {
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Deployment.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	if err := session.Insert(entity.ServiceCollectionName, &p.Service); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Deployment.Name))
 		} else {
