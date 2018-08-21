@@ -3,7 +3,7 @@
 load init
 
 @test "Create Deployment" {
-    http -v --check-status 127.0.0.1:7890/v1/deployments < deployment.json
+    http -v --check-status --auth-type=jwt 127.0.0.1:7890/v1/deployments < deployment.json
     [ $? = 0 ]
     #Wait the Deployment
     #jsonpath="{.status.phase}"
@@ -18,7 +18,7 @@ load init
 }
 
 @test "List Deployment" {
-   run bash -c "http http://127.0.0.1:7890/v1/deployments/ 2>/dev/null | jq -r '.[] | select(.name == \"${deploymentName}\").name'"
+   run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/deployments/ 2>/dev/null | jq -r '.[] | select(.name == \"${deploymentName}\").name'"
    [ "$output" = "${deploymentName}" ]
    [ $status = 0 ]
 }
@@ -34,7 +34,7 @@ load init
     [ $? = 0 ]
 }
 @test "Delete Deployment" {
-    run bash -c 'http http://127.0.0.1:7890/v1/deployments/ 2>/dev/null | jq -r ".[0].id"'
-    run http DELETE http://127.0.0.1:7890/v1/deployments/${output} 2>/dev/null
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/deployments/ 2>/dev/null | jq -r ".[0].id"'
+    run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/deployments/${output} 2>/dev/null
     [ $status = 0 ]
 }

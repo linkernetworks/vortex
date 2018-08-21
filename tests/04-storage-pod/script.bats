@@ -3,12 +3,12 @@
 load init
 
 @test "Create Storage" {
-    http -v --check-status 127.0.0.1:7890/v1/storage < storage.json
+    http -v --check-status --auth-type=jwt 127.0.0.1:7890/v1/storage < storage.json
     [ $? = 0 ]
 }
 
 @test "List Storage" {
-    run bash -c 'http http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
     id=${output}
     run kubectl -n vortex get sc nfs-storageclass-${id} -o jsonpath="{.provisioner}"
     [ "$output" = "nfs-provisioner-${id}" ]
@@ -25,12 +25,12 @@ load init
 }
 
 @test "Create Volume" {
-    http -v --check-status 127.0.0.1:7890/v1/volume < volume.json
+    http -v --check-status --auth-type=jwt 127.0.0.1:7890/v1/volume < volume.json
     [ $? = 0 ]
 }
 
 @test "List Volume" {
-    run bash -c 'http http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
     id=${output}
     NEXT_WAIT_TIME=0
     WAIT_LIMIT=40
@@ -44,12 +44,12 @@ load init
 }
 
 @test "Create Pod" {
-    http -v --check-status 127.0.0.1:7890/v1/pods < pod.json
+    http -v --check-status --auth-type=jwt 127.0.0.1:7890/v1/pods < pod.json
     [ $? = 0 ]
 }
 
 @test "List Pod" {
-   run bash -c "http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
+   run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
    [ "$output" = "${podName}" ]
    [ $status = 0 ]
 
@@ -70,19 +70,19 @@ load init
 }
 
 @test "Delete Pod" {
-    run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
-    run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
+    run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
     [ $status = 0 ]
 }
 
 @test "Delete Volume" {
-    run bash -c 'http http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
-    http -v --check-status DELETE http://127.0.0.1:7890/v1/volume/${output}
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/volume/ 2>/dev/null | jq -r ".[0].id"'
+    http -v --check-status --auth-type=jwt DELETE http://127.0.0.1:7890/v1/volume/${output}
     [ $? = 0 ]
 }
 
 @test "Delete Storage" {
-    run bash -c 'http http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
-    http -v --check-status DELETE http://127.0.0.1:7890/v1/storage/${output}
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/storage/ 2>/dev/null | jq -r ".[0].id"'
+    http -v --check-status --auth-type=jwt DELETE http://127.0.0.1:7890/v1/storage/${output}
     [ $? = 0 ]
 }
