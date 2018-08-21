@@ -5,5 +5,5 @@ if [ -z "$podName" ]; then
     rm -rf pod.json
     cp pod.info pod.json
     sed -i  "s/@PODNAME@/${podName}/" pod.json
-    export JWT_AUTH_TOKEN=$(http --check-status http://127.0.0.1:7890/v1/users/signin < credential.json 2>/dev/null | jq -r ".message")
+    export JWT_AUTH_TOKEN=$(http --check-status http://127.0.0.1:7890/v1/users/signin < credential 2>/dev/null | jq -r ".message")
 fi
