@@ -254,22 +254,48 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	bName := namesgenerator.GetRandomName(0)
 	ifName := namesgenerator.GetRandomName(0)
 	podNetwork := entity.PodNetwork{
-		IfName:     ifName,
-		IPAddress:  "1.2.3.4",
-		Netmask:    "255.255.255.0",
+		Name:      "my-net",
+		IfName:    ifName,
+		IPAddress: "1.2.3.4",
+		Netmask:   "255.255.255.0",
+		RoutesGw: []entity.PodRouteGw{
+			{
+				DstCIDR: "192.168.2.0/24",
+				Gateway: "192.168.2.254",
+			},
+		},
+		RoutesIntf: []entity.PodRouteIntf{
+			{
+				DstCIDR: "192.168.3.0/24",
+			},
+		},
 		BridgeName: bName,
 	}
 	command := generateClientCommand(podNetwork)
-	ans := []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24"}
+	ans := []string{
+		"-s=unix:///tmp/vortex.sock",
+		"-b=" + bName,
+		"-n=" + ifName,
+		"-i=1.2.3.4/24",
+		"--route-gw=192.168.2.0/24,192.168.2.254",
+		"--route-intf=192.168.3.0/24",
+	}
 	suite.Equal(ans, command)
 
 	var vlanTag int32
 	vlanTag = 123
 	podNetwork.VlanTag = &vlanTag
 	command = generateClientCommand(podNetwork)
-	ans = []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24", "-v=123"}
+	ans = []string{
+		"-s=unix:///tmp/vortex.sock",
+		"-b=" + bName,
+		"-n=" + ifName,
+		"-i=1.2.3.4/24",
+		"-v=123",
+		"--route-gw=192.168.2.0/24,192.168.2.254",
+		"--route-intf=192.168.3.0/24",
+	}
 	suite.Equal(ans, command)
-
 }
 
 func (suite *PodTestSuite) TestGenerateNetwork() {
