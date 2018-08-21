@@ -571,6 +571,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		case "kube_node_info":
 			node.Detail.Hostname = id
 			node.Detail.KernelVersion = string(result.Metric["kernel_version"])
+			node.Detail.ContainerVersion = strings.Split(string(result.Metric["container_runtime_version"]), "//")[1]
 			node.Detail.KubeproxyVersion = string(result.Metric["kubeproxy_version"])
 			node.Detail.OS = string(result.Metric["os_image"])
 			node.Detail.KubernetesVersion = string(result.Metric["kubelet_version"])
@@ -652,7 +653,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	node.Detail.Status = string(results[0].Metric["condition"])
 
-	// resource
+	// resource reported from kube-state-metrics
 	expression = Expression{}
 	expression.Metrics = []string{
 		"kube_pod_container_resource_limits.*",
@@ -681,6 +682,30 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 		case "kube_pod_container_resource_limits_memory_bytes":
 			node.Resource.MemoryLimits = float32(result.Value)
+		}
+	}
+
+	// resource resported form node-exporter
+	expression = Expression{}
+	expression.Metrics = []string{
+		"node_memory_HugePages_Total",
+		"node_memory_HugePages_Free"}
+	expression.QueryLabels = map[string]string{"node": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	results, err = query(sp, str)
+	if err != nil {
+		return node, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+		case "node_memory_HugePages_Total":
+			node.Resource.MemoryTotalHugepages = float32(result.Value)
+
+		case "node_memory_HugePages_Free":
+			node.Resource.MemoryFreeHugepages = float32(result.Value)
 		}
 	}
 

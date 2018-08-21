@@ -37,16 +37,18 @@ type NICOverviewMetrics struct {
 
 // NodeResourceMetrics is the structure for node resource metrics
 type NodeResourceMetrics struct {
-	CPURequests       float32 `json:"cpuRequests"`
-	CPULimits         float32 `json:"cpuLimits"`
-	MemoryRequests    float32 `json:"memoryRequests"`
-	MemoryLimits      float32 `json:"memoryLimits"`
-	AllocatableCPU    float32 `json:"allocatableCPU"`
-	AllocatableMemory float32 `json:"allocatableMemory"`
-	AllocatablePods   float32 `json:"allocatablePods"`
-	CapacityCPU       float32 `json:"capacityCPU"`
-	CapacityMemory    float32 `json:"capacityMemory"`
-	CapacityPods      float32 `json:"capacityPods"`
+	CPURequests          float32 `json:"cpuRequests"`
+	CPULimits            float32 `json:"cpuLimits"`
+	MemoryRequests       float32 `json:"memoryRequests"`
+	MemoryLimits         float32 `json:"memoryLimits"`
+	MemoryTotalHugepages float32 `json:"memoryTotalHugepages"`
+	MemoryFreeHugepages  float32 `json:"memoryFreeHugepages"`
+	AllocatableCPU       float32 `json:"allocatableCPU"`
+	AllocatableMemory    float32 `json:"allocatableMemory"`
+	AllocatablePods      float32 `json:"allocatablePods"`
+	CapacityCPU          float32 `json:"capacityCPU"`
+	CapacityMemory       float32 `json:"capacityMemory"`
+	CapacityPods         float32 `json:"capacityPods"`
 }
 
 // NodeDetailMetrics is the structure for node detail metrics
@@ -56,6 +58,7 @@ type NodeDetailMetrics struct {
 	Status            string            `json:"status"`
 	OS                string            `json:"os"`
 	KernelVersion     string            `json:"kernelVersion"`
+	ContainerVersion  string            `json:"containerVersion"`
 	KubeproxyVersion  string            `json:"kubeproxyVersion"`
 	KubernetesVersion string            `json:"kubernetesVersion"`
 	Labels            map[string]string `json:"labels"`
