@@ -621,10 +621,10 @@ For each Pod, we have fileds need to handle.
     - ipADdress: the IPv4 address of the `ifName` interface.
     - netmask: the IPv4 netmask of the `ifName` interface.
     - routesGw: a array of route with gateway (Optional)
-        - dstCIDR: destination network cidr for add IP routing table
-        - gateway: the gateway of the interface subnet
+        - dstCIDR(required): destination network cidr for add IP routing table
+        - gateway(required): the gateway of the interface subnet
     - routeIntf: a array of route without gateway (Optional)
-        - dstCIDR: destination network cidr for add IP routing table
+        - dstCIDR(required): destination network cidr for add IP routing table
 7. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
 8. restartPolicy: the attribute how the pod restart is container, it should be a string and only valid for those following strings.
     - Always,OnFailure,Never
