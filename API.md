@@ -637,36 +637,41 @@ Example:
 Request Data:
 
 ```json
-{
-  "name": "awesome",
-  "labels": {},
+{  
+  "name":"awesome",
+  "labels":{},
   "envVars":{},
-  "containers": [{
-    "name": "busybox",
-    "image": "busybox",
-    "command": ["sleep", "3600"]
-  }],
-  "networks":[
-  {
+  "containers":[  
+    {  
+      "name":"busybox",
+      "image":"busybox",
+      "command":[  
+        "sleep",
+        "3600"
+      ]
+    }
+  ],
+  "networks":[  
+    {  
       "name":"MyNetwork2",
       "ifName":"eth12",
       "vlanTag":0,
       "ipAddress":"1.2.3.4",
       "netmask":"255.255.255.0",
-      "routesGw": [
-         {
-            "dstCIDR":"192.168.2.0/24",
-            "gateway":"192.168.2.254"
-         }
+      "routesGw":[  
+        {  
+          "dstCIDR":"192.168.2.0/24",
+          "gateway":"192.168.2.254"
+        }
       ],
-      "routeIntf": [
-         {
-            "dstCIDR":"224.0.0.0/4",
-         }
+      "routeIntf":[  
+        {  
+          "dstCIDR":"224.0.0.0/4"
+        }
       ]
-  },
-  "volumes":[
+    }
   ],
+  "volumes":[],
   "capability":true,
   "networkType":"host",
   "nodeAffinity":[]
