@@ -784,6 +784,11 @@ For each Deployment, we have fileds need to handle.
     - vlanTag: the vlan tag for `ifName` interface.
     - ipADdress: the IPv4 address of the `ifName` interface.
     - netmask: the IPv4 netmask of the `ifName` interface.
+    - routesGw: a array of route with gateway (Optional)
+        - dstCIDR(required): destination network cidr for add IP routing table
+        - gateway(required): the gateway of the interface subnet
+    - routeIntf: a array of route without gateway (Optional)
+        - dstCIDR(required): destination network cidr for add IP routing table
 7. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
 8.
 9. networkType: the string options for network type, support "host", "custom" and "cluster".
@@ -811,7 +816,18 @@ Request Data:
       "ifName":"eth12",
       "vlanTag":0,
       "ipAddress":"1.2.3.4",
-      "netmask":"255.255.255.0"
+      "netmask":"255.255.255.0",
+      "routesGw": [
+         {
+            "dstCIDR":"192.168.2.0/24",
+            "gateway":"192.168.2.254"
+         }
+      ],
+      "routeIntf": [
+         {
+            "dstCIDR":"224.0.0.0/4",
+         }
+      ]
   }],
   "volumes":[
   ],
