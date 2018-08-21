@@ -1,6 +1,6 @@
 {
     "deployment": {
-        "name": "@DEPLOYMENTNAME@",
+        "name": "@APPNAME@",
             "labels":{},
             "envVars":{
                 "myip":"1.2.3.4"
@@ -23,7 +23,7 @@
             "replicas":2
     },
         "service":{
-            "name": "@SERVICENAME@",
+            "name": "@APPNAME@",
             "namespace":"default",
             "type":"ClusterIP",
             "selector":{},

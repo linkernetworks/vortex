@@ -31,6 +31,14 @@ func createAppHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
+	session.C(entity.DeploymentCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"name"},
+		Unique: true,
+	})
+	session.C(entity.ServiceCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"name"},
+		Unique: true,
+	})
 	defer session.Close()
 
 	// Check whether this name has been used
@@ -59,7 +67,7 @@ func createAppHandler(ctx *web.Context) {
 	p.Service.Namespace = p.Deployment.Namespace
 	if err := service.CreateService(sp, &p.Service); err != nil {
 		if errors.IsAlreadyExists(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", p.Service))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", p.Service.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
