@@ -1,5 +1,24 @@
 # Change Log
 
+## [v0.1.16](https://github.com/linkernetworks/vortex/tree/v0.1.16) (2018-08-21)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.15...v0.1.16)
+
+**Fixed bugs:**
+
+- Node's NIC type is empty string caused docker0 show up [\#251](https://github.com/linkernetworks/vortex/issues/251)
+
+**Merged pull requests:**
+
+- \[Task\] add generate commands [\#267](https://github.com/linkernetworks/vortex/pull/267) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-274: Report container created time and which node it is on [\#264](https://github.com/linkernetworks/vortex/pull/264) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-273: Report container version and hugepages resource [\#263](https://github.com/linkernetworks/vortex/pull/263) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] Update deploy route [\#262](https://github.com/linkernetworks/vortex/pull/262) ([sufuf3](https://github.com/sufuf3))
+- \[Task\] Update pod route [\#261](https://github.com/linkernetworks/vortex/pull/261) ([sufuf3](https://github.com/sufuf3))
+- johnlin/remove redis dep [\#260](https://github.com/linkernetworks/vortex/pull/260) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Support the deployment when creating resources. [\#257](https://github.com/linkernetworks/vortex/pull/257) ([hwchiu](https://github.com/hwchiu))
+- \[Upgrade\] upgrade network-controller [\#256](https://github.com/linkernetworks/vortex/pull/256) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] VX-270: Change node to exported\_node [\#255](https://github.com/linkernetworks/vortex/pull/255) ([WakeupTsai](https://github.com/WakeupTsai))
+
 ## [v0.1.15](https://github.com/linkernetworks/vortex/tree/v0.1.15) (2018-08-17)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.14...v0.1.15)
 
