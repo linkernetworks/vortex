@@ -311,7 +311,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMetrics, error) {
 	container := entity.ContainerMetrics{}
 
-	// basic info
+	// basic info from kube-state-metrics
 	expression := Expression{}
 	expression.Metrics = []string{
 		"kube_pod_container_info",
@@ -331,12 +331,36 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		case "kube_pod_container_info":
 			container.Detail.ContainerName = id
 			container.Detail.Pod = string(result.Metric["pod"])
-			container.Detail.Node = string(result.Metric["exported_node"])
 			container.Detail.Image = string(result.Metric["image"])
 			container.Detail.Namespace = string(result.Metric["namespace"])
 
 		case "kube_pod_container_status_restarts_total":
 			container.Status.RestartTime = int(result.Value)
+		}
+	}
+
+	// basic info from cadvisor
+	expression = Expression{}
+	expression.Metrics = []string{
+		"container_start_time_seconds",
+		"container_last_seen"}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
+
+	str = basicExpr(expression.Metrics)
+	str = queryExpr(str, expression.QueryLabels)
+	results, err = query(sp, str)
+	if err != nil {
+		return container, err
+	}
+
+	for _, result := range results {
+		switch result.Metric["__name__"] {
+
+		case "container_last_seen":
+			container.Detail.Node = string(result.Metric["node"])
+
+		case "container_start_time_seconds":
+			container.Detail.CreatedAt = int(result.Value)
 		}
 	}
 
