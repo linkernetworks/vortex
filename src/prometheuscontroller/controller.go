@@ -311,7 +311,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMetrics, error) {
 	container := entity.ContainerMetrics{}
 
-	// basic info
+	// basic info from kube-state-metrics
 	expression := Expression{}
 	expression.Metrics = []string{
 		"kube_pod_container_info",
@@ -339,7 +339,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
-	// created at
+	// basic info from cadvisor
 	expression = Expression{}
 	expression.Metrics = []string{
 		"container_start_time_seconds",
