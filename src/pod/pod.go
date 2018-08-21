@@ -106,12 +106,14 @@ func generateClientCommand(network entity.PodNetwork) (command []string) {
 	if network.VlanTag != nil {
 		command = append(command, "-v="+strconv.Itoa((int)(*network.VlanTag)))
 	}
-	if len(network.Routes) != 0 {
-		// Support one command with one add route in first version
-		if network.Routes[0].Gateway != "" {
-			command = append(command, "--net="+network.Routes[0].DstCIDR, "-g="+network.Routes[0].Gateway)
-		} else {
-			command = append(command, "--net="+network.Routes[0].DstCIDR)
+	if len(network.RoutesGw) != 0 {
+		for _, netroute := range network.RoutesGw {
+			command = append(command, "--route-gw="+netroute.DstCIDR+","+netroute.Gateway)
+		}
+	}
+	if len(network.RoutesIntf) != 0 {
+		for _, netroute := range network.RoutesIntf {
+			command = append(command, "--route-intf="+netroute.DstCIDR)
 		}
 	}
 	return
@@ -123,7 +125,7 @@ func generateInitContainer(networks []entity.PodNetwork) ([]corev1.Container, er
 	for i, v := range networks {
 		containers = append(containers, corev1.Container{
 			Name:    fmt.Sprintf("init-network-client-%d", i),
-			Image:   "sdnvortex/network-controller:v0.4.0",
+			Image:   "sdnvortex/network-controller:v0.4.3",
 			Command: []string{"/go/bin/client"},
 			Args:    generateClientCommand(v),
 			Env: []corev1.EnvVar{

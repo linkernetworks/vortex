@@ -25,10 +25,15 @@ type Container struct {
 	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
 }
 
-// PodRoute is the structure for add IP routing table
-type PodRoute struct {
+// PodRouteGw is the structure for add IP routing table with gateway
+type PodRouteGw struct {
 	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
-	Gateway string `bson:"gateway" json:"gateway" validate:"omitempty,ipv4"`
+	Gateway string `bson:"gateway" json:"gateway" validate:"required,ipv4"`
+}
+
+// PodRouteIntf is the structure for add IP routing table via interface
+type PodRouteIntf struct {
+	DstCIDR string `bson:"dstCIDR" json:"dstCIDR" validate:"required,cidrv4"`
 }
 
 // PodNetwork is the structure for pod network info
@@ -36,10 +41,11 @@ type PodNetwork struct {
 	Name   string `bson:"name" json:"name" validate:"required"`
 	IfName string `bson:"ifName" json:"ifName" validate:"required"`
 	// can not validate nil
-	VlanTag   *int32     `bson:"vlanTag" json:"vlanTag" validate:"-"`
-	IPAddress string     `bson:"ipAddress" json:"ipAddress" validate:"required,ipv4"`
-	Netmask   string     `bson:"netmask" json:"netmask" validate:"required,ipv4"`
-	Routes    []PodRoute `bson:"routes,omitempty" json:"routes" validate:"required,dive,required"`
+	VlanTag    *int32         `bson:"vlanTag" json:"vlanTag" validate:"-"`
+	IPAddress  string         `bson:"ipAddress" json:"ipAddress" validate:"required,ipv4"`
+	Netmask    string         `bson:"netmask" json:"netmask" validate:"required,ipv4"`
+	RoutesGw   []PodRouteGw   `bson:"routesGw,omitempty" json:"routesGw" validate:"required,dive,required"`
+	RoutesIntf []PodRouteIntf `bson:"routesIntf,omitempty" json:"routesIntf" validate:"required,dive,required"`
 
 	// It's from the entity.Network entity
 	BridgeName string `bson:"bridgeName" json:"bridgeName" validate:"-"`
