@@ -30,13 +30,13 @@ load init
 }
 
 @test "Check Deployment Label" {
-    run kubectl get deployment ${appName} -o jsonpath="{.spec.template.metadata.labels.app}"
+    run kubectl get deployment ${appName} -o jsonpath="{.spec.template.metadata.labels.vortex}"
     [ "$output" = "${appName}" ]
     [ $status = 0 ]
 }
 
 @test "Check Service Selector" {
-    run kubectl get svc ${appName} -o jsonpath="{.spec.selector.app}"
+    run kubectl get svc ${appName} -o jsonpath="{.spec.selector.vortex}"
     [ "$output" = "${appName}" ]
     [ $status = 0 ]
 }

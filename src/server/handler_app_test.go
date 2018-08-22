@@ -92,7 +92,7 @@ func (suite *AppTestSuite) TestCreateApp() {
 		Ports:     ports,
 	}
 
-	app := entity.App{
+	app := entity.Application{
 		Deployment: deploy,
 		Service:    service,
 	}

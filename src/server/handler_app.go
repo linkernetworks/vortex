@@ -19,7 +19,7 @@ import (
 func createAppHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	p := entity.App{}
+	p := entity.Application{}
 	if err := req.ReadEntity(&p); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
@@ -41,10 +41,8 @@ func createAppHandler(ctx *web.Context) {
 	})
 	defer session.Close()
 
-	// Check whether this name has been used
-	ID := bson.NewObjectId()
-	p.Deployment.ID = ID
-	p.Service.ID = ID
+	p.Deployment.ID = bson.NewObjectId()
+	p.Service.ID = bson.NewObjectId()
 
 	time := timeutils.Now()
 	p.Deployment.CreatedAt = time
@@ -54,6 +52,11 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
+	//Bond to same namespace
+	p.Service.Namespace = p.Deployment.Namespace
+
+	//We use the application label for deployment and service
+	p.Service.Selector[deployment.DefaultLabel] = p.Deployment.Name
 	if err := deployment.CreateDeployment(sp, &p.Deployment); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Deployment.Name))
@@ -63,8 +66,6 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
-	p.Service.Selector["app"] = p.Deployment.Name
-	p.Service.Namespace = p.Deployment.Namespace
 	if err := service.CreateService(sp, &p.Service); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", p.Service.Name))
@@ -85,7 +86,7 @@ func createAppHandler(ctx *web.Context) {
 
 	if err := session.Insert(entity.ServiceCollectionName, &p.Service); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Deployment.Name))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", p.Service.Name))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
