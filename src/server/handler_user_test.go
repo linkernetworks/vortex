@@ -56,7 +56,7 @@ func (suite *UserTestSuite) TestSignUpUser() {
 			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		FirstName:   "John",
 		LastName:    "Doe",
 		PhoneNumber: "0900000000",
@@ -80,7 +80,7 @@ func (suite *UserTestSuite) TestSignUpUser() {
 	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.username": user.LoginCredential.Username}, &retUser)
 	suite.NoError(err)
 	suite.NotEqual("", retUser.ID)
-	suite.Equal(user.Username, retUser.Username)
+	suite.Equal(user.DisplayName, retUser.DisplayName)
 	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 	// sign up always get the role of user
 	suite.Equal("user", retUser.Role)
@@ -95,7 +95,7 @@ func (suite *UserTestSuite) TestSignUpFailedUser() {
 			Username: sameUsername,
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		FirstName:   "John",
 		LastName:    "Doe",
 		PhoneNumber: "0900000000",
@@ -108,7 +108,7 @@ func (suite *UserTestSuite) TestSignUpFailedUser() {
 			Username: sameUsername,
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		FirstName:   "John",
 		LastName:    "Doe",
 		PhoneNumber: "0900000000",
@@ -137,7 +137,7 @@ func (suite *UserTestSuite) TestSignInUser() {
 	user := entity.User{
 		ID:              bson.NewObjectId(),
 		LoginCredential: userCred,
-		Username:        "John Doe",
+		DisplayName:     "John Doe",
 		FirstName:       "John",
 		LastName:        "Doe",
 		PhoneNumber:     "0900000000",
@@ -196,7 +196,7 @@ func (suite *UserTestSuite) TestCreateUser() {
 			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		Role:        "root",
 		FirstName:   "John",
 		LastName:    "Doe",
@@ -222,7 +222,7 @@ func (suite *UserTestSuite) TestCreateUser() {
 	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.username": user.LoginCredential.Username}, &retUser)
 	suite.NoError(err)
 	suite.NotEqual("", retUser.ID)
-	suite.Equal(user.Username, retUser.Username)
+	suite.Equal(user.DisplayName, retUser.DisplayName)
 	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 
 	// We use the new write but empty input which will cause the readEntity Error
@@ -273,7 +273,7 @@ func (suite *UserTestSuite) TestDeleteUser() {
 			Username: "hello@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		Role:        "root",
 		FirstName:   "John",
 		LastName:    "Doe",
@@ -319,7 +319,7 @@ func (suite *UserTestSuite) TestGetUser() {
 			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		Role:        "root",
 		FirstName:   "John",
 		LastName:    "Doe",
@@ -340,7 +340,7 @@ func (suite *UserTestSuite) TestGetUser() {
 	retUser := entity.User{}
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retUser)
 	suite.NoError(err)
-	suite.Equal(user.Username, retUser.Username)
+	suite.Equal(user.DisplayName, retUser.DisplayName)
 	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 }
 
@@ -364,7 +364,7 @@ func (suite *UserTestSuite) TestListUser() {
 				Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 				Password: "p@ssw0rd",
 			},
-			Username:    "John Doe",
+			DisplayName: "John Doe",
 			Role:        "root",
 			FirstName:   "John",
 			LastName:    "Doe",
@@ -413,7 +413,7 @@ func (suite *UserTestSuite) TestListUser() {
 			_, retUsers = retUsers[0], retUsers[1:]
 			suite.Equal(tc.expectSize, len(retUsers))
 			for i, u := range retUsers {
-				suite.Equal(users[i].Username, u.Username)
+				suite.Equal(users[i].DisplayName, u.DisplayName)
 				suite.Equal(users[i].LoginCredential.Username, u.LoginCredential.Username)
 			}
 		})
