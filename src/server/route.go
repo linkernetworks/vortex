@@ -21,6 +21,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newNetworkService(a.ServiceProvider))
 	container.Add(newStorageService(a.ServiceProvider))
 	container.Add(newVolumeService(a.ServiceProvider))
+	container.Add(newContainerService(a.ServiceProvider))
 	container.Add(newPodService(a.ServiceProvider))
 	container.Add(newDeploymentService(a.ServiceProvider))
 	container.Add(newServiceService(a.ServiceProvider))
@@ -86,6 +87,14 @@ func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createVolume)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteVolume)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listVolume)))
+	return webService
+}
+
+func newContainerService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/containers").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Route(webService.GET("/logs/{namespace}/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
+	webService.Route(webService.GET("/logs/file/{namespace}/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerLogFileHandler)))
 	return webService
 }
 
