@@ -595,7 +595,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 		case "kube_node_info":
 			node.Detail.Hostname = id
 			node.Detail.KernelVersion = string(result.Metric["kernel_version"])
-			node.Detail.ContainerVersion = strings.Split(string(result.Metric["container_runtime_version"]), "//")[1]
+			node.Detail.DockerVersion = strings.Split(string(result.Metric["container_runtime_version"]), "//")[1]
 			node.Detail.KubeproxyVersion = string(result.Metric["kubeproxy_version"])
 			node.Detail.OS = string(result.Metric["os_image"])
 			node.Detail.KubernetesVersion = string(result.Metric["kubelet_version"])
@@ -713,7 +713,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	expression = Expression{}
 	expression.Metrics = []string{
 		"node_memory_HugePages_Total",
-		"node_memory_HugePages_Free"}
+		"node_memory_HugePages_Free",
+		"node_memory_Hugepagesize_bytes"}
 	expression.QueryLabels = map[string]string{"node": id}
 
 	str = basicExpr(expression.Metrics)
@@ -730,6 +731,9 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 		case "node_memory_HugePages_Free":
 			node.Resource.MemoryFreeHugepages = float32(result.Value)
+
+		case "node_memory_Hugepagesize_bytes":
+			node.Resource.MemoryHugepageSize = float32(result.Value)
 		}
 	}
 
