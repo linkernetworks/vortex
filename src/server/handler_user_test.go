@@ -53,7 +53,7 @@ func (suite *UserTestSuite) TestSignUpUser() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -73,26 +73,26 @@ func (suite *UserTestSuite) TestSignUpUser() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
 
 	// load data to check
 	retUser := entity.User{}
-	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.email": user.LoginCredential.Email}, &retUser)
+	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.username": user.LoginCredential.Username}, &retUser)
 	suite.NoError(err)
 	suite.NotEqual("", retUser.ID)
 	suite.Equal(user.Username, retUser.Username)
-	suite.Equal(user.LoginCredential.Email, retUser.LoginCredential.Email)
+	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 	// sign up always get the role of user
 	suite.Equal("user", retUser.Role)
 }
 
 func (suite *UserTestSuite) TestSignUpFailedUser() {
-	sameEmail := namesgenerator.GetRandomName(0) + "@linkernetworks.com"
+	sameUsername := namesgenerator.GetRandomName(0) + "@linkernetworks.com"
 	// given a user already in mongodb
 	userFirst := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    sameEmail,
+			Username: sameUsername,
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -105,7 +105,7 @@ func (suite *UserTestSuite) TestSignUpFailedUser() {
 	userSecond := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    sameEmail,
+			Username: sameUsername,
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -125,13 +125,13 @@ func (suite *UserTestSuite) TestSignUpFailedUser() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", sameEmail)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", sameUsername)
 }
 
 func (suite *UserTestSuite) TestSignInUser() {
 	// given a user already in signup
 	userCred := entity.LoginCredential{
-		Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+		Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 		Password: "p@ssw0rd",
 	}
 	user := entity.User{
@@ -154,7 +154,7 @@ func (suite *UserTestSuite) TestSignInUser() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
 
 	// do Sign In
 	bodyBytesSignIn, err := json.MarshalIndent(userCred, "", "  ")
@@ -172,7 +172,7 @@ func (suite *UserTestSuite) TestSignInUser() {
 
 func (suite *UserTestSuite) TestSignInFailedUser() {
 	userCred := entity.LoginCredential{
-		Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+		Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 		Password: "p@ssw0rd",
 	}
 
@@ -193,7 +193,7 @@ func (suite *UserTestSuite) TestCreateUser() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -215,21 +215,21 @@ func (suite *UserTestSuite) TestCreateUser() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
 
 	// load data to check
 	retUser := entity.User{}
-	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.email": user.LoginCredential.Email}, &retUser)
+	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.username": user.LoginCredential.Username}, &retUser)
 	suite.NoError(err)
 	suite.NotEqual("", retUser.ID)
 	suite.Equal(user.Username, retUser.Username)
-	suite.Equal(user.LoginCredential.Email, retUser.LoginCredential.Email)
+	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 
 	// We use the new write but empty input which will cause the readEntity Error
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
-	// Create again and it should fail since the email exist
+	// Create again and it should fail since the username exist
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/users", bodyReader)
 	suite.NoError(err)
@@ -243,7 +243,7 @@ func (suite *UserTestSuite) TestCreateUserFail() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    "hello@linkernetworks.com",
+			Username: "hello@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
 		Role:        "root",
@@ -270,7 +270,7 @@ func (suite *UserTestSuite) TestDeleteUser() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    "hello@linkernetworks.com",
+			Username: "hello@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -282,7 +282,7 @@ func (suite *UserTestSuite) TestDeleteUser() {
 	}
 
 	suite.session.Insert(entity.UserCollectionName, &user)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
 
 	bodyBytes, err := json.MarshalIndent(user, "", "  ")
 	suite.NoError(err)
@@ -316,7 +316,7 @@ func (suite *UserTestSuite) TestGetUser() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+			Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 			Password: "p@ssw0rd",
 		},
 		Username:    "John Doe",
@@ -328,7 +328,7 @@ func (suite *UserTestSuite) TestGetUser() {
 	}
 	// Create data into mongo manually
 	suite.session.Insert(entity.UserCollectionName, &user)
-	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", user.LoginCredential.Email)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/users/"+user.ID.Hex(), nil)
 	suite.NoError(err)
@@ -341,7 +341,7 @@ func (suite *UserTestSuite) TestGetUser() {
 	err = json.Unmarshal(httpWriter.Body.Bytes(), &retUser)
 	suite.NoError(err)
 	suite.Equal(user.Username, retUser.Username)
-	suite.Equal(user.LoginCredential.Email, retUser.LoginCredential.Email)
+	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 }
 
 func (suite *UserTestSuite) TestGetUserWithInvalidID() {
@@ -361,7 +361,7 @@ func (suite *UserTestSuite) TestListUser() {
 		users = append(users, entity.User{
 			ID: bson.NewObjectId(),
 			LoginCredential: entity.LoginCredential{
-				Email:    namesgenerator.GetRandomName(0) + "@linkernetworks.com",
+				Username: namesgenerator.GetRandomName(0) + "@linkernetworks.com",
 				Password: "p@ssw0rd",
 			},
 			Username:    "John Doe",
@@ -376,7 +376,7 @@ func (suite *UserTestSuite) TestListUser() {
 	for _, u := range users {
 		err := suite.session.Insert(entity.UserCollectionName, &u)
 		suite.NoError(err)
-		defer suite.session.Remove(entity.UserCollectionName, "loginCredential.email", u.LoginCredential.Email)
+		defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", u.LoginCredential.Username)
 	}
 
 	testCases := []struct {
@@ -414,7 +414,7 @@ func (suite *UserTestSuite) TestListUser() {
 			suite.Equal(tc.expectSize, len(retUsers))
 			for i, u := range retUsers {
 				suite.Equal(users[i].Username, u.Username)
-				suite.Equal(users[i].LoginCredential.Email, u.LoginCredential.Email)
+				suite.Equal(users[i].LoginCredential.Username, u.LoginCredential.Username)
 			}
 		})
 	}

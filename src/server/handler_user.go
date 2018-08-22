@@ -37,7 +37,7 @@ func signUpUserHandler(ctx *web.Context) {
 	}
 	user.LoginCredential.Password = encryptedPassword
 
-	user.LoginCredential.Email = strings.ToLower(user.LoginCredential.Email)
+	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 
 	// sign up user only can ba the role of user
 	user.Role = "user"
@@ -48,9 +48,9 @@ func signUpUserHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	// make email to be a unique key
+	// make username(email) to be a unique key
 	session.C(entity.UserCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"loginCredential.email"},
+		Key:    []string{"loginCredential.username"},
 		Unique: true,
 	})
 	defer session.Close()
@@ -60,7 +60,7 @@ func signUpUserHandler(ctx *web.Context) {
 
 	if err := session.Insert(entity.UserCollectionName, &user); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Email: %s already existed", user.LoginCredential.Email))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Username: %s already existed", user.LoginCredential.Username))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -135,7 +135,7 @@ func createUserHandler(ctx *web.Context) {
 	}
 	user.LoginCredential.Password = encryptedPassword
 
-	user.LoginCredential.Email = strings.ToLower(user.LoginCredential.Email)
+	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 
 	if err := sp.Validator.Struct(user); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
@@ -143,9 +143,9 @@ func createUserHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	// make email to be a unique key
+	// make username(email) to be a unique key
 	session.C(entity.UserCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"loginCredential.email"},
+		Key:    []string{"loginCredential.username"},
 		Unique: true,
 	})
 	defer session.Close()
@@ -155,7 +155,7 @@ func createUserHandler(ctx *web.Context) {
 
 	if err := session.Insert(entity.UserCollectionName, &user); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Email: %s already existed", user.LoginCredential.Email))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Username: %s already existed", user.LoginCredential.Username))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}

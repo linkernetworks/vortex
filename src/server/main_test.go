@@ -29,10 +29,10 @@ func init() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    "test@linkernetworks.com",
+			Username: "test@linkernetworks.com",
 			Password: "test",
 		},
-		Username:    "John Doe",
+		Display:     "John Doe",
 		Role:        "root",
 		FirstName:   "John",
 		LastName:    "Doe",

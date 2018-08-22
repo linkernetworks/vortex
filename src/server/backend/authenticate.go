@@ -16,7 +16,7 @@ func Authenticate(session *mongo.Session, credential entity.LoginCredential) (en
 	authenticatedUser := entity.User{}
 	if err := session.FindOne(
 		entity.UserCollectionName,
-		bson.M{"loginCredential.email": credential.Email},
+		bson.M{"loginCredential.username": credential.Username},
 		&authenticatedUser,
 	); err != nil {
 		return entity.User{}, false, err

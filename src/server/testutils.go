@@ -18,7 +18,7 @@ func loginGetToken(sp *serviceprovider.Container, wc *restful.Container) (string
 
 	var resp response.ActionResponse
 	userCred := entity.LoginCredential{
-		Email:    "test@linkernetworks.com",
+		Username: "test@linkernetworks.com",
 		Password: "test",
 	}
 
