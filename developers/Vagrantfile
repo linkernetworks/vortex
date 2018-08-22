@@ -16,6 +16,7 @@ sudo mkdir -p "/etc/systemd/system/docker.service.d/"
 sudo cp "/tmp/override.conf" "/etc/systemd/system/docker.service.d/override.conf"
 sudo apt-get update
 sudo apt-get install -y git build-essential nfs-common ntp jq bats httpie
+sudo pip install httpie-jwt-auth
 
 # Install Docker
 # kubernetes official max validated version: 17.03.2~ce-0~ubuntu-xenial
