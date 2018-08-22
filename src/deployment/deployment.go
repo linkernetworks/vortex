@@ -20,6 +20,7 @@ var allCapabilities = []corev1.Capability{"NET_ADMIN", "SYS_ADMIN", "NET_RAW"}
 
 // VolumeNamePrefix will set prefix of volumename
 const VolumeNamePrefix = "volume-"
+const DefaultLabel = "vortex"
 
 // CheckDeploymentParameter will Check Deployment's Parameter
 func CheckDeploymentParameter(sp *serviceprovider.Container, deploy *entity.Deployment) error {
@@ -298,7 +299,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": deploy.Name,
+					DefaultLabel: deploy.Name,
 				},
 			},
 			Replicas: &deploy.Replicas,
@@ -308,7 +309,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": deploy.Name,
+						DefaultLabel: deploy.Name,
 					},
 				},
 				Spec: corev1.PodSpec{
