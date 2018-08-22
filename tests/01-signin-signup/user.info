@@ -3,7 +3,7 @@
     "username":"testuser@linkernetworks.com",
     "password":"p@ssw0rd"
   },
-  "username":"John Doe",
+  "displayName":"John Doe",
   "firstName":"John",
   "lastName":"Doe",
   "phoneNumber":"0911111111"
