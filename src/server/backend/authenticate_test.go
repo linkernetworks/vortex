@@ -55,7 +55,7 @@ func (suite *AuthenticateTestSuite) SetupSuite() {
 func (suite *AuthenticateTestSuite) TearDownSuite() {
 	suite.session.Remove(
 		entity.UserCollectionName,
-		"loginCredential.email",
+		"loginCredential.username",
 		"auth@linkernetworks.com",
 	)
 }

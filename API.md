@@ -72,10 +72,10 @@ Example:
 ```json
 {
   "loginCredential":{
-    "email":"guest@linkernetworks.com",
+    "username":"guest@linkernetworks.com",
     "password":"password"
   },
-  "username":"John Doe",
+  "displayName":"John Doe",
   "firstName":"John",
   "lastName":"Doe",
   "phoneNumber":"0911111111"
@@ -90,10 +90,10 @@ Response Data:
     "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
     "jwt": "",
     "loginCredential": {
-        "email": "guest@linkernetworks.com",
+        "username": "guest@linkernetworks.com",
         "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
     },
-    "username": "John Doe",
+    "displayName": "John Doe",
     "role": "user",
     "firstName": "John",
     "lastName": "Doe",
@@ -110,7 +110,7 @@ Example:
 
 ```json
 {
-    "email":"hello@linkernetworks.com",
+    "username":"hello@linkernetworks.com",
     "password":"password"
 }
 ```
@@ -135,11 +135,11 @@ role can only be "root", "user", "guest".
 ```json
 {
   "loginCredential":{
-    "email":"guest@linkernetworks.com",
+    "username":"guest@linkernetworks.com",
     "password":"password"
   },
   "role": "guest",
-  "username":"John Doe",
+  "displayName":"John Doe",
   "firstName":"John",
   "lastName":"Doe",
   "phoneNumber":"0911111111"
@@ -154,10 +154,10 @@ Response Data:
     "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
     "jwt": "",
     "loginCredential": {
-        "email": "guest@linkernetworks.com",
+        "username": "guest@linkernetworks.com",
         "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
     },
-    "username": "John Doe",
+    "displayName": "John Doe",
     "role": "guest",
     "firstName": "John",
     "lastName": "Doe",
@@ -184,10 +184,10 @@ Response Data:
         "uuid": "52870ee9-4bfd-44ea-8cca-a9ce7826b1bd",
         "jwt": "",
         "loginCredential": {
-            "email": "root@linkernetworks.com",
+            "username": "root@linkernetworks.com",
             "password": "$2a$14$CQasyFUsBuqwmmpk/i9t9.9j2BTyPzK3PyWATMgb/7g8do57c9oHe"
         },
-        "username": "John Doe",
+        "displayName": "John Doe",
         "role": "root",
         "firstName": "John",
         "lastName": "Doe",
@@ -199,10 +199,10 @@ Response Data:
         "uuid": "a4604f7d-06a8-4226-9792-765e72b14f9c",
         "jwt": "",
         "loginCredential": {
-            "email": "user@linkernetworks.com",
+            "username": "user@linkernetworks.com",
             "password": "$2a$14$SzULcUvWqsCy6XeelPdsRutCDJkdsrM4mi2HXpXPEaEugV.jJsMNC"
         },
-        "username": "John Doe",
+        "displayName": "John Doe",
         "role": "user",
         "firstName": "John",
         "lastName": "Doe",
@@ -214,10 +214,10 @@ Response Data:
         "uuid": "44b4646a-d009-457c-9fdd-1cc0bf226543",
         "jwt": "",
         "loginCredential": {
-            "email": "guest@linkernetworks.com",
+            "username": "guest@linkernetworks.com",
             "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
         },
-        "username": "John Doe",
+        "displayName": "John Doe",
         "role": "guest",
         "firstName": "John",
         "lastName": "Doe",
