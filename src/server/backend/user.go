@@ -6,11 +6,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func FindUserByUUID(session *mongo.Session, uuid string) (entity.User, error) {
+func FindUserByID(session *mongo.Session, ID bson.ObjectId) (entity.User, error) {
 	var user entity.User
 	if err := session.FindOne(
 		entity.UserCollectionName,
-		bson.M{"uuid": uuid},
+		bson.M{"_id": ID},
 		&user,
 	); err != nil {
 		return entity.User{}, err

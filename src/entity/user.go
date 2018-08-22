@@ -26,8 +26,6 @@ type LoginCredential struct {
 // User is the structure for user info
 type User struct {
 	ID              bson.ObjectId   `bson:"_id,omitempty" json:"id" validate:"-"`
-	UUID            string          `bson:"uuid" json:"uuid" validate:"required,uuid4"`
-	JWT             string          `bson:"jwt" json:"jwt" validate:"-"`
 	LoginCredential LoginCredential `bson:"loginCredential" json:"loginCredential" validate:"required"`
 	DisplayName     string          `bson:"displayName" json:"displayName" validate:"required"`
 	Role            string          `bson:"role" json:"role" validate:"required,eq=root|eq=user|eq=guest"`

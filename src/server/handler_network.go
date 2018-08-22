@@ -21,7 +21,7 @@ import (
 
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	uuid, ok := req.Attribute("UserID").(string)
+	mgoID, ok := req.Attribute("UserID").(string)
 	if !ok {
 		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
@@ -63,7 +63,7 @@ func createNetworkHandler(ctx *web.Context) {
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
 	// create by who
-	user, err := backend.FindUserByUUID(session, uuid)
+	user, err := backend.FindUserByID(session, bson.ObjectId(mgoID))
 	if err != nil {
 		switch err {
 		case mgo.ErrNotFound:

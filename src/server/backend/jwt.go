@@ -7,7 +7,7 @@ import (
 )
 
 // GenerateToken is for generating token
-func GenerateToken(userUUID string, role string) (string, error) {
+func GenerateToken(userID string, role string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims{
 		// issuer of the claim
@@ -17,7 +17,7 @@ func GenerateToken(userUUID string, role string) (string, error) {
 		// user role
 		"role": role,
 		// the subject of this token. This is the user associated with the relevant action
-		"sub": userUUID,
+		"sub": userID,
 	}
 	return token.SignedString([]byte(SecretKey))
 }

@@ -14,7 +14,6 @@ import (
 	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 
-	"github.com/satori/go.uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -27,8 +26,6 @@ func signUpUserHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-
-	user.UUID = uuid.Must(uuid.NewV4()).String()
 
 	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
@@ -105,7 +102,7 @@ func signInUserHandler(ctx *web.Context) {
 	}
 
 	// Passed
-	tokenString, err := backend.GenerateToken(authenticatedUser.UUID, authenticatedUser.Role)
+	tokenString, err := backend.GenerateToken(authenticatedUser.ID.Hex(), authenticatedUser.Role)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -125,8 +122,6 @@ func createUserHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-
-	user.UUID = uuid.Must(uuid.NewV4()).String()
 
 	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
