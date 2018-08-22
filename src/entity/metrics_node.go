@@ -43,6 +43,7 @@ type NodeResourceMetrics struct {
 	MemoryLimits         float32 `json:"memoryLimits"`
 	MemoryTotalHugepages float32 `json:"memoryTotalHugepages"`
 	MemoryFreeHugepages  float32 `json:"memoryFreeHugepages"`
+	MemoryHugepageSize   float32 `json:"memoryHugepagesSize"`
 	AllocatableCPU       float32 `json:"allocatableCPU"`
 	AllocatableMemory    float32 `json:"allocatableMemory"`
 	AllocatablePods      float32 `json:"allocatablePods"`
@@ -58,7 +59,7 @@ type NodeDetailMetrics struct {
 	Status            string            `json:"status"`
 	OS                string            `json:"os"`
 	KernelVersion     string            `json:"kernelVersion"`
-	ContainerVersion  string            `json:"containerVersion"`
+	DockerVersion     string            `json:"dockerVersion"`
 	KubeproxyVersion  string            `json:"kubeproxyVersion"`
 	KubernetesVersion string            `json:"kubernetesVersion"`
 	Labels            map[string]string `json:"labels"`
