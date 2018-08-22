@@ -18,13 +18,13 @@ load init
 }
 
 @test "List Service" {
-   run bash -c "http http://127.0.0.1:7890/v1/services 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").name'"
+   run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/services 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").name'"
    [ "$output" = "${appName}" ]
    [ $status = 0 ]
 }
 
 @test "List Deployment" {
-   run bash -c "http http://127.0.0.1:7890/v1/deployments 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").name'"
+   run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/deployments 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").name'"
    [ "$output" = "${appName}" ]
    [ $status = 0 ]
 }
@@ -42,13 +42,13 @@ load init
 }
 
 @test "Delete Deployment" {
-    run bash -c "http http://127.0.0.1:7890/v1/deployments 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").id'"
-    run http DELETE http://127.0.0.1:7890/v1/deployments/${output} 2>/dev/null
+    run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/deployments 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").id'"
+    run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/deployments/${output} 2>/dev/null
     [ $status = 0 ]
 }
 
 @test "Delete Services" {
-    run bash -c "http http://127.0.0.1:7890/v1/services 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").id'"
-    run http DELETE http://127.0.0.1:7890/v1/services/${output} 2>/dev/null
+    run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/services 2>/dev/null | jq -r '.[] | select(.name == \"${appName}\").id'"
+    run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/services/${output} 2>/dev/null
     [ $status = 0 ]
 }
