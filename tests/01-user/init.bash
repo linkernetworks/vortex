@@ -1,4 +1,2 @@
-if [ -z "$deploymentName" ]; then
-    rm -rf user.json
-    cp user.info user.json
-fi
+rm -rf user.json
+cp user.info user.json
