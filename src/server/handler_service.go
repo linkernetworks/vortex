@@ -58,7 +58,7 @@ func createServiceHandler(ctx *web.Context) {
 		return
 	}
 	// create by who
-	user, err := backend.FindUserByID(session, bson.ObjectId(mgoID))
+	user, err := backend.FindUserByID(session, bson.ObjectIdHex(mgoID))
 	if err != nil {
 		switch err {
 		case mgo.ErrNotFound:
