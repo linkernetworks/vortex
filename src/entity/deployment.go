@@ -65,7 +65,7 @@ type Deployment struct {
 	NodeAffinity []string            `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
 	CreatedAt    *time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 
-	Replicas int32 `bson:"replicas",json:"replicas" validate:"required"`
+	Replicas int32 `bson:"replicas" json:"replicas" validate:"required"`
 }
 
 // GetCollection - get model mongo collection name.
