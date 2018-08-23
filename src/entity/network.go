@@ -36,13 +36,14 @@ type Node struct {
 // Network is the structure for Network info
 type Network struct {
 	ID         bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
+	OwenerID   bson.ObjectId `bson:"ownerID" json:"ownerID" validate:"-"`
 	Type       NetworkType   `bson:"type" json:"type" validate:"required"`
 	IsDPDKPort bool          `bson:"isDPDKPort" json:"isDPDKPort" validate:"-"`
 	Name       string        `bson:"name" json:"name" validate:"required"`
 	VlanTags   []int32       `bson:"vlanTags" json:"vlanTags" validate:"required,dive,max=4095,min=0"`
 	BridgeName string        `bson:"bridgeName" json:"bridgeName" validate:"-"`
 	Nodes      []Node        `bson:"nodes" json:"nodes" validate:"required,dive,required"`
-	CreatedBy  User          `bson:"createdBy" json:"createdBy" validate:"-"`
+	CreatedBy  User          `bson:"-" json:"createdBy" validate:"-"`
 	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 

@@ -62,19 +62,7 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
-	// create by who
-	user, err := backend.FindUserByID(session, bson.ObjectIdHex(mgoID))
-	if err != nil {
-		switch err {
-		case mgo.ErrNotFound:
-			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
-			return
-		default:
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	network.CreatedBy = user
+	network.OwenerID = bson.ObjectIdHex(mgoID)
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
@@ -82,6 +70,20 @@ func createNetworkHandler(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
 		return
+	}
+
+	// find owner in user entity
+	network.CreatedBy, err = backend.FindUserByID(session, network.OwenerID)
+	if err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			// user not found
+			response.BadRequest(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
 	}
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
@@ -124,6 +126,23 @@ func listNetworkHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, network := range networks {
+		var err error
+		// find owner in user entity
+		network.CreatedBy, err = backend.FindUserByID(session, network.OwenerID)
+		if err != nil {
+			switch err {
+			case mgo.ErrNotFound:
+				response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
+				return
+			default:
+				response.InternalServerError(req.Request, resp.ResponseWriter, err)
+				return
+			}
+		}
+	}
+
 	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -137,7 +156,6 @@ func listNetworkHandler(ctx *web.Context) {
 
 func getNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
 	id := req.PathParameter("id")
 
 	session := sp.Mongo.NewSession()
@@ -149,6 +167,20 @@ func getNetworkHandler(ctx *web.Context) {
 		switch err {
 		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
+			return
+		default:
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+	}
+
+	var err error
+	// find owner in user entity
+	network.CreatedBy, err = backend.FindUserByID(session, network.OwenerID)
+	if err != nil {
+		switch err {
+		case mgo.ErrNotFound:
+			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
 			return
 		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
