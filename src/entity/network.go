@@ -36,7 +36,7 @@ type Node struct {
 // Network is the structure for Network info
 type Network struct {
 	ID         bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
-	OwenerID   bson.ObjectId `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
+	OwnerID    bson.ObjectId `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
 	Type       NetworkType   `bson:"type" json:"type" validate:"required"`
 	IsDPDKPort bool          `bson:"isDPDKPort" json:"isDPDKPort" validate:"-"`
 	Name       string        `bson:"name" json:"name" validate:"required"`

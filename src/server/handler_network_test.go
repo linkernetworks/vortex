@@ -61,6 +61,7 @@ func TestNetworkSuite(t *testing.T) {
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
+		OwnerID:    bson.NewObjectId(),
 		Type:       entity.FakeNetworkType,
 		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
@@ -115,6 +116,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	}{
 		{"CreateFail",
 			entity.Network{
+				OwnerID:    bson.NewObjectId(),
 				Type:       entity.FakeNetworkType,
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
@@ -129,6 +131,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 			http.StatusInternalServerError},
 		{"NetworkTypeError",
 			entity.Network{
+				OwnerID:    bson.NewObjectId(),
 				Type:       "none-exist",
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
@@ -167,6 +170,7 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		ID:         bson.NewObjectId(),
+		OwnerID:    bson.NewObjectId(),
 		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
 		VlanTags:   []int32{},
@@ -214,6 +218,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 	}{
 		{"NetworkDeleteFail", entity.Network{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},
@@ -229,6 +234,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		{"NetworkTypeError",
 			entity.Network{
 				ID:         bson.NewObjectId(),
+				OwnerID:    bson.NewObjectId(),
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
 				BridgeName: namesgenerator.GetRandomName(0),
@@ -243,6 +249,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 			http.StatusBadRequest},
 		{"PodStillUse", entity.Network{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},
@@ -299,6 +306,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 	tType := entity.FakeNetworkType
 	network := entity.Network{
 		ID:       bson.NewObjectId(),
+		OwnerID:  bson.NewObjectId(),
 		Name:     tName,
 		VlanTags: []int32{},
 		Type:     tType,
@@ -344,6 +352,7 @@ func (suite *NetworkTestSuite) TestGetNetworkStatus() {
 	tType := entity.FakeNetworkType
 	network := entity.Network{
 		ID:       bson.NewObjectId(),
+		OwnerID:  bson.NewObjectId(),
 		Name:     tName,
 		VlanTags: []int32{},
 		Type:     tType,
@@ -377,6 +386,7 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	count := 3
 	for i := 0; i < count; i++ {
 		networks = append(networks, entity.Network{
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},

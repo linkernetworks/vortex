@@ -73,18 +73,7 @@ func createNetworkHandler(ctx *web.Context) {
 	}
 
 	// find owner in user entity
-	network.CreatedBy, err = backend.FindUserByID(session, network.OwenerID)
-	if err != nil {
-		switch err {
-		case mgo.ErrNotFound:
-			// user not found
-			response.BadRequest(req.Request, resp.ResponseWriter, err)
-			return
-		default:
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
+	network.CreatedBy, _ = backend.FindUserByID(session, network.OwenerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 
