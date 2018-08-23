@@ -19,7 +19,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createVolume(ctx *web.Context) {
+func createVolumeHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 	mgoID, ok := req.Attribute("UserID").(string)
 	if !ok {
@@ -72,7 +72,7 @@ func createVolume(ctx *web.Context) {
 	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 
-func deleteVolume(ctx *web.Context) {
+func deleteVolumeHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	id := req.PathParameter("id")
@@ -112,7 +112,7 @@ func deleteVolume(ctx *web.Context) {
 	})
 }
 
-func listVolume(ctx *web.Context) {
+func listVolumeHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	var pageSize = 10
