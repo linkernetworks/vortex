@@ -48,7 +48,8 @@ func createVolume(ctx *web.Context) {
 	// Check whether this name has been used
 	v.ID = bson.NewObjectId()
 	v.CreatedAt = timeutils.Now()
-	//Generate the metaName for PVC meta name and we will use it future
+	v.OwnerID = bson.ObjectIdHex(mgoID)
+	// Generate the metaName for PVC meta name and we will use it future
 	if err := volume.CreateVolume(sp, &v); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("PVC Name: %s already existed", v.Name))
@@ -56,19 +57,7 @@ func createVolume(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
 	}
-	// create by who
-	user, err := backend.FindUserByID(session, bson.ObjectIdHex(mgoID))
-	if err != nil {
-		switch err {
-		case mgo.ErrNotFound:
-			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
-			return
-		default:
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	v.CreatedBy = user
+
 	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", v.Name))
@@ -77,6 +66,9 @@ func createVolume(ctx *web.Context) {
 		}
 		return
 	}
+
+	// find owner in user entity
+	v.CreatedBy, _ = backend.FindUserByID(session, v.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 
@@ -156,6 +148,12 @@ func listVolume(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 			return
 		}
+	}
+
+	// insert users entity
+	for _, volume := range volumes {
+		// find owner in user entity
+		volume.CreatedBy, _ = backend.FindUserByID(session, volume.OwnerID)
 	}
 
 	count, err := session.Count(entity.VolumeCollectionName, bson.M{})

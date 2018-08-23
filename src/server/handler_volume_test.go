@@ -72,6 +72,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
 	volume := entity.Volume{
+		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
 		StorageName: suite.storage.Name,
 		Capacity:    tCapacity,
@@ -123,6 +124,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	tAccessMode := corev1.PersistentVolumeAccessMode("ReadOnlyMany")
 	tCapacity := "500G"
 	volume := entity.Volume{
+		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
@@ -150,6 +152,7 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 	tCapacity := "250"
 	volume := entity.Volume{
 		ID:          bson.NewObjectId(),
+		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
@@ -203,6 +206,7 @@ func (suite *VolumeTestSuite) TestListVolume() {
 	for i := 0; i < count; i++ {
 		volumes = append(volumes, entity.Volume{
 			ID:          bson.NewObjectId(),
+			OwnerID:     bson.NewObjectId(),
 			Name:        namesgenerator.GetRandomName(0),
 			StorageName: namesgenerator.GetRandomName(0),
 			AccessMode:  corev1.PersistentVolumeAccessMode("ReadOnlyMany"),
