@@ -48,7 +48,7 @@ func createServiceHandler(ctx *web.Context) {
 	// Check whether this name has been used
 	s.ID = bson.NewObjectId()
 	s.CreatedAt = timeutils.Now()
-
+	s.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := service.CreateService(sp, &s); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))
@@ -57,19 +57,7 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
-	// create by who
-	user, err := backend.FindUserByID(session, bson.ObjectIdHex(mgoID))
-	if err != nil {
-		switch err {
-		case mgo.ErrNotFound:
-			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
-			return
-		default:
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	s.CreatedBy = user
+
 	if err := session.Insert(entity.ServiceCollectionName, &s); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))
@@ -78,6 +66,9 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
+
+	// find owner in user entity
+	s.CreatedBy, _ = backend.FindUserByID(session, s.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, s)
 }
 
@@ -159,6 +150,12 @@ func listServiceHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, service := range services {
+		// find owner in user entity
+		service.CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
+	}
+
 	count, err := session.Count(entity.ServiceCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -190,5 +187,8 @@ func getServiceHandler(ctx *web.Context) {
 			return
 		}
 	}
+
+	// find owner in user entity
+	service.CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
 	resp.WriteEntity(service)
 }

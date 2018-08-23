@@ -69,6 +69,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
+		OwnerID:   bson.NewObjectId(),
 		ID:        bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
@@ -121,8 +122,9 @@ func (suite *ServiceTestSuite) TestCreateService() {
 func (suite *ServiceTestSuite) TestCreateServiceFail() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
-		ID:   bson.NewObjectId(),
-		Name: serviceName,
+		ID:      bson.NewObjectId(),
+		OwnerID: bson.NewObjectId(),
+		Name:    serviceName,
 	}
 
 	bodyBytes, err := json.MarshalIndent(service, "", "  ")
@@ -155,6 +157,7 @@ func (suite *ServiceTestSuite) TestDeleteService() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
 		ID:        bson.NewObjectId(),
+		OwnerID:   bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
 		Type:      "NodePort",
@@ -214,6 +217,7 @@ func (suite *ServiceTestSuite) TestGetService() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
 		ID:        bson.NewObjectId(),
+		OwnerID:   bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
 		Type:      "NodePort",
@@ -269,6 +273,7 @@ func (suite *ServiceTestSuite) TestListService() {
 
 		services = append(services, entity.Service{
 			ID:        bson.NewObjectId(),
+			OwnerID:   bson.NewObjectId(),
 			Name:      namesgenerator.GetRandomName(0),
 			Namespace: "default",
 			Type:      "NodePort",
