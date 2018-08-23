@@ -62,7 +62,7 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
-	network.OwenerID = bson.ObjectIdHex(mgoID)
+	network.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
@@ -73,7 +73,7 @@ func createNetworkHandler(ctx *web.Context) {
 	}
 
 	// find owner in user entity
-	network.CreatedBy, _ = backend.FindUserByID(session, network.OwenerID)
+	network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 
@@ -118,7 +118,7 @@ func listNetworkHandler(ctx *web.Context) {
 	// insert users entity
 	for _, network := range networks {
 		// find owner in user entity
-		network.CreatedBy, _ = backend.FindUserByID(session, network.OwenerID)
+		network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	}
 
 	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
@@ -153,7 +153,7 @@ func getNetworkHandler(ctx *web.Context) {
 	}
 
 	// find owner in user entity
-	network.CreatedBy, _ = backend.FindUserByID(session, network.OwenerID)
+	network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	resp.WriteEntity(network)
 }
 
