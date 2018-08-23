@@ -1,5 +1,24 @@
 # Change Log
 
+## [v0.1.18](https://github.com/linkernetworks/vortex/tree/v0.1.18) (2018-08-23)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.17...v0.1.18)
+
+**Merged pull requests:**
+
+- Set the request CPU to 50m for nfs-provisioner. [\#271](https://github.com/linkernetworks/vortex/pull/271) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] VX-279: Skipping the deployment of vortex-server in Travis [\#270](https://github.com/linkernetworks/vortex/pull/270) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Upgrade\] upgrade network controller to v0.4.5 [\#269](https://github.com/linkernetworks/vortex/pull/269) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.1.17](https://github.com/linkernetworks/vortex/tree/v0.1.17) (2018-08-22)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.16...v0.1.17)
+
+**Merged pull requests:**
+
+- \[Bug\] VX-276: Modify field name of docker version, and add Hugepages byte field [\#268](https://github.com/linkernetworks/vortex/pull/268) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] Support the new type App [\#266](https://github.com/linkernetworks/vortex/pull/266) ([hwchiu](https://github.com/hwchiu))
+- johnlin/user add bats tests [\#265](https://github.com/linkernetworks/vortex/pull/265) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-271: Log handler which responses the logs of the containers [\#258](https://github.com/linkernetworks/vortex/pull/258) ([WakeupTsai](https://github.com/WakeupTsai))
+
 ## [v0.1.16](https://github.com/linkernetworks/vortex/tree/v0.1.16) (2018-08-21)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.15...v0.1.16)
 
