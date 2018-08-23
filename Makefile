@@ -119,8 +119,8 @@ apps.launch-prod:
 .PHONY: apps.launch-testing
 apps.launch-testing:
 	yq -y .services deploy/helm/config/testing.yaml | helm install --name vortex-services-testing --debug --wait -f - deploy/helm/services
-	yq -y .apps.prometheus deploy/helm/config/testing.yaml | helm install --name vortex-prometheus-testing --debug --wait -f - --set deploy/helm/apps/charts/prometheus
-	yq -y .apps.network-controller deploy/helm/config/testing.yaml | helm install --name vortex-nc-testing --debug --wait -f - --set deploy/helm/apps/charts/network-controller
+	yq -y .apps.prometheus deploy/helm/config/testing.yaml | helm install --name vortex-prometheus-testing --debug --wait -f - deploy/helm/apps/charts/prometheus
+	yq -y .apps.\"network-controller\" deploy/helm/config/testing.yaml | helm install --name vortex-nc-testing --debug --wait -f - deploy/helm/apps/charts/network-controller
 
 .PHONY: apps.upgrade-dev
 apps.upgrade-dev:
