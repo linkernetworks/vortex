@@ -119,7 +119,8 @@ apps.launch-prod:
 .PHONY: apps.launch-testing
 apps.launch-testing:
 	yq -y .services deploy/helm/config/testing.yaml | helm install --name vortex-services-testing --debug --wait -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/testing.yaml | helm install --name vortex-apps-testing --debug --wait -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
+	yq -y .apps.prometheus deploy/helm/config/testing.yaml | helm install --name vortex-prometheus-testing --debug --wait -f - --set deploy/helm/apps/charts/prometheus
+	yq -y .apps.network-controller deploy/helm/config/testing.yaml | helm install --name vortex-nc-testing --debug --wait -f - --set deploy/helm/apps/charts/network-controller
 
 .PHONY: apps.upgrade-dev
 apps.upgrade-dev:
@@ -130,11 +131,6 @@ apps.upgrade-dev:
 apps.upgrade-prod:
 	yq -y .services deploy/helm/config/production.yaml | helm upgrade vortex-services-prod --debug -f - deploy/helm/services
 	yq -y .apps deploy/helm/config/production.yaml | helm  upgrade vortex-apps-prod --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
-
-.PHONY: apps.upgrade-testing
-apps.upgrade-testing:
-	yq -y .services deploy/helm/config/testing.yaml | helm upgrade vortex-services-testing --debug -f - deploy/helm/services
-	yq -y .apps deploy/helm/config/testing.yaml | helm  upgrade vortex-apps-testing --debug -f - --set vortex-server.controller.apiserverImageTag=$(SERVER_VERSION) deploy/helm/apps
 
 .PHONY: apps.teardown-dev
 apps.teardown-dev:
@@ -149,7 +145,8 @@ apps.teardown-prod:
 .PHONY: apps.teardown-testing
 apps.teardown-testing:
 	helm delete --purge vortex-services-testing
-	helm delete --purge vortex-apps-testing
+	helm delete --purge vortex-prometheus-testing
+	helm delete --purge vortex-nc-testing
 
 ## dockerfiles/ ########################################
 
