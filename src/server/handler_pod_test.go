@@ -65,6 +65,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
+		OwnerID:       bson.NewObjectId(),
 		Name:          tName,
 		Namespace:     namespace,
 		Labels:        map[string]string{},
@@ -128,6 +129,7 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
+		OwnerID:    bson.NewObjectId(),
 		Name:       tName,
 		Namespace:  namespace,
 		Containers: containers,
@@ -162,6 +164,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		ID:            bson.NewObjectId(),
+		OwnerID:       bson.NewObjectId(),
 		Name:          tName,
 		Namespace:     namespace,
 		Containers:    containers,
@@ -219,6 +222,7 @@ func (suite *PodTestSuite) TestGetPod() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		ID:         bson.NewObjectId(),
+		OwnerID:    bson.NewObjectId(),
 		Name:       tName,
 		Namespace:  namespace,
 		Containers: containers,
@@ -268,6 +272,7 @@ func (suite *PodTestSuite) TestListPod() {
 		}
 		pods = append(pods, entity.Pod{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Name:       namesgenerator.GetRandomName(0),
 			Namespace:  namespace,
 			Containers: containers,

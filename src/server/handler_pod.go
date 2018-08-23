@@ -61,19 +61,8 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
-	// create by who
-	user, err := backend.FindUserByID(session, bson.ObjectIdHex(mgoID))
-	if err != nil {
-		switch err {
-		case mgo.ErrNotFound:
-			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized"))
-			return
-		default:
-			response.InternalServerError(req.Request, resp.ResponseWriter, err)
-			return
-		}
-	}
-	p.CreatedBy = user
+
+	p.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
@@ -82,6 +71,8 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// find owner in user entity
+	p.CreatedBy, _ = backend.FindUserByID(session, p.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
@@ -163,6 +154,11 @@ func listPodHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, pod := range pods {
+		// find owner in user entity
+		pod.CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
+	}
 	count, err := session.Count(entity.PodCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -194,5 +190,7 @@ func getPodHandler(ctx *web.Context) {
 			return
 		}
 	}
+	// find owner in user entity
+	pod.CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
 	resp.WriteEntity(pod)
 }
