@@ -43,7 +43,7 @@ type Network struct {
 	VlanTags   []int32       `bson:"vlanTags" json:"vlanTags" validate:"required,dive,max=4095,min=0"`
 	BridgeName string        `bson:"bridgeName" json:"bridgeName" validate:"-"`
 	Nodes      []Node        `bson:"nodes" json:"nodes" validate:"required,dive,required"`
-	CreatedBy  User          `bson:"-" json:"createdBy" validate:"-"`
+	CreatedBy  User          `json:"createdBy" validate:"-"`
 	CreatedAt  *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
