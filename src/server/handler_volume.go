@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/volume"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -20,6 +21,11 @@ import (
 
 func createVolume(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	mgoID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	v := entity.Volume{}
 	if err := req.ReadEntity(&v); err != nil {
@@ -42,7 +48,8 @@ func createVolume(ctx *web.Context) {
 	// Check whether this name has been used
 	v.ID = bson.NewObjectId()
 	v.CreatedAt = timeutils.Now()
-	//Generate the metaName for PVC meta name and we will use it future
+	v.OwnerID = bson.ObjectIdHex(mgoID)
+	// Generate the metaName for PVC meta name and we will use it future
 	if err := volume.CreateVolume(sp, &v); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("PVC Name: %s already existed", v.Name))
@@ -50,6 +57,7 @@ func createVolume(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
 	}
+
 	if err := session.Insert(entity.VolumeCollectionName, &v); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", v.Name))
@@ -58,6 +66,9 @@ func createVolume(ctx *web.Context) {
 		}
 		return
 	}
+
+	// find owner in user entity
+	v.CreatedBy, _ = backend.FindUserByID(session, v.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, v)
 }
 
@@ -137,6 +148,12 @@ func listVolume(ctx *web.Context) {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 			return
 		}
+	}
+
+	// insert users entity
+	for _, volume := range volumes {
+		// find owner in user entity
+		volume.CreatedBy, _ = backend.FindUserByID(session, volume.OwnerID)
 	}
 
 	count, err := session.Count(entity.VolumeCollectionName, bson.M{})

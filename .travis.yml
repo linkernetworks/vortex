@@ -63,9 +63,10 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
     - name: "Integration Tests"
       install:
-          - sudo add-apt-repository ppa:duggan/bats --yes 
+          - sudo add-apt-repository ppa:duggan/bats --yes
           - sudo apt-get update -q
-          - sudo apt-get install -qqy httpie bats nfs-kernel-server 
+          - sudo apt-get install -qqy httpie bats nfs-kernel-server
+          - sudo pip install -U httpie-jwt-auth
           - mkdir -p /tmp/nfs
           - echo "/tmp/nfs *(rw,sync,no_root_squash)" | sudo tee /etc/exports
           - sudo exportfs -r

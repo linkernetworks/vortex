@@ -11,6 +11,7 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/pod"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -20,6 +21,11 @@ import (
 
 func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	mgoID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	p := entity.Pod{}
 	if err := req.ReadEntity(&p); err != nil {
@@ -55,6 +61,8 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
+
+	p.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
@@ -63,6 +71,8 @@ func createPodHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// find owner in user entity
+	p.CreatedBy, _ = backend.FindUserByID(session, p.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
@@ -144,6 +154,11 @@ func listPodHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, pod := range pods {
+		// find owner in user entity
+		pod.CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
+	}
 	count, err := session.Count(entity.PodCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -175,5 +190,7 @@ func getPodHandler(ctx *web.Context) {
 			return
 		}
 	}
+	// find owner in user entity
+	pod.CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
 	resp.WriteEntity(pod)
 }

@@ -40,10 +40,10 @@ func (suite *AuthenticateTestSuite) SetupSuite() {
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
-			Email:    "auth@linkernetworks.com",
+			Username: "auth@linkernetworks.com",
 			Password: hashedPassword,
 		},
-		Username:    "John Doe",
+		DisplayName: "John Doe",
 		FirstName:   "John",
 		LastName:    "Doe",
 		PhoneNumber: "091111l111",
@@ -55,7 +55,7 @@ func (suite *AuthenticateTestSuite) SetupSuite() {
 func (suite *AuthenticateTestSuite) TearDownSuite() {
 	suite.session.Remove(
 		entity.UserCollectionName,
-		"loginCredential.email",
+		"loginCredential.username",
 		"auth@linkernetworks.com",
 	)
 }
@@ -66,18 +66,18 @@ func TestAuthenticateSuite(t *testing.T) {
 
 func (suite *AuthenticateTestSuite) TestAuthenticate() {
 	CorrectCred := entity.LoginCredential{
-		Email:    "auth@linkernetworks.com",
+		Username: "auth@linkernetworks.com",
 		Password: suite.plainTextPassword,
 	}
 	user, passed, err := Authenticate(suite.session, CorrectCred)
 	suite.NoError(err)
 	suite.True(passed)
-	suite.Equal(CorrectCred.Email, user.LoginCredential.Email)
+	suite.Equal(CorrectCred.Username, user.LoginCredential.Username)
 }
 
 func (suite *AuthenticateTestSuite) TestFailedAuthenticate() {
 	WrongCred := entity.LoginCredential{
-		Email:    "auth@linkernetworks.com",
+		Username: "auth@linkernetworks.com",
 		Password: "wrongPasswordOX",
 	}
 	_, passed, err := Authenticate(suite.session, WrongCred)

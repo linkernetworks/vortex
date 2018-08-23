@@ -26,9 +26,10 @@ func init() {
 
 type PodTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *PodTestSuite) SetupSuite() {
@@ -42,6 +43,9 @@ func (suite *PodTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 	service := newPodService(suite.sp)
 	suite.wc.Add(service)
+
+	token, _ := loginGetToken(suite.sp, suite.wc)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *PodTestSuite) TearDownSuite() {}
@@ -61,6 +65,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
+		OwnerID:       bson.NewObjectId(),
 		Name:          tName,
 		Namespace:     namespace,
 		Labels:        map[string]string{},
@@ -81,6 +86,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -103,6 +109,7 @@ func (suite *PodTestSuite) TestCreatePod() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/pods", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -122,6 +129,7 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
+		OwnerID:    bson.NewObjectId(),
 		Name:       tName,
 		Namespace:  namespace,
 		Containers: containers,
@@ -138,6 +146,7 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -155,6 +164,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		ID:            bson.NewObjectId(),
+		OwnerID:       bson.NewObjectId(),
 		Name:          tName,
 		Namespace:     namespace,
 		Containers:    containers,
@@ -178,6 +188,7 @@ func (suite *PodTestSuite) TestDeletePod() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -192,6 +203,7 @@ func (suite *PodTestSuite) TestDeletePodWithInvalidID() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -210,6 +222,7 @@ func (suite *PodTestSuite) TestGetPod() {
 	tName := namesgenerator.GetRandomName(0)
 	pod := entity.Pod{
 		ID:         bson.NewObjectId(),
+		OwnerID:    bson.NewObjectId(),
 		Name:       tName,
 		Namespace:  namespace,
 		Containers: containers,
@@ -222,6 +235,7 @@ func (suite *PodTestSuite) TestGetPod() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods/"+pod.ID.Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -238,6 +252,7 @@ func (suite *PodTestSuite) TestGetPodWithInvalidID() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -257,6 +272,7 @@ func (suite *PodTestSuite) TestListPod() {
 		}
 		pods = append(pods, entity.Pod{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Name:       namesgenerator.GetRandomName(0),
 			Namespace:  namespace,
 			Containers: containers,
@@ -290,6 +306,7 @@ func (suite *PodTestSuite) TestListPod() {
 			httpRequest, err := http.NewRequest("GET", url, nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -311,6 +328,7 @@ func (suite *PodTestSuite) TestListPodWithInvalidPage() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/pods?page=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -318,6 +336,7 @@ func (suite *PodTestSuite) TestListPodWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pods?page_size=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -325,6 +344,7 @@ func (suite *PodTestSuite) TestListPodWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/pods?page=-1", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)

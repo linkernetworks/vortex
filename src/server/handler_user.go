@@ -14,7 +14,6 @@ import (
 	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 
-	"github.com/satori/go.uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -28,16 +27,14 @@ func signUpUserHandler(ctx *web.Context) {
 		return
 	}
 
-	user.UUID = uuid.Must(uuid.NewV4()).String()
-
-	encryptedPassword, err := hashPassword(user.LoginCredential.Password)
+	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	user.LoginCredential.Password = encryptedPassword
 
-	user.LoginCredential.Email = strings.ToLower(user.LoginCredential.Email)
+	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 
 	// sign up user only can ba the role of user
 	user.Role = "user"
@@ -48,9 +45,9 @@ func signUpUserHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	// make email to be a unique key
+	// make username(email) to be a unique key
 	session.C(entity.UserCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"loginCredential.email"},
+		Key:    []string{"loginCredential.username"},
 		Unique: true,
 	})
 	defer session.Close()
@@ -60,7 +57,7 @@ func signUpUserHandler(ctx *web.Context) {
 
 	if err := session.Insert(entity.UserCollectionName, &user); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Email: %s already existed", user.LoginCredential.Email))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Username: %s already existed", user.LoginCredential.Username))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
@@ -90,7 +87,7 @@ func signInUserHandler(ctx *web.Context) {
 	if err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to login. Incorrect authentication credentials"))
+			response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: Failed to login. Incorrect authentication credentials"))
 			return
 		default:
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -100,12 +97,12 @@ func signInUserHandler(ctx *web.Context) {
 
 	// when authenticating not pass
 	if !passed {
-		response.Forbidden(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to login. Incorrect authentication credentials"))
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: Failed to login. Incorrect authentication credentials"))
 		return
 	}
 
 	// Passed
-	tokenString, err := backend.GenerateToken(authenticatedUser.UUID, authenticatedUser.Role)
+	tokenString, err := backend.GenerateToken(authenticatedUser.ID.Hex(), authenticatedUser.Role)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -126,16 +123,14 @@ func createUserHandler(ctx *web.Context) {
 		return
 	}
 
-	user.UUID = uuid.Must(uuid.NewV4()).String()
-
-	encryptedPassword, err := hashPassword(user.LoginCredential.Password)
+	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
 	user.LoginCredential.Password = encryptedPassword
 
-	user.LoginCredential.Email = strings.ToLower(user.LoginCredential.Email)
+	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 
 	if err := sp.Validator.Struct(user); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
@@ -143,9 +138,9 @@ func createUserHandler(ctx *web.Context) {
 	}
 
 	session := sp.Mongo.NewSession()
-	// make email to be a unique key
+	// make username(email) to be a unique key
 	session.C(entity.UserCollectionName).EnsureIndex(mgo.Index{
-		Key:    []string{"loginCredential.email"},
+		Key:    []string{"loginCredential.username"},
 		Unique: true,
 	})
 	defer session.Close()
@@ -155,7 +150,7 @@ func createUserHandler(ctx *web.Context) {
 
 	if err := session.Insert(entity.UserCollectionName, &user); err != nil {
 		if mgo.IsDup(err) {
-			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Email: %s already existed", user.LoginCredential.Email))
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Username: %s already existed", user.LoginCredential.Username))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}

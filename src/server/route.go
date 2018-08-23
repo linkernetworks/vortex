@@ -36,7 +36,6 @@ func (a *App) AppRoute() *mux.Router {
 func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/version").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	//	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, versionHandler)))
 	return webService
 }
@@ -65,6 +64,7 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/networks").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNetworkHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getNetworkHandler)))
 	webService.Route(webService.GET("/status/{id}").To(handler.RESTfulServiceHandler(sp, getNetworkStatusHandler)))
@@ -85,6 +85,7 @@ func newStorageService(sp *serviceprovider.Container) *restful.WebService {
 func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/volume").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createVolume)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteVolume)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listVolume)))
@@ -102,6 +103,7 @@ func newContainerService(sp *serviceprovider.Container) *restful.WebService {
 func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/pods").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createPodHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deletePodHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listPodHandler)))
@@ -129,6 +131,7 @@ func newAppService(sp *serviceprovider.Container) *restful.WebService {
 func newServiceService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/services").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createServiceHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteServiceHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listServiceHandler)))

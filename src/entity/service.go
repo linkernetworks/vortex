@@ -22,11 +22,13 @@ type ServicePort struct {
 // Service is the structure for service
 type Service struct {
 	ID        bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
+	OwnerID   bson.ObjectId     `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
 	Name      string            `bson:"name" json:"name" validate:"required,k8sname"`
 	Namespace string            `bson:"namespace" json:"namespace" validate:"required"`
 	Type      string            `bson:"type" json:"type" validate:"oneof=ClusterIP NodePort"`
 	Selector  map[string]string `bson:"selector" json:"selector" validate:"required"`
 	Ports     []ServicePort     `bson:"ports" json:"ports" validate:"required"`
+	CreatedBy User              `json:"createdBy" validate:"-"`
 	CreatedAt *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 

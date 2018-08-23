@@ -10,6 +10,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/service"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -20,6 +21,11 @@ import (
 
 func createServiceHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	mgoID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	s := entity.Service{}
 	if err := req.ReadEntity(&s); err != nil {
@@ -42,7 +48,7 @@ func createServiceHandler(ctx *web.Context) {
 	// Check whether this name has been used
 	s.ID = bson.NewObjectId()
 	s.CreatedAt = timeutils.Now()
-
+	s.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := service.CreateService(sp, &s); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))
@@ -51,6 +57,7 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
+
 	if err := session.Insert(entity.ServiceCollectionName, &s); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))
@@ -59,6 +66,9 @@ func createServiceHandler(ctx *web.Context) {
 		}
 		return
 	}
+
+	// find owner in user entity
+	s.CreatedBy, _ = backend.FindUserByID(session, s.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, s)
 }
 
@@ -140,6 +150,12 @@ func listServiceHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, service := range services {
+		// find owner in user entity
+		service.CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
+	}
+
 	count, err := session.Count(entity.ServiceCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -171,5 +187,8 @@ func getServiceHandler(ctx *web.Context) {
 			return
 		}
 	}
+
+	// find owner in user entity
+	service.CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
 	resp.WriteEntity(service)
 }

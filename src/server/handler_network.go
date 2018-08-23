@@ -12,6 +12,7 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	np "github.com/linkernetworks/vortex/src/networkprovider"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 
 	mgo "gopkg.in/mgo.v2"
@@ -20,6 +21,11 @@ import (
 
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	mgoID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	network := entity.Network{}
 	if err := req.ReadEntity(&network); err != nil {
@@ -56,6 +62,7 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
+	network.OwnerID = bson.ObjectIdHex(mgoID)
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))
@@ -64,6 +71,9 @@ func createNetworkHandler(ctx *web.Context) {
 		}
 		return
 	}
+
+	// find owner in user entity
+	network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, network)
 }
 
@@ -105,6 +115,12 @@ func listNetworkHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, network := range networks {
+		// find owner in user entity
+		network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
+	}
+
 	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -118,7 +134,6 @@ func listNetworkHandler(ctx *web.Context) {
 
 func getNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-
 	id := req.PathParameter("id")
 
 	session := sp.Mongo.NewSession()
@@ -136,6 +151,9 @@ func getNetworkHandler(ctx *web.Context) {
 			return
 		}
 	}
+
+	// find owner in user entity
+	network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	resp.WriteEntity(network)
 }
 

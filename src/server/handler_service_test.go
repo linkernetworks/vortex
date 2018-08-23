@@ -26,9 +26,10 @@ func init() {
 
 type ServiceTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *ServiceTestSuite) SetupSuite() {
@@ -42,6 +43,9 @@ func (suite *ServiceTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 	service := newServiceService(suite.sp)
 	suite.wc.Add(service)
+
+	token, _ := loginGetToken(suite.sp, suite.wc)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *ServiceTestSuite) TearDownSuite() {}
@@ -65,6 +69,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
+		OwnerID:   bson.NewObjectId(),
 		ID:        bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
@@ -81,6 +86,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -104,6 +110,7 @@ func (suite *ServiceTestSuite) TestCreateService() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/services", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -115,8 +122,9 @@ func (suite *ServiceTestSuite) TestCreateService() {
 func (suite *ServiceTestSuite) TestCreateServiceFail() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
-		ID:   bson.NewObjectId(),
-		Name: serviceName,
+		ID:      bson.NewObjectId(),
+		OwnerID: bson.NewObjectId(),
+		Name:    serviceName,
 	}
 
 	bodyBytes, err := json.MarshalIndent(service, "", "  ")
@@ -127,6 +135,7 @@ func (suite *ServiceTestSuite) TestCreateServiceFail() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -148,6 +157,7 @@ func (suite *ServiceTestSuite) TestDeleteService() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
 		ID:        bson.NewObjectId(),
+		OwnerID:   bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
 		Type:      "NodePort",
@@ -169,6 +179,7 @@ func (suite *ServiceTestSuite) TestDeleteService() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -183,6 +194,7 @@ func (suite *ServiceTestSuite) TestDeleteServiceWithInvalidID() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -205,6 +217,7 @@ func (suite *ServiceTestSuite) TestGetService() {
 	serviceName := namesgenerator.GetRandomName(0)
 	service := entity.Service{
 		ID:        bson.NewObjectId(),
+		OwnerID:   bson.NewObjectId(),
 		Name:      serviceName,
 		Namespace: "default",
 		Type:      "NodePort",
@@ -219,6 +232,7 @@ func (suite *ServiceTestSuite) TestGetService() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/services/"+service.ID.Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -235,6 +249,7 @@ func (suite *ServiceTestSuite) TestGetServiceWithInvalidID() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/services/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -258,6 +273,7 @@ func (suite *ServiceTestSuite) TestListService() {
 
 		services = append(services, entity.Service{
 			ID:        bson.NewObjectId(),
+			OwnerID:   bson.NewObjectId(),
 			Name:      namesgenerator.GetRandomName(0),
 			Namespace: "default",
 			Type:      "NodePort",
@@ -293,6 +309,7 @@ func (suite *ServiceTestSuite) TestListService() {
 			httpRequest, err := http.NewRequest("GET", url, nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -314,6 +331,7 @@ func (suite *ServiceTestSuite) TestListServiceWithInvalidPage() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/services?page=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -321,6 +339,7 @@ func (suite *ServiceTestSuite) TestListServiceWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/services?page_size=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -328,6 +347,7 @@ func (suite *ServiceTestSuite) TestListServiceWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/services?page=-1", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)

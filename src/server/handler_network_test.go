@@ -30,15 +30,17 @@ func init() {
 
 type NetworkTestSuite struct {
 	suite.Suite
-	wc      *restful.Container
-	session *mongo.Session
-	sp      *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	sp        *serviceprovider.Container
+	JWTBearer string
 }
 
 func (suite *NetworkTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
+	suite.sp = sp
 	//init session
 	suite.session = sp.Mongo.NewSession()
 	//init restful container
@@ -46,7 +48,8 @@ func (suite *NetworkTestSuite) SetupSuite() {
 	service := newNetworkService(sp)
 	suite.wc.Add(service)
 
-	suite.sp = sp
+	token, _ := loginGetToken(suite.sp, suite.wc)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *NetworkTestSuite) TearDownSuite() {}
@@ -58,6 +61,7 @@ func TestNetworkSuite(t *testing.T) {
 func (suite *NetworkTestSuite) TestCreateNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
+		OwnerID:    bson.NewObjectId(),
 		Type:       entity.FakeNetworkType,
 		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
@@ -80,6 +84,8 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -93,7 +99,10 @@ func (suite *NetworkTestSuite) TestCreateNetwork() {
 	bodyReader = strings.NewReader(string(bodyBytes))
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/networks", bodyReader)
 	suite.NoError(err)
+
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -107,6 +116,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 	}{
 		{"CreateFail",
 			entity.Network{
+				OwnerID:    bson.NewObjectId(),
 				Type:       entity.FakeNetworkType,
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
@@ -121,6 +131,7 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 			http.StatusInternalServerError},
 		{"NetworkTypeError",
 			entity.Network{
+				OwnerID:    bson.NewObjectId(),
 				Type:       "none-exist",
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
@@ -145,6 +156,8 @@ func (suite *NetworkTestSuite) TestCreateNetworkFail() {
 			suite.NoError(err)
 
 			httpRequest.Header.Add("Content-Type", "application/json")
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
+
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
@@ -157,6 +170,7 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	tName := namesgenerator.GetRandomName(0)
 	network := entity.Network{
 		ID:         bson.NewObjectId(),
+		OwnerID:    bson.NewObjectId(),
 		IsDPDKPort: true, //for fake network, true means success,
 		Name:       tName,
 		VlanTags:   []int32{},
@@ -175,6 +189,9 @@ func (suite *NetworkTestSuite) TestDeleteNetwork() {
 	defer suite.session.Remove(entity.NetworkCollectionName, "name", tName)
 
 	httpRequestDelete, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
+	suite.NoError(err)
+	httpRequestDelete.Header.Add("Authorization", suite.JWTBearer)
+
 	httpWriterDelete := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriterDelete, httpRequestDelete)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriterDelete)
@@ -186,6 +203,7 @@ func (suite *NetworkTestSuite) TestDeleteEmptyNetwork() {
 	//Remove with non-exist network id
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -200,6 +218,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 	}{
 		{"NetworkDeleteFail", entity.Network{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},
@@ -215,6 +234,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 		{"NetworkTypeError",
 			entity.Network{
 				ID:         bson.NewObjectId(),
+				OwnerID:    bson.NewObjectId(),
 				Name:       namesgenerator.GetRandomName(0),
 				VlanTags:   []int32{},
 				BridgeName: namesgenerator.GetRandomName(0),
@@ -229,6 +249,7 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 			http.StatusBadRequest},
 		{"PodStillUse", entity.Network{
 			ID:         bson.NewObjectId(),
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},
@@ -270,6 +291,8 @@ func (suite *NetworkTestSuite) TestDeleteNetworkFail() {
 			suite.NoError(err)
 
 			httpRequest.Header.Add("Content-Type", "application/json")
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
+
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
@@ -283,6 +306,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 	tType := entity.FakeNetworkType
 	network := entity.Network{
 		ID:       bson.NewObjectId(),
+		OwnerID:  bson.NewObjectId(),
 		Name:     tName,
 		VlanTags: []int32{},
 		Type:     tType,
@@ -299,6 +323,7 @@ func (suite *NetworkTestSuite) TestGetNetwork() {
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+network.ID.Hex(), nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -315,6 +340,7 @@ func (suite *NetworkTestSuite) TestGetNetworkWithInvalidID() {
 	// Get data with none-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -326,6 +352,7 @@ func (suite *NetworkTestSuite) TestGetNetworkStatus() {
 	tType := entity.FakeNetworkType
 	network := entity.Network{
 		ID:       bson.NewObjectId(),
+		OwnerID:  bson.NewObjectId(),
 		Name:     tName,
 		VlanTags: []int32{},
 		Type:     tType,
@@ -342,6 +369,7 @@ func (suite *NetworkTestSuite) TestGetNetworkStatus() {
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/status/"+network.ID.Hex(), nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -358,6 +386,7 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 	count := 3
 	for i := 0; i < count; i++ {
 		networks = append(networks, entity.Network{
+			OwnerID:    bson.NewObjectId(),
 			Type:       entity.FakeNetworkType,
 			Name:       namesgenerator.GetRandomName(0),
 			VlanTags:   []int32{},
@@ -396,8 +425,8 @@ func (suite *NetworkTestSuite) TestListNetwork() {
 				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
 			}
 			httpRequest, err := http.NewRequest("GET", url, nil)
-
 			suite.NoError(err)
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
@@ -420,6 +449,7 @@ func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 	//Get data with non-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks?page=asdd", nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -427,6 +457,7 @@ func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page_size=asdd", nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
@@ -434,6 +465,7 @@ func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/networks?page=-1", nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)

@@ -3,7 +3,7 @@
 load init
 
 @test "Create Pod" {
-    http -v --check-status 127.0.0.1:7890/v1/pods < pod.json
+    http -v --check-status --auth-type=jwt 127.0.0.1:7890/v1/pods < pod.json
     [ $? = 0 ]
     #Wait the Pod
     #jsonpath="{.status.phase}"
@@ -18,7 +18,7 @@ load init
 }
 
 @test "List Pod" {
-   run bash -c "http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
+   run bash -c "http --auth-type=jwt http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r '.[] | select(.name == \"${podName}\").name'"
    [ "$output" = "${podName}" ]
    [ $status = 0 ]
 }
@@ -34,7 +34,7 @@ load init
     [ $? = 0 ]
 }
 @test "Delete Pod" {
-    run bash -c 'http http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
-    run http DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
+    run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
     [ $status = 0 ]
 }

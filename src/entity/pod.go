@@ -60,6 +60,7 @@ type PodVolume struct {
 // Pod is the structure for pod info
 type Pod struct {
 	ID            bson.ObjectId     `bson:"_id,omitempty" json:"id" validate:"-"`
+	OwnerID       bson.ObjectId     `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
 	Name          string            `bson:"name" json:"name" validate:"required,k8sname"`
 	Namespace     string            `bson:"namespace" json:"namespace" validate:"required"`
 	Labels        map[string]string `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
@@ -71,6 +72,8 @@ type Pod struct {
 	Capability    bool              `bson:"capability" json:"capability" validate:"-"`
 	NetworkType   string            `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
 	NodeAffinity  []string          `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
+	HostNetwork   bool              `bson:"hostNetwork" json:"hostNetwork" validate:"-"`
+	CreatedBy     User              `json:"createdBy" validate:"-"`
 	CreatedAt     *time.Time        `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
