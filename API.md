@@ -56,7 +56,9 @@
     - [List Namespaces](#list-namespaces)
     - [Get Namespace](#get-namespace)
     - [Delete Namespace](#delete-namespace)
-
+  - [OVS](#ovs)
+    - [Get PortStats](#get-portstats)
+   
 
 
 ## User
@@ -1631,5 +1633,46 @@ Response Data:
 {
   "error": false,
   "message": "Delete success"
+}
+```
+
+## OVS
+In the ovs api, we should use two parameter to indicate what OVS we want to operate in.
+1. NodeName: the node name in the kubernetes cluster
+2. BridgeName: the bridge name when admin create the network in the network page.
+the portal can use the list network to fetch the actual bridge name of each network.
+
+### Get PortStats
+
+**GET /v1/ovs/portstats/?nodeName=xxx&bridge=xxx**
+
+Example:
+
+```
+curl http://localhost:7890/v1/ovs/portstats?nodeName=vortex-dev&bridgeName=system-47f8ce
+```
+
+Response Data:
+
+```json
+{
+...
+ {
+     "PortID": 2,
+         "received": {
+             "packets": 0,
+             "bytes": 0,
+             "dropped": 0,
+             "errors": 0
+         },
+         "traansmitted": {
+             "packets": 8,
+             "bytes": 648,
+             "dropped": 0,
+             "errors": 0,
+             "collisions": 0
+         }
+ },
+...
 }
 ```
