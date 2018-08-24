@@ -37,14 +37,19 @@ func (suite *PodTestSuite) SetupSuite() {
 	sp := serviceprovider.NewForTesting(cf)
 
 	suite.sp = sp
-	//init session
+	// init session
 	suite.session = sp.Mongo.NewSession()
-	//init restful container
+	// init restful container
 	suite.wc = restful.NewContainer()
-	service := newPodService(suite.sp)
-	suite.wc.Add(service)
 
-	token, _ := loginGetToken(suite.sp, suite.wc)
+	podService := newPodService(suite.sp)
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(podService)
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
 	suite.JWTBearer = "Bearer " + token
 }
 

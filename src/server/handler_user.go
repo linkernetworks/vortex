@@ -66,6 +66,16 @@ func signUpUserHandler(ctx *web.Context) {
 	resp.WriteHeaderAndEntity(http.StatusCreated, user)
 }
 
+func verifyTokenHandler(ctx *web.Context) {
+	_, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	mgoID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
+	http.Redirect(resp.ResponseWriter, req.Request, "/v1/users/"+mgoID, 303)
+}
+
 func signInUserHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 

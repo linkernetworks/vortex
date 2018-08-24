@@ -1,9 +1,11 @@
 package backend
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/linkernetworks/logger"
 )
 
 // GenerateToken is for generating token
@@ -20,4 +22,27 @@ func GenerateToken(userID string, role string) (string, error) {
 		"sub": userID,
 	}
 	return token.SignedString([]byte(SecretKey))
+}
+
+// VerifyToken is for verifing the JWT
+func VerifyToken(tokenData []byte) bool {
+	// trim possible whitespace from token
+	tokenData = regexp.MustCompile(`\s*$`).ReplaceAll(tokenData, []byte{})
+
+	// Parse the token
+	token, err := jwt.Parse(string(tokenData), func(t *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+	// Print an error if we can't parse for some reason
+	if err != nil {
+		logger.Infof("Couldn't parse token: %v", err)
+		return false
+	}
+
+	// Is token invalid?
+	if !token.Valid {
+		logger.Infof("Token is invalid")
+		return false
+	}
+	return true
 }

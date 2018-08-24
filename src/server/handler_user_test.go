@@ -25,9 +25,10 @@ func init() {
 
 type UserTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *UserTestSuite) SetupSuite() {
@@ -35,12 +36,18 @@ func (suite *UserTestSuite) SetupSuite() {
 	sp := serviceprovider.NewForTesting(cf)
 
 	suite.sp = sp
-	//init session
+	// init session
 	suite.session = sp.Mongo.NewSession()
-	//init restful container
+	// init restful container
 	suite.wc = restful.NewContainer()
-	user := newUserService(suite.sp)
-	suite.wc.Add(user)
+
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *UserTestSuite) TearDownSuite() {}
@@ -84,6 +91,28 @@ func (suite *UserTestSuite) TestSignUpUser() {
 	suite.Equal(user.LoginCredential.Username, retUser.LoginCredential.Username)
 	// sign up always get the role of user
 	suite.Equal("user", retUser.Role)
+}
+
+func (suite *UserTestSuite) TestVerifyToken() {
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/users/verify/auth", nil)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusSeeOther, httpWriter)
+}
+
+func (suite *UserTestSuite) TestVerifyInvalidToken() {
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/users/verify/auth", nil)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", "InValidToken")
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusUnauthorized, httpWriter)
 }
 
 func (suite *UserTestSuite) TestSignUpFailedUser() {
@@ -333,6 +362,7 @@ func (suite *UserTestSuite) TestGetUser() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/users/"+user.ID.Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -349,6 +379,7 @@ func (suite *UserTestSuite) TestGetUserWithInvalidID() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/users/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)

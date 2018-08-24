@@ -39,17 +39,21 @@ func (suite *VolumeTestSuite) SetupSuite() {
 	sp := serviceprovider.NewForTesting(cf)
 
 	suite.sp = sp
-	//init session
+	// init session
 	suite.session = sp.Mongo.NewSession()
-	//init restful container
+	// init restful container
 	suite.wc = restful.NewContainer()
-	service := newVolumeService(suite.sp)
-	suite.wc.Add(service)
+	volumeService := newVolumeService(suite.sp)
+	userService := newUserService(suite.sp)
 
-	token, _ := loginGetToken(suite.sp, suite.wc)
+	suite.wc.Add(userService)
+	suite.wc.Add(volumeService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
 	suite.JWTBearer = "Bearer " + token
 
-	//init a Storage
+	// init a Storage
 	suite.storage = entity.Storage{
 		ID:   bson.NewObjectId(),
 		Type: "nfs",

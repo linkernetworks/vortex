@@ -5,6 +5,7 @@
   - [Table of Contents](#table-of-contents)
   - [User](#user)
     - [Signup](#signup)
+    - [Verify Token](#verify-token)
     - [Signin](#signin)
     - [Create User](#create-user)
     - [List User](#list-user)
@@ -100,6 +101,22 @@ Response Data:
 }
 ```
 
+### Verify Token
+
+**GET /v1/user/verify/auth**
+
+with a authorization JWT key
+
+```
+Authorization: Bearer <MY_TOKEN>
+```
+
+Response status code:
+
+when jwt is valid return status code 303 redirect to /v1/user/<id>
+when jwt is invalid return status code 401 
+
+
 ### Signin
 
 **POST /v1/users/signin**
@@ -125,7 +142,7 @@ Response Data:
 
 ### Create User
 
-**POST /v1/user**
+**POST /v1/users**
 
 Example:
 
@@ -219,8 +236,25 @@ Response Data:
 
 ### Get User
 
-TODO 
+**GET /v1/users/5b5b418c760aab15e771bde2**
 
+Response
+
+```json
+{
+    "id": "5b5b418c760aab15e771bde2",
+    "loginCredential": {
+        "username": "guest@linkernetworks.com",
+        "password": "$2a$14$XO4OOUCaiTNQHm.ZTzHU5..WwtP2ec2Q2HPPQuMHP1WoXCjXiRrxa"
+    },
+    "displayName": "John Doe",
+    "role": "guest",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "0911111111",
+    "createdAt": "2018-07-28T00:00:12.632011379+08:00"
+}
+```
 
 ### Delete User
 
