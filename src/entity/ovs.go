@@ -22,7 +22,7 @@ type PortStatsTransmit struct {
 	Collisions uint64 `json:"collisions"`
 }
 type OVSPortStat struct {
-	PortID      uint16            `json:'portID"`
+	PortID      uint32            `json:'portID"`
 	Received    PortStatsReceive  `json:"received"`
 	Transmitted PortStatsTransmit `json:"traansmitted"`
 }
