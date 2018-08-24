@@ -1,0 +1,15 @@
+{
+	"type":"system",
+	"isDPDKPort":false,
+	"name":"@NETWORKNAME@",
+	"vlanTags":[],
+	"bridgeName":"br0",
+	"nodes":[
+		{
+			"name": "@NODENAME@",
+			"physicalInterfaces": [{
+				"name":"@ETHNAME@"
+			}]
+		}
+	]
+}
