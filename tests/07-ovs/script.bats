@@ -44,6 +44,13 @@ load init
    [ $status = 0 ]
 }
 
+@test "Get OVS Port Status" {
+    run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/networks/ 2>/dev/null | jq -r ".[0].bridgeName"'
+    localID=`http --auth-type=jwt "127.0.0.1:7890/v1/ovs/portstat?nodeName=$nodeName&bridgeName=$output" | jq -r ".[0].PortID"`
+    [ $? = 0 ]
+    [ "$localID" = "4294967295" ]
+}
+
 @test "Delete Pod" {
     run bash -c 'http --auth-type=jwt http://127.0.0.1:7890/v1/pods/ 2>/dev/null | jq -r ".[0].id"'
     run http --auth-type=jwt DELETE http://127.0.0.1:7890/v1/pods/${output} 2>/dev/null
