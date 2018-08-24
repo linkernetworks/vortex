@@ -52,7 +52,7 @@ func (suite *OVSControllerTestSuite) SetupSuite() {
 	fakeclient := fakeclientset.NewSimpleClientset()
 	suite.sp.KubeCtl = kc.New(fakeclient)
 
-	suite.bridgeName = namesgenerator.GetRandomName(0)
+	suite.bridgeName = namesgenerator.GetRandomName(0)[0:6]
 
 	// Create a fake clinet
 	// Initial nodes
@@ -72,7 +72,7 @@ func (suite *OVSControllerTestSuite) SetupSuite() {
 	})
 	suite.NoError(err)
 
-	exec.Command("ovs-vsctl", "add-br", suite.bridgeName).Run()
+	execute(&suite.Suite, exec.Command("ovs-vsctl", "add-br", suite.bridgeName))
 }
 
 func (suite *OVSControllerTestSuite) TearDownSuite() {

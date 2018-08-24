@@ -1654,9 +1654,8 @@ curl http://localhost:7890/v1/ovs/portstats?nodeName=vortex-dev&bridgeName=syste
 
 Response Data:
 
-```json
+```json=
 {
-...
  {
      "PortID": 2,
          "received": {
@@ -1672,7 +1671,6 @@ Response Data:
              "errors": 0,
              "collisions": 0
          }
- },
-...
+ }
 }
 ```
