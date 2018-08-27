@@ -11,6 +11,7 @@ type PodMetrics struct {
 	Namespace    string                     `json:"namespace"`
 	Node         string                     `json:"node"`
 	Status       string                     `json:"status"`
+	Phase        string                     `json:"phase"`
 	CreateAt     int                        `json:"createAt"`
 	CreateByKind string                     `json:"createByKind"`
 	CreateByName string                     `json:"createByName"`
