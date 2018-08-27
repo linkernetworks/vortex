@@ -196,7 +196,7 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 
 		case "kube_pod_status_phase":
 			if int(result.Value) == 1 {
-				pod.Status = string(result.Metric["phase"])
+				pod.Phase = string(result.Metric["phase"])
 			}
 
 		case "kube_pod_container_info":
@@ -204,6 +204,42 @@ func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error)
 
 		case "kube_pod_container_status_restarts_total":
 			pod.RestartCount = pod.RestartCount + int(result.Value)
+		}
+	}
+
+	// status
+	pod.Status = ""
+podStatusCheckingLoop:
+	for _, container := range pod.Containers {
+		expression.Metrics = []string{"kube_pod_container_status.*"}
+		expression.QueryLabels = map[string]string{"container": container}
+
+		str = basicExpr(expression.Metrics)
+		str = queryExpr(str, expression.QueryLabels)
+		str = equalExpr(str, 1)
+
+		results, err = query(sp, str)
+		if err != nil {
+			return pod, err
+		}
+
+		for _, result := range results {
+			switch result.Metric["__name__"] {
+
+			case "kube_pod_container_status_ready":
+				pod.Status = "ready"
+
+			case "kube_pod_container_status_running":
+				pod.Status = "running"
+
+			case "kube_pod_container_status_terminated_reason":
+				pod.Status = string(result.Metric["reason"])
+				break podStatusCheckingLoop
+
+			case "kube_pod_container_status_waiting_reason":
+				pod.Status = string(result.Metric["reason"])
+				break podStatusCheckingLoop
+			}
 		}
 	}
 
@@ -335,7 +371,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 			container.Detail.Namespace = string(result.Metric["namespace"])
 
 		case "kube_pod_container_status_restarts_total":
-			container.Status.RestartTime = int(result.Value)
+			container.Detail.RestartCount = int(result.Value)
 		}
 	}
 
@@ -365,6 +401,8 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 	}
 
 	// status
+	container.Detail.Status = ""
+
 	expression.Metrics = []string{"kube_pod_container_status.*"}
 	expression.QueryLabels = map[string]string{"container": id}
 
@@ -377,28 +415,23 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		return container, err
 	}
 
+containerStatusCheckingLoop:
 	for _, result := range results {
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_container_status_ready":
-			if container.Status.Status == "" {
-				container.Status.Status = "ready"
-			}
+			container.Detail.Status = "ready"
 
 		case "kube_pod_container_status_running":
-			container.Status.Status = "running"
-
-		case "kube_pod_container_status_waiting":
-			container.Status.Status = "waiting"
-
-		case "kube_pod_container_status_terminated":
-			container.Status.Status = "terminated"
+			container.Detail.Status = "running"
 
 		case "kube_pod_container_status_terminated_reason":
-			container.Status.TerminatedReason = string(result.Metric["reason"])
+			container.Detail.Status = string(result.Metric["reason"])
+			break containerStatusCheckingLoop
 
 		case "kube_pod_container_status_waiting_reason":
-			container.Status.WaitingReason = string(result.Metric["reason"])
+			container.Detail.Status = string(result.Metric["reason"])
+			break containerStatusCheckingLoop
 		}
 	}
 
@@ -416,7 +449,7 @@ func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMet
 		}
 	}
 
-	if container.Status.Status == "waiting" || container.Status.Status == "terminated" {
+	if container.Detail.Status != "ready" && container.Detail.Status != "running" {
 		return container, nil
 	}
 
