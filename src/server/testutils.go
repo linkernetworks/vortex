@@ -9,13 +9,9 @@ import (
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
-	"github.com/linkernetworks/vortex/src/serviceprovider"
 )
 
-func loginGetToken(sp *serviceprovider.Container, wc *restful.Container) (string, error) {
-	service := newUserService(sp)
-	wc.Add(service)
-
+func loginGetToken(wc *restful.Container) (string, error) {
 	var resp response.ActionResponse
 	userCred := entity.LoginCredential{
 		Username: "test@linkernetworks.com",

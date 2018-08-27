@@ -51,13 +51,18 @@ func newRegistryService(sp *serviceprovider.Container) *restful.WebService {
 func newUserService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/users").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createUserHandler)))
-	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
-	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listUserHandler)))
-	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getUserHandler)))
 	// Authenticate handlers Sign Up / Sign In
 	webService.Route(webService.POST("/signup").To(handler.RESTfulServiceHandler(sp, signUpUserHandler)))
 	webService.Route(webService.POST("/signin").To(handler.RESTfulServiceHandler(sp, signInUserHandler)))
+
+	// TODO only root role can access
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listUserHandler)))
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createUserHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
+
+	// user role can access
+	webService.Route(webService.GET("/{id}").Filter(validateTokenMiddleware).To(handler.RESTfulServiceHandler(sp, getUserHandler)))
+	webService.Route(webService.GET("/verify/auth").Filter(validateTokenMiddleware).To(handler.RESTfulServiceHandler(sp, verifyTokenHandler)))
 	return webService
 }
 
