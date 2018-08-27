@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -31,9 +32,33 @@ func validateTokenMiddleware(req *restful.Request, resp *restful.Response, chain
 		} else {
 			resp.WriteHeader(http.StatusUnauthorized)
 			logger.Infof("Token is not valid")
+			return
 		}
 	} else {
 		resp.WriteHeader(http.StatusUnauthorized)
 		logger.Infof("Unauthorized access to this resource")
+		return
+	}
+}
+
+func requiredRootRoleMiddleware(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	role := req.Attribute("Role").(string)
+	if role == "root" {
+		chain.ProcessFilter(req, resp)
+	} else {
+		resp.WriteHeader(http.StatusForbidden)
+		log.Printf("User role forbidden")
+		return
+	}
+}
+
+func requiredUserRoleMiddleware(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	role := req.Attribute("Role").(string)
+	if role == "user" || role == "root" {
+		chain.ProcessFilter(req, resp)
+	} else {
+		resp.WriteHeader(http.StatusForbidden)
+		log.Printf("User role forbidden")
+		return
 	}
 }
