@@ -449,7 +449,7 @@ containerStatusCheckingLoop:
 		}
 	}
 
-	if container.Detail.Status != "ready" || container.Detail.Status != "running" {
+	if container.Detail.Status != "ready" && container.Detail.Status != "running" {
 		return container, nil
 	}
 
