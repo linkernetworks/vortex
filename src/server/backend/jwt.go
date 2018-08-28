@@ -14,7 +14,7 @@ func GenerateToken(userID string, user entity.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims{
 		// issuer of the claim
-		"exp": time.Now().Add(time.Hour * time.Duration(8)).Unix(),
+		"exp": time.Now().Add(time.Hour * time.Duration(12)).Unix(),
 		// issued-at time
 		"iat": time.Now().Unix(),
 		// user role
