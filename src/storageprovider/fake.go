@@ -12,7 +12,7 @@ type FakeStorageProvider struct {
 }
 
 // ValidateBeforeCreating will validate StorageProvider before creating
-func (fake FakeStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Storage) error {
+func (fake FakeStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Container, storage *entity.Storage) error {
 	if fake.FakeParameter == "" {
 		return fmt.Errorf("Fail to validate but don't worry, I'm fake storage provider")
 	}
@@ -20,10 +20,15 @@ func (fake FakeStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Conta
 }
 
 // CreateStorage will create storage
-func (fake FakeStorageProvider) CreateStorage(sp *serviceprovider.Container, net *entity.Storage) error {
+func (fake FakeStorageProvider) CreateStorage(sp *serviceprovider.Container, storage *entity.Storage) error {
 	if fake.IWantFail {
 		return fmt.Errorf("Fail to create storage but don't worry, I'm fake storage provider")
 	}
+	return nil
+}
+
+// ValidateBeforeDeleting will validate StorageProvider before deleting
+func (fake FakeStorageProvider) ValidateBeforeDeleting(sp *serviceprovider.Container, net *entity.Storage) error {
 	return nil
 }
 
