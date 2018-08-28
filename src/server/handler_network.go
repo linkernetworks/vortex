@@ -21,7 +21,7 @@ import (
 
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	mgoID, ok := req.Attribute("UserID").(string)
+	userID, ok := req.Attribute("UserID").(string)
 	if !ok {
 		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
@@ -62,7 +62,7 @@ func createNetworkHandler(ctx *web.Context) {
 
 	network.ID = bson.NewObjectId()
 	network.CreatedAt = timeutils.Now()
-	network.OwnerID = bson.ObjectIdHex(mgoID)
+	network.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.NetworkCollectionName, &network); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp, fmt.Errorf("Network Name: %s already existed", network.Name))

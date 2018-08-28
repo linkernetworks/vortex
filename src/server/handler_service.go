@@ -21,7 +21,7 @@ import (
 
 func createServiceHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	mgoID, ok := req.Attribute("UserID").(string)
+	userID, ok := req.Attribute("UserID").(string)
 	if !ok {
 		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
@@ -48,7 +48,7 @@ func createServiceHandler(ctx *web.Context) {
 	// Check whether this name has been used
 	s.ID = bson.NewObjectId()
 	s.CreatedAt = timeutils.Now()
-	s.OwnerID = bson.ObjectIdHex(mgoID)
+	s.OwnerID = bson.ObjectIdHex(userID)
 	if err := service.CreateService(sp, &s); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", s.Name))

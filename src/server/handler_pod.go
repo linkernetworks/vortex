@@ -21,7 +21,7 @@ import (
 
 func createPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	mgoID, ok := req.Attribute("UserID").(string)
+	userID, ok := req.Attribute("UserID").(string)
 	if !ok {
 		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
@@ -62,7 +62,7 @@ func createPodHandler(ctx *web.Context) {
 		return
 	}
 
-	p.OwnerID = bson.ObjectIdHex(mgoID)
+	p.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.PodCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Pod Name: %s already existed", p.Name))
