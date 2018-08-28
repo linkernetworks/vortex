@@ -3,19 +3,38 @@ package backend
 import (
 	"testing"
 
+	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateToken(t *testing.T) {
-	roles := "admin"
-	tokenString, err := GenerateToken("234243353535330", roles)
+	user := entity.User{
+		LoginCredential: entity.LoginCredential{
+			Username: "admin@linkernetworks.com",
+		},
+		DisplayName: "admin",
+		Role:        "root",
+		FirstName:   "john",
+		LastName:    "lin",
+		PhoneNumber: "123456789",
+	}
+	tokenString, err := GenerateToken("234243353535330", user)
 	assert.NotNil(t, tokenString)
 	assert.NoError(t, err)
 }
 
 func TestVerifyToken(t *testing.T) {
-	roles := "admin"
-	tokenString, err := GenerateToken("234243353535330", roles)
+	user := entity.User{
+		LoginCredential: entity.LoginCredential{
+			Username: "admin@linkernetworks.com",
+		},
+		DisplayName: "admin",
+		Role:        "root",
+		FirstName:   "john",
+		LastName:    "lin",
+		PhoneNumber: "123456789",
+	}
+	tokenString, err := GenerateToken("234243353535330", user)
 	assert.NotNil(t, tokenString)
 	assert.NoError(t, err)
 

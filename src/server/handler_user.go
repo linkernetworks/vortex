@@ -112,7 +112,7 @@ func signInUserHandler(ctx *web.Context) {
 	}
 
 	// Passed
-	tokenString, err := backend.GenerateToken(authenticatedUser.ID.Hex(), authenticatedUser.Role)
+	tokenString, err := backend.GenerateToken(authenticatedUser.ID.Hex(), authenticatedUser)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
