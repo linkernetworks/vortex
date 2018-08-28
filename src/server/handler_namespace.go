@@ -11,6 +11,7 @@ import (
 	"github.com/linkernetworks/vortex/src/namespace"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -20,6 +21,11 @@ import (
 
 func createNamespaceHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	n := entity.Namespace{}
 	if err := req.ReadEntity(&n); err != nil {
@@ -51,6 +57,8 @@ func createNamespaceHandler(ctx *web.Context) {
 		}
 		return
 	}
+
+	n.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.NamespaceCollectionName, &n); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Namespace: %s already existed", n.Name))
@@ -59,6 +67,7 @@ func createNamespaceHandler(ctx *web.Context) {
 		}
 		return
 	}
+	n.CreatedBy, _ = backend.FindUserByID(session, n.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, n)
 }
 

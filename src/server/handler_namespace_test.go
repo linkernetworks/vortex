@@ -26,9 +26,10 @@ func init() {
 
 type NamespaceTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *NamespaceTestSuite) SetupSuite() {
@@ -36,23 +37,29 @@ func (suite *NamespaceTestSuite) SetupSuite() {
 	sp := serviceprovider.NewForTesting(cf)
 
 	suite.sp = sp
-	//init session
+	// init session
 	suite.session = sp.Mongo.NewSession()
-	//init restful container
+	// init restful container
 	suite.wc = restful.NewContainer()
-	service := newNamespaceService(suite.sp)
-	suite.wc.Add(service)
+
+	namespaceService := newNamespaceService(suite.sp)
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(namespaceService)
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
+	suite.JWTBearer = "Bearer " + token
 }
 
-func (suite *NamespaceTestSuite) TearDownSuite() {
-}
+func (suite *NamespaceTestSuite) TearDownSuite() {}
 
 func TestNamespaceSuite(t *testing.T) {
 	suite.Run(t, new(NamespaceTestSuite))
 }
 
 func (suite *NamespaceTestSuite) TestCreateNamespace() {
-
 	nsName := namesgenerator.GetRandomName(0)
 	namespace := entity.Namespace{
 		ID:   bson.NewObjectId(),
@@ -67,6 +74,7 @@ func (suite *NamespaceTestSuite) TestCreateNamespace() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -89,6 +97,7 @@ func (suite *NamespaceTestSuite) TestCreateNamespace() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/namespaces", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -119,6 +128,7 @@ func (suite *NamespaceTestSuite) TestDeleteNamespace() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -133,6 +143,7 @@ func (suite *NamespaceTestSuite) TestDeleteNamespaceWithInvalidID() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -146,13 +157,14 @@ func (suite *NamespaceTestSuite) TestGetNamespace() {
 		Name: nsName,
 	}
 
-	//Create data into mongo manually
+	// Create data into mongo manually
 	suite.session.C(entity.NamespaceCollectionName).Insert(namespace)
 	defer suite.session.Remove(entity.NamespaceCollectionName, "name", nsName)
 
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/namespaces/"+namespace.ID.Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -164,10 +176,11 @@ func (suite *NamespaceTestSuite) TestGetNamespace() {
 }
 
 func (suite *NamespaceTestSuite) TestGetNamespaceWithInvalidID() {
-	//Get data with non-exits ID
+	// Get data with non-exits ID
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/namespaces/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -210,6 +223,7 @@ func (suite *NamespaceTestSuite) TestListNamespace() {
 			httpRequest, err := http.NewRequest("GET", url, nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -230,6 +244,7 @@ func (suite *NamespaceTestSuite) TestListNamespaceWithInvalidPage() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/namespaces?page=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -237,6 +252,7 @@ func (suite *NamespaceTestSuite) TestListNamespaceWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/namespaces?page_size=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -244,6 +260,7 @@ func (suite *NamespaceTestSuite) TestListNamespaceWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/namespaces?page=-1", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
