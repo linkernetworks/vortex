@@ -26,9 +26,10 @@ func init() {
 
 type DeploymentTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *DeploymentTestSuite) SetupSuite() {
@@ -36,12 +37,20 @@ func (suite *DeploymentTestSuite) SetupSuite() {
 	sp := serviceprovider.NewForTesting(cf)
 
 	suite.sp = sp
-	//init session
+	// init session
 	suite.session = sp.Mongo.NewSession()
-	//init restful container
+	// init restful container
 	suite.wc = restful.NewContainer()
-	service := newDeploymentService(suite.sp)
-	suite.wc.Add(service)
+
+	deploymentService := newDeploymentService(suite.sp)
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(deploymentService)
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *DeploymentTestSuite) TearDownSuite() {}
@@ -81,6 +90,7 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -103,6 +113,7 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/deployments", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -138,6 +149,7 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFail() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -178,6 +190,7 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -192,6 +205,7 @@ func (suite *DeploymentTestSuite) TestDeleteDeploymentWithInvalidID() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -222,6 +236,7 @@ func (suite *DeploymentTestSuite) TestGetDeployment() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/deployments/"+deploy.ID.Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -238,6 +253,7 @@ func (suite *DeploymentTestSuite) TestGetDeploymentWithInvalidID() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/deployments/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -290,6 +306,7 @@ func (suite *DeploymentTestSuite) TestListDeployment() {
 			httpRequest, err := http.NewRequest("GET", url, nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -311,6 +328,7 @@ func (suite *DeploymentTestSuite) TestListDeploymentWithInvalidPage() {
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/deployments?page=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -318,6 +336,7 @@ func (suite *DeploymentTestSuite) TestListDeploymentWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/deployments?page_size=asdd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
@@ -325,6 +344,7 @@ func (suite *DeploymentTestSuite) TestListDeploymentWithInvalidPage() {
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/deployments?page=-1", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
