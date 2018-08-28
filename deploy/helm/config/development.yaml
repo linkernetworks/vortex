@@ -28,7 +28,7 @@ apps:
       replicaCount: 1
       imageTag: v2.2.1
       scrapeInterval: 5s
-      retention: 1h
+      retention: 24h
       cpu: 50m
     service:
       nodePort: true

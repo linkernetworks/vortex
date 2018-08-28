@@ -3,6 +3,7 @@ package prometheuscontroller
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
@@ -267,7 +268,7 @@ podStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err := queryRange(sp, str)
+	resultMatrix, err := queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return pod, err
 	}
@@ -287,7 +288,7 @@ podStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return pod, err
 	}
@@ -307,7 +308,7 @@ podStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return pod, err
 	}
@@ -327,7 +328,7 @@ podStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return pod, err
 	}
@@ -460,7 +461,7 @@ containerStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 
-	resultMatrix, err := queryRange(sp, str)
+	resultMatrix, err := queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return container, err
 	}
@@ -477,7 +478,7 @@ containerStatusCheckingLoop:
 	str = queryExpr(str, expression.QueryLabels)
 	str = multiplyExpr(sumExpr(rateExpr(durationExpr(str, "1m"))), 100)
 
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return container, err
 	}
@@ -793,7 +794,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err := queryRange(sp, str)
+	resultMatrix, err := queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return node, err
 	}
@@ -813,7 +814,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return node, err
 	}
@@ -833,7 +834,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return node, err
 	}
@@ -853,7 +854,7 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, time.Minute*2, time.Second*10)
 	if err != nil {
 		return node, err
 	}
