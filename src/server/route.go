@@ -162,19 +162,20 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Path("/v1/monitoring").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	// node
 	webService.Route(webService.GET("/nodes").To(handler.RESTfulServiceHandler(sp, listNodeMetricsHandler)))
-	webService.Route(webService.GET("/nodes/{node}").To(handler.RESTfulServiceHandler(sp, getNodeMetricsHandler)))
-	webService.Route(webService.GET("/nodes/{node}/nics").To(handler.RESTfulServiceHandler(sp, listNodeNicsMetricsHandler)))
+	webService.Route(webService.GET("/nodes/{id}").To(handler.RESTfulServiceHandler(sp, getNodeMetricsHandler)))
+	webService.Route(webService.GET("/nodes/{id}/nics").To(handler.RESTfulServiceHandler(sp, listNodeNicsMetricsHandler)))
 	// pod
 	webService.Route(webService.GET("/pods").To(handler.RESTfulServiceHandler(sp, listPodMetricsHandler)))
-	webService.Route(webService.GET("/pods/{pod}").To(handler.RESTfulServiceHandler(sp, getPodMetricsHandler)))
-	//container
-	webService.Route(webService.GET("/pods/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerMetricsHandler)))
+	webService.Route(webService.GET("/pods/{id}").To(handler.RESTfulServiceHandler(sp, getPodMetricsHandler)))
+	// container
+	webService.Route(webService.GET("/containers").To(handler.RESTfulServiceHandler(sp, listContainerMetricsHandler)))
+	webService.Route(webService.GET("/containers/{id}").To(handler.RESTfulServiceHandler(sp, getContainerMetricsHandler)))
 	// service
 	webService.Route(webService.GET("/services").To(handler.RESTfulServiceHandler(sp, listServiceMetricsHandler)))
-	webService.Route(webService.GET("/services/{service}").To(handler.RESTfulServiceHandler(sp, getServiceMetricsHandler)))
+	webService.Route(webService.GET("/services/{id}").To(handler.RESTfulServiceHandler(sp, getServiceMetricsHandler)))
 	// controller
 	webService.Route(webService.GET("/controllers").To(handler.RESTfulServiceHandler(sp, listControllerMetricsHandler)))
-	webService.Route(webService.GET("/controllers/{controller}").To(handler.RESTfulServiceHandler(sp, getControllerMetricsHandler)))
+	webService.Route(webService.GET("/controllers/{id}").To(handler.RESTfulServiceHandler(sp, getControllerMetricsHandler)))
 	return webService
 }
 

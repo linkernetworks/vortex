@@ -10,10 +10,9 @@ import (
 
 func getContainerMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	podId := req.PathParameter("pod")
-	containerId := req.PathParameter("container")
+	id := req.PathParameter("id")
 
-	container, err := pc.GetContainer(sp, podId, containerId)
+	container, err := pc.GetContainer(sp, id)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -24,7 +23,7 @@ func getContainerMetricsHandler(ctx *web.Context) {
 
 func getPodMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("pod")
+	id := req.PathParameter("id")
 
 	pod, err := pc.GetPod(sp, id)
 	if err != nil {
@@ -37,7 +36,7 @@ func getPodMetricsHandler(ctx *web.Context) {
 
 func getServiceMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("service")
+	id := req.PathParameter("id")
 
 	service, err := pc.GetService(sp, id)
 	if err != nil {
@@ -50,7 +49,7 @@ func getServiceMetricsHandler(ctx *web.Context) {
 
 func getControllerMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("controller")
+	id := req.PathParameter("id")
 
 	controller, err := pc.GetController(sp, id)
 	if err != nil {
@@ -63,7 +62,7 @@ func getControllerMetricsHandler(ctx *web.Context) {
 
 func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("node")
+	id := req.PathParameter("id")
 
 	node, err := pc.GetNode(sp, id)
 	if err != nil {
@@ -72,6 +71,43 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	}
 
 	resp.WriteEntity(node)
+}
+
+func listContainerMetricsHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	query := query.New(req.Request.URL.Query())
+	queryLabels := map[string]string{}
+
+	if node, ok := query.Str("node"); ok {
+		queryLabels["node"] = node
+	}
+
+	if namespace, ok := query.Str("namespace"); ok {
+		queryLabels["namespace"] = namespace
+	}
+
+	if pod, ok := query.Str("pod"); ok {
+		queryLabels["pod"] = pod
+	}
+
+	containerNameList, err := pc.ListContainerName(sp, queryLabels)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	containerList := map[string]entity.ContainerMetrics{}
+	for _, containerName := range containerNameList {
+		container, err := pc.GetContainer(sp, containerName)
+		if err != nil {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			return
+		}
+		containerList[containerName] = container
+	}
+
+	resp.WriteEntity(containerList)
 }
 
 func listPodMetricsHandler(ctx *web.Context) {
@@ -194,7 +230,7 @@ func listNodeMetricsHandler(ctx *web.Context) {
 
 func listNodeNicsMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	id := req.PathParameter("node")
+	id := req.PathParameter("id")
 
 	nicList, err := pc.ListNodeNICs(sp, id)
 	if err != nil {

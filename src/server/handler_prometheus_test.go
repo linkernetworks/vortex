@@ -106,14 +106,29 @@ func (suite *PrometheusTestSuite) TestGetPodMetrics() {
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 }
 
+func (suite *PrometheusTestSuite) TestListContainerMetrics() {
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/containers/", nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/containers?node=.*&namespace=.*&pod=.*", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+}
+
 func (suite *PrometheusTestSuite) TestGetContainerMetrics() {
 	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
-	podName := pods[0].Name
 	containerName := pods[0].Status.ContainerStatuses[0].Name
 
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/pods/"+podName+"/"+containerName, nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/containers/"+containerName, nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
