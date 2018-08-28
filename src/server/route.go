@@ -147,6 +147,7 @@ func newServiceService(sp *serviceprovider.Container) *restful.WebService {
 func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/namespaces").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createNamespaceHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteNamespaceHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNamespaceHandler)))
