@@ -43,7 +43,6 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 func newRegistryService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/registry").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	//	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/auth").To(handler.RESTfulServiceHandler(sp, registryBasicAuthHandler)))
 	return webService
 }
@@ -81,6 +80,7 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 func newStorageService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/storage").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createStorage)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listStorage)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteStorage)))
