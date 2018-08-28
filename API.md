@@ -30,11 +30,11 @@
     - [List Pods](#list-pods)
     - [Get Pod](#get-pod)
     - [Delete Pod](#delete-pod)
-  - [Deployment](#deploy)
-    - [Create Deployment](#create-deploy)
-    - [List Deployments](#list-deploys)
-    - [Get Deployment](#get-deploy)
-    - [Delete Deployment](#delete-deploy)
+  - [Deployment](#deployment)
+    - [Create Deployment](#create-deployment)
+    - [List Deployments](#list-deployments)
+    - [Get Deployment](#get-deployment)
+    - [Delete Deployment](#delete-deployment)
   - [Resouce Monitoring](#resouce-monitoring)
     - [List Nodes](#list-nodes)
     - [Get Node](#get-node)
@@ -1433,12 +1433,15 @@ Response Data:
 {
   "controllerName": "prometheus",
   "type": "deployment",
-  "namespace": "monitoring",
+  "namespace": "vortex",
   "strategy": "",
-  "createAt": 1531211728,
+  "createAt": 1535031877,
   "desiredPod": 1,
   "currentPod": 1,
   "availablePod": 1,
+  "pods": [
+   "prometheus-85bc764c94-kj4wg"
+  ],
   "labels": {
    "name": "prometheus-deployment"
   }

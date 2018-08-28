@@ -10,5 +10,6 @@ type ControllerMetrics struct {
 	DesiredPod     int               `json:"desiredPod"`
 	CurrentPod     int               `json:"currentPod"`
 	AvailablePod   int               `json:"availablePod"`
+	Pods           []string          `json:"pods"`
 	Labels         map[string]string `json:"labels"`
 }
