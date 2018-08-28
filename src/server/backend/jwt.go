@@ -6,18 +6,23 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/entity"
 )
 
 // GenerateToken is for generating token
-func GenerateToken(userID string, role string) (string, error) {
+func GenerateToken(userID string, user entity.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims{
 		// issuer of the claim
-		"exp": time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"exp": time.Now().Add(time.Hour * time.Duration(12)).Unix(),
 		// issued-at time
 		"iat": time.Now().Unix(),
 		// user role
-		"role": role,
+		"role": user.Role,
+		// user email
+		"username": user.LoginCredential.Username,
+		// user display name
+		"displayName": user.DisplayName,
 		// the subject of this token. This is the user associated with the relevant action
 		"sub": userID,
 	}
