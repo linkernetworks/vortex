@@ -11,6 +11,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -20,6 +21,11 @@ import (
 
 func createDeploymentHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	p := entity.Deployment{}
 	if err := req.ReadEntity(&p); err != nil {
@@ -55,6 +61,7 @@ func createDeploymentHandler(ctx *web.Context) {
 		}
 		return
 	}
+	p.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.DeploymentCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Name))
@@ -63,6 +70,8 @@ func createDeploymentHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// find owner in user entity
+	p.CreatedBy, _ = backend.FindUserByID(session, p.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
@@ -144,6 +153,11 @@ func listDeploymentHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, deployment := range deployments {
+		// find owner in user entity
+		deployment.CreatedBy, _ = backend.FindUserByID(session, deployment.OwnerID)
+	}
 	count, err := session.Count(entity.DeploymentCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -175,5 +189,6 @@ func getDeploymentHandler(ctx *web.Context) {
 			return
 		}
 	}
+	deployment.CreatedBy, _ = backend.FindUserByID(session, deployment.OwnerID)
 	resp.WriteEntity(deployment)
 }
