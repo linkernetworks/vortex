@@ -118,6 +118,7 @@ func newPodService(sp *serviceprovider.Container) *restful.WebService {
 
 func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
+	webService.Filter(validateTokenMiddleware)
 	webService.Path("/v1/deployments").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createDeploymentHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteDeploymentHandler)))
