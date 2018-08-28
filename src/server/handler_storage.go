@@ -11,6 +11,7 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/storageprovider"
 	"github.com/linkernetworks/vortex/src/web"
 	mgo "gopkg.in/mgo.v2"
@@ -20,6 +21,11 @@ import (
 
 func createStorage(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	storage := entity.Storage{}
 	if err := req.ReadEntity(&storage); err != nil {
@@ -63,6 +69,7 @@ func createStorage(ctx *web.Context) {
 		return
 	}
 
+	storage.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.StorageCollectionName, &storage); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.Name))
@@ -71,6 +78,7 @@ func createStorage(ctx *web.Context) {
 		}
 		return
 	}
+	storage.CreatedBy, _ = backend.FindUserByID(session, storage.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, storage)
 }
 
@@ -94,7 +102,7 @@ func listStorage(ctx *web.Context) {
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
-	storageProviders := []entity.Storage{}
+	storages := []entity.Storage{}
 
 	var c = session.C(entity.StorageCollectionName)
 	var q *mgo.Query
@@ -102,7 +110,7 @@ func listStorage(ctx *web.Context) {
 	selector := bson.M{}
 	q = c.Find(selector).Sort("_id").Skip((page - 1) * pageSize).Limit(pageSize)
 
-	if err := q.All(&storageProviders); err != nil {
+	if err := q.All(&storages); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			response.NotFound(req.Request, resp.ResponseWriter, err)
@@ -113,6 +121,11 @@ func listStorage(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, storage := range storages {
+		// find owner in user entity
+		storage.CreatedBy, _ = backend.FindUserByID(session, storage.OwnerID)
+	}
 	count, err := session.Count(entity.StorageCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -121,7 +134,7 @@ func listStorage(ctx *web.Context) {
 	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
 	resp.AddHeader("X-Total-Count", strconv.Itoa(count))
 	resp.AddHeader("X-Total-Pages", strconv.Itoa(totalPages))
-	resp.WriteEntity(storageProviders)
+	resp.WriteEntity(storages)
 }
 
 func deleteStorage(ctx *web.Context) {

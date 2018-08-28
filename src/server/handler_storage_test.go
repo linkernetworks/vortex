@@ -23,29 +23,33 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type StorageSuite struct {
-	suite.Suite
-	wc      *restful.Container
-	session *mongo.Session
-}
-
 type StorageTestSuite struct {
 	suite.Suite
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *StorageTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
-	//init restful container
-	suite.wc = restful.NewContainer()
-	service := newStorageService(sp)
-	suite.wc.Add(service)
-
-	//init session
+	suite.sp = sp
+	// init session
 	suite.session = sp.Mongo.NewSession()
+	// init restful container
+	suite.wc = restful.NewContainer()
+
+	storageService := newStorageService(sp)
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(storageService)
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *StorageTestSuite) TearDownSuite() {}
@@ -55,7 +59,7 @@ func TestStorageSuite(t *testing.T) {
 }
 
 func (suite *StorageTestSuite) TestCreateStorage() {
-	//Testing parameter
+	// Testing parameter
 	tName := namesgenerator.GetRandomName(0)
 	storage := entity.Storage{
 		Type:             entity.FakeStorageType,
@@ -76,6 +80,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	defer suite.session.Remove(entity.StorageCollectionName, "name", tName)
@@ -90,6 +95,7 @@ func (suite *StorageTestSuite) TestCreateStorage() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/storage", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
@@ -169,6 +175,7 @@ func (suite *StorageTestSuite) TestCreateStorageFail() {
 			suite.NoError(err)
 
 			httpRequest.Header.Add("Content-Type", "application/json")
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), tc.errorCode, httpWriter)
@@ -199,6 +206,7 @@ func (suite *StorageTestSuite) TestDeleteStorage() {
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+storage.ID.Hex(), bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -209,6 +217,7 @@ func (suite *NetworkTestSuite) TestDeleteEmptyStorage() {
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -217,6 +226,7 @@ func (suite *NetworkTestSuite) TestDeleteEmptyStorage() {
 func (suite *StorageTestSuite) TestInValidDeleteStorage() {
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusNotFound, httpWriter)
@@ -256,6 +266,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 			httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/storage/"+tc.storage.ID.Hex(), nil)
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpRequest.Header.Add("Content-Type", "application/json")
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
@@ -307,6 +318,7 @@ func (suite *StorageTestSuite) TestListStorage() {
 
 			suite.NoError(err)
 
+			httpRequest.Header.Add("Authorization", suite.JWTBearer)
 			httpWriter := httptest.NewRecorder()
 			suite.wc.Dispatch(httpWriter, httpRequest)
 			assertResponseCode(suite.T(), http.StatusOK, httpWriter)
@@ -324,26 +336,29 @@ func (suite *StorageTestSuite) TestListStorage() {
 }
 
 func (suite *StorageTestSuite) TestListInvalidStorage() {
-	//Invliad page size
+	// Invliad page size
 	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/storage?page=0", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
 
-	//Invliad page type
+	// Invliad page type
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storage?page=asd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	//Invliad page_size type
+	// Invliad page_size type
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/storage?page_size=asd", nil)
 	suite.NoError(err)
 
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
