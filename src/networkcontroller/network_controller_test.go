@@ -157,6 +157,9 @@ func (suite *NetworkControllerTestSuite) TestCreateOVSUserpsaceNetwork() {
 	err = nc.CreateOVSNetwork("netdev", tName, network.Nodes[0].PhyInterfaces, network.VlanTags)
 	suite.NoError(err)
 
+	data, err := nc.DumpOVSPorts(tName)
+	suite.NoError(err)
+	suite.Equal(2, len(data))
 	//TODO we need support the list function to check the ovs is existed
 	defer exec.Command("ovs-vsctl", "del-br", tName).Run()
 }
