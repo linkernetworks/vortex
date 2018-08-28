@@ -185,5 +185,7 @@ func getNamespaceHandler(ctx *web.Context) {
 			return
 		}
 	}
+	// find owner in user entity
+	namespace.CreatedBy, _ = backend.FindUserByID(session, namespace.OwnerID)
 	resp.WriteEntity(namespace)
 }
