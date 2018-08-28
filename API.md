@@ -41,6 +41,7 @@
     - [List NICs of certain node](#list-nics-of-certain-node)
     - [List Pod](#list-pod)
     - [Get Pod](#get-pod)
+    - [List Containers](#list-containers)
     - [Get Container](#get-container)
     - [List Services](#list-services)
     - [Get Service](#get-service)
@@ -655,7 +656,7 @@ For each Pod, we have fileds need to handle.
     - Always,OnFailure,Never
 9. networkType: the string options for network type, support "host", "custom" and "cluster".
 10. nodeAffinity: the string array to indicate whchi nodes I want my Pod can run in.
-11. envVars: the environment variables for containers and it's map (string to stirng) form.
+12. envVars: the environment variables for containers and it's map (string to stirng) form.
 
 Example:
 
@@ -999,8 +1000,7 @@ Response Data:
    "createAt": 1532573834,
    "status": "Ready",
    "os": "Ubuntu 16.04.4 LTS",
-   "kernelVersion": "4.4.0-133-generic",
-   "dockerVersion": "17.6.2",
+   "kernelVersion": "4.4.0-128-generic",
    "kubeproxyVersion": "v1.11.0",
    "kubernetesVersion": "v1.11.0",
    "labels": {
@@ -1010,18 +1010,15 @@ Response Data:
    }
   },
   "resource": {
-   "cpuRequests": 1.3,
-   "cpuLimits": 0,
-   "memoryRequests": 146800640,
-   "memoryLimits": 356515840,
-   "memoryTotalHugepages": 1024,
-   "memoryFreeHugepages": 512,
-   "memoryHugepagesSize": 2097152,
+   "cpuRequests": 1.05,
+   "cpuLimits": 0.6,
+   "memoryRequests": 283115520,
+   "memoryLimits": 3009413000,
    "allocatableCPU": 2,
-   "allocatableMemory": 2948079600,
+   "allocatableMemory": 1891131400,
    "allocatablePods": 110,
    "capacityCPU": 2,
-   "capacityMemory": 5200421000,
+   "capacityMemory": 4143472600,
    "capacityPods": 110
   },
   "nics": {
@@ -1255,8 +1252,38 @@ Response Data:
  }
 ```
 
+### List Containers
+**GET /v1/monitoring/container?namespace=\.\*&node=\.\*&podpo=\.***
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/containers
+```
+
+Response Data:
+``` json
+{
+  "node-exporter": { ... },
+  "prometheus": { ... },
+  "tiller": { ... },
+  "vortex-server": { ... },
+  ...
+```
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/containers\?namespace\=vortex\&node\=vortex-dev\&pod\=vortex-server-6945b797bb-jbszk
+```
+
+Response Data:
+``` json
+{
+  "vortex-server": { ... }
+ }
+```
+
 ### Get Container
-**Get /v1/monitoring/pods/{pod}/{container}**
+**Get /v1/monitoring/container/{id}**
 
 Example:
 ```
@@ -1267,18 +1294,22 @@ Response Data:
 ``` json
 {
   "detail": {
-   "containerName": "test1",
-   "createAt": 1535361241,
-   "status": "running",
-   "restartTime": 4,
-   "pod": "atest",
-   "namespace": "default",
+   "containerName": "prometheus",
+   "createAt": 0,
+   "pod": "prometheus-7f759794cb-52t54",
+   "namespace": "vortex",
    "node": "vortex-dev",
-   "image": "busybox:latest",
+   "image": "prom/prometheus:v2.2.1",
    "command": [
-    "sleep",
-    "3600"
-   ]
+    "/bin/prometheus"
+   ],
+   "vNic": ""
+  },
+  "status": {
+   "status": "running",
+   "waitingReason": "",
+   "terminatedReason": "",
+   "restartTime": 0
   },
   "resource": {
    "cpuUsagePercentage": [

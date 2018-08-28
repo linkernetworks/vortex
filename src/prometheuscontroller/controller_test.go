@@ -136,10 +136,9 @@ func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
 	namespace := "vortex"
 	pods, err := suite.sp.KubeCtl.GetPods(namespace)
 	suite.NoError(err)
-	podName := pods[0].Name
 	containerName := pods[0].Status.ContainerStatuses[0].Name
 
-	container, err := GetContainer(suite.sp, podName, containerName)
+	container, err := GetContainer(suite.sp, containerName)
 	suite.NoError(err)
 	suite.Equal(containerName, container.Detail.ContainerName)
 }

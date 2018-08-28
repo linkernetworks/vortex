@@ -344,7 +344,7 @@ podStatusCheckingLoop:
 }
 
 // GetContainer will get container
-func GetContainer(sp *serviceprovider.Container, podId string, containerId string) (entity.ContainerMetrics, error) {
+func GetContainer(sp *serviceprovider.Container, id string) (entity.ContainerMetrics, error) {
 	container := entity.ContainerMetrics{}
 
 	// basic info from kube-state-metrics
@@ -352,7 +352,7 @@ func GetContainer(sp *serviceprovider.Container, podId string, containerId strin
 	expression.Metrics = []string{
 		"kube_pod_container_info",
 		"kube_pod_container_status_restarts_total"}
-	expression.QueryLabels = map[string]string{"container": containerId, "pod": podId}
+	expression.QueryLabels = map[string]string{"container": id}
 
 	str := basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -365,7 +365,7 @@ func GetContainer(sp *serviceprovider.Container, podId string, containerId strin
 		switch result.Metric["__name__"] {
 
 		case "kube_pod_container_info":
-			container.Detail.ContainerName = containerId
+			container.Detail.ContainerName = id
 			container.Detail.Pod = string(result.Metric["pod"])
 			container.Detail.Image = string(result.Metric["image"])
 			container.Detail.Namespace = string(result.Metric["namespace"])
@@ -380,7 +380,7 @@ func GetContainer(sp *serviceprovider.Container, podId string, containerId strin
 	expression.Metrics = []string{
 		"container_start_time_seconds",
 		"container_last_seen"}
-	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": containerId, "container_label_io_kubernetes_pod_name": podId}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -404,7 +404,7 @@ func GetContainer(sp *serviceprovider.Container, podId string, containerId strin
 	container.Detail.Status = ""
 
 	expression.Metrics = []string{"kube_pod_container_status.*"}
-	expression.QueryLabels = map[string]string{"container": containerId, "pod": podId}
+	expression.QueryLabels = map[string]string{"container": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -443,7 +443,7 @@ containerStatusCheckingLoop:
 	}
 
 	for _, obj := range pod.Spec.Containers {
-		if obj.Name == containerId {
+		if obj.Name == id {
 			container.Detail.Command = obj.Command
 			break
 		}
@@ -455,7 +455,7 @@ containerStatusCheckingLoop:
 
 	// Memory resource
 	expression.Metrics = []string{"container_memory_usage_bytes"}
-	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": containerId, "container_label_io_kubernetes_pod_name": podId}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
@@ -471,7 +471,7 @@ containerStatusCheckingLoop:
 
 	// CPU resource
 	expression.Metrics = []string{"container_cpu_usage_seconds_total"}
-	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": containerId, "container_label_io_kubernetes_pod_name": podId}
+	expression.QueryLabels = map[string]string{"container_label_io_kubernetes_container_name": id}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
