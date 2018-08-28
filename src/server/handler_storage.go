@@ -152,7 +152,11 @@ func deleteStorage(ctx *web.Context) {
 	}
 
 	if err := storageProvider.DeleteStorage(sp, &storage); err != nil {
-		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		if err, ok := err.(*storageprovider.BusyError); !ok {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.BadRequest(req.Request, resp.ResponseWriter, err)
+		}
 		return
 	}
 
