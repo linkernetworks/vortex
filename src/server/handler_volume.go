@@ -21,7 +21,7 @@ import (
 
 func createVolumeHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
-	mgoID, ok := req.Attribute("UserID").(string)
+	userID, ok := req.Attribute("UserID").(string)
 	if !ok {
 		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
 		return
@@ -48,7 +48,7 @@ func createVolumeHandler(ctx *web.Context) {
 	// Check whether this name has been used
 	v.ID = bson.NewObjectId()
 	v.CreatedAt = timeutils.Now()
-	v.OwnerID = bson.ObjectIdHex(mgoID)
+	v.OwnerID = bson.ObjectIdHex(userID)
 	// Generate the metaName for PVC meta name and we will use it future
 	if err := volume.CreateVolume(sp, &v); err != nil {
 		if errors.IsAlreadyExists(err) {
