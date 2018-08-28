@@ -149,6 +149,11 @@ func listNamespaceHandler(ctx *web.Context) {
 		}
 	}
 
+	// insert users entity
+	for _, namespace := range namespaces {
+		// find owner in user entity
+		namespace.CreatedBy, _ = backend.FindUserByID(session, namespace.OwnerID)
+	}
 	count, err := session.Count(entity.NamespaceCollectionName, bson.M{})
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
