@@ -138,7 +138,7 @@ func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, stora
 	if err != nil {
 		return err
 	} else if count > 0 {
-		return fmt.Errorf("The StorageName %s can't be deleted, since there're some volume still use it", storage.Name)
+		return &BusyError{storage.Name}
 	}
 
 	//Delete StorageClass

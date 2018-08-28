@@ -149,6 +149,9 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 
 	err = sp.DeleteStorage(suite.sp, storage)
 	suite.Error(err)
+	err, ok := err.(*BusyError)
+	suite.True(ok)
+	suite.Error(err)
 }
 
 func (suite *StorageTestSuite) TestValidateBeforeCreatingFail() {

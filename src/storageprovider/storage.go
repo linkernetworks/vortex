@@ -24,3 +24,11 @@ func GetStorageProvider(storage *entity.Storage) (StorageProvider, error) {
 		return nil, fmt.Errorf("Unsupported Storage Type %s", storage.Type)
 	}
 }
+
+type BusyError struct {
+	name string
+}
+
+func (e *BusyError) Error() string {
+	return fmt.Sprintf("The StorageName %s can't be deleted, since there're some volume still use it", e.name)
+}
