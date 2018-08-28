@@ -42,7 +42,10 @@ func (suite *StorageTestSuite) SetupSuite() {
 	suite.wc = restful.NewContainer()
 
 	storageService := newStorageService(sp)
+	userService := newUserService(suite.sp)
+
 	suite.wc.Add(storageService)
+	suite.wc.Add(userService)
 
 	token, _ := loginGetToken(suite.wc)
 	suite.NotEmpty(token)
