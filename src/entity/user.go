@@ -9,6 +9,11 @@ import (
 // UserCollectionName's const
 const (
 	UserCollectionName string = "users"
+	// access control role
+	RootRole string = "root"
+	UserRole string = "user"
+	// view only
+	GuestRole string = "guest"
 )
 
 // RegistryBasicAuthCredential is the structure for a user login credential
