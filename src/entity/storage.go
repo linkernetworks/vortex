@@ -23,12 +23,14 @@ const (
 // Storage is the Storage info
 type Storage struct {
 	ID               bson.ObjectId `bson:"_id,omitempty" json:"id" validate:"-"`
+	OwnerID          bson.ObjectId `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
 	Type             StorageType   `bson:"type" json:"type" validate:"required"`
 	Name             string        `bson:"name" json:"name" validate:"required"`
 	StorageClassName string        `bson:"storageClassName" json:"storageClassName" validate:"-"`
 	IP               string        `bson:"ip" json:"ip" validate:"required,ipv4"`
 	PATH             string        `bson:"path" json:"path" validate:"required"`
 	Fake             *FakeStorage  `bson:"fake,omitempty" json:"fake,omitempty" validate:"-"` //FakeStorage, for restful testing.
+	CreatedBy        User          `json:"createdBy" validate:"-"`
 	CreatedAt        *time.Time    `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 }
 
