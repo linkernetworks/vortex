@@ -28,7 +28,7 @@ apps:
       replicaCount: 1
       imageTag: v2.2.1
       scrapeInterval: 5s
-      retention: 1h
+      retention: 30d
       cpu: 100m
     service:
       nodePort: false
@@ -66,5 +66,20 @@ services:
         accessModes: ReadWriteMany
         storageClass: mongo
         storage: 100Gi
+    service:
+      nodePort: false
+  # vortex/deploy/helm/services/charts/influxdb
+  influxdb:
+    controller:
+      replicaCount: 1
+      cpu: 200m
+      image:
+        tag: 1.5-alpine
+      pvc:
+        volumeType: local
+        reclaimPolicy: Recycle
+        accessModes: ReadWriteMany
+        storageClass: influx
+        storage: 50Gi
     service:
       nodePort: false

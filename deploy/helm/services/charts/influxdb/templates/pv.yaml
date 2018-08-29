@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: influxdb-{{- .Values.controller.pvc.volumeType }}
+spec:
+  storageClassName: {{ .Values.controller.pvc.storageClass }}
+  persistentVolumeReclaimPolicy: {{ .Values.controller.pvc.reclaimPolicy }}
+  capacity:
+    storage: {{ .Values.controller.pvc.storage }}
+  accessModes:
+    - {{ .Values.controller.pvc.accessModes }}
+  {{- if eq .Values.controller.pvc.volumeType "local"}}
+  hostPath:
+    path: "/data/influxdb"
+  {{- else if eq .Values.controller.pvc.volumeType "nfs" }}
+  nfs: 
+    path: {{ .Values.controller.pvc.nfsPath }}
+    server: {{ .Values.controller.pvc.nfsServer }}
+  {{- end }}
