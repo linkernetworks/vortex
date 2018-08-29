@@ -1,12 +1,15 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/emicklei/go-restful"
 	"github.com/linkernetworks/logger"
+	"github.com/linkernetworks/vortex/src/entity"
+	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/server/backend"
 )
 
@@ -29,11 +32,65 @@ func validateTokenMiddleware(req *restful.Request, resp *restful.Response, chain
 			req.SetAttribute("Role", claims["role"])
 			chain.ProcessFilter(req, resp)
 		} else {
-			resp.WriteHeader(http.StatusUnauthorized)
-			logger.Infof("Token is not valid")
+			resp.WriteHeaderAndEntity(http.StatusUnauthorized,
+				response.ActionResponse{
+					Error:   true,
+					Message: "Token is invalid",
+				})
+			return
 		}
 	} else {
-		resp.WriteHeader(http.StatusUnauthorized)
 		logger.Infof("Unauthorized access to this resource")
+		resp.WriteHeaderAndEntity(http.StatusUnauthorized,
+			response.ActionResponse{
+				Error:   true,
+				Message: "Unauthorized access to this resource",
+			})
+		return
+	}
+}
+
+func rootRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	role := req.Attribute("Role").(string)
+	if role == entity.RootRole {
+		chain.ProcessFilter(req, resp)
+	} else {
+		log.Printf("User has no root role: Forbidden")
+		resp.WriteHeaderAndEntity(http.StatusForbidden,
+			response.ActionResponse{
+				Error:   true,
+				Message: "Permission denied",
+			})
+		return
+	}
+}
+
+func userRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	role := req.Attribute("Role").(string)
+	if role == entity.RootRole || role == entity.UserRole {
+		chain.ProcessFilter(req, resp)
+	} else {
+		log.Printf("User has no user role: Forbidden")
+		resp.WriteHeaderAndEntity(http.StatusForbidden,
+			response.ActionResponse{
+				Error:   true,
+				Message: "Permission denied",
+			})
+		return
+	}
+}
+
+func guestRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	role := req.Attribute("Role").(string)
+	if role == entity.RootRole || role == entity.UserRole || role == entity.GuestRole {
+		chain.ProcessFilter(req, resp)
+	} else {
+		log.Printf("User has no guest role: Forbidden")
+		resp.WriteHeaderAndEntity(http.StatusForbidden,
+			response.ActionResponse{
+				Error:   true,
+				Message: "Permission denied",
+			})
+		return
 	}
 }
