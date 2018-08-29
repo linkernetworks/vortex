@@ -55,7 +55,7 @@ func (suite *PrometheusQueryTestSuite) TestQuery() {
 func (suite *PrometheusQueryTestSuite) TestQueryRange() {
 	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
 
-	results, err := queryRange(suite.sp, queryStr, time.Minute*2, time.Second*10)
+	results, err := queryRange(suite.sp, queryStr, rs)
 	suite.NoError(err)
 	suite.NotEqual(0, float32(results[0].Values[0].Value))
 

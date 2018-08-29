@@ -65,8 +65,8 @@ func sumExpr(expr string) string {
 }
 
 // Append a duration for expression
-func durationExpr(expr string, duration string) string {
-	expr = fmt.Sprintf("%s[%v]", expr, duration)
+func durationExpr(expr string, duration int) string {
+	expr = fmt.Sprintf("%s[%vm]", expr, duration)
 
 	return expr
 }

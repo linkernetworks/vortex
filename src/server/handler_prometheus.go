@@ -13,7 +13,29 @@ func getContainerMetricsHandler(ctx *web.Context) {
 	podId := req.PathParameter("pod")
 	containerId := req.PathParameter("container")
 
-	container, err := pc.GetContainer(sp, podId, containerId)
+	rs := pc.RangeSetting{}
+	query := query.New(req.Request.URL.Query())
+
+	var err error
+	rs.Interval, err = query.TimeDuration("interval", 2)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Resolution, err = query.TimeDuration("resolution", 10)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Rate, err = query.TimeDuration("rate", 1)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	container, err := pc.GetContainer(sp, podId, containerId, rs)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -26,7 +48,29 @@ func getPodMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 	id := req.PathParameter("pod")
 
-	pod, err := pc.GetPod(sp, id)
+	rs := pc.RangeSetting{}
+	query := query.New(req.Request.URL.Query())
+
+	var err error
+	rs.Interval, err = query.TimeDuration("interval", 2)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Resolution, err = query.TimeDuration("resolution", 10)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Rate, err = query.TimeDuration("rate", 1)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	pod, err := pc.GetPod(sp, id, rs)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -65,7 +109,29 @@ func getNodeMetricsHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 	id := req.PathParameter("node")
 
-	node, err := pc.GetNode(sp, id)
+	rs := pc.RangeSetting{}
+	query := query.New(req.Request.URL.Query())
+
+	var err error
+	rs.Interval, err = query.TimeDuration("interval", 2)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Resolution, err = query.TimeDuration("resolution", 10)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Rate, err = query.TimeDuration("rate", 1)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	node, err := pc.GetNode(sp, id, rs)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return
@@ -93,6 +159,27 @@ func listPodMetricsHandler(ctx *web.Context) {
 		queryLabels["created_by_name"] = controller + ".*"
 	}
 
+	rs := pc.RangeSetting{}
+
+	var err error
+	rs.Interval, err = query.TimeDuration("interval", 2)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Resolution, err = query.TimeDuration("resolution", 10)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Rate, err = query.TimeDuration("rate", 1)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	podNameList, err := pc.ListPodName(sp, queryLabels)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
@@ -101,7 +188,7 @@ func listPodMetricsHandler(ctx *web.Context) {
 
 	podList := map[string]entity.PodMetrics{}
 	for _, podName := range podNameList {
-		pod, err := pc.GetPod(sp, podName)
+		pod, err := pc.GetPod(sp, podName, rs)
 		if err != nil {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 			return
@@ -179,9 +266,30 @@ func listNodeMetricsHandler(ctx *web.Context) {
 		return
 	}
 
+	rs := pc.RangeSetting{}
+	query := query.New(req.Request.URL.Query())
+
+	rs.Interval, err = query.TimeDuration("interval", 2)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Resolution, err = query.TimeDuration("resolution", 10)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	rs.Rate, err = query.TimeDuration("rate", 1)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	nodeList := map[string]entity.NodeMetrics{}
 	for _, nodeName := range nodeNameList {
-		node, err := pc.GetNode(sp, nodeName)
+		node, err := pc.GetNode(sp, nodeName, rs)
 		if err != nil {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 			return
