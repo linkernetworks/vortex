@@ -35,7 +35,8 @@
     - [List Deployments](#list-deployments)
     - [Get Deployment](#get-deployment)
     - [Delete Deployment](#delete-deployment)
-  - [Resouce Monitoring](#resouce-monitoring)
+  - [Resource Monitoring](#resource-monitoring)
+    - [Query Range](#query-range)
     - [List Nodes](#list-nodes)
     - [Get Node](#get-node)
     - [List NICs of certain node](#list-nics-of-certain-node)
@@ -965,7 +966,33 @@ Response Data:
 ```
 
 
-## Resouce Monitoring
+## Resource Monitoring
+
+### Query Range
+All the resource which need the historical data can use query string to set the query detail. The unit of `interval` and `rate` is minute. And the unit of `resolution` is second.
+
+Example:
+```
+# Default: Query the data every 10s in past 2m, and
+# the result value is the average in 1m --> about 12 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766
+
+# Month: Query the data every 7200s (2h) in past 43200m (30d), and
+# the result value is the average in 60m (1h) --> about 360 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=43200&resolution=7200&rate=60
+
+# Week: Query the data every 1200s (20m) in past 10080m (7d), and
+# the result value is the average in 20m --> about 504 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=10080&resolution=1200&rate=20
+
+# Day: Query the data every 300s (5m) in past 1440m (1d), and
+# the result value is the average in 5m --> about 288 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=1440&resolution=300&rate=5
+
+# Hour: Query the data every 60s (1m) in past 60m (1d), and
+# the result value is the average in 1m --> about 60 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=60&resolution=60&rate=1
+```
 
 ### List Nodes
 **GET /v1/monitoring/nodes**
