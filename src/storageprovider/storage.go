@@ -10,6 +10,7 @@ import (
 type StorageProvider interface {
 	ValidateBeforeCreating(sp *serviceprovider.Container, net *entity.Storage) error
 	CreateStorage(sp *serviceprovider.Container, net *entity.Storage) error
+	ValidateBeforeDeleting(sp *serviceprovider.Container, net *entity.Storage) error
 	DeleteStorage(sp *serviceprovider.Container, net *entity.Storage) error
 }
 

@@ -147,7 +147,7 @@ func (suite *StorageTestSuite) TestDeleteStorageFail() {
 	suite.NoError(err)
 	sp = sp.(NFSStorageProvider)
 
-	err = sp.DeleteStorage(suite.sp, storage)
+	err = sp.ValidateBeforeDeleting(suite.sp, storage)
 	suite.Error(err)
 }
 

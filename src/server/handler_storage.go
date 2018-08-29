@@ -164,6 +164,11 @@ func deleteStorage(ctx *web.Context) {
 		return
 	}
 
+	if err := storageProvider.ValidateBeforeDeleting(sp, &storage); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
 	if err := storageProvider.DeleteStorage(sp, &storage); err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		return

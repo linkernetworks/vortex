@@ -34,6 +34,23 @@ func (nfs NFSStorageProvider) ValidateBeforeCreating(sp *serviceprovider.Contain
 	return nil
 }
 
+// ValidateBeforeDeleting will validate StorageProvider before deleting
+func (nfs NFSStorageProvider) ValidateBeforeDeleting(sp *serviceprovider.Container, storage *entity.Storage) error {
+	//If the storage is used by some volume, we can't delete it.
+	q := bson.M{"storageName": storage.Name}
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	count, err := session.Count(entity.VolumeCollectionName, q)
+	if err != nil {
+		return err
+	} else if count > 0 {
+		return fmt.Errorf("The StorageName %s can't be deleted, since there're some volume still use it", storage.Name)
+	}
+
+	return nil
+}
+
 func getDeployment(name string, storage *entity.Storage) *appsv1.Deployment {
 	var replicas int32
 	replicas = 1
@@ -128,18 +145,6 @@ func (nfs NFSStorageProvider) DeleteStorage(sp *serviceprovider.Container, stora
 	namespace := "vortex"
 	deployName := NFSProvisionerPrefix + storage.ID.Hex()
 	storageName := NFSStorageClassPrefix + storage.ID.Hex()
-
-	//If the storage is used by some volume, we can't delete it.
-	q := bson.M{"storageName": storage.Name}
-	session := sp.Mongo.NewSession()
-	defer session.Close()
-
-	count, err := session.Count(entity.VolumeCollectionName, q)
-	if err != nil {
-		return err
-	} else if count > 0 {
-		return fmt.Errorf("The StorageName %s can't be deleted, since there're some volume still use it", storage.Name)
-	}
 
 	//Delete StorageClass
 	if err := sp.KubeCtl.DeleteStorageClass(storageName); err != nil {
