@@ -127,7 +127,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetPod() {
 	suite.NoError(err)
 	podName := pods[0].GetName()
 
-	pod, err := GetPod(suite.sp, podName)
+	rs := RangeSetting{Interval: 1, Resolution: 1, Rate: 1}
+	pod, err := GetPod(suite.sp, podName, rs)
 	suite.NoError(err)
 	suite.Equal(podName, pod.PodName)
 }
@@ -139,7 +140,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetContainer() {
 	podName := pods[0].Name
 	containerName := pods[0].Status.ContainerStatuses[0].Name
 
-	container, err := GetContainer(suite.sp, podName, containerName)
+	rs := RangeSetting{Interval: 1, Resolution: 1, Rate: 1}
+	container, err := GetContainer(suite.sp, podName, containerName, rs)
 	suite.NoError(err)
 	suite.Equal(containerName, container.Detail.ContainerName)
 }
@@ -171,7 +173,8 @@ func (suite *PrometheusExpressionTestSuite) TestGetNode() {
 	suite.NoError(err)
 	nodeName := nodes[0].GetName()
 
-	node, err := GetNode(suite.sp, nodeName)
+	rs := RangeSetting{Interval: 1, Resolution: 1, Rate: 1}
+	node, err := GetNode(suite.sp, nodeName, rs)
 	suite.NoError(err)
 	suite.Equal(nodeName, node.Detail.Hostname)
 }

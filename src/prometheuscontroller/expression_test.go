@@ -67,9 +67,9 @@ func (suite *PrometheusExprTestSuite) TestSumExpr() {
 }
 
 func (suite *PrometheusExprTestSuite) TestDurationExpr() {
-	var duration = "1h"
+	var duration = 1
 	str := durationExpr("TEST_STRING", duration)
-	suite.Equal(`TEST_STRING[1h]`, str)
+	suite.Equal(`TEST_STRING[1m]`, str)
 }
 
 func (suite *PrometheusExprTestSuite) TestRateExpr() {
