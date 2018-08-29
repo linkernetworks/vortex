@@ -26,7 +26,6 @@ func getOVSPortStatsHandler(ctx *web.Context) {
 		return
 	}
 
-	fmt.Println(nodeName, bridgeName)
 	portStats, err := ovscontroller.DumpPorts(sp, nodeName, bridgeName)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
