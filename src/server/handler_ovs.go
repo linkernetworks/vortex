@@ -9,7 +9,7 @@ import (
 	"github.com/linkernetworks/vortex/src/web"
 )
 
-func getOVSPortStatsHandler(ctx *web.Context) {
+func getOVSPortInfoHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	//Get the parameter
