@@ -8,6 +8,7 @@ import (
 	"github.com/linkernetworks/vortex/src/deployment"
 	"github.com/linkernetworks/vortex/src/entity"
 	response "github.com/linkernetworks/vortex/src/net/http"
+	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/service"
 	"github.com/linkernetworks/vortex/src/web"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -18,6 +19,11 @@ import (
 
 func createAppHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
 
 	p := entity.Application{}
 	if err := req.ReadEntity(&p); err != nil {
@@ -43,6 +49,9 @@ func createAppHandler(ctx *web.Context) {
 
 	p.Deployment.ID = bson.NewObjectId()
 	p.Service.ID = bson.NewObjectId()
+
+	p.Deployment.OwnerID = bson.ObjectIdHex(userID)
+	p.Service.OwnerID = bson.ObjectIdHex(userID)
 
 	time := timeutils.Now()
 	p.Deployment.CreatedAt = time
@@ -75,6 +84,7 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
+	p.Deployment.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.DeploymentCollectionName, &p.Deployment); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Deployment.Name))
@@ -84,6 +94,7 @@ func createAppHandler(ctx *web.Context) {
 		return
 	}
 
+	p.Service.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.ServiceCollectionName, &p.Service); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Service Name: %s already existed", p.Service.Name))
@@ -92,5 +103,8 @@ func createAppHandler(ctx *web.Context) {
 		}
 		return
 	}
+	// find owner in user entity
+	p.Service.CreatedBy, _ = backend.FindUserByID(session, p.Service.OwnerID)
+	p.Deployment.CreatedBy, _ = backend.FindUserByID(session, p.Deployment.OwnerID)
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
