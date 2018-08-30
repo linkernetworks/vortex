@@ -61,6 +61,8 @@ sudo pip install yq
 # Install NFS Server
 sudo apt-get install -qqy nfs-kernel-server
 sudo mkdir /nfsshare
+sudo mkdir /nfsshare/mongodb
+sudo mkdir /nfsshare/influxdb
 echo "/nfsshare *(rw,sync,no_root_squash)" | sudo tee /etc/exports
 sudo exportfs -r
 sudo showmount -e

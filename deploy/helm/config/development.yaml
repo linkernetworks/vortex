@@ -60,7 +60,7 @@ services:
         tag: 4.1.1-xenial
       pvc:
         volumeType: nfs
-        nfsPath: /nfsshare
+        nfsPath: /nfsshare/mongodb
         nfsServer: 172.17.8.100
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
@@ -76,10 +76,12 @@ services:
       image:
         tag: 1.5-alpine
       pvc:
-        volumeType: local
+        volumeType: nfs
+        nfsPath: /nfsshare/influxdb
+        nfsServer: 172.17.8.100
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
-        storageClass: influx
+        storageClass: mongo
         storage: 1Gi
     service:
       nodePort: true
