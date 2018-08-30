@@ -10,8 +10,11 @@ import (
 	"golang.org/x/net/context"
 )
 
-const timeGap = 2
-const queryResolution = 10
+type RangeSetting struct {
+	Interval   time.Duration // minutes
+	Resolution time.Duration // seconds
+	Rate       time.Duration // minutes
+}
 
 // Instant query at a single point in time
 func query(sp *serviceprovider.Container, expression string) (model.Vector, error) {
@@ -34,10 +37,10 @@ func query(sp *serviceprovider.Container, expression string) (model.Vector, erro
 }
 
 // Query over a range of time
-func queryRange(sp *serviceprovider.Container, expression string) (model.Matrix, error) {
+func queryRange(sp *serviceprovider.Container, expression string, rs RangeSetting) (model.Matrix, error) {
 	api := sp.Prometheus.API
 
-	rangeSet := pv1.Range{Start: time.Now().Add(-time.Minute * timeGap), End: time.Now(), Step: time.Second * queryResolution}
+	rangeSet := pv1.Range{Start: time.Now().Add(-time.Minute * rs.Interval), End: time.Now(), Step: time.Second * rs.Resolution}
 	result, err := api.QueryRange(context.Background(), expression, rangeSet)
 
 	// https://github.com/prometheus/client_golang/blob/d6a9817c4afc94d51115e4a30d449056a3fbf547/api/prometheus/v1/api.go#L316

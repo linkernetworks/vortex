@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: influxdb
+  namespace: vortex
+  labels:
+    name: influxdb
+spec:
+  serviceName: "influxdb"
+  replicas: {{ .Values.controller.replicaCount }}
+  template:
+    metadata:
+      labels:
+        name: influxdb
+        service: influxdb
+        role: db
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:{{ .Values.controller.image.tag }}
+        ports:
+        - name: api
+          containerPort: 8086
+        - name: backup
+          containerPort: 8088
+        volumeMounts:
+        - name: influxdb
+          mountPath: /var/lib/influxdb
+        - name: config-volume
+          mountPath: /etc/influxdb
+        env:
+        - name: INFLUXDB_DB
+          value: "prometheuslogs"
+        resources:
+          requests:
+            cpu: {{ .Values.controller.cpu }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: influxdb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: influxdb
+      spec:
+        accessModes: [ {{ .Values.controller.pvc.accessModes | quote }} ]
+        storageClassName: {{ .Values.controller.pvc.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.controller.pvc.storage }}

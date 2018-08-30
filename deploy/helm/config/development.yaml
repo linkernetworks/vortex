@@ -28,7 +28,7 @@ apps:
       replicaCount: 1
       imageTag: v2.2.1
       scrapeInterval: 5s
-      retention: 1h
+      retention: 24h
       cpu: 50m
     service:
       nodePort: true
@@ -60,11 +60,28 @@ services:
         tag: 4.1.1-xenial
       pvc:
         volumeType: nfs
-        nfsPath: /nfsshare
+        nfsPath: /nfsshare/mongodb
         nfsServer: 172.17.8.100
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
-        storageClass:
+        storageClass: mongo
+        storage: 1Gi
+    service:
+      nodePort: true
+  # vortex/deploy/helm/services/charts/influxdb
+  influxdb:
+    controller:
+      replicaCount: 1
+      cpu: 50m
+      image:
+        tag: 1.5-alpine
+      pvc:
+        volumeType: nfs
+        nfsPath: /nfsshare/influxdb
+        nfsServer: 172.17.8.100
+        reclaimPolicy: Delete
+        accessModes: ReadWriteOnce
+        storageClass: mongo
         storage: 1Gi
     service:
       nodePort: true

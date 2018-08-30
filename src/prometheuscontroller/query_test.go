@@ -55,11 +55,12 @@ func (suite *PrometheusQueryTestSuite) TestQuery() {
 func (suite *PrometheusQueryTestSuite) TestQueryRange() {
 	queryStr := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{container_label_io_kubernetes_container_name=~"%s"}[1m])) * 100`, suite.containerName)
 
-	results, err := queryRange(suite.sp, queryStr)
+	rs := RangeSetting{Interval: 1, Resolution: 1, Rate: 1}
+	results, err := queryRange(suite.sp, queryStr, rs)
 	suite.NoError(err)
 	suite.NotEqual(0, float32(results[0].Values[0].Value))
 
 	// Get nil if the results is empty
-	results, _ = queryRange(suite.sp, "")
+	results, _ = queryRange(suite.sp, "", rs)
 	suite.Equal(model.Matrix(nil), results)
 }

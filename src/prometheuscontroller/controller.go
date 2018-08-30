@@ -150,7 +150,7 @@ func ListNodeNICs(sp *serviceprovider.Container, id string) (entity.NodeNICsMetr
 }
 
 // GetPod will get pod
-func GetPod(sp *serviceprovider.Container, id string) (entity.PodMetrics, error) {
+func GetPod(sp *serviceprovider.Container, id string, rs RangeSetting) (entity.PodMetrics, error) {
 	pod := entity.PodMetrics{}
 	pod.Labels = map[string]string{}
 	pod.NICs = map[string]entity.NICShortMetrics{}
@@ -266,8 +266,8 @@ podStatusCheckingLoop:
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err := queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err := queryRange(sp, str, rs)
 	if err != nil {
 		return pod, err
 	}
@@ -286,8 +286,8 @@ podStatusCheckingLoop:
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return pod, err
 	}
@@ -306,8 +306,8 @@ podStatusCheckingLoop:
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return pod, err
 	}
@@ -326,8 +326,8 @@ podStatusCheckingLoop:
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return pod, err
 	}
@@ -344,7 +344,7 @@ podStatusCheckingLoop:
 }
 
 // GetContainer will get container
-func GetContainer(sp *serviceprovider.Container, podId string, containerId string) (entity.ContainerMetrics, error) {
+func GetContainer(sp *serviceprovider.Container, podId string, containerId string, rs RangeSetting) (entity.ContainerMetrics, error) {
 	container := entity.ContainerMetrics{}
 
 	// basic info from kube-state-metrics
@@ -460,7 +460,7 @@ containerStatusCheckingLoop:
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
 
-	resultMatrix, err := queryRange(sp, str)
+	resultMatrix, err := queryRange(sp, str, rs)
 	if err != nil {
 		return container, err
 	}
@@ -475,9 +475,9 @@ containerStatusCheckingLoop:
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = multiplyExpr(sumExpr(rateExpr(durationExpr(str, "1m"))), 100)
+	str = multiplyExpr(sumExpr(rateExpr(durationExpr(str, int(rs.Rate)))), 100)
 
-	resultMatrix, err = queryRange(sp, str)
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return container, err
 	}
@@ -616,7 +616,7 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 }
 
 // GetNode will get node metrics
-func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, error) {
+func GetNode(sp *serviceprovider.Container, id string, rs RangeSetting) (entity.NodeMetrics, error) {
 	node := entity.NodeMetrics{}
 	node.Detail.Labels = map[string]string{}
 	node.NICs = map[string]entity.NICMetrics{}
@@ -792,8 +792,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err := queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err := queryRange(sp, str, rs)
 	if err != nil {
 		return node, err
 	}
@@ -812,8 +812,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return node, err
 	}
@@ -832,8 +832,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return node, err
 	}
@@ -852,8 +852,8 @@ func GetNode(sp *serviceprovider.Container, id string) (entity.NodeMetrics, erro
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
-	str = rateExpr(durationExpr(str, "1m"))
-	resultMatrix, err = queryRange(sp, str)
+	str = rateExpr(durationExpr(str, int(rs.Rate)))
+	resultMatrix, err = queryRange(sp, str, rs)
 	if err != nil {
 		return node, err
 	}

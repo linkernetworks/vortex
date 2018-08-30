@@ -6,6 +6,14 @@ metadata:
 data:
   # https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
   prometheus.yml: |
+    # Remote write configuration
+    remote_write:
+    - url: "http://influxdb.vortex:8086/api/v1/prom/write?db=prometheuslogs"
+
+    # Remote read configuration
+    remote_read:
+    - url: "http://influxdb.vortex:8086/api/v1/prom/read?db=prometheuslogs"
+    
     global:
       scrape_interval: {{ .Values.controller.scrapeInterval }}
       scrape_timeout: 5s

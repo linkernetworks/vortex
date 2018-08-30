@@ -66,3 +66,18 @@ services:
         storage: 1Gi
     service:
       nodePort: true
+  # vortex/deploy/helm/services/charts/influxdb
+  influxdb:
+    controller:
+      replicaCount: 1
+      cpu: 20m
+      image:
+        tag: 1.5-alpine
+      pvc:
+        volumeType: local
+        reclaimPolicy: Delete
+        accessModes: ReadWriteOnce
+        storageClass: influx
+        storage: 1Gi
+    service:
+      nodePort: true
