@@ -70,6 +70,9 @@ func New(cf config.Config) *Container {
 		Validator:  validate,
 	}
 
+	if err := createDefaultUser(sp.Mongo); err != nil {
+		logger.Infof("Create Default admin user failed: %v", err)
+	}
 	return sp
 }
 
