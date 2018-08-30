@@ -44,6 +44,10 @@ load init
     localID=`http --auth-type=jwt "127.0.0.1:7890/v1/ovs/portinfos?nodeName=$nodeName&bridgeName=$output" | jq -r ".[3].portID"`
     [ $? = 0 ]
     [ "$localID" = "-1" ]
+
+    podName=`http --auth-type=jwt "127.0.0.1:7890/v1/ovs/portinfos?nodeName=$nodeName&bridgeName=$output" | jq -r ".[0].podName"`
+    echo $podName | grep ${deploymentName}
+    [ $? = 0 ]
 }
 
 @test "Delete Deployment" {
