@@ -56,6 +56,10 @@ func createDeploymentHandler(ctx *web.Context) {
 	if err := deployment.CreateDeployment(sp, &p); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Name))
+		} else if errors.IsConflict(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Create setting has conflict: %v", err))
+		} else if errors.IsInvalid(err) {
+			response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("Create setting is invalid: %v", err))
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
