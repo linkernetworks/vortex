@@ -10,9 +10,11 @@ type OVSPortStats struct {
 }
 
 type OVSPortInfo struct {
-	PortID      int32        `json:"portID"`
-	Name        string       `json:"name"`
-	MacAddress  string       `json:"macAddress"`
-	Received    OVSPortStats `json:"received"`
-	Transmitted OVSPortStats `json:"traansmitted"`
+	PortID        int32        `json:"portID"`
+	Name          string       `json:"name"`
+	PodName       string       `json:"podName"`
+	InterfaceName string       `json:"interfaceName"`
+	MacAddress    string       `json:"macAddress"`
+	Received      OVSPortStats `json:"received"`
+	Transmitted   OVSPortStats `json:"traansmitted"`
 }
