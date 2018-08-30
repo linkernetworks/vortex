@@ -81,7 +81,7 @@ services:
         nfsServer: 10.1.14.86
         reclaimPolicy: Recycle
         accessModes: ReadWriteMany
-        storageClass: mongo
+        storageClass: influx
         storage: 50Gi
     service:
       nodePort: false
