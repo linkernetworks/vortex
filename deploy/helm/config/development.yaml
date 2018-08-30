@@ -81,7 +81,7 @@ services:
         nfsServer: 172.17.8.100
         reclaimPolicy: Delete
         accessModes: ReadWriteOnce
-        storageClass: mongo
+        storageClass: influx
         storage: 1Gi
     service:
       nodePort: true
