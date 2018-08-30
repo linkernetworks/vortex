@@ -63,6 +63,7 @@ sudo apt-get install -qqy nfs-kernel-server
 sudo mkdir /nfsshare
 sudo mkdir /nfsshare/mongodb
 sudo mkdir /nfsshare/influxdb
+sudo mkdir /nfsshare/user
 echo "/nfsshare *(rw,sync,no_root_squash)" | sudo tee /etc/exports
 sudo exportfs -r
 sudo showmount -e
