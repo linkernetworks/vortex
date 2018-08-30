@@ -273,10 +273,10 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	}
 	command := generateClientCommand(podNetwork)
 	ans := []string{
-		"-s=unix:///tmp/vortex.sock",
-		"-b=" + bName,
-		"-n=" + ifName,
-		"-i=1.2.3.4/24",
+		"--server=unix:///tmp/vortex.sock",
+		"--bridge=" + bName,
+		"--nic=" + ifName,
+		"--ip=1.2.3.4/24",
 		"--route-gw=192.168.2.0/24,192.168.2.254",
 		"--route-intf=192.168.3.0/24",
 	}
@@ -287,11 +287,11 @@ func (suite *PodTestSuite) TestGenerateClientCommand() {
 	podNetwork.VlanTag = &vlanTag
 	command = generateClientCommand(podNetwork)
 	ans = []string{
-		"-s=unix:///tmp/vortex.sock",
-		"-b=" + bName,
-		"-n=" + ifName,
-		"-i=1.2.3.4/24",
-		"-v=123",
+		"--server=unix:///tmp/vortex.sock",
+		"--bridge=" + bName,
+		"--nic=" + ifName,
+		"--ip=1.2.3.4/24",
+		"--vlan=123",
 		"--route-gw=192.168.2.0/24,192.168.2.254",
 		"--route-intf=192.168.3.0/24",
 	}
