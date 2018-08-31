@@ -128,14 +128,14 @@ func (suite *PrometheusTestSuite) TestListServiceMetrics() {
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	fmt.Printf("Monitoring kubernetes result (prometheus): %v", httpWriter.Result)
+	fmt.Printf("Monitoring kubernetes result (prometheus): %v\n", httpWriter.Result)
 
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services/kubernetes", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services/kubernetes", nil)
 	suite.NoError(err)
 
-	httpWriter := httptest.NewRecorder()
+	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
-	fmt.Printf("Monitoring kubernetes result (API): %v", httpWriter.Result)
+	fmt.Printf("Monitoring kubernetes result (API): %v\n", httpWriter.Result)
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services", nil)
 	suite.NoError(err)
