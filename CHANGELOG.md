@@ -1,5 +1,54 @@
 # Change Log
 
+## [v0.2.3](https://github.com/linkernetworks/vortex/tree/v0.2.3) (2018-08-31)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.2...v0.2.3)
+
+**Merged pull requests:**
+
+- \[Bug\] For travis debug [\#305](https://github.com/linkernetworks/vortex/pull/305) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] initContainer use long commands [\#300](https://github.com/linkernetworks/vortex/pull/300) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Support the PodName and InterfaceName of OVSPortInfo query. [\#297](https://github.com/linkernetworks/vortex/pull/297) ([hwchiu](https://github.com/hwchiu))
+- \[Task\] create default user when server startup [\#295](https://github.com/linkernetworks/vortex/pull/295) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.2.2](https://github.com/linkernetworks/vortex/tree/v0.2.2) (2018-08-31)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.1...v0.2.2)
+
+**Merged pull requests:**
+
+- \[Bug\] Handle the errors when creating is failed [\#299](https://github.com/linkernetworks/vortex/pull/299) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Bug\] Fix storageclass name [\#298](https://github.com/linkernetworks/vortex/pull/298) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-283: Add user folder under /nfsshare folder [\#296](https://github.com/linkernetworks/vortex/pull/296) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] VX-282: Query the historical resource usage in certain interval from prometheus [\#294](https://github.com/linkernetworks/vortex/pull/294) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] user roles filter for accessing control [\#283](https://github.com/linkernetworks/vortex/pull/283) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.2.1](https://github.com/linkernetworks/vortex/tree/v0.2.1) (2018-08-29)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.0...v0.2.1)
+
+**Merged pull requests:**
+
+- Revert "Revert "\[Bug\] VX-280: GetContainer API should require pod name"" [\#293](https://github.com/linkernetworks/vortex/pull/293) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] rename [\#291](https://github.com/linkernetworks/vortex/pull/291) ([John-Lin](https://github.com/John-Lin))
+- Revert "\[Bug\] VX-280: GetContainer API should require pod name" [\#290](https://github.com/linkernetworks/vortex/pull/290) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] add auth for deployment [\#289](https://github.com/linkernetworks/vortex/pull/289) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] add auth for storage [\#288](https://github.com/linkernetworks/vortex/pull/288) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] add auth for namespaces [\#287](https://github.com/linkernetworks/vortex/pull/287) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] add more expire time and user info in jwt [\#286](https://github.com/linkernetworks/vortex/pull/286) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] Return the Bad-Request when deleting the storage if it's used by some volume [\#285](https://github.com/linkernetworks/vortex/pull/285) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-281: Report the pods which belong to deployment in getController [\#284](https://github.com/linkernetworks/vortex/pull/284) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Bug\] VX-280: GetContainer API should require pod name [\#282](https://github.com/linkernetworks/vortex/pull/282) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\]  Support the new API to get the port status of ovs. [\#280](https://github.com/linkernetworks/vortex/pull/280) ([hwchiu](https://github.com/hwchiu))
+
+## [v0.2.0](https://github.com/linkernetworks/vortex/tree/v0.2.0) (2018-08-27)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.18...v0.2.0)
+
+**Merged pull requests:**
+
+- \[Bug\] VX-278: Modify the way that reporting the status [\#281](https://github.com/linkernetworks/vortex/pull/281) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] add verify jwt handler [\#279](https://github.com/linkernetworks/vortex/pull/279) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] volume handler [\#273](https://github.com/linkernetworks/vortex/pull/273) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] hot fix tag [\#272](https://github.com/linkernetworks/vortex/pull/272) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] VX-233 johnlin/resource createdby [\#204](https://github.com/linkernetworks/vortex/pull/204) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.1.18](https://github.com/linkernetworks/vortex/tree/v0.1.18) (2018-08-23)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.1.17...v0.1.18)
 
