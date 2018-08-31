@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -122,10 +123,24 @@ func (suite *PrometheusTestSuite) TestGetContainerMetrics() {
 }
 
 func (suite *PrometheusTestSuite) TestListServiceMetrics() {
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services", nil)
+	httpRequest, err := http.NewRequest("GET", `http://172.17.8.100:30003/api/v1/query?query=kube_service_info%7Bservice%3D%22kubernetes%22%7D`, nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	fmt.Printf("Monitoring kubernetes result (prometheus): %v", httpWriter.Result)
+
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services/kubernetes", nil)
+	suite.NoError(err)
+
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	fmt.Printf("Monitoring kubernetes result (API): %v", httpWriter.Result)
+
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/monitoring/services", nil)
+	suite.NoError(err)
+
+	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
 
