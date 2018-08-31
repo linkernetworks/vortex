@@ -71,6 +71,7 @@ func New(cf config.Config) *Container {
 	}
 
 	if err := createDefaultUser(sp.Mongo); err != nil {
+		// ignore insert error
 		logger.Infof("Create Default admin user failed: %v", err)
 	}
 	return sp
