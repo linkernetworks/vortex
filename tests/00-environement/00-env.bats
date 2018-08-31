@@ -27,6 +27,6 @@
 }
 
 @test "Check NFS server setting" {
-    showmount -e | grep /tmp/nfs ; echo $?
+    showmount -e | grep /nfsshare ; echo $?
     [ $? = 0 ]
 }

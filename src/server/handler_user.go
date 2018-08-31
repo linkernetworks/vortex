@@ -12,6 +12,7 @@ import (
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/server/backend"
+	"github.com/linkernetworks/vortex/src/utils"
 	"github.com/linkernetworks/vortex/src/web"
 
 	mgo "gopkg.in/mgo.v2"
@@ -27,12 +28,12 @@ func signUpUserHandler(ctx *web.Context) {
 		return
 	}
 
-	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
+	hashedPassword, err := utils.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-	user.LoginCredential.Password = encryptedPassword
+	user.LoginCredential.Password = hashedPassword
 
 	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 
@@ -133,12 +134,12 @@ func createUserHandler(ctx *web.Context) {
 		return
 	}
 
-	encryptedPassword, err := backend.HashPassword(user.LoginCredential.Password)
+	hashedPassword, err := utils.HashPassword(user.LoginCredential.Password)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-	user.LoginCredential.Password = encryptedPassword
+	user.LoginCredential.Password = hashedPassword
 
 	user.LoginCredential.Username = strings.ToLower(user.LoginCredential.Username)
 

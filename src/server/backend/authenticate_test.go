@@ -9,6 +9,7 @@ import (
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/linkernetworks/vortex/src/utils"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -34,7 +35,7 @@ func (suite *AuthenticateTestSuite) SetupSuite() {
 
 	suite.plainTextPassword = "@uthentic@te"
 
-	hashedPassword, err := HashPassword(suite.plainTextPassword)
+	hashedPassword, err := utils.HashPassword(suite.plainTextPassword)
 	suite.NoError(err)
 
 	user := entity.User{

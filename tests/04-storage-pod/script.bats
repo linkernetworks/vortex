@@ -65,7 +65,7 @@ load init
 
 @test "Test NFS" {
     kubectl exec ${podName} touch /tmp/testing
-    find /tmp/nfs | grep testing
+    find /nfsshare | grep testing
     [ $? = 0 ]
 }
 

@@ -3,6 +3,7 @@ package backend
 import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -22,7 +23,7 @@ func Authenticate(session *mongo.Session, credential entity.LoginCredential) (en
 		return entity.User{}, false, err
 	}
 	hashedPassword := authenticatedUser.LoginCredential.Password
-	if CheckPasswordHash(credential.Password, hashedPassword) {
+	if utils.CheckPasswordHash(credential.Password, hashedPassword) {
 		return authenticatedUser, true, nil
 	}
 	return entity.User{}, false, nil
