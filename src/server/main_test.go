@@ -32,7 +32,7 @@ func init() {
 			Username: "test@linkernetworks.com",
 			Password: "test",
 		},
-		DisplayName: "John Doe",
+		DisplayName: "mainTestUser",
 		Role:        "root",
 		FirstName:   "John",
 		LastName:    "Doe",

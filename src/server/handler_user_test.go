@@ -400,7 +400,6 @@ func (suite *UserTestSuite) TestListUser() {
 			FirstName:   "John",
 			LastName:    "Doe",
 			PhoneNumber: "0914141414",
-			CreatedAt:   &time.Time{},
 		})
 	}
 
@@ -415,6 +414,7 @@ func (suite *UserTestSuite) TestListUser() {
 		pageSize   string
 		expectSize int
 	}{
+		// the extra 1 should include administrator user in database. Auto-insert when server startup
 		{"", "", count},
 		{"1", "1", count},
 		{"1", "3", count},
@@ -439,9 +439,11 @@ func (suite *UserTestSuite) TestListUser() {
 			retUsers := []entity.User{}
 			err = json.Unmarshal(httpWriter.Body.Bytes(), &retUsers)
 			suite.NoError(err)
-			// Pop out the first test user. test user is generated in main_test.go
+
 			// the propose of test user is for others api to get a JWT token
-			_, retUsers = retUsers[0], retUsers[1:]
+			// Pop out the first test user. test user is generated in main_test.go
+			_, _, retUsers = retUsers[0], retUsers[1], retUsers[2:]
+
 			suite.Equal(tc.expectSize, len(retUsers))
 			for i, u := range retUsers {
 				suite.Equal(users[i].DisplayName, u.DisplayName)
