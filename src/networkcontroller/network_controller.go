@@ -1,8 +1,6 @@
 package networkcontroller
 
 import (
-	"bytes"
-	"encoding/binary"
 	"time"
 
 	pb "github.com/linkernetworks/network-controller/messages"
@@ -131,7 +129,7 @@ func (nc *NetworkController) DeleteOVSNetwork(bridgeName string) error {
 }
 
 // DumpOVSPorts will dump ports infromation of the target ovs
-func (nc *NetworkController) DumpOVSPorts(bridgeName string) ([]entity.OVSPortStat, error) {
+func (nc *NetworkController) DumpOVSPorts(bridgeName string) ([]*pb.PortInfo, error) {
 	data, err := nc.ClientCtl.DumpPorts(
 		nc.Context,
 		&pb.DumpPortsRequest{
@@ -141,10 +139,5 @@ func (nc *NetworkController) DumpOVSPorts(bridgeName string) ([]entity.OVSPortSt
 		return nil, err
 	}
 
-	ovsPortStats := make([]entity.OVSPortStat, len(data.Ports))
-	for i, p := range data.Ports {
-		buf := bytes.NewBuffer(p)
-		err = binary.Read(buf, binary.BigEndian, &ovsPortStats[i])
-	}
-	return ovsPortStats, nil
+	return data.Ports, nil
 }

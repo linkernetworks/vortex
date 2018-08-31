@@ -55,19 +55,19 @@ func TestOVSSuite(t *testing.T) {
 
 func (suite *OVSTestSuite) TestGetOVSPortStatsFail() {
 	//Empty data
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/ovs/portstat", nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/ovs/portinfos", nil)
 	suite.NoError(err)
 
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portstat?nodeName=11", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portinfos?nodeName=11", nil)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portstat?nodeName=11&&bridgeName=111", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portinfos?nodeName=11&&bridgeName=111", nil)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)

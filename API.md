@@ -58,7 +58,7 @@
     - [Get Namespace](#get-namespace)
     - [Delete Namespace](#delete-namespace)
   - [OVS](#ovs)
-    - [Get PortStats](#get-portstats)
+    - [Get PortInfos](#get-portinfos)
    
 
 
@@ -1675,14 +1675,14 @@ In the ovs api, we should use two parameter to indicate what OVS we want to oper
 2. BridgeName: the bridge name when admin create the network in the network page.
 the portal can use the list network to fetch the actual bridge name of each network.
 
-### Get PortStats
+### Get PortInfos
 
-**GET /v1/ovs/portstats/?nodeName=xxx&bridge=xxx**
+**GET /v1/ovs/portinfos/?nodeName=xxx&bridge=xxx**
 
 Example:
 
 ```
-curl http://localhost:7890/v1/ovs/portstats?nodeName=vortex-dev&bridgeName=system-47f8ce
+curl http://localhost:7890/v1/ovs/portinfos?nodeName=vortex-dev&bridgeName=system-47f8ce
 ```
 
 Response Data:

@@ -1,5 +1,5 @@
 {
-	"name": "@PODNAME@",
+	"name": "@DEPLOYMENTNAME@",
 	"labels":{},
     "envVars":{},
 	"namespace":"default",
@@ -42,5 +42,6 @@
     "restartPolicy":"Always",
     "capability": true,
     "networkType": "custom",
-	"nodeAffinity": []
+	"nodeAffinity": [],
+    "replicas":1
 }

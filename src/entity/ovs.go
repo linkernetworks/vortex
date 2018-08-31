@@ -1,28 +1,20 @@
 package entity
 
-// PortStatsReceive contains information regarding the number of received
+// PortStatsTransmit contains information regarding the number of transmitted
 // packets, bytes, etc.
-type PortStatsReceive struct {
+type OVSPortStats struct {
 	Packets uint64 `json:"packets"`
 	Bytes   uint64 `json:"bytes"`
 	Dropped uint64 `json:"dropped"`
 	Errors  uint64 `json:"errors"`
-	Frame   uint64 `json:"-"`
-	Over    uint64 `json:"-"`
-	CRC     uint64 `json:"-"`
 }
 
-// PortStatsTransmit contains information regarding the number of transmitted
-// packets, bytes, etc.
-type PortStatsTransmit struct {
-	Packets    uint64 `json:"packets"`
-	Bytes      uint64 `json:"bytes"`
-	Dropped    uint64 `json:"dropped"`
-	Errors     uint64 `json:"errors"`
-	Collisions uint64 `json:"collisions"`
-}
-type OVSPortStat struct {
-	PortID      uint32            `json:'portID"`
-	Received    PortStatsReceive  `json:"received"`
-	Transmitted PortStatsTransmit `json:"traansmitted"`
+type OVSPortInfo struct {
+	PortID        int32        `json:"portID"`
+	Name          string       `json:"name"`
+	PodName       string       `json:"podName"`
+	InterfaceName string       `json:"interfaceName"`
+	MacAddress    string       `json:"macAddress"`
+	Received      OVSPortStats `json:"received"`
+	Transmitted   OVSPortStats `json:"traansmitted"`
 }

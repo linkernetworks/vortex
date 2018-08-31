@@ -9,7 +9,7 @@ import (
 	"github.com/linkernetworks/vortex/src/web"
 )
 
-func getOVSPortStatsHandler(ctx *web.Context) {
+func getOVSPortInfoHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
 	//Get the parameter
@@ -26,7 +26,6 @@ func getOVSPortStatsHandler(ctx *web.Context) {
 		return
 	}
 
-	fmt.Println(nodeName, bridgeName)
 	portStats, err := ovscontroller.DumpPorts(sp, nodeName, bridgeName)
 	if err != nil {
 		response.InternalServerError(req.Request, resp.ResponseWriter, err)
