@@ -534,6 +534,9 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 		}
 	}
 
+	//DEBUG
+	fmt.Printf("get the ports setting of service %v in namespace %v", service.ServiceName, service.Namespace)
+
 	// get service port config
 	kc := sp.KubeCtl
 	object, err := kc.GetService(service.ServiceName, service.Namespace)
