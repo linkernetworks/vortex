@@ -1,6 +1,7 @@
 package prometheuscontroller
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -537,7 +538,7 @@ func GetService(sp *serviceprovider.Container, id string) (entity.ServiceMetrics
 	kc := sp.KubeCtl
 	object, err := kc.GetService(service.ServiceName, service.Namespace)
 	if err != nil {
-		return entity.ServiceMetrics{}, err
+		return entity.ServiceMetrics{}, fmt.Errorf("fail to get the ports setting of service %v in namespace %v: %v", service.ServiceName, service.Namespace, err)
 	}
 	service.Ports = object.Spec.Ports
 

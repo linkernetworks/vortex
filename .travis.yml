@@ -59,7 +59,11 @@ jobs:
   include:
     - stage: "Tests"
       name: "Unit Test"
-      script: make pre-build && sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
+      script: 
+        # DEBUG: first two lines is for debug
+        - kubectl get pods --all-namespaces
+        - kubectl get service --all-namespaces
+        - make pre-build && sudo -E PATH=$PATH TEST_GRPC=1 TEST_PROMETHEUS=1 make src.test-coverage-minikube
       after_success:
         - cp build/src/coverage.txt coverage.txt
         - bash <(curl -s https://codecov.io/bash)
