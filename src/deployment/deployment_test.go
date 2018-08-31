@@ -260,14 +260,25 @@ func (suite *DeploymentTestSuite) TestGenerateClientCommand() {
 		BridgeName: bName,
 	}
 	command := generateClientCommand(deployNetwork)
-	ans := []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24"}
+	ans := []string{
+		"--server=unix:///tmp/vortex.sock",
+		"--bridge=" + bName,
+		"--nic=" + ifName,
+		"--ip=1.2.3.4/24",
+	}
 	suite.Equal(ans, command)
 
 	var vlanTag int32
 	vlanTag = 123
 	deployNetwork.VlanTag = &vlanTag
 	command = generateClientCommand(deployNetwork)
-	ans = []string{"-s=unix:///tmp/vortex.sock", "-b=" + bName, "-n=" + ifName, "-i=1.2.3.4/24", "-v=123"}
+	ans = []string{
+		"--server=unix:///tmp/vortex.sock",
+		"--bridge=" + bName,
+		"--nic=" + ifName,
+		"--ip=1.2.3.4/24",
+		"--vlan=123",
+	}
 	suite.Equal(ans, command)
 
 }

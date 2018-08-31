@@ -99,14 +99,14 @@ func generateClientCommand(network entity.DeploymentNetwork) (command []string) 
 	ip := utils.IPToCIDR(network.IPAddress, network.Netmask)
 
 	command = []string{
-		"-s=unix:///tmp/vortex.sock",
-		"-b=" + network.BridgeName,
-		"-n=" + network.IfName,
-		"-i=" + ip,
+		"--server=unix:///tmp/vortex.sock",
+		"--bridge=" + network.BridgeName,
+		"--nic=" + network.IfName,
+		"--ip=" + ip,
 	}
 
 	if network.VlanTag != nil {
-		command = append(command, "-v="+strconv.Itoa((int)(*network.VlanTag)))
+		command = append(command, "--vlan="+strconv.Itoa((int)(*network.VlanTag)))
 	}
 	if len(network.RoutesGw) != 0 {
 		for _, netroute := range network.RoutesGw {
