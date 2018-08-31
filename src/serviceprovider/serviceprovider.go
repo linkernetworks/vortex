@@ -8,6 +8,7 @@ import (
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/prometheusprovider"
+	"github.com/linkernetworks/vortex/src/server/backend"
 
 	"github.com/linkernetworks/mongo"
 	kubeCtl "github.com/linkernetworks/vortex/src/kubernetes"
@@ -70,7 +71,7 @@ func New(cf config.Config) *Container {
 		Validator:  validate,
 	}
 
-	if err := createDefaultUser(sp.Mongo); err != nil {
+	if err := backend.CreateDefaultUser(sp.Mongo); err != nil {
 		// ignore insert error
 		logger.Infof("Create Default admin user failed: %v", err)
 	}

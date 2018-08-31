@@ -1,4 +1,4 @@
-package serviceprovider
+package backend
 
 import (
 	"github.com/linkernetworks/mongo"
@@ -7,14 +7,20 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createDefaultUser(mongoService *mongo.Service) error {
+func CreateDefaultUser(mongoService *mongo.Service) error {
 	session := mongoService.NewSession()
 	defer session.Close()
+
+	hashedPassword, err := HashPassword("password")
+	if err != nil {
+		return err
+	}
+
 	user := entity.User{
 		ID: bson.NewObjectId(),
 		LoginCredential: entity.LoginCredential{
 			Username: "admin@vortex.com",
-			Password: "password",
+			Password: hashedPassword,
 		},
 		DisplayName: "administrator",
 		Role:        "root",
