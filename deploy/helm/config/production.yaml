@@ -19,7 +19,7 @@ apps:
   # vortex/deploy/helm/apps/charts/network-controller
   network-controller:
     controller:
-      imageTag: v0.4.5
+      imageTag: v0.4.7
       tcpCPU: 100m
       unixCPU: 100m
   # vortex/deploy/helm/apps/charts/prometheus
