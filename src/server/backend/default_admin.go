@@ -1,18 +1,17 @@
-package serviceprovider
+package backend
 
 import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
-	"github.com/linkernetworks/vortex/src/server/backend"
 	"gopkg.in/mgo.v2/bson"
 )
 
-func createDefaultUser(mongoService *mongo.Service) error {
+func CreateDefaultUser(mongoService *mongo.Service) error {
 	session := mongoService.NewSession()
 	defer session.Close()
 
-	hashedPassword, err := backend.HashPassword("password")
+	hashedPassword, err := HashPassword("password")
 	if err != nil {
 		return err
 	}
