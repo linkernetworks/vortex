@@ -301,6 +301,9 @@ func CreatePod(sp *serviceprovider.Container, pod *entity.Pod) error {
 			Affinity:       generateAffinity(nodeAffinity),
 			RestartPolicy:  corev1.RestartPolicy(pod.RestartPolicy),
 			HostNetwork:    hostNetwork,
+			ImagePullSecrets: []corev1.LocalObjectReference{
+				{Name: "dockerhub-token"},
+			},
 		},
 	}
 
