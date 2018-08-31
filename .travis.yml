@@ -54,6 +54,8 @@ before_script:
     # Check if prometheus is ready
   - until curl --connect-timeout 1 -sL -w "%{http_code}\\n" http://`kubectl get service -n vortex prometheus -o jsonpath="{.spec.clusterIP}"`:9090/api/v1/query?query=prometheus_build_info -o /dev/null | grep 200; do sleep 1; echo "wait the prometheus to be available"; kubectl get pods --all-namespaces; done
   - until [ `kubectl  -n vortex get --no-headers pods | awk '{c[$3]++}END{ print NR-c["Running"]}'` -eq 0 ]; do sleep 1; echo "wait all pod running"; kubectl -n vortex get pods;  done
+  - kubectl -n kube-system get all
+  - kubectl get all
 
 jobs:
   include:
