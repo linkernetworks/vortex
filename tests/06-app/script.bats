@@ -3,7 +3,7 @@
 load init
 
 @test "Create App" {
-    http -v --check-status 127.0.0.1:7890/v1/apps < app.json
+    http -v --check-status  --auth-type=jwt 127.0.0.1:7890/v1/apps < app.json
     [ $? = 0 ]
     #Wait the Deployment
     #jsonpath="{.status.phase}"

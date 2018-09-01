@@ -25,9 +25,10 @@ func init() {
 
 type AppTestSuite struct {
 	suite.Suite
-	sp      *serviceprovider.Container
-	wc      *restful.Container
-	session *mongo.Session
+	sp        *serviceprovider.Container
+	wc        *restful.Container
+	session   *mongo.Session
+	JWTBearer string
 }
 
 func (suite *AppTestSuite) SetupSuite() {
@@ -39,8 +40,15 @@ func (suite *AppTestSuite) SetupSuite() {
 	suite.session = sp.Mongo.NewSession()
 	//init restful container
 	suite.wc = restful.NewContainer()
-	service := newAppService(suite.sp)
-	suite.wc.Add(service)
+	appService := newAppService(suite.sp)
+	userService := newUserService(suite.sp)
+
+	suite.wc.Add(appService)
+	suite.wc.Add(userService)
+
+	token, _ := loginGetToken(suite.wc)
+	suite.NotEmpty(token)
+	suite.JWTBearer = "Bearer " + token
 }
 
 func (suite *AppTestSuite) TearDownSuite() {}
@@ -104,6 +112,7 @@ func (suite *AppTestSuite) TestCreateApp() {
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
@@ -127,6 +136,7 @@ func (suite *AppTestSuite) TestCreateApp() {
 	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/apps", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)

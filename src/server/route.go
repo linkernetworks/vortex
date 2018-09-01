@@ -131,6 +131,7 @@ func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 func newAppService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 	webService.Path("/v1/apps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createAppHandler)))
 	return webService
 }
