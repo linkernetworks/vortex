@@ -3,10 +3,10 @@ package ovscontroller
 import (
 	"net"
 
+	"github.com/linkernetworks/network-controller/utils"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/networkcontroller"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	"github.com/linkernetworks/vortex/src/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -28,8 +28,8 @@ func DumpPorts(sp *serviceprovider.Container, nodeName string, bridgeName string
 	//We need to find a mapping for veth to podName
 	//1. lookup the mongodb to find all deployments which bridge name is equal to bridgeName
 	//2. lookup all current pods which is belogs to above deployments
-	//3. use the pod's UID and the interfae of each entity.DeploymentNetowrk to geneate the vethxxxxxx
-	//4. use the vethxxx as the key to combine the podName/interfaace and the OVSPorts
+	//3. use the pod's UID and the interfae of each entity.DeploymentNetowrk to geneate the vetxXXXXXX
+	//4. use the vtxXXXXXXXXX as the key to combine the podName/interfaace and the OVSPorts
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 
@@ -67,14 +67,14 @@ func DumpPorts(sp *serviceprovider.Container, nodeName string, bridgeName string
 			continue
 		}
 
-		//3. use the pod's UID and the interfae of each entity.DeploymentNetowrk to geneate the vethxxxxxx
+		//3. use the pod's UID and the interfae of each entity.DeploymentNetowrk to geneate the vtxXXXXXXXXX
 		//for each deploymentNetwork, we get the vethname via veth+sha256(podUID + interfaceName in container)[0:8]
 		uid := v.ObjectMeta.UID
 		for _, k := range deploy.Networks {
-			veth := "veth" + utils.SHA256String(string(uid) + k.IfName)[0:8]
+			vethName := utils.GenerateVethName(string(uid), k.IfName)
 			//Use the veth name as the key and the PodName/InterfaceName in the value, we will add those inforamtion
 			//to OVSPortInfo later.
-			interfaces[veth] = &portData{
+			interfaces[vethName] = &portData{
 				v.Name,
 				k,
 			}
