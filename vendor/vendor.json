@@ -263,10 +263,18 @@
 		{
 			"checksumSHA1": "QAOy7z8HT9JxBXbIhPjTjdLusVU=",
 			"path": "github.com/linkernetworks/network-controller/messages",
-			"revision": "ab932c09f38fb545d892db529a99a9d9bc6e257a",
-			"revisionTime": "2018-08-31T03:13:05Z",
-			"version": "v0.4.7",
-			"versionExact": "v0.4.7"
+			"revision": "76cb2946e17ea2ab9e92dce65c96f87e96e25302",
+			"revisionTime": "2018-09-01T07:38:16Z",
+			"version": "=v0.4.8",
+			"versionExact": "v0.4.8"
+		},
+		{
+			"checksumSHA1": "PKUmbmBhKwMo6Cj7j0KUZQ6Ecsk=",
+			"path": "github.com/linkernetworks/network-controller/utils",
+			"revision": "76cb2946e17ea2ab9e92dce65c96f87e96e25302",
+			"revisionTime": "2018-09-01T07:38:16Z",
+			"version": "=v0.4.8",
+			"versionExact": "v0.4.8"
 		},
 		{
 			"checksumSHA1": "8bkCE7r0DcTaPDbKbwaI34Bmrbw=",
