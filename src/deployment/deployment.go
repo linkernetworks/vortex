@@ -319,6 +319,9 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 					Affinity:       generateAffinity(nodeAffinity),
 					RestartPolicy:  corev1.RestartPolicyAlways,
 					HostNetwork:    hostNetwork,
+					ImagePullSecrets: []corev1.LocalObjectReference{
+						{Name: "dockerhub-token"},
+					},
 				},
 			},
 		},
