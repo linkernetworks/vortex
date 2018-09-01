@@ -4,10 +4,6 @@ apps:
   vortex:
     controller:
       replicaCount: 1
-      nodeSelector:
-        glusterfs: false
-    replicaCount: 1
-    controller:
       apiserverImageTag: v0.2.3
       webappImageTag: v0.1.19
       portalCPU: 50m
@@ -16,6 +12,8 @@ apps:
       ports:
         apiserverNodePort: 32326
         webappNodePort: 32767
+    secret:
+      dockerToken:
   # vortex/deploy/helm/apps/charts/network-controller
   network-controller:
     controller:
