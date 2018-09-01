@@ -87,8 +87,6 @@ src.test-coverage-vagrant:
 src.test-bats:
 	sed -i.bak "s/localhost:9090/$$(minikube ip):30003/g; s/localhost:27017/$$(minikube ip):31717/g" config/testing.json
 	./build/src/cmd/vortex/vortex -config config/testing.json -port 7890 &
-	@echo "Waiting for server startup"
-	sleep 1
 	@cd tests;\
 	./test.sh
 
