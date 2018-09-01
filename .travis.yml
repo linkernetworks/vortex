@@ -73,8 +73,10 @@ jobs:
           - sudo apt-get update -q
           - sudo apt-get install -qqy httpie bats nfs-kernel-server
           - sudo pip install -U httpie-jwt-auth
-          - mkdir -p /tmp/nfs
-          - echo "/tmp/nfs *(rw,sync,no_root_squash)" | sudo tee /etc/exports
+          - sudo mkdir -p /nfsshare/mongodb
+          - sudo mkdir -p /nfsshare/influxdb
+          - sudo mkdir -p /nfsshare/user
+          - echo "/nfsshare *(rw,sync,no_root_squash)" | sudo tee /etc/exports
           - sudo exportfs -r
           - sudo showmount -e
       script:

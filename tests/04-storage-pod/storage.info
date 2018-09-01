@@ -2,5 +2,5 @@
 	"type": "nfs",
     "name": "@NFSSTORAGENAME@",
     "ip":"@NFSIP@",
-    "path":"/tmp/nfs"
+    "path":"/nfsshare"
 }
