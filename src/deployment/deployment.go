@@ -334,7 +334,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 	return err
 }
 
-// DeleteDeployment will delete deploy
+// DeleteDeployment will delete a deployment
 func DeleteDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) error {
 	return sp.KubeCtl.DeleteDeployment(deploy.Name, deploy.Namespace)
 }
