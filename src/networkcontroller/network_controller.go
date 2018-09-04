@@ -128,7 +128,7 @@ func (nc *NetworkController) DeleteOVSNetwork(bridgeName string) error {
 	return nil
 }
 
-// DumpOVSPorts will dump ports infromation of the target ovs
+// DumpOVSPorts will dump ports information of the target ovs
 func (nc *NetworkController) DumpOVSPorts(bridgeName string) ([]*pb.PortInfo, error) {
 	data, err := nc.ClientCtl.DumpPorts(
 		nc.Context,

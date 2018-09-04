@@ -61,8 +61,7 @@ func getContainerLogsHandler(ctx *web.Context) {
 
 	result, err := container.GetLogDetails(sp, namespace, podID, containerID, logSelector, usePreviousLogs)
 	if err != nil {
-		fmt.Errorf("failed to get the details of node: %v", err)
-		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("failed to get the details of node: %v", err))
 		return
 	}
 	resp.WriteHeaderAndEntity(http.StatusOK, result)

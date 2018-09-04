@@ -16,6 +16,7 @@ import (
 	_ "github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	_ "gopkg.in/mgo.v2/bson"
+
 	//corev1 "k8s.io/api/core/v1"
 
 	"testing"
@@ -63,11 +64,13 @@ func (suite *OVSTestSuite) TestGetOVSPortStatsFail() {
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portinfos?nodeName=11", nil)
+	suite.NoError(err)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
 	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/ovs/portinfos?nodeName=11&&bridgeName=111", nil)
+	suite.NoError(err)
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
