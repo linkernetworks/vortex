@@ -1,11 +1,10 @@
 package server
 
 import (
-	_ "encoding/json"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
-
+	"testing"
 	"time"
 
 	restful "github.com/emicklei/go-restful"
@@ -13,13 +12,7 @@ import (
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
-	_ "github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
-	_ "gopkg.in/mgo.v2/bson"
-
-	//corev1 "k8s.io/api/core/v1"
-
-	"testing"
 )
 
 func init() {
