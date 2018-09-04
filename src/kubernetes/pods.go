@@ -17,7 +17,8 @@ func (kc *KubeCtl) GetPods(namespace string) ([]*corev1.Pod, error) {
 	if err != nil {
 		return pods, err
 	}
-	for i, _ := range podsList.Items {
+
+	for i := 0; i < len(podsList.Items); i++ {
 		pods = append(pods, &podsList.Items[i])
 	}
 	return pods, nil
