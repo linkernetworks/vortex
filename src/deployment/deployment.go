@@ -177,8 +177,8 @@ func generateInitContainer(networks []entity.DeploymentNetwork) ([]corev1.Contai
 		privileged := true
 		containers = append(containers, corev1.Container{
 			Name:    "init-ethtool",
-			Image:   "sdnvortex/set-ethtool:v0.1.0",
-			Command: []string{"./ethtool.sh"},
+			Image:   "sdnvortex/ethtool:latest",
+			Command: []string{"/usr/bin/ethtool.sh"},
 			Args:    ethtools,
 			SecurityContext: &corev1.SecurityContext{
 				Privileged: &privileged,
