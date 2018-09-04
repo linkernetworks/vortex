@@ -3,6 +3,7 @@ package deployment
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -20,6 +21,8 @@ var allCapabilities = []corev1.Capability{"NET_ADMIN", "SYS_ADMIN", "NET_RAW"}
 
 // VolumeNamePrefix will set prefix of volumename
 const VolumeNamePrefix = "volume-"
+
+// DefaultLabel is the  label we used for our deploying application/deployment/pods
 const DefaultLabel = "vortex"
 
 // CheckDeploymentParameter will Check Deployment's Parameter
@@ -124,6 +127,7 @@ func generateClientCommand(network entity.DeploymentNetwork) (command []string) 
 func generateInitContainer(networks []entity.DeploymentNetwork) ([]corev1.Container, error) {
 	containers := []corev1.Container{}
 
+	ethtools := []string{}
 	for i, v := range networks {
 		containers = append(containers, corev1.Container{
 			Name:    fmt.Sprintf("init-network-client-%d", i),
@@ -161,6 +165,23 @@ func generateInitContainer(networks []entity.DeploymentNetwork) ([]corev1.Contai
 					Name:      "grpc-sock",
 					MountPath: "/tmp/",
 				},
+			},
+		})
+
+		if strings.HasPrefix(v.BridgeName, "netdev") {
+			ethtools = append(ethtools, v.IfName)
+		}
+	}
+
+	if len(ethtools) != 0 {
+		privileged := true
+		containers = append(containers, corev1.Container{
+			Name:    "init-ethtool",
+			Image:   "sdnvortex/set-ethtool:v0.1.0",
+			Command: []string{"./ethtool.sh"},
+			Args:    ethtools,
+			SecurityContext: &corev1.SecurityContext{
+				Privileged: &privileged,
 			},
 		})
 	}
