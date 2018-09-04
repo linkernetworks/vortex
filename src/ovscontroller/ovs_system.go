@@ -18,6 +18,9 @@ func DumpPorts(sp *serviceprovider.Container, nodeName string, bridgeName string
 
 	nodeAddr := net.JoinHostPort(nodeIP, networkcontroller.DEFAULT_CONTROLLER_PORT)
 	nc, err := networkcontroller.New(nodeAddr)
+	if err != nil {
+		return nil, err
+	}
 
 	//Get the information of OVS ports
 	retPorts, err := nc.DumpOVSPorts(bridgeName)
