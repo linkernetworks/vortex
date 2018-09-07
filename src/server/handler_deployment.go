@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math"
 	"net/http"
 	"strconv"
@@ -9,15 +10,19 @@ import (
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/deployment"
 	"github.com/linkernetworks/vortex/src/entity"
+	"github.com/linkernetworks/vortex/src/kubernetes"
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
+	"k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+const _24K = (1 << 10) * 24
 
 func createDeploymentHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
@@ -195,4 +200,90 @@ func getDeploymentHandler(ctx *web.Context) {
 	}
 	deployment.CreatedBy, _ = backend.FindUserByID(session, deployment.OwnerID)
 	resp.WriteEntity(deployment)
+}
+
+func uploadDeploymentYAMLHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
+
+	if err := req.Request.ParseMultipartForm(_24K); nil != err {
+		response.InternalServerError(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to read multipart form: %s", err.Error()))
+		return
+	}
+
+	infile, _, err := req.Request.FormFile("file")
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("Error parsing uploaded file %v", err))
+		return
+	}
+
+	content, err := ioutil.ReadAll(infile)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, fmt.Errorf("Failed to read data: %s", err.Error()))
+		return
+	}
+
+	if len(content) == 0 {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("Empty content"))
+		return
+	}
+
+	obj, err := kubernetes.ParseK8SYAML(content)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	deploymentObj := obj.(*v1.Deployment)
+
+	d := entity.Deployment{
+		ID:          bson.NewObjectId(),
+		OwnerID:     bson.ObjectIdHex(userID),
+		Name:        deploymentObj.ObjectMeta.Name,
+		Namespace:   deploymentObj.ObjectMeta.Namespace,
+		NetworkType: entity.DeploymentClusterNetwork,
+		Replicas:    *deploymentObj.Spec.Replicas,
+	}
+
+	if d.Namespace == "" {
+		d.Namespace = "default"
+	}
+
+	session := sp.Mongo.NewSession()
+	session.C(entity.DeploymentCollectionName).EnsureIndex(mgo.Index{
+		Key:    []string{"name"},
+		Unique: true,
+	})
+	defer session.Close()
+
+	d.CreatedAt = timeutils.Now()
+	_, err = sp.KubeCtl.CreateDeployment(deploymentObj, d.Namespace)
+	if err != nil {
+		if errors.IsAlreadyExists(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", d.Name))
+		} else if errors.IsConflict(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Create setting has conflict: %v", err))
+		} else if errors.IsInvalid(err) {
+			response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("Create setting is invalid: %v", err))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	if err := session.Insert(entity.DeploymentCollectionName, &d); err != nil {
+		if mgo.IsDup(err) {
+			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", d.Name))
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+	// find owner in user entity
+	d.CreatedBy, _ = backend.FindUserByID(session, d.OwnerID)
+	resp.WriteHeaderAndEntity(http.StatusCreated, d)
 }
