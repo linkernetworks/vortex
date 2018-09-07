@@ -1,5 +1,25 @@
 # Change Log
 
+## [v0.2.5](https://github.com/linkernetworks/vortex/tree/v0.2.5) (2018-09-07)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.4...v0.2.5)
+
+**Merged pull requests:**
+
+- \[Hot-fix\] fix go report [\#312](https://github.com/linkernetworks/vortex/pull/312) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Support the dpdk network with veth offloading [\#311](https://github.com/linkernetworks/vortex/pull/311) ([hwchiu](https://github.com/hwchiu))
+
+## [v0.2.4](https://github.com/linkernetworks/vortex/tree/v0.2.4) (2018-09-01)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.3...v0.2.4)
+
+**Merged pull requests:**
+
+- \[Upgrade\] upgrade network controller to v0.4.8 [\#309](https://github.com/linkernetworks/vortex/pull/309) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] waiting server startup [\#308](https://github.com/linkernetworks/vortex/pull/308) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] hashed default user password [\#307](https://github.com/linkernetworks/vortex/pull/307) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] add image pull secret [\#302](https://github.com/linkernetworks/vortex/pull/302) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Docker hub secret [\#301](https://github.com/linkernetworks/vortex/pull/301) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] application has auth [\#292](https://github.com/linkernetworks/vortex/pull/292) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.2.3](https://github.com/linkernetworks/vortex/tree/v0.2.3) (2018-08-31)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.2...v0.2.3)
 
