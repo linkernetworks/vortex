@@ -15,12 +15,14 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/web"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 )
@@ -43,6 +45,13 @@ func handleExecShell(ctx *web.Context) {
 
 	kubeconfigPath := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+
+	if err != nil {
+		cfg, err = rest.InClusterConfig()
+		if err != nil {
+			panic(fmt.Errorf("Load the kubernetes config fail"))
+		}
+	}
 
 	terminalSessions[sessionId] = TerminalSession{
 		id:       sessionId,

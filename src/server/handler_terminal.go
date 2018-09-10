@@ -174,7 +174,7 @@ func handleTerminalSession(session sockjs.Session) {
 	terminalSession.bound <- nil
 }
 
-// CreateAttachHandler is called from main for /api/sockjs
+// CreateAttachHandler is called from main for /v1/sockjs
 func CreateAttachHandler(path string) http.Handler {
 	return sockjs.NewHandler(path, sockjs.DefaultOptions, handleTerminalSession)
 }
