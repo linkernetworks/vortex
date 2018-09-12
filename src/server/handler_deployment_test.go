@@ -1,10 +1,15 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"math/rand"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -348,4 +353,95 @@ func (suite *DeploymentTestSuite) TestListDeploymentWithInvalidPage() {
 	httpWriter = httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusInternalServerError, httpWriter)
+}
+
+func (suite *DeploymentTestSuite) TestUploadDeploymentYAML() {
+	filename := "../../testYAMLs/deployment.yaml"
+
+	bodyBuf := bytes.NewBufferString("")
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	// use the bodyWriter to write the Part headers to the buffer
+	_, err := bodyWriter.CreateFormFile("file", filename)
+	suite.NoError(err)
+
+	// the file data will be the second part of the body
+	file, err := os.Open(filename)
+	suite.NoError(err)
+
+	// need to know the boundary to properly close the part myself.
+	boundary := bodyWriter.Boundary()
+	//close_string := fmt.Sprintf("\r\n--%s--\r\n", boundary)
+	closeBuf := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
+
+	// use multi-reader to defer the reading of the file data until
+	// writing to the socket buffer.
+	requestReader := io.MultiReader(bodyBuf, file, closeBuf)
+	fileStat, err := file.Stat()
+	suite.NoError(err)
+
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/deployments/upload/yaml", requestReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpRequest.ContentLength = fileStat.Size() + int64(bodyBuf.Len()) + int64(closeBuf.Len())
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	defer suite.session.Remove(entity.DeploymentCollectionName, "name", "upload-deployment")
+
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
+
+	//load data to check
+	retDeployment := entity.Deployment{}
+	err = suite.session.FindOne(entity.DeploymentCollectionName, bson.M{"name": "upload-deployment"}, &retDeployment)
+	suite.NoError(err)
+	suite.NotEqual("", retDeployment.ID)
+	suite.Equal("upload-deployment", retDeployment.Name)
+	suite.Equal("default", retDeployment.Namespace)
+
+	//Create again and it should fail since the name exist
+	httpWriter = httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
+
+	err = p.DeleteDeployment(suite.sp, &retDeployment)
+	suite.NoError(err)
+}
+
+func (suite *DeploymentTestSuite) TestUploadDeploymentYAMLFail() {
+	filename := "../../testYAMLs/namespace.yaml"
+
+	bodyBuf := bytes.NewBufferString("")
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	// use the bodyWriter to write the Part headers to the buffer
+	_, err := bodyWriter.CreateFormFile("file", filename)
+	suite.NoError(err)
+
+	// the file data will be the second part of the body
+	file, err := os.Open(filename)
+	suite.NoError(err)
+
+	// need to know the boundary to properly close the part myself.
+	boundary := bodyWriter.Boundary()
+	//close_string := fmt.Sprintf("\r\n--%s--\r\n", boundary)
+	closeBuf := bytes.NewBufferString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
+
+	// use multi-reader to defer the reading of the file data until
+	// writing to the socket buffer.
+	requestReader := io.MultiReader(bodyBuf, file, closeBuf)
+	fileStat, err := file.Stat()
+	suite.NoError(err)
+
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/deployments/upload/yaml", requestReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpRequest.ContentLength = fileStat.Size() + int64(bodyBuf.Len()) + int64(closeBuf.Len())
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+
+	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 }
