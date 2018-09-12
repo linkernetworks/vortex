@@ -145,6 +145,7 @@ func newServiceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteServiceHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listServiceHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getServiceHandler)))
+	webService.Route(webService.POST("/upload/yaml").Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadServiceYAMLHandler)))
 	return webService
 }
 
@@ -156,6 +157,7 @@ func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteNamespaceHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNamespaceHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getNamespaceHandler)))
+	webService.Route(webService.POST("/upload/yaml").Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadNamespaceYAMLHandler)))
 	return webService
 }
 
