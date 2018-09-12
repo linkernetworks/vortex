@@ -236,7 +236,11 @@ func uploadServiceYAMLHandler(ctx *web.Context) {
 		return
 	}
 
-	serviceObj := obj.(*v1.Service)
+	serviceObj, ok := obj.(*v1.Service)
+	if !ok {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The YAML file is not for creating service"))
+		return
+	}
 
 	var servicePorts []entity.ServicePort
 	for _, port := range serviceObj.Spec.Ports {
