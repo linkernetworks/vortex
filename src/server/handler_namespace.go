@@ -229,7 +229,11 @@ func uploadNamespaceYAMLHandler(ctx *web.Context) {
 		return
 	}
 
-	namespaceObj := obj.(*v1.Namespace)
+	namespaceObj, ok := obj.(*v1.Namespace)
+	if !ok {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The YAML file is not for creating namespace"))
+		return
+	}
 
 	d := entity.Namespace{
 		ID:      bson.NewObjectId(),
