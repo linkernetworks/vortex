@@ -42,6 +42,7 @@ func (suite *VolumeTestSuite) TestGetPVCInstance() {
 	volume := &entity.Volume{
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
+		Namespace:   "default",
 		StorageName: namesgenerator.GetRandomName(0),
 	}
 
@@ -67,7 +68,6 @@ func (suite *VolumeTestSuite) TestGetStorageClassName() {
 }
 
 func (suite *VolumeTestSuite) TestCreateVolume() {
-	namespace := "default"
 	session := suite.sp.Mongo.NewSession()
 	defer session.Close()
 	storage := entity.Storage{
@@ -82,6 +82,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	volume := &entity.Volume{
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
+		Namespace:   "default",
 		StorageName: storage.Name,
 	}
 
@@ -89,14 +90,14 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	suite.NoError(err)
 
 	name := volume.GetPVCName()
-	v, err := suite.sp.KubeCtl.GetPVC(name, namespace)
+	v, err := suite.sp.KubeCtl.GetPVC(name, volume.Namespace)
 	suite.NoError(err)
 	suite.NotNil(v)
 
 	err = DeleteVolume(suite.sp, volume)
 	suite.NoError(err)
 
-	v, err = suite.sp.KubeCtl.GetPVC(name, namespace)
+	v, err = suite.sp.KubeCtl.GetPVC(name, volume.Namespace)
 	suite.Error(err)
 	suite.Nil(v)
 }
@@ -105,6 +106,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeFail() {
 	volume := &entity.Volume{
 		ID:          bson.NewObjectId(),
 		Name:        namesgenerator.GetRandomName(0),
+		Namespace:   "default",
 		StorageName: namesgenerator.GetRandomName(0),
 	}
 
@@ -113,10 +115,10 @@ func (suite *VolumeTestSuite) TestCreateVolumeFail() {
 }
 
 func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
-	namespace := "default"
 	volume := &entity.Volume{
-		ID:   bson.NewObjectId(),
-		Name: namesgenerator.GetRandomName(0),
+		ID:        bson.NewObjectId(),
+		Name:      namesgenerator.GetRandomName(0),
+		Namespace: "default",
 	}
 
 	session := suite.sp.Mongo.NewSession()
@@ -156,7 +158,7 @@ func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
 		Status: corev1.PodStatus{
 			Phase: corev1.PodRunning,
 		},
-	}, namespace)
+	}, volume.Namespace)
 	suite.sp.KubeCtl.CreatePod(&corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: pods[1].Name,
@@ -164,7 +166,7 @@ func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
 		Status: corev1.PodStatus{
 			Phase: corev1.PodRunning,
 		},
-	}, namespace)
+	}, volume.Namespace)
 	suite.sp.KubeCtl.CreatePod(&corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: namesgenerator.GetRandomName(0),
@@ -172,7 +174,7 @@ func (suite *VolumeTestSuite) TestDeleteVolumeFail() {
 		Status: corev1.PodStatus{
 			Phase: corev1.PodRunning,
 		},
-	}, namespace)
+	}, volume.Namespace)
 
 	err := DeleteVolume(suite.sp, volume)
 	suite.Error(err)
