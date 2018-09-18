@@ -9,10 +9,10 @@ data:
         for: 2m
         labels:
           admin: false
-          email_to: "{{$labels.label_email_to}}"
+          email_to: "{{ "{{" }}$labels.label_email_to{{ "}}" }}"
         annotations:
-          summary: "Deployment \"{{$labels.deployment}}\" in namespace \"{{$labels.namespace}}\" is not running."
-          description: "There is no avaiable pod for the deployment \"{{$labels.deployment}}\" in namespace \"{{$labels.namespace}}\"."
+          summary: "Deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\" is not running."
+          description: "There is no avaiable pod for the deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\"."
       - alert: Vortex_Not_Running
         expr: (max(kube_deployment_status_replicas_available{namespace=~"vortex|kube-system" }) by (deployment,namespace) == 0)
         for: 2m
@@ -20,8 +20,8 @@ data:
           admin: true
           email_to: admin
         annotations:
-          summary: "Deployment \"{{$labels.deployment}}\" in namespace \"{{$labels.namespace}}\" is not running."
-          description: "There is no avaiable pod for the deployment \"{{$labels.deployment}}\" in namespace \"{{$labels.namespace}}\"."
+          summary: "Deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\" is not running."
+          description: "There is no avaiable pod for the deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\"."
 kind: ConfigMap
 metadata:
   name: prometheus-rules

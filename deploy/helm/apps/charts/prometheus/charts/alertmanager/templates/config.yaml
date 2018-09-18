@@ -6,13 +6,13 @@ metadata:
 data:
   alertmanager.yml: |-
     global:
-      smtp_smarthost: 'smtp.gmail.com:587'
-      smtp_from: 'vortexlinker@gmail.com'
-      smtp_auth_username: 'vortexlinker@gmail.com'
-      smtp_auth_password: 'password'
+      smtp_smarthost: '{{ .Values.config.smtpHost }}'
+      smtp_from: '{{ .Values.config.smtpFrom }}'
+      smtp_auth_username: '{{ .Values.config.smtpUsername }}'
+      smtp_auth_password: '{{ .Values.config.smtpPassword }}'
 
     route:
-      group_by: [admin]
+      group_by: ['admin', 'email_to']
       receiver: admin
       routes:
       - match:
@@ -25,14 +25,14 @@ data:
     receivers:
     - name: admin
       email_configs:
-      - to: "c20712983@gmail.com"
+      - to: "{{ .Values.config.adminEmail }}"
         headers: { Subject: "[WARN] Alert Email From Vortex" }
-        html: '{{ template "email.html" . }}'
+        html: '{{ "{{" }} template "email.html" . {{ "}}" }}'
     - name: email_router
       email_configs:
-      - to: "{{ .GroupLabels.email_to }}@gmail.com"
+      - to: "{{ "{{" }} .GroupLabels.email_to {{ "}}" }}@gmail.com"
         headers: { Subject: "[WARN] Alert Email From Vortex" }
-        html: '{{ template "email.html" . }}'
+        html: '{{ "{{" }} template "email.html" . {{ "}}" }}'
 
     templates:
       - '/etc/email-template/email.tmpl'

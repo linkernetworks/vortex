@@ -17,13 +17,19 @@ data:
     global:
       scrape_interval: {{ .Values.controller.scrapeInterval }}
       scrape_timeout: 5s
-    scrape_configs:
 
-      
+    rule_files:
+    - /etc/prometheus-rules/rules.yml
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+          - targets: ["alertmanager.vortex.svc.cluster.local:9093"]
+
+    scrape_configs:
     - job_name: 'prometheus'
       static_configs:
         - targets: ['localhost:9090']
-
 
     - job_name: 'kubernetes-service-endpoints'
       kubernetes_sd_configs:
@@ -56,7 +62,6 @@ data:
       - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
         target_label: node
-
 
     - job_name: 'kubernetes-pods'
       kubernetes_sd_configs:
