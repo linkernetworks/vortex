@@ -30,6 +30,8 @@ spec:
           name: data
         - mountPath: "/etc/prometheus"
           name: config-volume
+        - name: rules-volume
+          mountPath: /etc/prometheus-rules
         resources:
           requests:
             cpu: 100m
@@ -40,6 +42,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: data
-      - configMap:
+      - name: config-volume
+        configMap:
           name: prometheus-config
-        name: config-volume
+      - name: rules-volume
+        configMap:
+          name: prometheus-rules

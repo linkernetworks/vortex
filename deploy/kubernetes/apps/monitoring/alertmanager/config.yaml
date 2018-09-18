@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: vortex
+data:
+  alertmanager.yml: |-
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'vortexlinker@gmail.com'
+      smtp_auth_username: 'vortexlinker@gmail.com'
+      smtp_auth_password: 'password'
+
+    route:
+      group_by: [email_to]
+      receiver: email_router
+
+    receivers:
+    - name: email_router
+      email_configs:
+      - to: "{{ .GroupLabels.email_to }}@gmail.com"

@@ -1,9 +1,9 @@
 {
   "mongo": {
-    "url": "mongodb://172.17.8.100:31717/vortex_test"
+    "url": "mongodb://localhost:27017/vortex_test"
   },
   "prometheus": {
-    "url": "http://172.17.8.100:30003"
+    "url": "http://localhost:9090"
   },
   "registry": {
         "url": "https://dockerhub.pw"

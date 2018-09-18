@@ -5,10 +5,20 @@ metadata:
   namespace: vortex
 data:
   # https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
-  prometheus.yml: |
+  prometheus.yml: |-
+
     global:
       scrape_interval: 5s
       scrape_timeout: 5s
+    
+    rule_files:
+    - /etc/prometheus-rules/rules.yml
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+          - targets: ["alertmanager.vortex.svc.cluster.local:9093"]
+
     scrape_configs:
 
       
