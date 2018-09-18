@@ -44,7 +44,6 @@ func getStorageClassName(session *mongo.Session, storageName string) (string, er
 
 // CreateVolume is a function to create volume
 func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
-	namespace := "default"
 	session := sp.Mongo.NewSession()
 	defer session.Close()
 	//fetch the db to get the storageName
@@ -55,13 +54,12 @@ func CreateVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 
 	name := volume.GetPVCName()
 	pvc := getPVCInstance(volume, name, storageName)
-	_, err = sp.KubeCtl.CreatePVC(pvc, namespace)
+	_, err = sp.KubeCtl.CreatePVC(pvc, volume.Namespace)
 	return err
 }
 
 // DeleteVolume is a function to delete volume
 func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
-	namespace := "default"
 	//Check the pod
 	session := sp.Mongo.NewSession()
 	defer session.Close()
@@ -80,5 +78,5 @@ func DeleteVolume(sp *serviceprovider.Container, volume *entity.Volume) error {
 		return fmt.Errorf("delete the volume [%s] fail, since the followings pods still ust it: %s", volume.Name, podNames)
 	}
 
-	return sp.KubeCtl.DeletePVC(volume.GetPVCName(), namespace)
+	return sp.KubeCtl.DeletePVC(volume.GetPVCName(), volume.Namespace)
 }

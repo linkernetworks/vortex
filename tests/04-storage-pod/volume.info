@@ -1,6 +1,7 @@
 {
 	"storageName": "@STORAGENAME@",
 	"name": "@VOLUMENAME@",
+	"namespace": "default",
 	"accessMode":"ReadWriteMany",
 	"capacity":"300Gi"
 }

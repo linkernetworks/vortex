@@ -78,6 +78,7 @@ func (suite *VolumeTestSuite) TestCreateVolume() {
 	volume := entity.Volume{
 		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
+		Namespace:   "default",
 		StorageName: suite.storage.Name,
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
@@ -130,6 +131,7 @@ func (suite *VolumeTestSuite) TestCreateVolumeWithInvalidParameter() {
 	volume := entity.Volume{
 		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
+		Namespace:   "default",
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
@@ -158,6 +160,7 @@ func (suite *VolumeTestSuite) TestDeleteVolume() {
 		ID:          bson.NewObjectId(),
 		OwnerID:     bson.NewObjectId(),
 		Name:        tName,
+		Namespace:   "default",
 		StorageName: namesgenerator.GetRandomName(0),
 		Capacity:    tCapacity,
 		AccessMode:  tAccessMode,
@@ -212,6 +215,7 @@ func (suite *VolumeTestSuite) TestListVolume() {
 			ID:          bson.NewObjectId(),
 			OwnerID:     bson.NewObjectId(),
 			Name:        namesgenerator.GetRandomName(0),
+			Namespace:   "default",
 			StorageName: namesgenerator.GetRandomName(0),
 			AccessMode:  corev1.PersistentVolumeAccessMode("ReadOnlyMany"),
 			Capacity:    "250",
