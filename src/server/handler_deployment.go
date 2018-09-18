@@ -238,7 +238,11 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 		return
 	}
 
-	deploymentObj := obj.(*v1.Deployment)
+	deploymentObj, ok := obj.(*v1.Deployment)
+	if !ok {
+		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The YAML file is not for creating deployment"))
+		return
+	}
 
 	d := entity.Deployment{
 		ID:          bson.NewObjectId(),
