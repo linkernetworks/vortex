@@ -21,11 +21,12 @@ import (
 
 // Container is the structure for container
 type Container struct {
-	Config     config.Config
-	Mongo      *mongo.Service
-	Prometheus *prometheusprovider.Service
-	KubeCtl    *kubeCtl.KubeCtl
-	Validator  *validator.Validate
+	Config        config.Config
+	ClusterConfig *rest.Config
+	Mongo         *mongo.Service
+	Prometheus    *prometheusprovider.Service
+	KubeCtl       *kubeCtl.KubeCtl
+	Validator     *validator.Validate
 }
 
 // ServiceDiscoverResponse is the structure for Service Discover Response
@@ -63,11 +64,12 @@ func New(cf config.Config) *Container {
 	validate.RegisterValidation("k8sname", checkNameValidation)
 
 	sp := &Container{
-		Config:     cf,
-		Mongo:      mongo,
-		Prometheus: prometheus,
-		KubeCtl:    kubeCtl.New(clientset),
-		Validator:  validate,
+		Config:        cf,
+		ClusterConfig: k8s,
+		Mongo:         mongo,
+		Prometheus:    prometheus,
+		KubeCtl:       kubeCtl.New(clientset),
+		Validator:     validate,
 	}
 
 	if err := createDefaultUser(sp.Mongo); err != nil {
