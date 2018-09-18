@@ -11,8 +11,8 @@ data:
           team: node
           email_to: "{{$labels.label_email_to}}"
         annotations:
-          summary: "{{$labels.deployment}}: Deployment is not running"
-          description: "{{$labels.deployment}}: There is no avaiable pod for the deployment {{$labels.deployment}}"
+          summary: "Deployment \"{{$labels.deployment}}\" is not running"
+          description: "There is no avaiable pod for the deployment {\"{$labels.deployment}}\""
 kind: ConfigMap
 metadata:
   name: prometheus-rules

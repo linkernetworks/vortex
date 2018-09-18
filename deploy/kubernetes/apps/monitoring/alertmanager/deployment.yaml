@@ -34,6 +34,8 @@ spec:
             - name: storage-volume
               mountPath: "/data"
               subPath: ""
+            - name: email-template
+              mountPath: /etc/email-template
           resources:
             limits:
               cpu: 10m
@@ -59,8 +61,11 @@ spec:
               cpu: 10m
               memory: 10Mi
       volumes:
+        - name: storage-volume
+          emptyDir: {}
         - name: config-volume
           configMap:
             name: alertmanager-config
-        - name: storage-volume
-          emptyDir: {}
+        - name: email-template
+          configMap:
+            name: alertmanager-email-template

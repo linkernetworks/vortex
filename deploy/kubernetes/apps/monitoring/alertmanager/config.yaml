@@ -19,3 +19,8 @@ data:
     - name: email_router
       email_configs:
       - to: "{{ .GroupLabels.email_to }}@gmail.com"
+        headers: { Subject: "[WARN] Alert Email From Vortex" }
+        html: '{{ template "email.html" . }}'
+
+    templates:
+      - '/etc/email-template/email.tmpl'
