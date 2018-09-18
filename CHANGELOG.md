@@ -1,5 +1,25 @@
 # Change Log
 
+## [v0.2.6](https://github.com/linkernetworks/vortex/tree/v0.2.6) (2018-09-18)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.5...v0.2.6)
+
+**Closed issues:**
+
+- \[Task\] Add new API handler for delete pod [\#315](https://github.com/linkernetworks/vortex/issues/315)
+- \[Bug\] Namespace of volume is always be default [\#313](https://github.com/linkernetworks/vortex/issues/313)
+- \[Task\] Upload Namespace YAML API [\#277](https://github.com/linkernetworks/vortex/issues/277)
+- \[Task\] Upload Service YAML API [\#276](https://github.com/linkernetworks/vortex/issues/276)
+- \[Task\] Upload Deployment YAML API [\#275](https://github.com/linkernetworks/vortex/issues/275)
+- \[Task\] Upload Pod YAML API [\#274](https://github.com/linkernetworks/vortex/issues/274)
+
+**Merged pull requests:**
+
+- \[Bug\] johnlin/volume namespace [\#317](https://github.com/linkernetworks/vortex/pull/317) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] New deleting pod api [\#316](https://github.com/linkernetworks/vortex/pull/316) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] YAML upload handler for resources [\#314](https://github.com/linkernetworks/vortex/pull/314) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] upload deployment yaml [\#310](https://github.com/linkernetworks/vortex/pull/310) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] container exec [\#259](https://github.com/linkernetworks/vortex/pull/259) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.2.5](https://github.com/linkernetworks/vortex/tree/v0.2.5) (2018-09-07)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.4...v0.2.5)
 
