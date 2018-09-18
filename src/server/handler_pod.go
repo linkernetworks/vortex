@@ -120,6 +120,27 @@ func deletePodHandler(ctx *web.Context) {
 	})
 }
 
+func deletePodFromClusterHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	namespace := req.PathParameter("namespace")
+	pod := req.PathParameter("pod")
+
+	if err := sp.KubeCtl.DeletePod(pod, namespace); err != nil {
+		if errors.IsNotFound(err) {
+			response.NotFound(req.Request, resp.ResponseWriter, err)
+		} else {
+			response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		}
+		return
+	}
+
+	resp.WriteEntity(response.ActionResponse{
+		Error:   false,
+		Message: "Delete success",
+	})
+}
+
 func listPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 

@@ -203,6 +203,43 @@ func (suite *PodTestSuite) TestDeletePod() {
 	suite.Equal(0, n)
 }
 
+func (suite *PodTestSuite) TestDeletePodFromCluster() {
+	namespace := "default"
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+	tName := namesgenerator.GetRandomName(0)
+	pod := entity.Pod{
+		Name:          tName,
+		Namespace:     namespace,
+		Containers:    containers,
+		Capability:    true,
+		RestartPolicy: "Never",
+		NetworkType:   entity.PodHostNetwork,
+		NodeAffinity:  []string{},
+	}
+
+	err := p.CreatePod(suite.sp, &pod)
+	suite.NoError(err)
+
+	bodyBytes, err := json.MarshalIndent(pod, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pods/"+pod.Namespace+"/"+pod.Name, bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriter)
+}
+
 func (suite *PodTestSuite) TestDeletePodWithInvalidID() {
 	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/pods/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)

@@ -115,6 +115,7 @@ func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createPodHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deletePodHandler)))
+	webService.Route(webService.DELETE("/{namespace}/{pod}").To(handler.RESTfulServiceHandler(sp, deletePodFromClusterHandler)))
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listPodHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getPodHandler)))
 	return webService
