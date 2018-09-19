@@ -7,12 +7,12 @@ data:
   alertmanager.yml: |-
     global:
       smtp_smarthost: 'smtp.sendgrid.net:587'
-      smtp_from: 'develop@linkernetworks.com'
+      smtp_from: 'vortex@linkernetworks.com'
       smtp_auth_username: 'apikey'
       smtp_auth_password: 'key'
 
     route:
-      group_by: ['admin', 'email_to']
+      group_by: ['admin', 'email_account', 'email_domain']
       receiver: admin
       routes:
       - match:
@@ -26,12 +26,12 @@ data:
     - name: admin
       email_configs:
       - to: "vortex@linkernetworks.com"
-        headers: { Subject: "[WARN] Alert Email From Vortex" }
+        headers: { Subject: "[WARN] Alert Email From Vortex Alertmanager" }
         html: '{{ template "email.html" . }}'
     - name: email_router
       email_configs:
-      - to: "{{ .GroupLabels.email_to }}@gmail.com"
-        headers: { Subject: "[WARN] Alert Email From Vortex" }
+      - to: "{{ .GroupLabels.email_account }}@{{ .GroupLabels.email_domain }}"
+        headers: { Subject: "[WARN] Alert Email From Vortex Alertmanager" }
         html: '{{ template "email.html" . }}'
 
     templates:

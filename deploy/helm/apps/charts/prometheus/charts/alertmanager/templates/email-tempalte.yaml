@@ -309,10 +309,8 @@ data:
                       {{ "{{" }} range .Alerts.Firing {{ "}}" }}
                       <tr>
                         <td class="content-block">
-                          <strong>Labels</strong><br />
-                          {{ "{{" }} range .Labels.SortedPairs {{ "}}" }}{{ "{{" }} .Name {{ "}}" }} = {{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
-                          {{ "{{" }} if gt (len .Annotations) 0 {{ "}}" }}<strong>Annotations</strong><br />{{ "{{" }} end {{ "}}" }}
-                          {{ "{{" }} range .Annotations.SortedPairs {{ "}}" }}{{ "{{" }} .Name {{ "}}" }} = {{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
+                          {{ "{{" }} if gt (len .Annotations) 0 {{ "}}" }}<strong>Description</strong><br />{{ "{{" }} end {{ "}}" }}
+                          {{ "{{" }} range .Annotations.SortedPairs {{ "}}" }}{{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
                         </td>
                       </tr>
                       {{ "{{" }} end {{ "}}" }}
@@ -336,10 +334,8 @@ data:
                       {{ "{{" }} range .Alerts.Resolved {{ "}}" }}
                       <tr>
                         <td class="content-block">
-                          <strong>Labels</strong><br />
-                          {{ "{{" }} range .Labels.SortedPairs {{ "}}" }}{{ "{{" }} .Name {{ "}}" }} = {{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
-                          {{ "{{" }} if gt (len .Annotations) 0 {{ "}}" }}<strong>Annotations</strong><br />{{ "{{" }} end {{ "}}" }}
-                          {{ "{{" }} range .Annotations.SortedPairs {{ "}}" }}{{ "{{" }} .Name {{ "}}" }} = {{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
+                          {{ "{{" }} if gt (len .Annotations) 0 {{ "}}" }}<strong>Description</strong><br />{{ "{{" }} end {{ "}}" }}
+                          {{ "{{" }} range .Annotations.SortedPairs {{ "}}" }}{{ "{{" }} .Value {{ "}}" }}<br />{{ "{{" }} end {{ "}}" }}
                         </td>
                       </tr>
                       {{ "{{" }} end {{ "}}" }}
@@ -351,7 +347,7 @@ data:
               <div class="footer">
                 <table width="100%">
                   <tr>
-                    <td class="aligncenter content-block">Sent by {{ "{{" }} template "__alertmanager" . {{ "}}" }}</td>
+                    <td class="aligncenter content-block">Sent by Vortex{{ "{{" }} template "__alertmanager" . {{ "}}" }}</td>
                   </tr>
                 </table>
               </div></div>

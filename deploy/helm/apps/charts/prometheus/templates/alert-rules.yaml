@@ -5,22 +5,21 @@ data:
     - name: pod-alert-rule
       rules:
       - alert: Deployment_Not_Running
-        expr: (max(kube_deployment_status_replicas_available{namespace!~"vortex|kube-system" }) by (deployment,namespace) == 0) * on(deployment,namespace) group_left(label_email_to)(kube_deployment_labels)
+        expr: (max(kube_deployment_status_replicas_available{namespace!~"vortex|kube-system" }) by (deployment,namespace) == 0) * on(deployment,namespace) group_left(label_email_account,label_email_domain)(kube_deployment_labels)
         for: 2m
         labels:
           admin: false
-          email_to: "{{ "{{" }}$labels.label_email_to{{ "}}" }}"
+          email_account: "{{ "{{" }}$labels.label_email_account{{ "}}" }}"
+          email_domain: "{{ "{{" }}$labels.label_email_domain{{ "}}" }}"
         annotations:
-          summary: "Deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\" is not running."
           description: "There is no avaiable pod for the deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\"."
       - alert: Vortex_Not_Running
         expr: (max(kube_deployment_status_replicas_available{namespace=~"vortex|kube-system" }) by (deployment,namespace) == 0)
         for: 2m
         labels:
           admin: true
-          email_to: admin
+          email_account: admin
         annotations:
-          summary: "Deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\" is not running."
           description: "There is no avaiable pod for the deployment \"{{ "{{" }}$labels.deployment{{ "}}" }}\" in namespace \"{{ "{{" }}$labels.namespace{{ "}}" }}\"."
 kind: ConfigMap
 metadata:
