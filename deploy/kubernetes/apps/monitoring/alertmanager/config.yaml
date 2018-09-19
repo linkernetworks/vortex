@@ -6,13 +6,13 @@ metadata:
 data:
   alertmanager.yml: |-
     global:
-      smtp_smarthost: 'smtp.gmail.com:587'
-      smtp_from: 'vortexlinker@gmail.com'
-      smtp_auth_username: 'vortexlinker@gmail.com'
-      smtp_auth_password: 'password'
+      smtp_smarthost: 'smtp.sendgrid.net:587'
+      smtp_from: 'develop@linkernetworks.com'
+      smtp_auth_username: 'apikey'
+      smtp_auth_password: 'key'
 
     route:
-      group_by: [admin]
+      group_by: ['admin', 'email_to']
       receiver: admin
       routes:
       - match:
@@ -25,7 +25,7 @@ data:
     receivers:
     - name: admin
       email_configs:
-      - to: "c20712983@gmail.com"
+      - to: "vortex@linkernetworks.com"
         headers: { Subject: "[WARN] Alert Email From Vortex" }
         html: '{{ template "email.html" . }}'
     - name: email_router

@@ -54,12 +54,8 @@ spec:
               mountPath: /etc/config
               readOnly: true
           resources:
-            limits:
-              cpu: 10m
-              memory: 10Mi
             requests:
               cpu: 10m
-              memory: 10Mi
       volumes:
         - name: storage-volume
           emptyDir: {}
