@@ -77,6 +77,61 @@ func verifyTokenHandler(ctx *web.Context) {
 	http.Redirect(resp.ResponseWriter, req.Request, "/v1/users/"+userID, 303)
 }
 
+func patchPasswordHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	userID, ok := req.Attribute("UserID").(string)
+	if !ok {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID is empty"))
+		return
+	}
+
+	user, err := backend.FindUserByID(session, bson.ObjectIdHex(userID))
+	if err != nil {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID not found"))
+		return
+	}
+
+	var newCred entity.LoginCredential
+	if err := req.ReadEntity(&newCred); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	newCred.Username = user.LoginCredential.Username
+
+	if err := sp.Validator.Struct(newCred); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	hashedPassword, err := utils.HashPassword(newCred.Password)
+	if err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	newCred.Password = hashedPassword
+
+	user.LoginCredential = newCred
+	modifier := bson.M{
+		"$set": user,
+	}
+	query := bson.M{
+		"_id": user.ID,
+	}
+	if err := session.Update(entity.UserCollectionName, query, modifier); err != nil {
+		response.InternalServerError(req.Request, resp, err)
+		return
+	}
+
+	resp.WriteEntity(response.ActionResponse{
+		Error:   false,
+		Message: "password successfully changed",
+	})
+}
+
 func signInUserHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 

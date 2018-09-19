@@ -13,7 +13,9 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
+	response "github.com/linkernetworks/vortex/src/net/http"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
+	"github.com/linkernetworks/vortex/src/utils"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
@@ -113,6 +115,80 @@ func (suite *UserTestSuite) TestVerifyInvalidToken() {
 	httpWriter := httptest.NewRecorder()
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusUnauthorized, httpWriter)
+}
+
+func (suite *UserTestSuite) TestPatchPassword() {
+	var resp response.ActionResponse
+	testUsername := namesgenerator.GetRandomName(0) + "@linkernetworks.com"
+	// given a user already signup
+	user := entity.User{
+		ID: bson.NewObjectId(),
+		LoginCredential: entity.LoginCredential{
+			Username: testUsername,
+			Password: "password",
+		},
+		DisplayName: "John Doe",
+		FirstName:   "John",
+		LastName:    "Doe",
+		PhoneNumber: "0999999999",
+	}
+
+	bodyBytes, err := json.MarshalIndent(user, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/users/signup", bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
+	defer suite.session.Remove(entity.UserCollectionName, "loginCredential.username", user.LoginCredential.Username)
+
+	// do signin to get a jwt bearer
+	bodyBytesSignIn, err := json.MarshalIndent(user.LoginCredential, "", "  ")
+	suite.NoError(err)
+
+	bodyReaderSignIn := strings.NewReader(string(bodyBytesSignIn))
+	httpRequestSignIn, err := http.NewRequest("POST", "http://localhost:7890/v1/users/signin", bodyReaderSignIn)
+	suite.NoError(err)
+
+	httpRequestSignIn.Header.Add("Content-Type", "application/json")
+	httpWriterSignIn := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriterSignIn, httpRequestSignIn)
+	assertResponseCode(suite.T(), http.StatusOK, httpWriterSignIn)
+
+	decoder := json.NewDecoder(httpWriterSignIn.Body)
+	decoder.Decode(&resp)
+	JWTBearer := "Bearer " + resp.Message
+
+	// start to change the password
+	newCred := entity.LoginCredential{
+		Username: testUsername,
+		Password: "p@ssw0rd",
+	}
+
+	newCredBodyBytes, err := json.MarshalIndent(newCred, "", "  ")
+	suite.NoError(err)
+
+	newCredBodyReader := strings.NewReader(string(newCredBodyBytes))
+	patchPasswordHTTPRequest, err := http.NewRequest("PUT", "http://localhost:7890/v1/users/password", newCredBodyReader)
+	suite.NoError(err)
+
+	patchPasswordHTTPRequest.Header.Add("Content-Type", "application/json")
+	patchPasswordHTTPRequest.Header.Add("Authorization", JWTBearer)
+	patchPasswordHTTPWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(patchPasswordHTTPWriter, patchPasswordHTTPRequest)
+	assertResponseCode(suite.T(), http.StatusOK, patchPasswordHTTPWriter)
+
+	// load data to check
+	retUser := entity.User{}
+	err = suite.session.FindOne(entity.UserCollectionName, bson.M{"loginCredential.username": testUsername}, &retUser)
+	suite.NoError(err)
+
+	isCorrect := utils.CheckPasswordHash(newCred.Password, retUser.LoginCredential.Password)
+	suite.True(isCorrect)
 }
 
 func (suite *UserTestSuite) TestSignUpFailedUser() {
