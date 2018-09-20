@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: vortex
+data:
+  alertmanager.yml: |-
+    global:
+      smtp_smarthost: '{{ .Values.config.smtpHost }}'
+      smtp_from: '{{ .Values.config.smtpFrom }}'
+      smtp_auth_username: '{{ .Values.config.smtpUsername }}'
+      smtp_auth_password: '{{ .Values.config.smtpPassword }}'
+
+    route:
+      group_by: ['admin', 'email_account', 'email_domain']
+      receiver: admin
+      routes:
+      - match:
+          admin: true
+        receiver: admin
+      - match:
+          admin: false
+        receiver: email_router
+
+    receivers:
+    - name: admin
+      email_configs:
+      - to: "{{ .Values.config.adminEmail }}"
+        headers: { Subject: "[WARN] Alert Email From Vortex Alertmanager" }
+        html: '{{ "{{" }} template "email.html" . {{ "}}" }}'
+    - name: email_router
+      email_configs:
+      - to: "{{ "{{" }} .GroupLabels.email_account {{ "}}" }}@{{ "{{" }} .GroupLabels.email_domain {{ "}}" }}"
+        headers: { Subject: "[WARN] Alert Email From Vortex Alertmanager" }
+        html: '{{ "{{" }} template "email.html" . {{ "}}" }}'
+
+    templates:
+      - '/etc/email-template/email.tmpl'

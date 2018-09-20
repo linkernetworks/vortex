@@ -30,6 +30,17 @@ apps:
       cpu: 50m
     service:
       nodePort: true
+    # vortex/deploy/helm/apps/charts/prometheus/charts/alertmanager
+    alertmanager:
+      controller:
+        imageTag: v0.14.0
+        cpu: 10m
+      config:
+        smtpHost: smtp.sendgrid.net:587
+        smtpFrom: vortex@linkernetworks.com
+        smtpUsername: apikey
+        smtpPassword: "you need to replace this token manually"
+        adminEmail: vortex@linkernetworks.com
     # vortex/deploy/helm/apps/charts/prometheus/charts/cadvisor
     cadvisor:
       controller:

@@ -26,10 +26,12 @@ spec:
         - containerPort: 9090
           protocol: TCP
         volumeMounts:
-        - mountPath: "/prometheus"
-          name: data
-        - mountPath: "/etc/prometheus"
-          name: config-volume
+        - name: data
+          mountPath: "/prometheus"
+        - name: config-volume
+          mountPath: "/etc/prometheus"
+        - name: rules-volume
+          mountPath: /etc/prometheus-rules
         resources:
           requests:
             cpu: {{ .Values.controller.cpu }}
@@ -39,3 +41,6 @@ spec:
       - configMap:
           name: prometheus-config
         name: config-volume
+      - name: rules-volume
+        configMap:
+          name: prometheus-rules
