@@ -29,9 +29,9 @@ func DeleteNamespace(sp *serviceprovider.Container, namespace *entity.Namespace)
 	svcs, err2 := sp.KubeCtl.GetServices(namespace.Name)
 	pvcs, err3 := sp.KubeCtl.GetPVCs(namespace.Name)
 
-	//err from deployment/services/pvc should not return in namespace function
+	// err from deployment/services/pvc should not return in namespace function
 	if (err1 == nil && err2 == nil && err3 == nil) && (len(deploys) != 0 || len(svcs) != 0 || len(pvcs) != 0) {
-		return errors.NewForbidden(schema.GroupResource{Group: "none", Resource: "Namespace"}, namespace.Name, fmt.Errorf("Still have some resource under namespace %v", namespace.Name))
+		return errors.NewForbidden(schema.GroupResource{Group: "none", Resource: "Namespace"}, namespace.Name, fmt.Errorf("Still have some resource under namespace: %s", namespace.Name))
 	}
 
 	return sp.KubeCtl.DeleteNamespace(namespace.Name)
