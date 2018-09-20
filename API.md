@@ -32,6 +32,7 @@
     - [Delete Pod](#delete-pod)
   - [Deployment](#deployment)
     - [Create Deployment](#create-deployment)
+    - [Create Deployment by Uploading YAML](#create-deployment-by-uploading-yaml)
     - [List Deployments](#list-deployments)
     - [Get Deployment](#get-deployment)
     - [Delete Deployment](#delete-deployment)
@@ -49,11 +50,13 @@
     - [Get Controller](#get-controller)
   - [Service](#service)
     - [Create Service](#create-service)
+    - [Create Service by Uploading YAML](#create-service-by-uploading-yaml)
     - [List Services](#list-services)
     - [Get Service](#get-service)
     - [Delete Service](#delete-service)
   - [Namespace](#namespace)
     - [Create Namespace](#create-namespace)
+    - [Create Namespaces by Uploading YAML](#create-namespaces-by-uploading-yaml)
     - [List Namespaces](#list-namespaces)
     - [Get Namespace](#get-namespace)
     - [Delete Namespace](#delete-namespace)
@@ -882,6 +885,52 @@ Response Data:
 }
 ```
 
+### Create Deployment by Uploading YAML
+
+**POST /v1/deployments/yaml**
+
+```
+curl -X POST \
+  http://127.0.0.1:7890/v1/deployment/upload/yaml \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -F file=@/tmp/test.yaml
+```
+
+Response Data:
+
+```json
+{
+    "id": "5ba35619e63eb20001a23897",
+    "ownerID": "5ba20e71e63eb20001a23895",
+    "name": "upload-deployment",
+    "namespace": "default",
+    "labels": null,
+    "envVars": null,
+    "containers": null,
+    "volumes": null,
+    "networks": null,
+    "capability": false,
+    "networkType": "cluster",
+    "nodeAffinity": null,
+    "createdBy": {
+        "id": "5ba20e71e63eb20001a23895",
+        "loginCredential": {
+            "username": "username",
+            "password": "password"
+        },
+        "displayName": "administrator",
+        "role": "root",
+        "firstName": "administrator",
+        "lastName": "administrator",
+        "phoneNumber": "09521111111",
+        "createdAt": "2018-09-19T08:53:05.032Z"
+    },
+    "createdAt": "2018-09-20T08:11:05.163227558Z",
+    "replicas": 1
+}
+```
+
 ### List Deployments
 
 **GET /v1/deployments/**
@@ -1490,6 +1539,63 @@ Response Data:
 }
 ```
 
+### Create Service by Uploading YAML
+
+**POST /v1/services/upload/yaml**
+
+Example:
+
+```
+curl -X POST \
+  http://127.0.0.1:7890/v1/services/upload/yaml \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -F file=@/tmp/service.yaml
+```
+
+Request Data:
+```json
+{
+    "id": "5ba356b3e63eb20001a23898",
+    "ownerID": "5ba20e71e63eb20001a23895",
+    "name": "upload-service",
+    "namespace": "default",
+    "type": "NodePort",
+    "selector": {
+        "app": "MyApp",
+        "test": "test"
+    },
+    "ports": [
+        {
+            "name": "test1",
+            "port": 80,
+            "targetPort": 9376,
+            "nodePort": 32322
+        },
+        {
+            "name": "test2",
+            "port": 8080,
+            "targetPort": 8080,
+            "nodePort": 0
+        }
+    ],
+    "createdBy": {
+        "id": "5ba20e71e63eb20001a23895",
+        "loginCredential": {
+            "username": "username",
+            "password": "password"
+        },
+        "displayName": "administrator",
+        "role": "root",
+        "firstName": "administrator",
+        "lastName": "administrator",
+        "phoneNumber": "09521111111",
+        "createdAt": "2018-09-19T08:53:05.032Z"
+    },
+    "createdAt": "2018-09-20T08:13:39.741238952Z"
+}
+```
+
 ### List Services
 
 **GET /v1/services/**
@@ -1605,6 +1711,43 @@ Response Data:
   "id": "5b4edcbc4807c557d9feb69e",
   "name": "awesome",
   "createdAt": "2018-07-18T06:22:52.403Z"
+}
+```
+
+### Create Namespaces by Uploading YAML
+
+**POST /v1/namespaces/upload/yaml**
+
+Example:
+
+```
+curl -X POST \
+  http://127.0.0.1:7890/v1/namespaces/upload/yaml \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -F file=@/tmp/namespaces.yaml
+```
+
+Request Data:
+```json
+{
+    "id": "5ba35790e63eb20001a23899",
+    "ownerID": "5ba20e71e63eb20001a23895",
+    "name": "uploadnamespace",
+    "createdAt": "2018-09-20T08:17:20.497441034Z",
+    "createdBy": {
+        "id": "5ba20e71e63eb20001a23895",
+        "loginCredential": {
+            "username": "username",
+            "password": "password"
+        },
+        "displayName": "administrator",
+        "role": "root",
+        "firstName": "administrator",
+        "lastName": "administrator",
+        "phoneNumber": "09521111111",
+        "createdAt": "2018-09-19T08:53:05.032Z"
+    }
 }
 ```
 
