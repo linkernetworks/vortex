@@ -7,6 +7,7 @@
     - [Signup](#signup)
     - [Verify Token](#verify-token)
     - [Signin](#signin)
+    - [Update Password](#update-password)
     - [Create User](#create-user)
     - [List User](#list-user)
     - [Get User](#get-user)
@@ -59,14 +60,13 @@
     - [Delete Namespace](#delete-namespace)
   - [OVS](#ovs)
     - [Get PortInfos](#get-portinfos)
-   
 
 
 ## User
 
 ### Signup
 
-**POST /v1/user/signup**
+**POST /v1/users/signup**
 
 No need to give a role, server will assign a "user" role.
 
@@ -105,7 +105,7 @@ Response Data:
 
 ### Verify Token
 
-**GET /v1/user/verify/auth**
+**GET /v1/users/verify/auth**
 
 with a authorization JWT key
 
@@ -138,6 +138,28 @@ Response Data:
 {
     "error": false,
     "message": "MY_JWT_TOKEN"
+}
+```
+
+### Update Password
+
+**PUT /v1/users/password**
+
+Example:
+
+```json
+{
+    "username":"hello@linkernetworks.com",
+    "password":"password"
+}
+```
+
+Response Data:
+
+```json
+{
+    "error": false,
+    "message": "password successfully changed"
 }
 ```
 
@@ -185,9 +207,7 @@ Response Data:
 
 Request 
 
-```
-GET /v1/users
-```
+**GET /v1/users**
 
 
 Response Data:
@@ -262,9 +282,7 @@ Response
 
 Request
 
-```
-DELETE /v1/users/5b5aba2d7a3172bca6f1e280
-```
+**DELETE /v1/users/5b5aba2d7a3172bca6f1e280**
 
 Response Data
 

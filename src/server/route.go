@@ -66,6 +66,7 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 	// user role can access
 	webService.Route(webService.GET("/{id}").Filter(validateTokenMiddleware).To(handler.RESTfulServiceHandler(sp, getUserHandler)))
 	webService.Route(webService.GET("/verify/auth").Filter(validateTokenMiddleware).To(handler.RESTfulServiceHandler(sp, verifyTokenHandler)))
+	webService.Route(webService.PUT("/password").Filter(validateTokenMiddleware).To(handler.RESTfulServiceHandler(sp, patchPasswordHandler)))
 	return webService
 }
 
@@ -175,7 +176,7 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 	// pod
 	webService.Route(webService.GET("/pods").To(handler.RESTfulServiceHandler(sp, listPodMetricsHandler)))
 	webService.Route(webService.GET("/pods/{pod}").To(handler.RESTfulServiceHandler(sp, getPodMetricsHandler)))
-	//container
+	// container
 	webService.Route(webService.GET("/pods/{pod}/{container}").To(handler.RESTfulServiceHandler(sp, getContainerMetricsHandler)))
 	// service
 	webService.Route(webService.GET("/services").To(handler.RESTfulServiceHandler(sp, listServiceMetricsHandler)))
