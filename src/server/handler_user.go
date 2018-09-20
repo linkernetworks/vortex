@@ -103,7 +103,7 @@ func patchPasswordHandler(ctx *web.Context) {
 
 	// To verify that users only can change themselves password
 	if user.LoginCredential.Username != newCred.Username {
-		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID not found"))
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID match"))
 		return
 	}
 
