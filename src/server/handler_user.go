@@ -100,7 +100,12 @@ func patchPasswordHandler(ctx *web.Context) {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
 	}
-	newCred.Username = user.LoginCredential.Username
+
+	// To verify that users only can change themselves password
+	if user.LoginCredential.Username != newCred.Username {
+		response.Unauthorized(req.Request, resp.ResponseWriter, fmt.Errorf("Unauthorized: User ID not found"))
+		return
+	}
 
 	if err := sp.Validator.Struct(newCred); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
