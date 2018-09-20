@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/deployment"
@@ -58,6 +59,18 @@ func createDeploymentHandler(ctx *web.Context) {
 		return
 	}
 
+	p.OwnerID = bson.ObjectIdHex(userID)
+	// find owner in user entity
+	ownerUser, _ := backend.FindUserByID(session, p.OwnerID)
+
+	var account, domain string
+	components := strings.Split(ownerUser.LoginCredential.Username, "@")
+	account, domain = components[0], components[1]
+
+	// append label with owner email
+	p.Labels[deployment.NotificationEmailAccount] = account
+	p.Labels[deployment.NotificationEmailDomain] = domain
+
 	if err := deployment.CreateDeployment(sp, &p); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Name))
@@ -70,7 +83,6 @@ func createDeploymentHandler(ctx *web.Context) {
 		}
 		return
 	}
-	p.OwnerID = bson.ObjectIdHex(userID)
 	if err := session.Insert(entity.DeploymentCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Name))
@@ -79,8 +91,7 @@ func createDeploymentHandler(ctx *web.Context) {
 		}
 		return
 	}
-	// find owner in user entity
-	p.CreatedBy, _ = backend.FindUserByID(session, p.OwnerID)
+	p.CreatedBy = ownerUser
 	resp.WriteHeaderAndEntity(http.StatusCreated, p)
 }
 
@@ -265,6 +276,18 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 	defer session.Close()
 
 	d.CreatedAt = timeutils.Now()
+
+	// find owner in user entity
+	ownerUser, _ := backend.FindUserByID(session, d.OwnerID)
+
+	var account, domain string
+	components := strings.Split(ownerUser.LoginCredential.Username, "@")
+	account, domain = components[0], components[1]
+
+	// append label with owner email
+	deploymentObj.ObjectMeta.Labels[deployment.NotificationEmailAccount] = account
+	deploymentObj.ObjectMeta.Labels[deployment.NotificationEmailDomain] = domain
+
 	_, err = sp.KubeCtl.CreateDeployment(deploymentObj, d.Namespace)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
@@ -288,6 +311,6 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 		return
 	}
 	// find owner in user entity
-	d.CreatedBy, _ = backend.FindUserByID(session, d.OwnerID)
+	d.CreatedBy = ownerUser
 	resp.WriteHeaderAndEntity(http.StatusCreated, d)
 }

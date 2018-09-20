@@ -22,8 +22,14 @@ var allCapabilities = []corev1.Capability{"NET_ADMIN", "SYS_ADMIN", "NET_RAW"}
 // VolumeNamePrefix will set prefix of volumename
 const VolumeNamePrefix = "volume-"
 
-// DefaultLabel is the  label we used for our deploying application/deployment/pods
+// DefaultLabel is the label we used for our deploying application/deployment/pods
 const DefaultLabel = "vortex"
+
+// NotificationEmailAccount is the label we do notify to user email account
+const NotificationEmailAccount = "email_account"
+
+// NotificationEmailDomain is the label we do notify to user email domain
+const NotificationEmailDomain = "email_domain"
 
 // CheckDeploymentParameter will Check Deployment's Parameter
 func CheckDeploymentParameter(sp *serviceprovider.Container, deploy *entity.Deployment) error {
@@ -280,9 +286,9 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 			nodeAffinity = utils.Intersection(nodeAffinity, tmp)
 		}
 	case entity.DeploymentClusterNetwork:
-		//For cluster network, we won't set the nodeAffinity and any network options.
+		// For cluster network, we won't set the nodeAffinity and any network options.
 	default:
-		err = fmt.Errorf("UnSupported Deployment NetworkType %s", deploy.NetworkType)
+		err = fmt.Errorf("Unsupported Deployment NetworkType %s", deploy.NetworkType)
 	}
 
 	if err != nil {
@@ -320,6 +326,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
+					// vortex default label
 					DefaultLabel: deploy.Name,
 				},
 			},
@@ -330,6 +337,7 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
+						// vortex default label
 						DefaultLabel: deploy.Name,
 					},
 				},
