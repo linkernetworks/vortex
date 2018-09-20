@@ -37,18 +37,6 @@
     - [List Deployments](#list-deployments)
     - [Get Deployment](#get-deployment)
     - [Delete Deployment](#delete-deployment)
-  - [Resource Monitoring](#resource-monitoring)
-    - [Query Range](#query-range)
-    - [List Nodes](#list-nodes)
-    - [Get Node](#get-node)
-    - [List NICs of certain node](#list-nics-of-certain-node)
-    - [List Pod](#list-pod)
-    - [Get Pod](#get-pod)
-    - [Get Container](#get-container)
-    - [List Services](#list-services)
-    - [Get Service](#get-service)
-    - [List Controllers](#list-controllers)
-    - [Get Controller](#get-controller)
   - [Service](#service)
     - [Create Service](#create-service)
     - [Create Service by Uploading YAML](#create-service-by-uploading-yaml)
@@ -63,6 +51,18 @@
     - [Delete Namespace](#delete-namespace)
   - [OVS](#ovs)
     - [Get PortInfos](#get-portinfos)
+  - [Resource Monitoring](#resource-monitoring)
+    - [Query Range](#query-range)
+    - [Monitor Nodes](#monitor-nodes)
+    - [Monitor Certain Node](#monitor-certain-node)
+    - [List NICs of certain node](#list-nics-of-certain-node)
+    - [Monitor Pods](#monitor-pods)
+    - [Monitor Certain Pod](#monitor-certain-pod)
+    - [Monitor Certain Container](#monitor-certain-container)
+    - [Monitor Services](#monitor-services)
+    - [Monitor Certain Service](#monitor-certain-service)
+    - [Monitor Controllers](#monitor-controllers)
+    - [Monitor Certain Controller](#monitor-certain-controller)
 
 
 ## User
@@ -1032,487 +1032,6 @@ Response Data:
 }
 ```
 
-
-## Resource Monitoring
-
-### Query Range
-All the resource which need the historical data can use query string to set the query detail. The unit of `interval` and `rate` is minute. And the unit of `resolution` is second.
-
-Example:
-```
-# Default: Query the data every 10s in past 2m, and
-# the result value is the average in 1m --> about 12 data
-curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766
-
-# Month: Query the data every 7200s (2h) in past 43200m (30d), and
-# the result value is the average in 60m (1h) --> about 360 data
-curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=43200&resolution=7200&rate=60
-
-# Week: Query the data every 1200s (20m) in past 10080m (7d), and
-# the result value is the average in 20m --> about 504 data
-curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=10080&resolution=1200&rate=20
-
-# Day: Query the data every 300s (5m) in past 1440m (1d), and
-# the result value is the average in 5m --> about 288 data
-curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=1440&resolution=300&rate=5
-
-# Hour: Query the data every 60s (1m) in past 60m (1d), and
-# the result value is the average in 1m --> about 60 data
-curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=60&resolution=60&rate=1
-```
-
-### List Nodes
-**GET /v1/monitoring/nodes**
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/nodes
-```
-
-Response Data:
-``` json
-{
-  "vortex-dev": {...},
-  "node1": {...},
-  ...
-```
-
-### Get Node
-**Get /v1/monitoring/nodes/{id}**
-
-Example
-```
-curl -X GET http://localhost:7890/v1/monitoring/nodes/vortex-dev
-```
-
-Response Data:
-``` json
-{
-  "detail": {
-   "hostname": "vortex-dev",
-   "createAt": 1532573834,
-   "status": "Ready",
-   "os": "Ubuntu 16.04.4 LTS",
-   "kernelVersion": "4.4.0-133-generic",
-   "dockerVersion": "17.6.2",
-   "kubeproxyVersion": "v1.11.0",
-   "kubernetesVersion": "v1.11.0",
-   "labels": {
-    "beta_kubernetes_io_arch": "amd64",
-    "beta_kubernetes_io_os": "linux",
-    "kubernetes_io_hostname": "vortex-dev"
-   }
-  },
-  "resource": {
-   "cpuRequests": 1.3,
-   "cpuLimits": 0,
-   "memoryRequests": 146800640,
-   "memoryLimits": 356515840,
-   "memoryTotalHugepages": 1024,
-   "memoryFreeHugepages": 512,
-   "memoryHugepagesSize": 2097152,
-   "allocatableCPU": 2,
-   "allocatableMemory": 2948079600,
-   "allocatablePods": 110,
-   "capacityCPU": 2,
-   "capacityMemory": 5200421000,
-   "capacityPods": 110
-  },
-  "nics": {
-   "cni0": {
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "ip": "10.244.0.1/24",
-    "pciID": "",
-    "nicNetworkTraffic": {
-     "receiveBytesTotal": [
-      {
-       "timestamp": 1532931326.997,
-       "value": "1487.6274976818602"
-      } ...
-     ],
-     "transmitBytesTotal": [
-      {
-       "timestamp": 1532931327.002,
-       "value": "6528.226759513464"
-      } ...
-     ],
-     "receivePacketsTotal": [
-      {
-       "timestamp": 1532931327.006,
-       "value": "8.508936201159978"
-      } ...
-     ],
-     "transmitPacketsTotal": [
-      {
-       "timestamp": 1532931327.011,
-       "value": "10.690714714277922"
-      } ...
-     ]
-    }
-   },
-   "docker0": { ... },
-   "enp0s10": { ... },
-   ...
-  }
- }
-```
-
-### List NICs of certain node
-
-**Get /v1/monitoring/nodes/{id}/nics**
-
-Example:
-```
-curl -X GET  http://localhost:7890/v1/monitoring/nodes/vortex-dev/nics
-```
-
-Response Data:
-``` json
-{
-  "nics": [
-   {
-    "name": "cni0",
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "docker0",
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "dpdk0",
-    "default": false,
-    "dpdk": true,
-    "type": "physical",
-    "pciID": "0000:00:11.0"
-   },
-   {
-    "name": "dpdk1",
-    "default": false,
-    "dpdk": true,
-    "type": "physical",
-    "pciID": "0000:00:12.0"
-   },
-   {
-    "name": "enp0s10",
-    "default": false,
-    "dpdk": false,
-    "type": "physical",
-    "pciID": "0000:00:0a.0"
-   },
-   {
-    "name": "enp0s16",
-    "default": false,
-    "dpdk": false,
-    "type": "physical",
-    "pciID": "0000:00:10.0"
-   },
-   {
-    "name": "enp0s8",
-    "default": false,
-    "dpdk": false,
-    "type": "physical",
-    "pciID": "0000:00:08.0"
-   },
-   {
-    "name": "enp0s9",
-    "default": false,
-    "dpdk": false,
-    "type": "physical",
-    "pciID": "0000:00:09.0"
-   },
-   {
-    "name": "flannel.1",
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "lo",
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "pciID": ""
-   },
-   {
-    "name": "veth67bb7a60",
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "pciID": ""
-   } ...
-  ]
- }
-```
-
-### List Pod
-**GET /v1/monitoring/pods?namespace=\.\*&node=\.\*&deployment=\.***
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/pods
-```
-
-Response Data:
-``` json
-{
-  "busybox": { ... },
-  "etcd-vortex-dev": { ... },
-  ...
-}
-```
-
-Example
-```
-curl -X GET http://localhost:7890/v1/monitoring/pods?namespace=vortex\&node\=vortex-dev\&controller\=prometheus
-```
-
-Response Data:
-``` json
-{
-  "prometheus-7f759794cb-52t54": { ... }
-}
-
-```
-
-### Get Pod
-**Get /v1/monitoring/pods/{id}**
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/pods/cadvisor-qpsw7
-```
-
-Response Data:
-``` json
-{
-  "podName": "cadvisor-pnpmn",
-  "namespace": "vortex",
-  "node": "vortex-dev",
-  "status": "Running",
-  "createAt": 1532931162,
-  "createByKind": "DaemonSet",
-  "createByName": "cadvisor",
-  "ip": "10.244.0.16",
-  "labels": {
-   "controller_revision_hash": "1408846150",
-   "name": "cadvisor",
-   "pod_template_generation": "1"
-  },
-  "restartCount": 0,
-  "containers": [
-   "cadvisor"
-  ],
-  "nics": {
-   "eth0": {
-    "default": false,
-    "dpdk": false,
-    "type": "virtual",
-    "ip": "10.244.0.1/24",
-    "pciID": "",
-    "nicNetworkTraffic": {
-     "receiveBytesTotal": [
-      {
-       "timestamp": 1532931969.382,
-       "value": "291.60530191458025"
-      } ...
-     ],
-     "transmitBytesTotal": [
-      {
-       "timestamp": 1532931969.384,
-       "value": "55459.517445771744"
-      } ...
-     ],
-     "receivePacketsTotal": [
-      {
-       "timestamp": 1532931969.386,
-       "value": "3.76370479463263"
-      } ...
-     ],
-     "transmitPacketsTotal": [
-      {
-       "timestamp": 1532931969.388,
-       "value": "3.890979835997018"
-      } ...
-     ]
-    }
-   }
-  }
- }
-```
-
-### Get Container
-**Get /v1/monitoring/pods/{pod}/{container}**
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/containers/prometheus
-```
-
-Response Data:
-``` json
-{
-  "detail": {
-   "containerName": "test1",
-   "createAt": 1535361241,
-   "status": "running",
-   "restartTime": 4,
-   "pod": "atest",
-   "namespace": "default",
-   "node": "vortex-dev",
-   "image": "busybox:latest",
-   "command": [
-    "sleep",
-    "3600"
-   ]
-  },
-  "resource": {
-   "cpuUsagePercentage": [
-    {
-     "timestamp": 1532932286.495,
-     "value": "2.1569667381818194"
-    } ...
-   ],
-   "memoryUsageBytes": [
-    {
-     "timestamp": 1532932286.493,
-     "value": "258674688"
-    } ...
-   ]
-  }
- }
-```
-
-### List Services
-**GET /v1/monitoring/service?namespace=\.\***
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/services
-```
-
-Response Data:
-``` json
-{
-  "kube-dns": { ... },
-  "kube-state-metrics": { ... },
-  "kubelet": { ... },
-  ...
-```
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/services\?namespace\=monitoring
-```
-
-Response Data:
-``` json
-{
-  "kube-state-metrics": { ... },
-  "mongo": { ... },
-  "prometheus": { ... },
-  "vortex-server": { ... }
- }
-```
-
-### Get Service
-**Get /v1/monitoring/service/{id}**
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/services/mongo
-```
-
-Response Data:
-``` json
-{
-  "serviceName": "mongo",
-  "namespace": "monitoring",
-  "type": "ClusterIP",
-  "createAt": 1531196180,
-  "clusterIP": "10.107.88.103",
-  "Ports": [
-   {
-    "protocol": "TCP",
-    "port": 27017,
-    "targetPort": 27017
-   }
-  ],
-  "labels": {
-   "name": "mongo",
-   "service": "mongo"
-  }
- }
-```
-
-### List Controllers
-**GET /v1/monitoring/controller?namespace=\.\***
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/controllers
-```
-
-Response Data:
-``` json
-{
-  "coredns": { ... },
-  "kube-state-metrics": { ... },
-  "prometheus": { ... },
-  ...
- }
-```
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/controllers\?namespace\=vortex
-```
-
-Response Data:
-``` json
-{
-  "kube-state-metrics": { ... },
-  "prometheus": { ... },
-  "vortex-server": { ... }
- }
-```
-
-### Get Controller
-**Get /v1/monitoring/controller/{id}**
-
-Example:
-```
-curl -X GET http://localhost:7890/v1/monitoring/controllers/prometheus
-```
-
-Response Data:
-``` json
-{
-  "controllerName": "prometheus",
-  "type": "deployment",
-  "namespace": "vortex",
-  "strategy": "",
-  "createAt": 1535031877,
-  "desiredPod": 1,
-  "currentPod": 1,
-  "availablePod": 1,
-  "pods": [
-   "prometheus-85bc764c94-kj4wg"
-  ],
-  "labels": {
-   "name": "prometheus-deployment"
-  }
- }
-```
-
 ## Service
 
 ### Create Service
@@ -1867,4 +1386,484 @@ Response Data:
          }
  }
 }
+```
+
+## Resource Monitoring
+
+### Query Range
+All the resource which need the historical data can use query string to set the query detail. The unit of `interval` and `rate` is minute. And the unit of `resolution` is second.
+
+Example:
+```
+# Default: Query the data every 10s in past 2m, and
+# the result value is the average in 1m --> about 12 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766
+
+# Month: Query the data every 7200s (2h) in past 43200m (30d), and
+# the result value is the average in 60m (1h) --> about 360 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=43200&resolution=7200&rate=60
+
+# Week: Query the data every 1200s (20m) in past 10080m (7d), and
+# the result value is the average in 20m --> about 504 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=10080&resolution=1200&rate=20
+
+# Day: Query the data every 300s (5m) in past 1440m (1d), and
+# the result value is the average in 5m --> about 288 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=1440&resolution=300&rate=5
+
+# Hour: Query the data every 60s (1m) in past 60m (1d), and
+# the result value is the average in 1m --> about 60 data
+curl -X GET http://127.0.0.1:7890/v1/monitoring/pods/cadvisor-2j766?interval=60&resolution=60&rate=1
+```
+
+### Monitor Nodes
+**GET /v1/monitoring/nodes**
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/nodes
+```
+
+Response Data:
+``` json
+{
+  "vortex-dev": {...},
+  "node1": {...},
+  ...
+```
+
+### Monitor Certain Node
+**Get /v1/monitoring/nodes/{id}**
+
+Example
+```
+curl -X GET http://localhost:7890/v1/monitoring/nodes/vortex-dev
+```
+
+Response Data:
+``` json
+{
+  "detail": {
+   "hostname": "vortex-dev",
+   "createAt": 1532573834,
+   "status": "Ready",
+   "os": "Ubuntu 16.04.4 LTS",
+   "kernelVersion": "4.4.0-133-generic",
+   "dockerVersion": "17.6.2",
+   "kubeproxyVersion": "v1.11.0",
+   "kubernetesVersion": "v1.11.0",
+   "labels": {
+    "beta_kubernetes_io_arch": "amd64",
+    "beta_kubernetes_io_os": "linux",
+    "kubernetes_io_hostname": "vortex-dev"
+   }
+  },
+  "resource": {
+   "cpuRequests": 1.3,
+   "cpuLimits": 0,
+   "memoryRequests": 146800640,
+   "memoryLimits": 356515840,
+   "memoryTotalHugepages": 1024,
+   "memoryFreeHugepages": 512,
+   "memoryHugepagesSize": 2097152,
+   "allocatableCPU": 2,
+   "allocatableMemory": 2948079600,
+   "allocatablePods": 110,
+   "capacityCPU": 2,
+   "capacityMemory": 5200421000,
+   "capacityPods": 110
+  },
+  "nics": {
+   "cni0": {
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "ip": "10.244.0.1/24",
+    "pciID": "",
+    "nicNetworkTraffic": {
+     "receiveBytesTotal": [
+      {
+       "timestamp": 1532931326.997,
+       "value": "1487.6274976818602"
+      } ...
+     ],
+     "transmitBytesTotal": [
+      {
+       "timestamp": 1532931327.002,
+       "value": "6528.226759513464"
+      } ...
+     ],
+     "receivePacketsTotal": [
+      {
+       "timestamp": 1532931327.006,
+       "value": "8.508936201159978"
+      } ...
+     ],
+     "transmitPacketsTotal": [
+      {
+       "timestamp": 1532931327.011,
+       "value": "10.690714714277922"
+      } ...
+     ]
+    }
+   },
+   "docker0": { ... },
+   "enp0s10": { ... },
+   ...
+  }
+ }
+```
+
+### List NICs of certain node
+
+**Get /v1/monitoring/nodes/{id}/nics**
+
+Example:
+```
+curl -X GET  http://localhost:7890/v1/monitoring/nodes/vortex-dev/nics
+```
+
+Response Data:
+``` json
+{
+  "nics": [
+   {
+    "name": "cni0",
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "docker0",
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "dpdk0",
+    "default": false,
+    "dpdk": true,
+    "type": "physical",
+    "pciID": "0000:00:11.0"
+   },
+   {
+    "name": "dpdk1",
+    "default": false,
+    "dpdk": true,
+    "type": "physical",
+    "pciID": "0000:00:12.0"
+   },
+   {
+    "name": "enp0s10",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:0a.0"
+   },
+   {
+    "name": "enp0s16",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:10.0"
+   },
+   {
+    "name": "enp0s8",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:08.0"
+   },
+   {
+    "name": "enp0s9",
+    "default": false,
+    "dpdk": false,
+    "type": "physical",
+    "pciID": "0000:00:09.0"
+   },
+   {
+    "name": "flannel.1",
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "lo",
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "pciID": ""
+   },
+   {
+    "name": "veth67bb7a60",
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "pciID": ""
+   } ...
+  ]
+ }
+```
+
+### Monitor Pods
+**GET /v1/monitoring/pods?namespace=\.\*&node=\.\*&deployment=\.***
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/pods
+```
+
+Response Data:
+``` json
+{
+  "busybox": { ... },
+  "etcd-vortex-dev": { ... },
+  ...
+}
+```
+
+Example
+```
+curl -X GET http://localhost:7890/v1/monitoring/pods?namespace=vortex\&node\=vortex-dev\&controller\=prometheus
+```
+
+Response Data:
+``` json
+{
+  "prometheus-7f759794cb-52t54": { ... }
+}
+
+```
+
+### Monitor Certain Pod
+**Get /v1/monitoring/pods/{id}**
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/pods/cadvisor-qpsw7
+```
+
+Response Data:
+``` json
+{
+  "podName": "cadvisor-pnpmn",
+  "namespace": "vortex",
+  "node": "vortex-dev",
+  "status": "Running",
+  "createAt": 1532931162,
+  "createByKind": "DaemonSet",
+  "createByName": "cadvisor",
+  "ip": "10.244.0.16",
+  "labels": {
+   "controller_revision_hash": "1408846150",
+   "name": "cadvisor",
+   "pod_template_generation": "1"
+  },
+  "restartCount": 0,
+  "containers": [
+   "cadvisor"
+  ],
+  "nics": {
+   "eth0": {
+    "default": false,
+    "dpdk": false,
+    "type": "virtual",
+    "ip": "10.244.0.1/24",
+    "pciID": "",
+    "nicNetworkTraffic": {
+     "receiveBytesTotal": [
+      {
+       "timestamp": 1532931969.382,
+       "value": "291.60530191458025"
+      } ...
+     ],
+     "transmitBytesTotal": [
+      {
+       "timestamp": 1532931969.384,
+       "value": "55459.517445771744"
+      } ...
+     ],
+     "receivePacketsTotal": [
+      {
+       "timestamp": 1532931969.386,
+       "value": "3.76370479463263"
+      } ...
+     ],
+     "transmitPacketsTotal": [
+      {
+       "timestamp": 1532931969.388,
+       "value": "3.890979835997018"
+      } ...
+     ]
+    }
+   }
+  }
+ }
+```
+
+### Monitor Certain Container
+**Get /v1/monitoring/pods/{pod}/{container}**
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/containers/prometheus
+```
+
+Response Data:
+``` json
+{
+  "detail": {
+   "containerName": "test1",
+   "createAt": 1535361241,
+   "status": "running",
+   "restartTime": 4,
+   "pod": "atest",
+   "namespace": "default",
+   "node": "vortex-dev",
+   "image": "busybox:latest",
+   "command": [
+    "sleep",
+    "3600"
+   ]
+  },
+  "resource": {
+   "cpuUsagePercentage": [
+    {
+     "timestamp": 1532932286.495,
+     "value": "2.1569667381818194"
+    } ...
+   ],
+   "memoryUsageBytes": [
+    {
+     "timestamp": 1532932286.493,
+     "value": "258674688"
+    } ...
+   ]
+  }
+ }
+```
+
+### Monitor Services
+**GET /v1/monitoring/service?namespace=\.\***
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/services
+```
+
+Response Data:
+``` json
+{
+  "kube-dns": { ... },
+  "kube-state-metrics": { ... },
+  "kubelet": { ... },
+  ...
+```
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/services\?namespace\=monitoring
+```
+
+Response Data:
+``` json
+{
+  "kube-state-metrics": { ... },
+  "mongo": { ... },
+  "prometheus": { ... },
+  "vortex-server": { ... }
+ }
+```
+
+### Monitor Certain Service
+**Get /v1/monitoring/service/{id}**
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/services/mongo
+```
+
+Response Data:
+``` json
+{
+  "serviceName": "mongo",
+  "namespace": "monitoring",
+  "type": "ClusterIP",
+  "createAt": 1531196180,
+  "clusterIP": "10.107.88.103",
+  "Ports": [
+   {
+    "protocol": "TCP",
+    "port": 27017,
+    "targetPort": 27017
+   }
+  ],
+  "labels": {
+   "name": "mongo",
+   "service": "mongo"
+  }
+ }
+```
+
+### Monitor Controllers
+**GET /v1/monitoring/controller?namespace=\.\***
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/controllers
+```
+
+Response Data:
+``` json
+{
+  "coredns": { ... },
+  "kube-state-metrics": { ... },
+  "prometheus": { ... },
+  ...
+ }
+```
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/controllers\?namespace\=vortex
+```
+
+Response Data:
+``` json
+{
+  "kube-state-metrics": { ... },
+  "prometheus": { ... },
+  "vortex-server": { ... }
+ }
+```
+
+### Monitor Certain Controller
+**Get /v1/monitoring/controller/{id}**
+
+Example:
+```
+curl -X GET http://localhost:7890/v1/monitoring/controllers/prometheus
+```
+
+Response Data:
+``` json
+{
+  "controllerName": "prometheus",
+  "type": "deployment",
+  "namespace": "vortex",
+  "strategy": "",
+  "createAt": 1535031877,
+  "desiredPod": 1,
+  "currentPod": 1,
+  "availablePod": 1,
+  "pods": [
+   "prometheus-85bc764c94-kj4wg"
+  ],
+  "labels": {
+   "name": "prometheus-deployment"
+  }
+ }
 ```
