@@ -7,6 +7,7 @@
     - [Signup](#signup)
     - [Verify Token](#verify-token)
     - [Signin](#signin)
+    - [Update Password](#update-password)
     - [Create User](#create-user)
     - [List User](#list-user)
     - [Get User](#get-user)
@@ -59,7 +60,6 @@
     - [Delete Namespace](#delete-namespace)
   - [OVS](#ovs)
     - [Get PortInfos](#get-portinfos)
-   
 
 
 ## User
@@ -138,6 +138,28 @@ Response Data:
 {
     "error": false,
     "message": "MY_JWT_TOKEN"
+}
+```
+
+### Update Password
+
+**PUT /v1/users/password**
+
+Example:
+
+```json
+{
+    "username":"hello@linkernetworks.com",
+    "password":"password"
+}
+```
+
+Response Data:
+
+```json
+{
+    "error": false,
+    "message": "password successfully changed"
 }
 ```
 
