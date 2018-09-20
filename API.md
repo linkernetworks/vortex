@@ -910,7 +910,7 @@ Response Data:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/deployment/upload/yaml \
-  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'Authorization: Bearer <MY_TOKEN>' \
   -H 'content-type: multipart/form-data' \
   -F file=@/tmp/deployment.yaml
 ```
@@ -1085,7 +1085,7 @@ Example:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/services/upload/yaml \
-  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'Authorization: Bearer <MY_TOKEN>' \
   -H 'content-type: multipart/form-data' \
   -F file=@/tmp/service.yaml
 ```
@@ -1260,7 +1260,7 @@ Example:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/namespaces/upload/yaml \
-  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'Authorization: Bearer <MY_TOKEN>' \
   -H 'content-type: multipart/form-data' \
   -F file=@/tmp/namespaces.yaml
 ```
