@@ -112,3 +112,8 @@ func MethodNotAllow(req *http.Request, resp http.ResponseWriter, errs ...error) 
 func UnprocessableEntity(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
 	return WriteStatusAndError(req, resp, http.StatusUnprocessableEntity, errs...)
 }
+
+// NotAcceptable will set the status code http.StatusNotAcceptable to the HTTP response message
+func NotAcceptable(req *http.Request, resp http.ResponseWriter, errs ...error) (int, error) {
+	return WriteStatusAndError(req, resp, http.StatusNotAcceptable, errs...)
+}
