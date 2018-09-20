@@ -25,11 +25,12 @@ func CreateNamespace(sp *serviceprovider.Container, namespace *entity.Namespace)
 
 // DeleteNamespace will delete namespace
 func DeleteNamespace(sp *serviceprovider.Container, namespace *entity.Namespace) error {
-	deploys, _ := sp.KubeCtl.GetDeployments(namespace.Name)
-	svcs, _ := sp.KubeCtl.GetServices(namespace.Name)
-	pvcs, _ := sp.KubeCtl.GetPVCs(namespace.Name)
+	deploys, err1 := sp.KubeCtl.GetDeployments(namespace.Name)
+	svcs, err2 := sp.KubeCtl.GetServices(namespace.Name)
+	pvcs, err3 := sp.KubeCtl.GetPVCs(namespace.Name)
 
-	if len(deploys) != 0 || len(svcs) != 0 || len(pvcs) != 0 {
+	//err from deployment/services/pvc should not return in namespace function
+	if (err1 == nil && err2 == nil && err3 == nil) && (len(deploys) != 0 || len(svcs) != 0 || len(pvcs) != 0) {
 		return errors.NewForbidden(schema.GroupResource{Group: "none", Resource: "Namespace"}, namespace.Name, fmt.Errorf("Still have some resource under namespace %v", namespace.Name))
 	}
 

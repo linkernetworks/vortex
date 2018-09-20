@@ -92,7 +92,7 @@ func deleteNamespaceHandler(ctx *web.Context) {
 		if errors.IsNotFound(err) {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
 		} else if errors.IsForbidden(err) {
-			response.Forbidden(req.Request, resp.ResponseWriter, err)
+			response.NotAcceptable(req.Request, resp.ResponseWriter, err)
 		} else {
 			response.InternalServerError(req.Request, resp.ResponseWriter, err)
 		}
