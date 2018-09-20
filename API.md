@@ -912,8 +912,7 @@ curl -X POST \
   http://127.0.0.1:7890/v1/deployment/upload/yaml \
   -H 'Authorization: Bearer <MY_TOKEN>'
   -H 'content-type: multipart/form-data' \
-
-  -F file=@/tmp/test.yaml
+  -F file=@/tmp/deployment.yaml
 ```
 
 Response Data:
