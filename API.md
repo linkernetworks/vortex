@@ -66,7 +66,7 @@
 
 ### Signup
 
-**POST /v1/user/signup**
+**POST /v1/users/signup**
 
 No need to give a role, server will assign a "user" role.
 
@@ -105,7 +105,7 @@ Response Data:
 
 ### Verify Token
 
-**GET /v1/user/verify/auth**
+**GET /v1/users/verify/auth**
 
 with a authorization JWT key
 
@@ -207,9 +207,7 @@ Response Data:
 
 Request 
 
-```
-GET /v1/users
-```
+**GET /v1/users**
 
 
 Response Data:
@@ -284,9 +282,7 @@ Response
 
 Request
 
-```
-DELETE /v1/users/5b5aba2d7a3172bca6f1e280
-```
+**DELETE /v1/users/5b5aba2d7a3172bca6f1e280**
 
 Response Data
 
