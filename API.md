@@ -910,8 +910,9 @@ Response Data:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/deployment/upload/yaml \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'content-type: multipart/form-data' \
+
   -F file=@/tmp/test.yaml
 ```
 
@@ -1085,8 +1086,8 @@ Example:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/services/upload/yaml \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'content-type: multipart/form-data' \
   -F file=@/tmp/service.yaml
 ```
 
@@ -1260,8 +1261,8 @@ Example:
 ```
 curl -X POST \
   http://127.0.0.1:7890/v1/namespaces/upload/yaml \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -H 'Authorization: Bearer <MY_TOKEN>'
+  -H 'content-type: multipart/form-data' \
   -F file=@/tmp/namespaces.yaml
 ```
 
