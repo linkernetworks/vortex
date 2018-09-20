@@ -1,5 +1,20 @@
 # Change Log
 
+## [v0.2.7](https://github.com/linkernetworks/vortex/tree/v0.2.7) (2018-09-20)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.6...v0.2.7)
+
+**Merged pull requests:**
+
+- \[Task\] Refactor API readme [\#326](https://github.com/linkernetworks/vortex/pull/326) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] move assert response code function [\#325](https://github.com/linkernetworks/vortex/pull/325) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Readme for uploading YAML [\#324](https://github.com/linkernetworks/vortex/pull/324) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] deployment email label [\#323](https://github.com/linkernetworks/vortex/pull/323) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] for deleting namespace messages [\#322](https://github.com/linkernetworks/vortex/pull/322) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] remove aurocert [\#321](https://github.com/linkernetworks/vortex/pull/321) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] Forbid the namespace deleting if there is still some resource under it [\#320](https://github.com/linkernetworks/vortex/pull/320) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] Alertmanager for prometheus [\#319](https://github.com/linkernetworks/vortex/pull/319) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] update password [\#318](https://github.com/linkernetworks/vortex/pull/318) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.2.6](https://github.com/linkernetworks/vortex/tree/v0.2.6) (2018-09-18)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.5...v0.2.6)
 
