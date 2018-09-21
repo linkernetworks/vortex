@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: openvswitch-exec
-  namespace: default
+  namespace: vortex
 spec:
   selector:
     matchLabels:
