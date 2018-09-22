@@ -5,6 +5,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/linkernetworks/utils/timeutils"
 	"github.com/linkernetworks/vortex/src/entity"
@@ -277,9 +278,12 @@ func getOVSShellInfoHandler(ctx *web.Context) {
 	for _, pod := range pods {
 		// find all pod list in right node
 		if nodeName == pod.Spec.NodeName {
-			podName = pod.ObjectMeta.Name
-			// openvswitch-exec should only has one container
-			containerName = pod.Spec.Containers[0].Name
+			// find the openvswitch-exec pod
+			if strings.HasPrefix(pod.ObjectMeta.Name, "openvswitch-exec") {
+				podName = pod.ObjectMeta.Name
+				// openvswitch-exec should only has one container
+				containerName = pod.Spec.Containers[0].Name
+			}
 		}
 	}
 
