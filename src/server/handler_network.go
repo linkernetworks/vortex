@@ -19,6 +19,12 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type shellOVSInfoResponse struct {
+	Namespace     string `json:"namespace"`
+	PodName       string `json:"podName"`
+	ContainerName string `json:"containerName"`
+}
+
 func createNetworkHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 	userID, ok := req.Attribute("UserID").(string)
@@ -245,5 +251,41 @@ func deleteNetworkHandler(ctx *web.Context) {
 	resp.WriteEntity(response.ActionResponse{
 		Error:   false,
 		Message: "Delete success",
+	})
+}
+
+func getOVSShellInfoHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	nodeName := req.PathParameter("node")
+
+	pods, err := sp.KubeCtl.GetPods(sp.Config.Kubernetes.SystemNamespace)
+	if err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	var podName, containerName string
+	if len(pods) == 0 {
+		resp.WriteHeaderAndEntity(http.StatusNotFound, shellOVSInfoResponse{
+			Namespace:     sp.Config.Kubernetes.SystemNamespace,
+			PodName:       "none",
+			ContainerName: "none",
+		})
+		return
+	}
+
+	for _, pod := range pods {
+		// find all pod list in right node
+		if nodeName == pod.Spec.NodeName {
+			podName = pod.ObjectMeta.Name
+			// openvswitch-exec should only has one container
+			containerName = pod.Spec.Containers[0].Name
+		}
+	}
+
+	resp.WriteHeaderAndEntity(http.StatusOK, shellOVSInfoResponse{
+		Namespace:     sp.Config.Kubernetes.SystemNamespace,
+		PodName:       podName,
+		ContainerName: containerName,
 	})
 }
