@@ -15,7 +15,7 @@ type Config struct {
 	Mongo      *mongo.MongoConfig                   `json:"mongo"`
 	Prometheus *prometheusprovider.PrometheusConfig `json:"prometheus"`
 	Kubernetes *kubernetesConfig                    `json:"kubernetes"`
-	Registry   *RegistryConfig                      `json:"registry"`
+	Registry   *registryConfig                      `json:"registry"`
 	Logger     logger.LoggerConfig                  `json:"logger"`
 
 	// the version settings of the current application

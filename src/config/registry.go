@@ -1,6 +1,5 @@
 package config
 
-// Config is the structure for Registry Config
-type RegistryConfig struct {
+type registryConfig struct {
 	URL string `json:"url"`
 }
