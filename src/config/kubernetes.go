@@ -1,6 +1,5 @@
 package config
 
-// KubernetesConfig is the structure for Kubernetes Config
-type KubernetesConfig struct {
+type kubernetesConfig struct {
 	SystemNamespace string `json:"systemNamespace"`
 }
