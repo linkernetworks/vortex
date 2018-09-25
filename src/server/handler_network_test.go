@@ -479,7 +479,7 @@ func (suite *NetworkTestSuite) TestListNetworkWithInvalidPage() {
 
 func (suite *NetworkTestSuite) TestGetOVSShellInfoNotFound() {
 	notFoundNodeName := "node-55"
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks"+notFoundNodeName+"/shell", nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/networks/"+notFoundNodeName+"/shell", nil)
 	suite.NoError(err)
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
 
