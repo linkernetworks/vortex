@@ -11,6 +11,9 @@
     "registry": {
         "url": "https://dockerhub.pw"
     },
+    "kubernetes": {
+        "systemNamespace": "vortex"
+    },
     "logger": {
         "dir": "./logs",
         "level": "debug",

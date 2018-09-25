@@ -79,6 +79,7 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.GET("/status/{id}").To(handler.RESTfulServiceHandler(sp, getNetworkStatusHandler)))
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createNetworkHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteNetworkHandler)))
+	webService.Route(webService.GET("/{node}/shell").To(handler.RESTfulServiceHandler(sp, getOVSShellInfoHandler)))
 	return webService
 }
 
