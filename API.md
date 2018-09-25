@@ -18,6 +18,7 @@
     - [Get Network](#get-network)
     - [Get Network Status](#get-network-status)
     - [Delete Network](#delete-network)
+    - [Get Open vSwitch Shell Infomation](#get-open-vswitch-shell-information)
   - [Storage](#storage)
     - [Create Storage](#create-storage)
     - [List Storage](#list-storage)
@@ -477,6 +478,26 @@ Response Data:
 {
   "error": false,
   "message": "Delete success"
+}
+```
+
+### Get Open vSwitch Shell Information
+
+**DELETE /v1/networks/[nodeName]/shell**
+
+Example:
+
+```
+curl -X GET http://localhost:7890/v1/networks/node-1/shell
+```
+
+Response Data:
+
+```json
+{
+  "namespace": "vortex",
+  "podName": "openvswitch-exec-df12a",
+  "containerName": "openvswitch-exec"
 }
 ```
 
