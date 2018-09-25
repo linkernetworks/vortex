@@ -8,15 +8,14 @@ import (
 	"github.com/linkernetworks/logger"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/prometheusprovider"
-	"github.com/linkernetworks/vortex/src/registry"
 )
 
 // Config is the structure for vortex
 type Config struct {
 	Mongo      *mongo.MongoConfig                   `json:"mongo"`
 	Prometheus *prometheusprovider.PrometheusConfig `json:"prometheus"`
-	Registry   *registry.Config                     `json:"registry"`
 	Kubernetes *kubernetesConfig                    `json:"kubernetes"`
+	Registry   *registryConfig                      `json:"registry"`
 	Logger     logger.LoggerConfig                  `json:"logger"`
 
 	// the version settings of the current application
