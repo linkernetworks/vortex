@@ -23,6 +23,7 @@ import (
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/mgo.v2/bson"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func init() {
@@ -445,4 +446,170 @@ func (suite *DeploymentTestSuite) TestUploadDeploymentYAMLFail() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
+}
+
+func (suite *DeploymentTestSuite) TestEnableDeploymentWithAutoscaler() {
+	namespace := "default"
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+	tName := namesgenerator.GetRandomName(0)
+	deploy := entity.Deployment{
+		Name:         tName,
+		Namespace:    namespace,
+		Labels:       map[string]string{},
+		EnvVars:      map[string]string{},
+		Containers:   containers,
+		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
+		Networks:     []entity.DeploymentNetwork{},
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
+	}
+	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/deployments", bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
+	defer suite.session.Remove(entity.DeploymentCollectionName, "name", deploy.Name)
+	defer p.DeleteDeployment(suite.sp, &deploy)
+
+	autoscaler := entity.AutoscalerInfo{
+		Namespace:                namespace,
+		ScaleTargetRefName:       tName,
+		ResourceName:             corev1.ResourceCPU,
+		MinReplicas:              1,
+		MaxReplicas:              5,
+		TargetAverageUtilization: 30,
+	}
+	autoBodyBytes, err := json.MarshalIndent(autoscaler, "", "  ")
+	suite.NoError(err)
+
+	autoBodyReader := strings.NewReader(string(autoBodyBytes))
+	autoHTTPRequest, err := http.NewRequest("PUT", "http://localhost:7890/v1/deployments/autoscale?enable=true", autoBodyReader)
+	suite.NoError(err)
+
+	autoHTTPRequest.Header.Add("Content-Type", "application/json")
+	autoHTTPRequest.Header.Add("Authorization", suite.JWTBearer)
+	autoHTTPWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(autoHTTPWriter, autoHTTPRequest)
+	assertResponseCode(suite.T(), http.StatusAccepted, autoHTTPWriter)
+
+	// load data to check
+	retDeployment := entity.Deployment{}
+	err = suite.session.FindOne(entity.DeploymentCollectionName, bson.M{"name": deploy.Name}, &retDeployment)
+	suite.NoError(err)
+	suite.NotEqual("", retDeployment.ID)
+	suite.Equal(deploy.Name, retDeployment.Name)
+	suite.Equal(len(deploy.Containers), len(retDeployment.Containers))
+	suite.True(retDeployment.IsAutoscaler)
+	suite.NotNil(retDeployment.AutoscalerInfo)
+	defer p.DeleteAutoscaler(suite.sp, autoscaler)
+}
+
+func (suite *DeploymentTestSuite) TestDisableDeploymentWithAutoscaler() {
+	namespace := "default"
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+	tName := namesgenerator.GetRandomName(0)
+	deploy := entity.Deployment{
+		Name:         tName,
+		Namespace:    namespace,
+		Labels:       map[string]string{},
+		EnvVars:      map[string]string{},
+		Containers:   containers,
+		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
+		Networks:     []entity.DeploymentNetwork{},
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
+	}
+	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
+	suite.NoError(err)
+
+	bodyReader := strings.NewReader(string(bodyBytes))
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/deployments", bodyReader)
+	suite.NoError(err)
+
+	httpRequest.Header.Add("Content-Type", "application/json")
+	httpRequest.Header.Add("Authorization", suite.JWTBearer)
+	httpWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(httpWriter, httpRequest)
+	assertResponseCode(suite.T(), http.StatusCreated, httpWriter)
+	defer suite.session.Remove(entity.DeploymentCollectionName, "name", deploy.Name)
+	defer p.DeleteDeployment(suite.sp, &deploy)
+
+	// Creating a autoscaler
+	autoscalerCreating := entity.AutoscalerInfo{
+		Namespace:                namespace,
+		ScaleTargetRefName:       tName,
+		ResourceName:             corev1.ResourceCPU,
+		MinReplicas:              1,
+		MaxReplicas:              5,
+		TargetAverageUtilization: 30,
+	}
+	autoBodyBytesCreating, err := json.MarshalIndent(autoscalerCreating, "", "  ")
+	suite.NoError(err)
+
+	autoBodyReaderCreating := strings.NewReader(string(autoBodyBytesCreating))
+	autoHTTPRequestCreating, err := http.NewRequest("PUT", "http://localhost:7890/v1/deployments/autoscale?enable=true", autoBodyReaderCreating)
+	suite.NoError(err)
+
+	autoHTTPRequestCreating.Header.Add("Content-Type", "application/json")
+	autoHTTPRequestCreating.Header.Add("Authorization", suite.JWTBearer)
+	autoHTTPWriterCreating := httptest.NewRecorder()
+	suite.wc.Dispatch(autoHTTPWriterCreating, autoHTTPRequestCreating)
+	assertResponseCode(suite.T(), http.StatusAccepted, autoHTTPWriterCreating)
+
+	// Deleting a autoscaler
+	autoscaler := entity.AutoscalerInfo{
+		Namespace:                namespace,
+		ScaleTargetRefName:       tName,
+		ResourceName:             corev1.ResourceCPU,
+		MinReplicas:              1,
+		MaxReplicas:              5,
+		TargetAverageUtilization: 30,
+	}
+	autoBodyBytes, err := json.MarshalIndent(autoscaler, "", "  ")
+	suite.NoError(err)
+
+	autoBodyReader := strings.NewReader(string(autoBodyBytes))
+	autoHTTPRequest, err := http.NewRequest("PUT", "http://localhost:7890/v1/deployments/autoscale?enable=false", autoBodyReader)
+	suite.NoError(err)
+
+	autoHTTPRequest.Header.Add("Content-Type", "application/json")
+	autoHTTPRequest.Header.Add("Authorization", suite.JWTBearer)
+	autoHTTPWriter := httptest.NewRecorder()
+	suite.wc.Dispatch(autoHTTPWriter, autoHTTPRequest)
+	assertResponseCode(suite.T(), http.StatusAccepted, autoHTTPWriter)
+
+	// load data to check
+	retDeployment := entity.Deployment{}
+	err = suite.session.FindOne(entity.DeploymentCollectionName, bson.M{"name": deploy.Name}, &retDeployment)
+	suite.NoError(err)
+	suite.NotEqual("", retDeployment.ID)
+	suite.Equal(deploy.Name, retDeployment.Name)
+	suite.Equal(len(deploy.Containers), len(retDeployment.Containers))
+	suite.False(retDeployment.IsAutoscaler)
+	defer p.DeleteAutoscaler(suite.sp, autoscaler)
 }

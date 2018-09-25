@@ -9,8 +9,9 @@ import (
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/linkernetworks/vortex/src/utils"
-	appsv1 "k8s.io/api/apps/v1"
 
+	appsv1 "k8s.io/api/apps/v1"
+	v2beta1 "k8s.io/api/autoscaling/v2beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -409,4 +410,39 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 // DeleteDeployment will delete a deployment
 func DeleteDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) error {
 	return sp.KubeCtl.DeleteDeployment(deploy.Name, deploy.Namespace)
+}
+
+// CreateAutoscaler will create a autoscaler
+func CreateAutoscaler(sp *serviceprovider.Container, autoscalerInfo entity.AutoscalerInfo) error {
+	autoscaler := v2beta1.HorizontalPodAutoscaler{
+		ObjectMeta: metav1.ObjectMeta{
+			// use deployment name to name autoscaler's name
+			Name:      autoscalerInfo.ScaleTargetRefName,
+			Namespace: autoscalerInfo.Namespace,
+		},
+		Spec: v2beta1.HorizontalPodAutoscalerSpec{
+			ScaleTargetRef: v2beta1.CrossVersionObjectReference{
+				Kind: "Deployment",
+				Name: autoscalerInfo.ScaleTargetRefName,
+			},
+			MinReplicas: &autoscalerInfo.MinReplicas,
+			MaxReplicas: autoscalerInfo.MaxReplicas,
+			Metrics: []v2beta1.MetricSpec{
+				{
+					Type: v2beta1.ResourceMetricSourceType,
+					Resource: &v2beta1.ResourceMetricSource{
+						Name:                     autoscalerInfo.ResourceName,
+						TargetAverageUtilization: &autoscalerInfo.TargetAverageUtilization,
+					},
+				},
+			},
+		},
+	}
+	_, err := sp.KubeCtl.CreateAutoscaler(&autoscaler, autoscalerInfo.Namespace)
+	return err
+}
+
+// DeleteAutoscaler will delete a autoscaler
+func DeleteAutoscaler(sp *serviceprovider.Container, autoscalerInfo entity.AutoscalerInfo) error {
+	return sp.KubeCtl.DeleteAutoscaler(autoscalerInfo.ScaleTargetRefName, autoscalerInfo.Namespace)
 }
