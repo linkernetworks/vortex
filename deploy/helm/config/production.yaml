@@ -24,11 +24,11 @@ apps:
   openvswitch-exec:
     controller:
       imageTag: latest
-      cpu: 20m
+      cpu: 10m
   # vortex/deploy/helm/apps/charts/metrics-server
   metrics-server:
     controller:
-      cpu: 20m
+      cpu: 100m
   # vortex/deploy/helm/apps/charts/prometheus
   prometheus:
     controller:
