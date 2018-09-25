@@ -40,5 +40,5 @@ spec:
           mountPath: /tmp
         resources:
           requests:
-            cpu: 10m
+            cpu: {{ .Values.controller.cpu }}
 

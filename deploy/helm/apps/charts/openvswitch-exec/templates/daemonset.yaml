@@ -17,7 +17,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: openvswitch-exec
-        image: sdnvortex/openvswitch-exec:latest
+        image: sdnvortex/openvswitch-exec:{{ .Values.controller.imageTag }}
         command: ["tail"]
         args: ["-f", "/etc/hostname"]
         securityContext:
@@ -27,7 +27,7 @@ spec:
           name: ovs-sock
         resources:
           requests:
-            cpu: 10m
+            cpu: {{ .Values.controller.cpu }}
       volumes:
       - name: ovs-sock #since the UNIX version only add-port, the db.sock is enough
         hostPath:
