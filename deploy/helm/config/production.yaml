@@ -20,6 +20,15 @@ apps:
       imageTag: v0.4.8
       tcpCPU: 100m
       unixCPU: 100m
+  # vortex/deploy/helm/apps/charts/openvswitch-exec
+  openvswitch-exec:
+    controller:
+      imageTag: latest
+      cpu: 10m
+  # vortex/deploy/helm/apps/charts/metrics-server
+  metrics-server:
+    controller:
+      cpu: 100m
   # vortex/deploy/helm/apps/charts/prometheus
   prometheus:
     controller:

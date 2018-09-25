@@ -20,6 +20,15 @@ apps:
       imageTag: v0.4.8
       tcpCPU: 50m
       unixCPU: 50m
+  # vortex/deploy/helm/apps/charts/openvswitch-exec
+  openvswitch-exec:
+    controller:
+      imageTag: latest
+      cpu: 10m
+  # vortex/deploy/helm/apps/charts/metrics-server
+  metrics-server:
+    controller:
+      cpu: 30m
   # vortex/deploy/helm/apps/charts/prometheus
   prometheus:
     controller:
@@ -27,7 +36,7 @@ apps:
       imageTag: v2.2.1
       scrapeInterval: 5s
       retention: 24h
-      cpu: 50m
+      cpu: 30m
     service:
       nodePort: true
     # vortex/deploy/helm/apps/charts/prometheus/charts/alertmanager
