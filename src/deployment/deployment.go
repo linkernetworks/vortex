@@ -20,7 +20,10 @@ import (
 var allCapabilities = []corev1.Capability{"NET_ADMIN", "SYS_ADMIN", "NET_RAW"}
 
 // VolumeNamePrefix will set prefix of volumename
-const VolumeNamePrefix = "volume-"
+const VolumeNamePrefix = "volume"
+
+// ConfigMapNamePrefix will set prefix of volumename
+const ConfigMapNamePrefix = "configmap"
 
 // DefaultLabel is the label we used for our deploying application/deployment/pods
 const DefaultLabel = "vortex"
@@ -76,6 +79,36 @@ func generateVolume(session *mongo.Session, deploy *entity.Deployment) ([]corev1
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
 					ClaimName: volume.GetPVCName(),
+				},
+			},
+		})
+
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      vName,
+			MountPath: v.MountPath,
+		})
+	}
+
+	return volumes, volumeMounts, nil
+}
+
+func generateConfigMap(deploy *entity.Deployment) ([]corev1.Volume, []corev1.VolumeMount, error) {
+	volumes := []corev1.Volume{}
+	volumeMounts := []corev1.VolumeMount{}
+
+	for _, v := range deploy.ConfigMaps {
+
+		// TODO: check whether this configMap exist
+
+		vName := fmt.Sprintf("%s-%s", ConfigMapNamePrefix, v.Name)
+
+		volumes = append(volumes, corev1.Volume{
+			Name: vName,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: v.Name,
+					},
 				},
 			},
 		})
@@ -273,6 +306,11 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 		return err
 	}
 
+	configMaps, configMapMounts, err := generateConfigMap(deploy)
+	if err != nil {
+		return err
+	}
+
 	nodeAffinity := deploy.NodeAffinity
 	initContainers := []corev1.Container{}
 	hostNetwork := false
@@ -303,6 +341,9 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 			},
 		},
 	})
+
+	volumes = append(volumes, configMaps...)
+	volumeMounts = append(volumeMounts, configMapMounts...)
 
 	var containers []corev1.Container
 	securityContext := generateContainerSecurity(deploy)
@@ -356,9 +397,6 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 		},
 	}
 
-	if deploy.Namespace == "" {
-		deploy.Namespace = "default"
-	}
 	_, err = sp.KubeCtl.CreateDeployment(&p, deploy.Namespace)
 	return err
 }

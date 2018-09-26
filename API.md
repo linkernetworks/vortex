@@ -18,7 +18,7 @@
     - [Get Network](#get-network)
     - [Get Network Status](#get-network-status)
     - [Delete Network](#delete-network)
-    - [Get Open vSwitch Shell Infomation](#get-open-vswitch-shell-information)
+    - [Get Open vSwitch Shell Information](#get-open-vswitch-shell-information)
   - [Storage](#storage)
     - [Create Storage](#create-storage)
     - [List Storage](#list-storage)
@@ -855,7 +855,10 @@ For each Deployment, we have fileds need to handle.
 5. volumes: the array of the voluems that we want to mount to Deployment. (Optional)
     - name: the name of the volume and it should be the volume we created before.
     - mountPath: the mountPath of the volume and the container can see files under this path.
-6. networks: the array of the network that we want to create in the Deployment (Optional)
+6. configmaps: the array of the configmaps that we want to mount to Deployment. (Optional)
+    - name: the name of the configmap and it should be the configmap we created before.
+    - mountPath: the mountPath of the configmap and the container can see files under this path.
+7. networks: the array of the network that we want to create in the Deployment (Optional)
     - name: the name of the network and it should be the network we created before.
     - ifName: the inteface name you want to create in your container.
     - vlanTag: the vlan tag for `ifName` interface.
@@ -866,8 +869,7 @@ For each Deployment, we have fileds need to handle.
         - gateway(required): the gateway of the interface subnet
     - routeIntf: a array of route without gateway (Optional)
         - dstCIDR(required): destination network cidr for add IP routing table
-7. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
-8.
+8. capability: the power of the container, if it's ture, it will get almost all capability and act as a privileged=true.
 9. networkType: the string options for network type, support "host", "custom" and "cluster".
 10. nodeAffinity: the string array to indicate whchi nodes I want my Deployment can run in.
 11. envVars: the environment variables for containers and it's map (string to stirng) form.
@@ -879,39 +881,56 @@ Request Data:
 
 ```json
 {
-  "name": "awesome",
-  "labels": {},
-  "envVars":{},
-  "containers": [{
-    "name": "busybox",
-    "image": "busybox",
-    "command": ["sleep", "3600"]
-  }],
-  "networks":[
-  {
-      "name":"MyNetwork2",
-      "ifName":"eth12",
-      "vlanTag":0,
-      "ipAddress":"1.2.3.4",
-      "netmask":"255.255.255.0",
-      "routesGw": [
-         {
-            "dstCIDR":"192.168.2.0/24",
-            "gateway":"192.168.2.254"
-         }
-      ],
-      "routeIntf": [
-         {
-            "dstCIDR":"224.0.0.0/4",
-         }
-      ]
-  }],
-  "volumes":[
-  ],
-  "capability":true,
-  "networkType":"host",
-  "nodeAffinity":[],
-  "replicas":1
+    "id": "5bab4b079ec4606c32a55203",
+    "ownerID": "5ba312cd9ec4602d1072274a",
+    "name": "awesome",
+    "namespace": "default",
+    "labels": {
+        "email_account": "admin",
+        "email_domain": "vortex.com"
+    },
+    "envVars": {},
+    "containers": [
+        {
+            "name": "busybox",
+            "image": "busybox",
+            "command": [
+                "sleep",
+                "3600"
+            ]
+        }
+    ],
+    "volumes": [],
+    "configMaps": [
+        {
+            "name": "test-map",
+            "mountPath": "/path"
+        }
+    ],
+    "networks":[
+    {
+        "name":"MyNetwork2",
+        "ifName":"eth12",
+        "vlanTag":0,
+        "ipAddress":"1.2.3.4",
+        "netmask":"255.255.255.0",
+        "routesGw": [
+          {
+              "dstCIDR":"192.168.2.0/24",
+              "gateway":"192.168.2.254"
+          }
+        ],
+        "routeIntf": [
+          {
+              "dstCIDR":"224.0.0.0/4"
+          }
+        ]
+    }],
+    "capability": true,
+    "networkType": "host",
+    "nodeAffinity": [],
+    "createdAt": "2018-09-26T17:01:59.030105165+08:00",
+    "replicas": 1
 }
 ```
 
