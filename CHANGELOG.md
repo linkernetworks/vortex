@@ -1,5 +1,14 @@
 # Change Log
 
+## [v0.2.8](https://github.com/linkernetworks/vortex/tree/v0.2.8) (2018-09-26)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.7...v0.2.8)
+
+**Merged pull requests:**
+
+- \[Task\] move registry into src/config [\#329](https://github.com/linkernetworks/vortex/pull/329) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] add endpoint for getting ovs shell info [\#328](https://github.com/linkernetworks/vortex/pull/328) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] autoscalar and openvswitch-exec [\#327](https://github.com/linkernetworks/vortex/pull/327) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.2.7](https://github.com/linkernetworks/vortex/tree/v0.2.7) (2018-09-20)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.6...v0.2.7)
 
