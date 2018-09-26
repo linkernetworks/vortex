@@ -74,6 +74,7 @@ func (suite *AppTestSuite) TestCreateApp() {
 		EnvVars:      map[string]string{},
 		Containers:   containers,
 		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
 		Networks:     []entity.DeploymentNetwork{},
 		Capability:   true,
 		NetworkType:  entity.DeploymentHostNetwork,

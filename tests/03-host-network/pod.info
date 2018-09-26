@@ -15,6 +15,7 @@
 	"networks":[
 	],
 	"volumes":[],
+	"configMaps":[],
     "restartPolicy":"Always",
     "capability": true,
     "networkType": "host",
