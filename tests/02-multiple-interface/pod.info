@@ -39,6 +39,7 @@
 		}
 	],
 	"volumes":[],
+	"configMaps":[],
     "restartPolicy":"Always",
     "capability": true,
     "networkType": "custom",

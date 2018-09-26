@@ -129,7 +129,10 @@ func (suite *DeploymentTestSuite) TestGenerateVolumeFail() {
 	deploy := &entity.Deployment{
 		ID: bson.NewObjectId(),
 		Volumes: []entity.DeploymentVolume{
-			{Name: volumeName},
+			{
+				Name:      volumeName,
+				MountPath: "/path",
+			},
 		},
 	}
 
@@ -139,6 +142,24 @@ func (suite *DeploymentTestSuite) TestGenerateVolumeFail() {
 	suite.Nil(volumes)
 	suite.Nil(volumeMounts)
 	suite.Error(err)
+}
+
+func (suite *DeploymentTestSuite) TestGenerateConfigMap() {
+	configMapName := namesgenerator.GetRandomName(0)
+	deploy := &entity.Deployment{
+		ID: bson.NewObjectId(),
+		ConfigMaps: []entity.DeploymentConfig{
+			{
+				Name:      configMapName,
+				MountPath: "/path",
+			},
+		},
+	}
+
+	configMaps, configMapMounts, err := generateConfigMap(deploy)
+	suite.NotNil(configMaps)
+	suite.NotNil(configMapMounts)
+	suite.NoError(err)
 }
 
 func (suite *DeploymentTestSuite) TestCreateDeployment() {

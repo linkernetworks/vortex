@@ -50,8 +50,8 @@ type DeploymentVolume struct {
 	MountPath string `bson:"mountPath" json:"mountPath" validate:"required"`
 }
 
-// ConfigMapVolume is the structure for configMap volume info
-type ConfigMapVolume struct {
+// DeploymentConfig is the structure for configMap volume info
+type DeploymentConfig struct {
 	Name      string `bson:"name" json:"name" validate:"required,k8sname"`
 	MountPath string `bson:"mountPath" json:"mountPath" validate:"required"`
 }
@@ -66,7 +66,7 @@ type Deployment struct {
 	EnvVars      map[string]string   `bson:"envVars,omitempty" json:"envVars" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
 	Containers   []Container         `bson:"containers" json:"containers" validate:"required,dive,required"`
 	Volumes      []DeploymentVolume  `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
-	ConfigMaps   []ConfigMapVolume   `bson:"configMaps,omitempty" json:"configMaps" validate:"required,dive,required"`
+	ConfigMaps   []DeploymentConfig  `bson:"configMaps,omitempty" json:"configMaps" validate:"required,dive,required"`
 	Networks     []DeploymentNetwork `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
 	Capability   bool                `bson:"capability" json:"capability" validate:"-"`
 	NetworkType  string              `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
