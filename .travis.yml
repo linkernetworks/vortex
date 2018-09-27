@@ -40,7 +40,7 @@ before_script:
     # Fix the kubectl context, as it's often stale.
   - minikube update-context
     # Install nsenter
-  - docker run -v /usr/local/bin:/hostbin hwchiu/ubuntu-nsenter cp /nsenter /hostbin/nsenter
+  - docker run -v /usr/local/bin:/hostbin sdnvortex/ubuntu-nsenter cp /nsenter /hostbin/nsenter
     # Initial helm
   - make apps.init-helm
     # Check if tiller is ready
