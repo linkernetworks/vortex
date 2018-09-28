@@ -9,7 +9,7 @@ import (
 
 // The const for volume & PVC
 const (
-	VolumeCollectionName string = "volume"
+	VolumeCollectionName string = "volumes"
 	PVCNamePrefix        string = "pvc-"
 )
 
