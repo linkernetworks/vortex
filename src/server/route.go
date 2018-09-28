@@ -26,6 +26,7 @@ func (a *App) AppRoute() *mux.Router {
 	container.Add(newDeploymentService(a.ServiceProvider))
 	container.Add(newServiceService(a.ServiceProvider))
 	container.Add(newNamespaceService(a.ServiceProvider))
+	container.Add(newConfigMapService(a.ServiceProvider))
 	container.Add(newMonitoringService(a.ServiceProvider))
 	container.Add(newAppService(a.ServiceProvider))
 	container.Add(newOVSService(a.ServiceProvider))
@@ -164,6 +165,18 @@ func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listNamespaceHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getNamespaceHandler)))
 	webService.Route(webService.POST("/upload/yaml").Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadNamespaceYAMLHandler)))
+	return webService
+}
+
+func newConfigMapService(sp *serviceprovider.Container) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path("/v1/configMaps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Filter(validateTokenMiddleware)
+	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createConfigMapHandler)))
+	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteConfigMapHandler)))
+	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listConfigMapHandler)))
+	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getConfigMapHandler)))
+	webService.Route(webService.POST("/upload/yaml").Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadConfigMapYAMLHandler)))
 	return webService
 }
 
