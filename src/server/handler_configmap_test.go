@@ -17,7 +17,7 @@ import (
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
-	ns "github.com/linkernetworks/vortex/src/configMap"
+	"github.com/linkernetworks/vortex/src/configmap"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
@@ -113,7 +113,7 @@ func (suite *ConfigMapTestSuite) TestCreateConfigMap() {
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 	defer suite.session.Remove(entity.ConfigMapCollectionName, "name", configMap.Name)
 
-	err = ns.DeleteConfigMap(suite.sp, &configMap)
+	err = configmap.DeleteConfigMap(suite.sp, &configMap)
 	suite.NoError(err)
 }
 
@@ -124,7 +124,7 @@ func (suite *ConfigMapTestSuite) TestDeleteConfigMap() {
 		Name: configMapName,
 	}
 
-	err := ns.CreateConfigMap(suite.sp, &configMap)
+	err := configmap.CreateConfigMap(suite.sp, &configMap)
 	suite.NoError(err)
 
 	err = suite.session.Insert(entity.ConfigMapCollectionName, &configMap)
@@ -332,7 +332,7 @@ func (suite *ConfigMapTestSuite) TestUploadConfigMapYAML() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusConflict, httpWriter)
 
-	err = ns.DeleteConfigMap(suite.sp, &retConfigMap)
+	err = configmap.DeleteConfigMap(suite.sp, &retConfigMap)
 	suite.NoError(err)
 }
 

@@ -1,4 +1,4 @@
-package configMap
+package configmap
 
 import (
 	"math/rand"

@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/linkernetworks/utils/timeutils"
-	"github.com/linkernetworks/vortex/src/configMap"
+	"github.com/linkernetworks/vortex/src/configmap"
 	"github.com/linkernetworks/vortex/src/entity"
 	"github.com/linkernetworks/vortex/src/kubernetes"
 	response "github.com/linkernetworks/vortex/src/net/http"
@@ -63,7 +63,7 @@ func createConfigMapHandler(ctx *web.Context) {
 	n.ID = bson.NewObjectId()
 	n.CreatedAt = timeutils.Now()
 
-	if err := configMap.CreateConfigMap(sp, &n); err != nil {
+	if err := configmap.CreateConfigMap(sp, &n); err != nil {
 		if errors.IsAlreadyExists(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("ConfigMap	: %s already existed", n.Name))
 		} else {
@@ -99,7 +99,7 @@ func deleteConfigMapHandler(ctx *web.Context) {
 		return
 	}
 
-	if err := configMap.DeleteConfigMap(sp, &n); err != nil {
+	if err := configmap.DeleteConfigMap(sp, &n); err != nil {
 		if errors.IsNotFound(err) {
 			response.NotFound(req.Request, resp.ResponseWriter, err)
 		} else if errors.IsForbidden(err) {

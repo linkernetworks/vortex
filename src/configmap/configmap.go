@@ -1,4 +1,4 @@
-package configMap
+package configmap
 
 import (
 	"github.com/linkernetworks/vortex/src/entity"
