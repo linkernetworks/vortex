@@ -80,7 +80,7 @@ func (suite *ConfigMapTestSuite) TestCreateConfigMap() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configMaps", bodyReader)
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configmaps", bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -104,7 +104,7 @@ func (suite *ConfigMapTestSuite) TestCreateConfigMap() {
 
 	//Create again and it should fail since the name exist
 	bodyReader = strings.NewReader(string(bodyBytes))
-	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/configMaps", bodyReader)
+	httpRequest, err = http.NewRequest("POST", "http://localhost:7890/v1/configmaps", bodyReader)
 	suite.NoError(err)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -134,7 +134,7 @@ func (suite *ConfigMapTestSuite) TestDeleteConfigMap() {
 	suite.NoError(err)
 
 	bodyReader := strings.NewReader(string(bodyBytes))
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/configMaps/"+configMap.ID.Hex(), bodyReader)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/configmaps/"+configMap.ID.Hex(), bodyReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -149,7 +149,7 @@ func (suite *ConfigMapTestSuite) TestDeleteConfigMap() {
 }
 
 func (suite *ConfigMapTestSuite) TestDeleteConfigMapWithInvalidID() {
-	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/configMaps/"+bson.NewObjectId().Hex(), nil)
+	httpRequest, err := http.NewRequest("DELETE", "http://localhost:7890/v1/configmaps/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "application/json")
@@ -177,7 +177,7 @@ func (suite *ConfigMapTestSuite) TestGetConfigMap() {
 	suite.session.C(entity.ConfigMapCollectionName).Insert(configMap)
 	defer suite.session.Remove(entity.ConfigMapCollectionName, "name", configMapName)
 
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configMaps/"+configMap.ID.Hex(), nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configmaps/"+configMap.ID.Hex(), nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -193,7 +193,7 @@ func (suite *ConfigMapTestSuite) TestGetConfigMap() {
 
 func (suite *ConfigMapTestSuite) TestGetConfigMapWithInvalidID() {
 	// Get data with non-exits ID
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configMaps/"+bson.NewObjectId().Hex(), nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configmaps/"+bson.NewObjectId().Hex(), nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -232,9 +232,9 @@ func (suite *ConfigMapTestSuite) TestListConfigMap() {
 		caseName := "page:pageSize" + tc.page + ":" + tc.pageSize
 		suite.T().Run(caseName, func(t *testing.T) {
 			//list data by default page and page_size
-			url := "http://localhost:7890/v1/configMaps/"
+			url := "http://localhost:7890/v1/configmaps/"
 			if tc.page != "" || tc.pageSize != "" {
-				url = "http://localhost:7890/v1/configMaps?"
+				url = "http://localhost:7890/v1/configmaps?"
 				url += "page=" + tc.page + "%" + "page_size" + tc.pageSize
 			}
 			httpRequest, err := http.NewRequest("GET", url, nil)
@@ -258,7 +258,7 @@ func (suite *ConfigMapTestSuite) TestListConfigMap() {
 
 func (suite *ConfigMapTestSuite) TestListConfigMapWithInvalidPage() {
 	//Get data with non-exits ID
-	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configMaps?page=asdd", nil)
+	httpRequest, err := http.NewRequest("GET", "http://localhost:7890/v1/configmaps?page=asdd", nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -266,7 +266,7 @@ func (suite *ConfigMapTestSuite) TestListConfigMapWithInvalidPage() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/configMaps?page_size=asdd", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/configmaps?page_size=asdd", nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -274,7 +274,7 @@ func (suite *ConfigMapTestSuite) TestListConfigMapWithInvalidPage() {
 	suite.wc.Dispatch(httpWriter, httpRequest)
 	assertResponseCode(suite.T(), http.StatusBadRequest, httpWriter)
 
-	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/configMaps?page=-1", nil)
+	httpRequest, err = http.NewRequest("GET", "http://localhost:7890/v1/configmaps?page=-1", nil)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Authorization", suite.JWTBearer)
@@ -308,7 +308,7 @@ func (suite *ConfigMapTestSuite) TestUploadConfigMapYAML() {
 	fileStat, err := file.Stat()
 	suite.NoError(err)
 
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configMaps/upload/yaml", requestReader)
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configmaps/upload/yaml", requestReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
@@ -361,7 +361,7 @@ func (suite *ConfigMapTestSuite) TestUploadConfigMapYAMLFail() {
 	fileStat, err := file.Stat()
 	suite.NoError(err)
 
-	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configMaps/upload/yaml", requestReader)
+	httpRequest, err := http.NewRequest("POST", "http://localhost:7890/v1/configmaps/upload/yaml", requestReader)
 	suite.NoError(err)
 
 	httpRequest.Header.Add("Content-Type", "multipart/form-data; boundary="+boundary)
