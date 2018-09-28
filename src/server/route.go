@@ -170,7 +170,7 @@ func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
 
 func newConfigMapService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/configMaps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
+	webService.Path("/v1/configmaps").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
 	webService.Filter(validateTokenMiddleware)
 	webService.Route(webService.POST("/").To(handler.RESTfulServiceHandler(sp, createConfigMapHandler)))
 	webService.Route(webService.DELETE("/{id}").To(handler.RESTfulServiceHandler(sp, deleteConfigMapHandler)))

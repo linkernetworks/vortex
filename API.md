@@ -52,7 +52,7 @@
         - [Delete Namespace](#delete-namespace)
     - [ConfigMap](#configmap)
         - [Create ConfigMap](#create-configmap)
-        - [Create ConfigMaps by Uploading YAML](#create-configmaps-by-uploading-yaml)
+        - [Create ConfigMap by Uploading YAML](#create-configmap-by-uploading-yaml)
         - [List ConfigMaps](#list-configmaps)
         - [Get ConfigMap](#get-configmap)
         - [Delete ConfigMap](#delete-configmap)
@@ -1398,7 +1398,7 @@ Response Data:
 ## ConfigMap
 ### Create ConfigMap
 
-**POST /v1/configMaps**
+**POST /v1/configmaps**
 
 Request Data:
 
@@ -1429,15 +1429,15 @@ Response Data:
 }
 ```
 
-### Create ConfigMaps by Uploading YAML
+### Create ConfigMap by Uploading YAML
 
-**POST /v1/configMaps/upload/yaml**
+**POST /v1/configmaps/upload/yaml**
 
 Example:
 
 ```
 curl -X POST \
-  http://127.0.0.1:7890/v1/configMaps/upload/yaml \
+  http://127.0.0.1:7890/v1/configmaps/upload/yaml \
   -H 'Authorization: Bearer <MY_TOKEN>' \
   -H 'content-type: multipart/form-data' \
   -F file=@/tmp/configMaps.yaml
@@ -1454,18 +1454,18 @@ Request Data:
         "game.properties": "enemies=aliens\nlives=3\nenemies.cheat=true\nenemies.cheat.level=noGoodRotten\nsecret.code.passphrase=UUDDLRLRBABAS\nsecret.code.allowed=true\nsecret.code.lives=30\n",
         "ui.properties": "color.good=purple\ncolor.bad=yellow\nallow.textmode=true\nhow.nice.to.look=fairlyNice\n"
     },
-    "createdAt": "2018-09-28T13:53:02.898481105+08:00",
+    "createdAt": "2018-09-28T13:53:02.898481105+08:00"
 }
 ```
 
 ### List ConfigMaps
 
-**GET /v1/configMaps/**
+**GET /v1/configmaps/**
 
 Example:
 
 ```
-curl http://localhost:7890/v1/configMaps/
+curl http://localhost:7890/v1/configmaps/
 ```
 
 Response Data:
@@ -1499,12 +1499,12 @@ Response Data:
 
 ### Get ConfigMap
 
-**GET /v1/configMaps/[id]**
+**GET /v1/configmaps/[id]**
 
 Example:
 
 ```
-curl http://localhost:7890/v1/configMaps/5badc1849ec4608148a758d0
+curl http://localhost:7890/v1/configmaps/5badc1849ec4608148a758d0
 ```
 
 Response Data:
@@ -1525,12 +1525,12 @@ Response Data:
 
 ### Delete ConfigMap
 
-**DELETE /v1/configMaps/[id]**
+**DELETE /v1/configmaps/[id]**
 
 Example:
 
 ```
-curl -X DELETE http://localhost:7890/v1/configMaps/5badc1849ec4608148a758d0
+curl -X DELETE http://localhost:7890/v1/configmaps/5badc1849ec4608148a758d0
 ```
 
 Response Data:
