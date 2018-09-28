@@ -85,7 +85,7 @@ func (suite *KubeCtlConfigMapTestSuite) TestCreateDeleteConfigMap() {
 	namespace := "default"
 	configMap := corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "K8S-ConfigMap-1",
+			Name:      "K8S-ConfigMap-4",
 			Namespace: namespace,
 		},
 		Data: map[string]string{
