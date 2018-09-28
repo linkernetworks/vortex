@@ -8,7 +8,7 @@ import (
 
 // the const for ConfigMapCollectionName
 const (
-	ConfigMapCollectionName string = "configmap"
+	ConfigMapCollectionName string = "configmaps"
 )
 
 // ConfigMap is the structure for namespace info
