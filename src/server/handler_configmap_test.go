@@ -284,7 +284,7 @@ func (suite *ConfigMapTestSuite) TestListConfigMapWithInvalidPage() {
 }
 
 func (suite *ConfigMapTestSuite) TestUploadConfigMapYAML() {
-	filename := "../../testYAMLs/configMap.yaml"
+	filename := "../../testYAMLs/configmap.yaml"
 
 	bodyBuf := bytes.NewBufferString("")
 	bodyWriter := multipart.NewWriter(bodyBuf)
