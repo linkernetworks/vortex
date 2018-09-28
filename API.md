@@ -2,68 +2,74 @@
 
 ## Table of Contents
 - [Vortex API](#vortex-api)
-  - [Table of Contents](#table-of-contents)
-  - [User](#user)
-    - [Signup](#signup)
-    - [Verify Token](#verify-token)
-    - [Signin](#signin)
-    - [Update Password](#update-password)
-    - [Create User](#create-user)
-    - [List User](#list-user)
-    - [Get User](#get-user)
-    - [Delete User](#delete-user)
-  - [Network](#network)
-    - [Create Network](#create-network)
-    - [List Network](#list-network)
-    - [Get Network](#get-network)
-    - [Get Network Status](#get-network-status)
-    - [Delete Network](#delete-network)
-    - [Get Open vSwitch Shell Information](#get-open-vswitch-shell-information)
-  - [Storage](#storage)
-    - [Create Storage](#create-storage)
-    - [List Storage](#list-storage)
-    - [Remove Storage](#remove-storage)
-  - [Volume](#volume)
-    - [Create Volume](#create-volume)
-    - [List Volume](#list-volume)
-    - [Remove Volume](#remove-volume)
-  - [Pod](#pod)
-    - [Create Pod](#create-pod)
-    - [List Pods](#list-pods)
-    - [Get Pod](#get-pod)
-    - [Delete Pod](#delete-pod)
-  - [Deployment](#deployment)
-    - [Create Deployment](#create-deployment)
-    - [Create Deployment by Uploading YAML](#create-deployment-by-uploading-yaml)
-    - [List Deployments](#list-deployments)
-    - [Get Deployment](#get-deployment)
-    - [Delete Deployment](#delete-deployment)
-  - [Service](#service)
-    - [Create Service](#create-service)
-    - [Create Service by Uploading YAML](#create-service-by-uploading-yaml)
-    - [List Services](#list-services)
-    - [Get Service](#get-service)
-    - [Delete Service](#delete-service)
-  - [Namespace](#namespace)
-    - [Create Namespace](#create-namespace)
-    - [Create Namespaces by Uploading YAML](#create-namespaces-by-uploading-yaml)
-    - [List Namespaces](#list-namespaces)
-    - [Get Namespace](#get-namespace)
-    - [Delete Namespace](#delete-namespace)
-  - [OVS](#ovs)
-    - [Get PortInfos](#get-portinfos)
-  - [Resource Monitoring](#resource-monitoring)
-    - [Query Range](#query-range)
-    - [Monitor Nodes](#monitor-nodes)
-    - [Monitor Certain Node](#monitor-certain-node)
-    - [List NICs of certain node](#list-nics-of-certain-node)
-    - [Monitor Pods](#monitor-pods)
-    - [Monitor Certain Pod](#monitor-certain-pod)
-    - [Monitor Certain Container](#monitor-certain-container)
-    - [Monitor Services](#monitor-services)
-    - [Monitor Certain Service](#monitor-certain-service)
-    - [Monitor Controllers](#monitor-controllers)
-    - [Monitor Certain Controller](#monitor-certain-controller)
+    - [Table of Contents](#table-of-contents)
+    - [User](#user)
+        - [Signup](#signup)
+        - [Verify Token](#verify-token)
+        - [Signin](#signin)
+        - [Update Password](#update-password)
+        - [Create User](#create-user)
+        - [List User](#list-user)
+        - [Get User](#get-user)
+        - [Delete User](#delete-user)
+    - [Network](#network)
+        - [Create Network](#create-network)
+        - [List Network](#list-network)
+        - [Get Network](#get-network)
+        - [Get Network Status](#get-network-status)
+        - [Delete Network](#delete-network)
+        - [Get Open vSwitch Shell Information](#get-open-vswitch-shell-information)
+    - [Storage](#storage)
+        - [Create Storage](#create-storage)
+        - [List Storage](#list-storage)
+        - [Remove Storage](#remove-storage)
+    - [Volume](#volume)
+        - [Create Volume](#create-volume)
+        - [List Volume](#list-volume)
+        - [Remove Volume](#remove-volume)
+    - [Pod](#pod)
+        - [Create Pod](#create-pod)
+        - [List Pods](#list-pods)
+        - [Get Pod](#get-pod)
+        - [Delete Pod](#delete-pod)
+    - [Deployment](#deployment)
+        - [Create Deployment](#create-deployment)
+        - [Create Deployment by Uploading YAML](#create-deployment-by-uploading-yaml)
+        - [List Deployments](#list-deployments)
+        - [Get Deployment](#get-deployment)
+        - [Delete Deployment](#delete-deployment)
+    - [Service](#service)
+        - [Create Service](#create-service)
+        - [Create Service by Uploading YAML](#create-service-by-uploading-yaml)
+        - [List Services](#list-services)
+        - [Get Service](#get-service)
+        - [Delete Service](#delete-service)
+    - [Namespace](#namespace)
+        - [Create Namespace](#create-namespace)
+        - [Create Namespaces by Uploading YAML](#create-namespaces-by-uploading-yaml)
+        - [List Namespaces](#list-namespaces)
+        - [Get Namespace](#get-namespace)
+        - [Delete Namespace](#delete-namespace)
+    - [ConfigMap](#configmap)
+        - [Create ConfigMap](#create-configmap)
+        - [Create ConfigMaps by Uploading YAML](#create-configmaps-by-uploading-yaml)
+        - [List ConfigMaps](#list-configmaps)
+        - [Get ConfigMap](#get-configmap)
+        - [Delete ConfigMap](#delete-configmap)
+    - [OVS](#ovs)
+        - [Get PortInfos](#get-portinfos)
+    - [Resource Monitoring](#resource-monitoring)
+        - [Query Range](#query-range)
+        - [Monitor Nodes](#monitor-nodes)
+        - [Monitor Certain Node](#monitor-certain-node)
+        - [List NICs of certain node](#list-nics-of-certain-node)
+        - [Monitor Pods](#monitor-pods)
+        - [Monitor Certain Pod](#monitor-certain-pod)
+        - [Monitor Certain Container](#monitor-certain-container)
+        - [Monitor Services](#monitor-services)
+        - [Monitor Certain Service](#monitor-certain-service)
+        - [Monitor Controllers](#monitor-controllers)
+        - [Monitor Certain Controller](#monitor-certain-controller)
 
 
 ## User
@@ -1378,6 +1384,153 @@ Example:
 
 ```
 curl -X DELETE http://localhost:7890/v1/namespaces/5b4edcbc4807c557d9feb69e
+```
+
+Response Data:
+
+```json
+{
+  "error": false,
+  "message": "Delete success"
+}
+```
+
+## ConfigMap
+### Create ConfigMap
+
+**POST /v1/configMaps**
+
+Request Data:
+
+```json
+{  
+  "name":"awesome",
+  "namespace": "default",
+  "data": {
+  	"firstData":"b2tvaw==",
+  	"secondData":"d29vb29vb3c="
+  }
+}
+```
+
+Response Data:
+
+```json
+{
+    "id": "5badc1849ec4608148a758d0",
+    "ownerID": "5ba312cd9ec4602d1072274a",
+    "name": "awesome",
+    "namespace": "default",
+    "data": {
+        "firstData": "okok",
+        "secondData": "woooooow"
+    },
+    "createdAt": "2018-09-28T13:52:04.477490621+08:00",
+}
+```
+
+### Create ConfigMaps by Uploading YAML
+
+**POST /v1/configMaps/upload/yaml**
+
+Example:
+
+```
+curl -X POST \
+  http://127.0.0.1:7890/v1/configMaps/upload/yaml \
+  -H 'Authorization: Bearer <MY_TOKEN>' \
+  -H 'content-type: multipart/form-data' \
+  -F file=@/tmp/configMaps.yaml
+```
+
+Request Data:
+```json
+{
+    "id": "5badc1be9ec4608148a758d1",
+    "ownerID": "5ba312cd9ec4602d1072274a",
+    "name": "upload-configmap",
+    "namespace": "default",
+    "data": {
+        "game.properties": "enemies=aliens\nlives=3\nenemies.cheat=true\nenemies.cheat.level=noGoodRotten\nsecret.code.passphrase=UUDDLRLRBABAS\nsecret.code.allowed=true\nsecret.code.lives=30\n",
+        "ui.properties": "color.good=purple\ncolor.bad=yellow\nallow.textmode=true\nhow.nice.to.look=fairlyNice\n"
+    },
+    "createdAt": "2018-09-28T13:53:02.898481105+08:00",
+}
+```
+
+### List ConfigMaps
+
+**GET /v1/configMaps/**
+
+Example:
+
+```
+curl http://localhost:7890/v1/configMaps/
+```
+
+Response Data:
+
+```json
+[
+    {
+        "id": "5badc1849ec4608148a758d0",
+        "ownerID": "5ba312cd9ec4602d1072274a",
+        "name": "awesome",
+        "namespace": "default",
+        "data": {
+            "firstData": "okok",
+            "secondData": "woooooow"
+        },
+        "createdAt": "2018-09-28T13:52:04.477+08:00",
+    },
+    {
+        "id": "5badc1be9ec4608148a758d1",
+        "ownerID": "5ba312cd9ec4602d1072274a",
+        "name": "upload-configmap",
+        "namespace": "default",
+        "data": {
+            "game.properties": "enemies=aliens\nlives=3\nenemies.cheat=true\nenemies.cheat.level=noGoodRotten\nsecret.code.passphrase=UUDDLRLRBABAS\nsecret.code.allowed=true\nsecret.code.lives=30\n",
+            "ui.properties": "color.good=purple\ncolor.bad=yellow\nallow.textmode=true\nhow.nice.to.look=fairlyNice\n"
+        },
+        "createdAt": "2018-09-28T13:53:02.898+08:00"
+    }
+]
+```
+
+### Get ConfigMap
+
+**GET /v1/configMaps/[id]**
+
+Example:
+
+```
+curl http://localhost:7890/v1/configMaps/5badc1849ec4608148a758d0
+```
+
+Response Data:
+
+```json
+{
+    "id": "5badc1849ec4608148a758d0",
+    "ownerID": "5ba312cd9ec4602d1072274a",
+    "name": "awesome",
+    "namespace": "default",
+    "data": {
+        "firstData": "okok",
+        "secondData": "woooooow"
+    },
+    "createdAt": "2018-09-28T13:52:04.477+08:00"
+}
+```
+
+### Delete ConfigMap
+
+**DELETE /v1/configMaps/[id]**
+
+Example:
+
+```
+curl -X DELETE http://localhost:7890/v1/configMaps/5badc1849ec4608148a758d0
 ```
 
 Response Data:
