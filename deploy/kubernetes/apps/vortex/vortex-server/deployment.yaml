@@ -18,7 +18,7 @@ spec:
       serviceAccountName: vortex-admin
       containers:
       - name: vortex-webapp
-        image: sdnvortex/vortex-portal:v0.2.3
+        image: sdnvortex/vortex-portal:v0.2.5
         ports:
         - containerPort: 8080
       - name: vortex-server
