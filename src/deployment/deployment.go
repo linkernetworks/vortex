@@ -397,6 +397,11 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 		},
 	}
 
+	// pass the same labels to pod
+	for k, v := range deploy.Labels {
+		p.Spec.Template.ObjectMeta.Labels[k] = v
+	}
+
 	_, err = sp.KubeCtl.CreateDeployment(&p, deploy.Namespace)
 	return err
 }
