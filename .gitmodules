@@ -1,3 +1,0 @@
-[submodule "installer/kubespray"]
-	path = installer/kubespray
-	url = https://github.com/linkernetworks/kubespray.git
