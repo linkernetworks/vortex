@@ -1096,12 +1096,12 @@ Request Data:
 
 ```json
 {
-  "Namespace": "default",
-  "ScaleTargetRefName": "testDeploymentName",
-  "ResourceName": "cpu",
-  "MinReplicas": 1,
-  "MaxReplicas": 5,
-  "TargetAverageUtilization": 30
+  "namespace": "default",
+  "scaleTargetRefName": "testDeploymentName",
+  "resourceName": "cpu",
+  "minReplicas": 1,
+  "maxReplicas": 5,
+  "targetAverageUtilization": 30
 }
 ```
 
@@ -1119,12 +1119,12 @@ Request Data:
 
 ```json
 {
-  "Namespace": "default",
-  "ScaleTargetRefName": "testDeploymentName",
-  "ResourceName": "cpu",
-  "MinReplicas": 0,
-  "MaxReplicas": 0,
-  "TargetAverageUtilization": 0
+  "namespace": "default",
+  "scaleTargetRefName": "testDeploymentName",
+  "resourceName": "cpu",
+  "minReplicas": 0,
+  "maxReplicas": 0,
+  "targetAverageUtilization": 0
 }
 ```
 
