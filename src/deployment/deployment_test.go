@@ -10,6 +10,9 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/moby/moby/pkg/namesgenerator"
 	"github.com/stretchr/testify/suite"
+
+	corev1 "k8s.io/api/core/v1"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -474,4 +477,48 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentWithNetworkTypes() {
 
 		})
 	}
+}
+
+func (suite *DeploymentTestSuite) TestCreateDeploymentWithAutoscaler() {
+	containers := []entity.Container{
+		{
+			Name:    namesgenerator.GetRandomName(0),
+			Image:   "busybox",
+			Command: []string{"sleep", "3600"},
+		},
+	}
+
+	testDeploymentName := namesgenerator.GetRandomName(0)
+	deploy := &entity.Deployment{
+		ID:          bson.NewObjectId(),
+		Namespace:   "default",
+		Name:        testDeploymentName,
+		Containers:  containers,
+		NetworkType: entity.DeploymentClusterNetwork,
+		EnvVars: map[string]string{
+			"MY_IP": "1.2.3.4",
+		},
+	}
+
+	autoscaler := entity.AutoscalerInfo{
+		Name:                     "test-autoscaler",
+		Namespace:                "default",
+		ScaleTargetRefName:       testDeploymentName,
+		ResourceName:             corev1.ResourceCPU,
+		MinReplicas:              1,
+		MaxReplicas:              5,
+		TargetAverageUtilization: 30,
+	}
+
+	err := CreateDeployment(suite.sp, deploy)
+	suite.NoError(err)
+
+	err = CreateAutoscaler(suite.sp, autoscaler)
+	suite.NoError(err)
+
+	err = DeleteAutoscaler(suite.sp, autoscaler)
+	suite.NoError(err)
+
+	err = DeleteDeployment(suite.sp, deploy)
+	suite.NoError(err)
 }

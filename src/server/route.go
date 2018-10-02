@@ -133,6 +133,7 @@ func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Route(webService.GET("/").To(handler.RESTfulServiceHandler(sp, listDeploymentHandler)))
 	webService.Route(webService.GET("/{id}").To(handler.RESTfulServiceHandler(sp, getDeploymentHandler)))
 	webService.Route(webService.POST("/upload/yaml").Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadDeploymentYAMLHandler)))
+	webService.Route(webService.PUT("/autoscale").To(handler.RESTfulServiceHandler(sp, updateAutoscalerHandler)))
 	return webService
 }
 

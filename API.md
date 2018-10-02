@@ -71,7 +71,6 @@
         - [Monitor Controllers](#monitor-controllers)
         - [Monitor Certain Controller](#monitor-certain-controller)
 
-
 ## User
 
 ### Signup
@@ -1077,6 +1076,58 @@ Response Data:
   "message": "Delete success"
 }
 ```
+
+### Update Autoscaler
+
+`ResourceName` in json can only be "cpu" or "memory".
+`ScaleTargetRefName` is the target kubernetes deployment name 
+
+Enable autoscaler
+
+**PUT /v1/deployments/autoscale?enable=true**
+
+Example:
+
+```
+curl -X PUT http://localhost:7890/v1/deployments/autoscale?enable=true
+```
+
+Request Data:
+
+```json
+{
+  "namespace": "default",
+  "scaleTargetRefName": "testDeploymentName",
+  "resourceName": "cpu",
+  "minReplicas": 1,
+  "maxReplicas": 5,
+  "targetAverageUtilization": 30
+}
+```
+
+Disable autoscaler
+
+**PUT /v1/deployments/autoscale?enable=false**
+
+Example:
+
+```
+curl -X PUT http://localhost:7890/v1/deployments/autoscale?enable=false
+```
+
+Request Data:
+
+```json
+{
+  "namespace": "default",
+  "scaleTargetRefName": "testDeploymentName",
+  "resourceName": "cpu",
+  "minReplicas": 0,
+  "maxReplicas": 0,
+  "targetAverageUtilization": 0
+}
+```
+
 
 ## Service
 

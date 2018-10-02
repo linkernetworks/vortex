@@ -129,6 +129,12 @@ func deleteDeploymentHandler(ctx *web.Context) {
 		}
 	}
 
+	autoscaler := entity.AutoscalerInfo{
+		Namespace:          p.Namespace,
+		ScaleTargetRefName: p.Name,
+	}
+	// Autoscaler should be clean if there is any and ignore delete autoscaler error
+	deployment.DeleteAutoscaler(sp, autoscaler)
 	resp.WriteEntity(response.ActionResponse{
 		Error:   false,
 		Message: "Delete success",
@@ -313,4 +319,74 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 	// find owner in user entity
 	d.CreatedBy = ownerUser
 	resp.WriteHeaderAndEntity(http.StatusCreated, d)
+}
+
+func updateAutoscalerHandler(ctx *web.Context) {
+	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
+	enableAutoscaler := req.QueryParameter("enable") == "true"
+
+	session := sp.Mongo.NewSession()
+	defer session.Close()
+
+	autoscalerInfo := entity.AutoscalerInfo{}
+	if err := req.ReadEntity(&autoscalerInfo); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	// force set autoscaler to deployment name
+	autoscalerInfo.Name = autoscalerInfo.ScaleTargetRefName
+	if err := sp.Validator.Struct(autoscalerInfo); err != nil {
+		response.BadRequest(req.Request, resp.ResponseWriter, err)
+		return
+	}
+
+	if enableAutoscaler {
+		// Create a autoscaler
+		if err := deployment.CreateAutoscaler(sp, autoscalerInfo); err != nil {
+			if errors.IsAlreadyExists(err) {
+				response.Conflict(req.Request, resp.ResponseWriter, err)
+			} else if errors.IsConflict(err) {
+				response.Conflict(req.Request, resp.ResponseWriter, err)
+			} else if errors.IsInvalid(err) {
+				response.BadRequest(req.Request, resp.ResponseWriter, err)
+			} else {
+				response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			}
+			return
+
+		}
+	} else {
+		// Delete a autoscaler
+		if err := deployment.DeleteAutoscaler(sp, autoscalerInfo); err != nil {
+			if errors.IsNotFound(err) {
+				response.NotFound(req.Request, resp.ResponseWriter, err)
+			} else if errors.IsForbidden(err) {
+				response.NotAcceptable(req.Request, resp.ResponseWriter, err)
+			} else {
+				response.InternalServerError(req.Request, resp.ResponseWriter, err)
+			}
+			return
+		}
+	}
+	// find the deployment id by deployment name
+	deployment, err := backend.FindDeploymentByName(session, autoscalerInfo.ScaleTargetRefName)
+	if err != nil {
+		response.NotFound(req.Request, resp.ResponseWriter, fmt.Errorf("deployment not found"))
+		return
+	}
+
+	// Update autoscalerInfo
+	deployment.IsAutoscaler = enableAutoscaler
+	deployment.AutoscalerInfo = autoscalerInfo
+	modifier := bson.M{
+		"$set": deployment,
+	}
+	query := bson.M{
+		"_id": deployment.ID,
+	}
+	if err := session.Update(entity.DeploymentCollectionName, query, modifier); err != nil {
+		response.InternalServerError(req.Request, resp.ResponseWriter, err)
+		return
+	}
+	resp.WriteHeaderAndEntity(http.StatusAccepted, deployment)
 }
