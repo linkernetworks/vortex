@@ -422,7 +422,7 @@ func CreateAutoscaler(sp *serviceprovider.Container, autoscalerInfo entity.Autos
 		},
 		Spec: v2beta1.HorizontalPodAutoscalerSpec{
 			ScaleTargetRef: v2beta1.CrossVersionObjectReference{
-				APIVersion: "v2beta1",
+				APIVersion: "extensions/v1beta",
 				Kind:       "Deployment",
 				Name:       autoscalerInfo.ScaleTargetRefName,
 			},
