@@ -422,8 +422,9 @@ func CreateAutoscaler(sp *serviceprovider.Container, autoscalerInfo entity.Autos
 		},
 		Spec: v2beta1.HorizontalPodAutoscalerSpec{
 			ScaleTargetRef: v2beta1.CrossVersionObjectReference{
-				Kind: "Deployment",
-				Name: autoscalerInfo.ScaleTargetRefName,
+				APIVersion: "apps/v1",
+				Kind:       "Deployment",
+				Name:       autoscalerInfo.ScaleTargetRefName,
 			},
 			MinReplicas: &autoscalerInfo.MinReplicas,
 			MaxReplicas: autoscalerInfo.MaxReplicas,
