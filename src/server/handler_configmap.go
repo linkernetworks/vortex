@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -49,14 +48,8 @@ func createConfigMapHandler(ctx *web.Context) {
 	})
 	defer session.Close()
 
-	// Decode the data from base64 to string
 	for dataName, dataContent := range n.Data {
-		decoded, err := base64.StdEncoding.DecodeString(dataContent)
-		if err != nil {
-			response.BadRequest(req.Request, resp.ResponseWriter, err)
-			return
-		}
-		n.Data[dataName] = string(decoded)
+		n.Data[dataName] = string(dataContent)
 	}
 
 	// Check whether this name has been used
