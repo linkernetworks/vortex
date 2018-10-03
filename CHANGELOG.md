@@ -1,5 +1,19 @@
 # Change Log
 
+## [v0.2.9](https://github.com/linkernetworks/vortex/tree/v0.2.9) (2018-10-03)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.8...v0.2.9)
+
+**Merged pull requests:**
+
+- \[Task\] Remove decode base64 step when creating configmap [\#337](https://github.com/linkernetworks/vortex/pull/337) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] remove jenkins file [\#336](https://github.com/linkernetworks/vortex/pull/336) ([John-Lin](https://github.com/John-Lin))
+- \[Bug\] Assign pod labels when creating deployment [\#335](https://github.com/linkernetworks/vortex/pull/335) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Task\] ConfigMap API [\#334](https://github.com/linkernetworks/vortex/pull/334) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] use minikube 0.28.2 [\#333](https://github.com/linkernetworks/vortex/pull/333) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] use sdnvortex/ubuntu-nsenter [\#332](https://github.com/linkernetworks/vortex/pull/332) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] autoscaler API [\#331](https://github.com/linkernetworks/vortex/pull/331) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] Allow mount configMaps when creating deployment [\#330](https://github.com/linkernetworks/vortex/pull/330) ([WakeupTsai](https://github.com/WakeupTsai))
+
 ## [v0.2.8](https://github.com/linkernetworks/vortex/tree/v0.2.8) (2018-09-26)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.7...v0.2.8)
 
