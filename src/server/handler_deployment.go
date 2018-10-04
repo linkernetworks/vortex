@@ -298,7 +298,7 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 		}
 		// check if map contains memory key
 		if _, ok := container.Resources.Requests[corev1.ResourceMemory]; ok {
-			d.AutoscalerInfo.IsCapableAutoscaleResources[0] = "memory"
+			d.AutoscalerInfo.IsCapableAutoscaleResources[1] = "memory"
 		}
 	}
 
@@ -403,9 +403,18 @@ func updateAutoscalerHandler(ctx *web.Context) {
 		return
 	}
 
-	// Update autoscalerInfo
+	// update autoscalerInfo
 	deployment.IsEnableAutoscale = enableAutoscaler
-	deployment.AutoscalerInfo = autoscalerInfo
+
+	// update all autoscaler infomation
+	deployment.AutoscalerInfo.Name = autoscalerInfo.Name
+	deployment.AutoscalerInfo.Namespace = autoscalerInfo.Namespace
+	deployment.AutoscalerInfo.ScaleTargetRefName = autoscalerInfo.ScaleTargetRefName
+	deployment.AutoscalerInfo.ResourceName = autoscalerInfo.ResourceName
+	deployment.AutoscalerInfo.MinReplicas = autoscalerInfo.MinReplicas
+	deployment.AutoscalerInfo.MaxReplicas = autoscalerInfo.MaxReplicas
+	deployment.AutoscalerInfo.TargetAverageUtilization = autoscalerInfo.TargetAverageUtilization
+
 	modifier := bson.M{
 		"$set": deployment,
 	}
