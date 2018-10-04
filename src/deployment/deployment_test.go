@@ -225,8 +225,8 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFailWithoutNetwork() {
 			Name:                  namesgenerator.GetRandomName(0),
 			Image:                 "busybox",
 			Command:               []string{"sleep", "3600"},
-			ResourceRequestCPU:    0,
-			ResourceRequestMemory: 0,
+			ResourceRequestCPU:    30,
+			ResourceRequestMemory: 20,
 		},
 	}
 
