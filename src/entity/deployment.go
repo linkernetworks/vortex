@@ -86,7 +86,7 @@ type AutoscalerInfo struct {
 	Namespace string `bson:"namespace" json:"namespace" validate:"required"`
 	// ScaleTargetRef is deployment name
 	ScaleTargetRefName          string              `bson:"scaleTargetRefName" json:"scaleTargetRefName" validate:"required,k8sname"`
-	IsCapableAutoscaleResources []string            `bson:"isCapableAutoscaleResources" json:"isCapableAutoscaleResources" validate:"-"`
+	IsCapableAutoscaleResources [2]string           `bson:"isCapableAutoscaleResources" json:"isCapableAutoscaleResources" validate:"-"`
 	ResourceName                corev1.ResourceName `bson:"resourceName" json:"resourceName" validate:"required,eq=cpu|eq=memory"`
 	MinReplicas                 int32               `bson:"minReplicas" json:"minReplicas" validate:"required,numeric"`
 	MaxReplicas                 int32               `bson:"maxReplicas" json:"maxReplicas" validate:"required,numeric"`

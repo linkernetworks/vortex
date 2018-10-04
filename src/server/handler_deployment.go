@@ -43,16 +43,16 @@ func createDeploymentHandler(ctx *web.Context) {
 	// autoscale resource request setting prerequisite check
 	for _, container := range p.Containers {
 		if container.ResourceRequestCPU != 0 {
-			p.AutoscalerInfo.IsCapableAutoscaleResources = append(p.AutoscalerInfo.IsCapableAutoscaleResources, "cpu")
+			p.AutoscalerInfo.IsCapableAutoscaleResources[0] = "cpu"
 		}
 		if container.ResourceRequestMemory != 0 {
-			p.AutoscalerInfo.IsCapableAutoscaleResources = append(p.AutoscalerInfo.IsCapableAutoscaleResources, "memory")
+			p.AutoscalerInfo.IsCapableAutoscaleResources[1] = "memory"
 		}
 	}
 
 	if p.NetworkType == entity.DeploymentCustomNetwork {
-		// clear the slice
-		p.AutoscalerInfo.IsCapableAutoscaleResources = nil
+		// clear the array
+		p.AutoscalerInfo.IsCapableAutoscaleResources = [2]string{}
 	}
 
 	if err := sp.Validator.Struct(p); err != nil {
