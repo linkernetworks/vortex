@@ -1,5 +1,5 @@
 # Building stage
-FROM golang:1.10-alpine3.7
+FROM golang:1.11-alpine3.7
 
 WORKDIR /go/src/github.com/linkernetworks/vortex
 
