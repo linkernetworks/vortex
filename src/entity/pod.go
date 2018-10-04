@@ -20,9 +20,11 @@ const (
 
 // Container is the structure for init Container info
 type Container struct {
-	Name    string   `bson:"name" json:"name" validate:"required,k8sname"`
-	Image   string   `bson:"image" json:"image" validate:"required"`
-	Command []string `bson:"command" json:"command" validate:"required,dive,required"`
+	Name                  string   `bson:"name" json:"name" validate:"required,k8sname"`
+	Image                 string   `bson:"image" json:"image" validate:"required"`
+	Command               []string `bson:"command" json:"command" validate:"required,dive,required"`
+	ResourceRequestCPU    int      `bson:"resourceRequestCPU" json:"resourceRequestCPU" validate:"-"`
+	ResourceRequestMemory int      `bson:"resourceRequestMemory" json:"resourceRequestMemory" validate:"-"`
 }
 
 // PodRouteGw is the structure for add IP routing table with gateway

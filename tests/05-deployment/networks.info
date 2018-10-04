@@ -5,7 +5,7 @@
 	"vlanTags":[],
 	"bridgeName":"br0",
 	"nodes":[
-		{	
+		{
 			"name": "@NODENAME@",
 			"physicalInterfaces": [{
 				"name":"@ETHNAME@"

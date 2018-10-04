@@ -5,15 +5,17 @@
         "myip":"1.2.3.4"
     },
 	"namespace":"default",
+    "isCapableAutoscaleResources": [],
 	"containers":[
 		{
 			"name":"first-container",
 			"image":"busybox",
-            "command":["sleep","3600"]
+            "command":["sleep","3600"],
+            "resourceRequestCPU": 0,
+            "resourceRequestMemory": 0
 		}
 	],
-	"networks":[
-	],
+	"networks":[],
 	"volumes":[],
 	"configMaps":[],
     "restartPolicy":"Always",

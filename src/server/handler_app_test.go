@@ -61,25 +61,28 @@ func (suite *AppTestSuite) TestCreateApp() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		Name:         tName,
-		Namespace:    namespace,
-		Labels:       map[string]string{},
-		EnvVars:      map[string]string{},
-		Containers:   containers,
-		Volumes:      []entity.DeploymentVolume{},
-		ConfigMaps:   []entity.DeploymentConfig{},
-		Networks:     []entity.DeploymentNetwork{},
-		Capability:   true,
-		NetworkType:  entity.DeploymentHostNetwork,
-		NodeAffinity: []string{},
-		Replicas:     1,
+		Name:                        tName,
+		Namespace:                   namespace,
+		Labels:                      map[string]string{},
+		EnvVars:                     map[string]string{},
+		Containers:                  containers,
+		Volumes:                     []entity.DeploymentVolume{},
+		ConfigMaps:                  []entity.DeploymentConfig{},
+		Networks:                    []entity.DeploymentNetwork{},
+		IsCapableAutoscaleResources: []string{},
+		Capability:                  true,
+		NetworkType:                 entity.DeploymentHostNetwork,
+		NodeAffinity:                []string{},
+		Replicas:                    1,
 	}
 
 	ports := []entity.ServicePort{

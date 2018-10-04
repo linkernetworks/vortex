@@ -16,7 +16,8 @@ import (
 	"github.com/linkernetworks/vortex/src/net/http/query"
 	"github.com/linkernetworks/vortex/src/server/backend"
 	"github.com/linkernetworks/vortex/src/web"
-	"k8s.io/api/apps/v1"
+	appv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	mgo "gopkg.in/mgo.v2"
@@ -37,6 +38,21 @@ func createDeploymentHandler(ctx *web.Context) {
 	if err := req.ReadEntity(&p); err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
 		return
+	}
+
+	// autoscale resource request setting prerequisite check
+	for _, container := range p.Containers {
+		if container.ResourceRequestCPU != 0 {
+			p.IsCapableAutoscaleResources = append(p.IsCapableAutoscaleResources, "cpu")
+		}
+		if container.ResourceRequestMemory != 0 {
+			p.IsCapableAutoscaleResources = append(p.IsCapableAutoscaleResources, "memory")
+		}
+	}
+
+	if p.NetworkType == entity.DeploymentCustomNetwork {
+		// clear the slice
+		p.IsCapableAutoscaleResources = nil
 	}
 
 	if err := sp.Validator.Struct(p); err != nil {
@@ -83,6 +99,7 @@ func createDeploymentHandler(ctx *web.Context) {
 		}
 		return
 	}
+
 	if err := session.Insert(entity.DeploymentCollectionName, &p); err != nil {
 		if mgo.IsDup(err) {
 			response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Deployment Name: %s already existed", p.Name))
@@ -255,23 +272,34 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 		return
 	}
 
-	deploymentObj, ok := obj.(*v1.Deployment)
+	deploymentObj, ok := obj.(*appv1.Deployment)
 	if !ok {
 		response.BadRequest(req.Request, resp.ResponseWriter, fmt.Errorf("The YAML file is not for creating deployment"))
 		return
 	}
 
 	d := entity.Deployment{
-		ID:          bson.NewObjectId(),
-		OwnerID:     bson.ObjectIdHex(userID),
-		Name:        deploymentObj.ObjectMeta.Name,
-		Namespace:   deploymentObj.ObjectMeta.Namespace,
-		NetworkType: entity.DeploymentClusterNetwork,
-		Replicas:    *deploymentObj.Spec.Replicas,
+		ID:        bson.NewObjectId(),
+		OwnerID:   bson.ObjectIdHex(userID),
+		Name:      deploymentObj.ObjectMeta.Name,
+		Namespace: deploymentObj.ObjectMeta.Namespace,
+		Replicas:  *deploymentObj.Spec.Replicas,
 	}
 
 	if d.Namespace == "" {
 		d.Namespace = "default"
+	}
+
+	// autoscale resource request setting prerequisite check
+	for _, container := range deploymentObj.Spec.Template.Spec.Containers {
+		// check if map contains cpu key
+		if _, ok := container.Resources.Requests[corev1.ResourceCPU]; ok {
+			d.IsCapableAutoscaleResources = append(d.IsCapableAutoscaleResources, "cpu")
+		}
+		// check if map contains memory key
+		if _, ok := container.Resources.Requests[corev1.ResourceMemory]; ok {
+			d.IsCapableAutoscaleResources = append(d.IsCapableAutoscaleResources, "memory")
+		}
 	}
 
 	session := sp.Mongo.NewSession()
@@ -376,7 +404,7 @@ func updateAutoscalerHandler(ctx *web.Context) {
 	}
 
 	// Update autoscalerInfo
-	deployment.IsAutoscaler = enableAutoscaler
+	deployment.IsEnableAutoscale = enableAutoscaler
 	deployment.AutoscalerInfo = autoscalerInfo
 	modifier := bson.M{
 		"$set": deployment,

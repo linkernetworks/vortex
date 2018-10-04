@@ -59,23 +59,24 @@ type DeploymentConfig struct {
 
 // Deployment is the structure for deployment info
 type Deployment struct {
-	ID             bson.ObjectId       `bson:"_id,omitempty" json:"id" validate:"-"`
-	OwnerID        bson.ObjectId       `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
-	Name           string              `bson:"name" json:"name" validate:"required,k8sname"`
-	Namespace      string              `bson:"namespace" json:"namespace" validate:"required"`
-	Labels         map[string]string   `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
-	EnvVars        map[string]string   `bson:"envVars,omitempty" json:"envVars" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
-	Containers     []Container         `bson:"containers" json:"containers" validate:"required,dive,required"`
-	Volumes        []DeploymentVolume  `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
-	ConfigMaps     []DeploymentConfig  `bson:"configMaps,omitempty" json:"configMaps" validate:"required,dive,required"`
-	Networks       []DeploymentNetwork `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
-	Capability     bool                `bson:"capability" json:"capability" validate:"-"`
-	NetworkType    string              `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
-	NodeAffinity   []string            `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
-	IsAutoscaler   bool                `bson:"isAutoscaler" json:"isAutoscaler" validate:"-"`
-	AutoscalerInfo AutoscalerInfo      `bson:"autoscalerInfo" json:"autoscalerInfo" validate:"-"`
-	CreatedBy      User                `json:"createdBy" validate:"-"`
-	CreatedAt      *time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
+	ID                          bson.ObjectId       `bson:"_id,omitempty" json:"id" validate:"-"`
+	OwnerID                     bson.ObjectId       `bson:"ownerID,omitempty" json:"ownerID" validate:"-"`
+	Name                        string              `bson:"name" json:"name" validate:"required,k8sname"`
+	Namespace                   string              `bson:"namespace" json:"namespace" validate:"required"`
+	Labels                      map[string]string   `bson:"labels,omitempty" json:"labels" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
+	EnvVars                     map[string]string   `bson:"envVars,omitempty" json:"envVars" validate:"required,dive,keys,printascii,endkeys,required,printascii"`
+	Containers                  []Container         `bson:"containers" json:"containers" validate:"required,dive,required"`
+	Volumes                     []DeploymentVolume  `bson:"volumes,omitempty" json:"volumes" validate:"required,dive,required"`
+	ConfigMaps                  []DeploymentConfig  `bson:"configMaps,omitempty" json:"configMaps" validate:"required,dive,required"`
+	Networks                    []DeploymentNetwork `bson:"networks,omitempty" json:"networks" validate:"required,dive,required"`
+	Capability                  bool                `bson:"capability" json:"capability" validate:"-"`
+	NetworkType                 string              `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
+	NodeAffinity                []string            `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
+	IsCapableAutoscaleResources []string            `bson:"isCapableAutoscaleResources" json:"isCapableAutoscaleResources" validate:"required,dive,required,eq=memory|eq=cpu"`
+	IsEnableAutoscale           bool                `bson:"isEnableAutoscale" json:"isEnableAutoscale" validate:"-"`
+	AutoscalerInfo              AutoscalerInfo      `bson:"autoscalerInfo" json:"autoscalerInfo" validate:"-"`
+	CreatedBy                   User                `json:"createdBy" validate:"-"`
+	CreatedAt                   *time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty" validate:"-"`
 
 	Replicas int32 `bson:"replicas" json:"replicas" validate:"required"`
 }

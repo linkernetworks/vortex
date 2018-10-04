@@ -13,6 +13,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	v2beta1 "k8s.io/api/autoscaling/v2beta1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"gopkg.in/mgo.v2/bson"
@@ -347,17 +348,41 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 	volumeMounts = append(volumeMounts, configMapMounts...)
 
 	var containers []corev1.Container
+	var c corev1.Container
+
 	securityContext := generateContainerSecurity(deploy)
 	envVars := generateEnvVars(deploy)
-	for _, container := range deploy.Containers {
-		containers = append(containers, corev1.Container{
-			Name:            container.Name,
-			Image:           container.Image,
-			Command:         container.Command,
+
+	for _, deployContainer := range deploy.Containers {
+		c = corev1.Container{
+			Name:            deployContainer.Name,
+			Image:           deployContainer.Image,
+			Command:         deployContainer.Command,
 			VolumeMounts:    volumeMounts,
 			SecurityContext: securityContext,
 			Env:             envVars,
-		})
+		}
+		if deployContainer.ResourceRequestCPU != 0 {
+			c.Resources = corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					"cpu": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
+				},
+			}
+		} else if deployContainer.ResourceRequestMemory != 0 {
+			c.Resources = corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					"memory": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestMemory) + "Mi"),
+				},
+			}
+		} else if deployContainer.ResourceRequestMemory != 0 && deployContainer.ResourceRequestCPU != 0 {
+			c.Resources = corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					"cpu":    resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
+					"memory": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestMemory) + "Mi"),
+				},
+			}
+		}
+		containers = append(containers, c)
 	}
 
 	p := appsv1.Deployment{
