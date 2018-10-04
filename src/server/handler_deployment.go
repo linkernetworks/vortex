@@ -294,11 +294,11 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 	for _, container := range deploymentObj.Spec.Template.Spec.Containers {
 		// check if map contains cpu key
 		if _, ok := container.Resources.Requests[corev1.ResourceCPU]; ok {
-			d.AutoscalerInfo.IsCapableAutoscaleResources = append(d.AutoscalerInfo.IsCapableAutoscaleResources, "cpu")
+			d.AutoscalerInfo.IsCapableAutoscaleResources[0] = "cpu"
 		}
 		// check if map contains memory key
 		if _, ok := container.Resources.Requests[corev1.ResourceMemory]; ok {
-			d.AutoscalerInfo.IsCapableAutoscaleResources = append(d.AutoscalerInfo.IsCapableAutoscaleResources, "memory")
+			d.AutoscalerInfo.IsCapableAutoscaleResources[0] = "memory"
 		}
 	}
 
