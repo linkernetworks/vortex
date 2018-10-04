@@ -3,49 +3,39 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 # Vortex server
 
-Vortex share the same config and dependent services with aurora. Make sure dependent services are available before start vortex server.
+![overview](./images/overview.png)
+
+## Frontend
+
+- Portal(https://github.com/linkernetworks/vortex-portal)
+
+## Backend service
 
 - MongoDB
+- InfluxDB
+- Prometheus
+- [Metrics Server](https://github.com/kubernetes-incubator/metrics-server)
+- [Network Controller](https://github.com/linkernetworks/network-controller): Use Open vSwitch as a second bridge for underlay networking
 
-### GoBuild
+# Deploy to bare metal servers (Using helm)
 
-Build
-```
-make deps vortex
-```
+```shell
+$ make apps.init-helm
 
-Run
-```
-make run
-```
+# configure production yaml 
+$ vim deploy/helm/config/production.yaml
 
-### Docker build
-
-```
-make docker.build
+$ make apps.launch-prod
 ```
 
-### Test vortex image
+## Upgrade
 
-1. Start dependent services like mongo or influxdb
-2. Use docker run with host network
-
-```
-docker run -it --network=host asia.gcr.io/linker-aurora/vortex:<git-branch> bash
-// example
-docker run -it --network=host asia.gcr.io/linker-aurora/vortex:develop bash
+```shell
+$ apps.upgrade-prod
 ```
 
-# Deploy to Kubernetes
+## Teardown all system
 
-1. Apply base storage system
-2. Apply service
-3. Apply apps
-  -  require cluster admin to apply role binding
-
-```
-kubectl apply -f deploy/kubernetes/base/service/mongodb
-
-kubectl apply -f deploy/kubernetes/apps/monitoring/monitoring-namespace.yaml
-kubectl apply -f deploy/kubernetes/apps/ --resursive
+```shell
+$ make apps.teardown-prod
 ```
