@@ -7,7 +7,7 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 ## Frontend
 
-- Portal(https://github.com/linkernetworks/vortex-portal)
+- [Portal](https://github.com/linkernetworks/vortex-portal)
 
 ## Backend service
 
