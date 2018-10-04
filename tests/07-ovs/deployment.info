@@ -3,7 +3,6 @@
 	"labels":{},
     "envVars":{},
 	"namespace":"default",
-    "isCapableAutoscaleResources":[],
 	"containers":[
 		{
 			"name":"first-container",

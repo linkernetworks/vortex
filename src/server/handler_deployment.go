@@ -43,16 +43,16 @@ func createDeploymentHandler(ctx *web.Context) {
 	// autoscale resource request setting prerequisite check
 	for _, container := range p.Containers {
 		if container.ResourceRequestCPU != 0 {
-			p.IsCapableAutoscaleResources = append(p.IsCapableAutoscaleResources, "cpu")
+			p.AutoscalerInfo.IsCapableAutoscaleResources = append(p.AutoscalerInfo.IsCapableAutoscaleResources, "cpu")
 		}
 		if container.ResourceRequestMemory != 0 {
-			p.IsCapableAutoscaleResources = append(p.IsCapableAutoscaleResources, "memory")
+			p.AutoscalerInfo.IsCapableAutoscaleResources = append(p.AutoscalerInfo.IsCapableAutoscaleResources, "memory")
 		}
 	}
 
 	if p.NetworkType == entity.DeploymentCustomNetwork {
 		// clear the slice
-		p.IsCapableAutoscaleResources = nil
+		p.AutoscalerInfo.IsCapableAutoscaleResources = nil
 	}
 
 	if err := sp.Validator.Struct(p); err != nil {
@@ -294,11 +294,11 @@ func uploadDeploymentYAMLHandler(ctx *web.Context) {
 	for _, container := range deploymentObj.Spec.Template.Spec.Containers {
 		// check if map contains cpu key
 		if _, ok := container.Resources.Requests[corev1.ResourceCPU]; ok {
-			d.IsCapableAutoscaleResources = append(d.IsCapableAutoscaleResources, "cpu")
+			d.AutoscalerInfo.IsCapableAutoscaleResources = append(d.AutoscalerInfo.IsCapableAutoscaleResources, "cpu")
 		}
 		// check if map contains memory key
 		if _, ok := container.Resources.Requests[corev1.ResourceMemory]; ok {
-			d.IsCapableAutoscaleResources = append(d.IsCapableAutoscaleResources, "memory")
+			d.AutoscalerInfo.IsCapableAutoscaleResources = append(d.AutoscalerInfo.IsCapableAutoscaleResources, "memory")
 		}
 	}
 

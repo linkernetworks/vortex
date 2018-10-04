@@ -78,19 +78,18 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		Name:                        tName,
-		Namespace:                   namespace,
-		Labels:                      map[string]string{},
-		EnvVars:                     map[string]string{},
-		Containers:                  containers,
-		Volumes:                     []entity.DeploymentVolume{},
-		ConfigMaps:                  []entity.DeploymentConfig{},
-		Networks:                    []entity.DeploymentNetwork{},
-		IsCapableAutoscaleResources: []string{},
-		Capability:                  true,
-		NetworkType:                 entity.DeploymentHostNetwork,
-		NodeAffinity:                []string{},
-		Replicas:                    1,
+		Name:         tName,
+		Namespace:    namespace,
+		Labels:       map[string]string{},
+		EnvVars:      map[string]string{},
+		Containers:   containers,
+		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
+		Networks:     []entity.DeploymentNetwork{},
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
 	}
 	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
@@ -145,10 +144,9 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFail() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		Name:                        tName,
-		Namespace:                   namespace,
-		Containers:                  containers,
-		IsCapableAutoscaleResources: []string{},
+		Name:       tName,
+		Namespace:  namespace,
+		Containers: containers,
 		Volumes: []entity.DeploymentVolume{
 			{Name: namesgenerator.GetRandomName(0)},
 		},
@@ -181,15 +179,14 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		ID:                          bson.NewObjectId(),
-		Name:                        tName,
-		Namespace:                   namespace,
-		Containers:                  containers,
-		Capability:                  true,
-		NetworkType:                 entity.DeploymentHostNetwork,
-		NodeAffinity:                []string{},
-		IsCapableAutoscaleResources: []string{},
-		Replicas:                    1,
+		ID:           bson.NewObjectId(),
+		Name:         tName,
+		Namespace:    namespace,
+		Containers:   containers,
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
 	}
 
 	err := p.CreateDeployment(suite.sp, &deploy)
@@ -241,11 +238,10 @@ func (suite *DeploymentTestSuite) TestGetDeployment() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		ID:                          bson.NewObjectId(),
-		Name:                        tName,
-		Namespace:                   namespace,
-		IsCapableAutoscaleResources: []string{},
-		Containers:                  containers,
+		ID:         bson.NewObjectId(),
+		Name:       tName,
+		Namespace:  namespace,
+		Containers: containers,
 	}
 
 	//Create data into mongo manually
@@ -293,11 +289,10 @@ func (suite *DeploymentTestSuite) TestListDeployment() {
 			},
 		}
 		deployments = append(deployments, entity.Deployment{
-			ID:                          bson.NewObjectId(),
-			Name:                        namesgenerator.GetRandomName(0),
-			Namespace:                   namespace,
-			Containers:                  containers,
-			IsCapableAutoscaleResources: []string{},
+			ID:         bson.NewObjectId(),
+			Name:       namesgenerator.GetRandomName(0),
+			Namespace:  namespace,
+			Containers: containers,
 		})
 	}
 
@@ -476,19 +471,18 @@ func (suite *DeploymentTestSuite) TestEnableDeploymentWithAutoscaler() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		Name:                        tName,
-		Namespace:                   namespace,
-		Labels:                      map[string]string{},
-		EnvVars:                     map[string]string{},
-		Containers:                  containers,
-		Volumes:                     []entity.DeploymentVolume{},
-		ConfigMaps:                  []entity.DeploymentConfig{},
-		Networks:                    []entity.DeploymentNetwork{},
-		Capability:                  true,
-		NetworkType:                 entity.DeploymentHostNetwork,
-		IsCapableAutoscaleResources: []string{},
-		NodeAffinity:                []string{},
-		Replicas:                    1,
+		Name:         tName,
+		Namespace:    namespace,
+		Labels:       map[string]string{},
+		EnvVars:      map[string]string{},
+		Containers:   containers,
+		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
+		Networks:     []entity.DeploymentNetwork{},
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
 	}
 	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
@@ -551,19 +545,18 @@ func (suite *DeploymentTestSuite) TestDisableDeploymentWithAutoscaler() {
 	}
 	tName := namesgenerator.GetRandomName(0)
 	deploy := entity.Deployment{
-		Name:                        tName,
-		Namespace:                   namespace,
-		Labels:                      map[string]string{},
-		EnvVars:                     map[string]string{},
-		Containers:                  containers,
-		Volumes:                     []entity.DeploymentVolume{},
-		ConfigMaps:                  []entity.DeploymentConfig{},
-		Networks:                    []entity.DeploymentNetwork{},
-		Capability:                  true,
-		NetworkType:                 entity.DeploymentHostNetwork,
-		IsCapableAutoscaleResources: []string{},
-		NodeAffinity:                []string{},
-		Replicas:                    1,
+		Name:         tName,
+		Namespace:    namespace,
+		Labels:       map[string]string{},
+		EnvVars:      map[string]string{},
+		Containers:   containers,
+		Volumes:      []entity.DeploymentVolume{},
+		ConfigMaps:   []entity.DeploymentConfig{},
+		Networks:     []entity.DeploymentNetwork{},
+		Capability:   true,
+		NetworkType:  entity.DeploymentHostNetwork,
+		NodeAffinity: []string{},
+		Replicas:     1,
 	}
 	bodyBytes, err := json.MarshalIndent(deploy, "", "  ")
 	suite.NoError(err)
