@@ -3,11 +3,14 @@
 	"labels":{},
     "envVars":{},
 	"namespace":"default",
+    "isCapableAutoscaleResources":[],
 	"containers":[
 		{
 			"name":"first-container",
 			"image":"busybox",
-            "command":["sleep","3600"]
+            "command":["sleep","3600"],
+            "resourceRequestCPU": 0,
+            "resourceRequestMemory": 0
 		}
 	],
 	"networks":[

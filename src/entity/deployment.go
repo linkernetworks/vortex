@@ -72,7 +72,7 @@ type Deployment struct {
 	Capability                  bool                `bson:"capability" json:"capability" validate:"-"`
 	NetworkType                 string              `bson:"networkType" json:"networkType" validate:"required,eq=host|eq=cluster|eq=custom"`
 	NodeAffinity                []string            `bson:"nodeAffinity" json:"nodeAffinity" validate:"required"`
-	IsCapableAutoscaleResources []string            `bson:"isCapableAutoscaleResources" json:"isCapableAutoscaleResources" validate:"required,dive,required,eq=memory|eq=cpu"`
+	IsCapableAutoscaleResources []string            `bson:"isCapableAutoscaleResources" json:"isCapableAutoscaleResources" validate:"-"`
 	IsEnableAutoscale           bool                `bson:"isEnableAutoscale" json:"isEnableAutoscale" validate:"-"`
 	AutoscalerInfo              AutoscalerInfo      `bson:"autoscalerInfo" json:"autoscalerInfo" validate:"-"`
 	CreatedBy                   User                `json:"createdBy" validate:"-"`

@@ -5,7 +5,7 @@
         "myip":"1.2.3.4"
     },
 	"namespace":"default",
-    "isCapableAutoscaleResources": [],
+    "isCapableAutoscaleResources":[],
 	"containers":[
 		{
 			"name":"first-container",
