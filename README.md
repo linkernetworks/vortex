@@ -17,7 +17,7 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 - [Metrics Server](https://github.com/kubernetes-incubator/metrics-server)
 - [Network Controller](https://github.com/linkernetworks/network-controller): Use Open vSwitch as a second bridge for underlay networking
 
-# Deploy to bare metal servers (Using helm)
+## Deploy to bare metal servers (Using helm)
 
 ```shell
 $ make apps.init-helm
