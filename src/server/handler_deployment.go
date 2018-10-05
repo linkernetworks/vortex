@@ -406,7 +406,7 @@ func updateAutoscalerHandler(ctx *web.Context) {
 	// update autoscalerInfo
 	deployment.IsEnableAutoscale = enableAutoscaler
 
-	// update all autoscaler infomation
+	// update all autoscaler information
 	deployment.AutoscalerInfo.Name = autoscalerInfo.Name
 	deployment.AutoscalerInfo.Namespace = autoscalerInfo.Namespace
 	deployment.AutoscalerInfo.ScaleTargetRefName = autoscalerInfo.ScaleTargetRefName
