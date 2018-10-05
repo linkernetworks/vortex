@@ -24,13 +24,15 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
     - Download containers logs
 - Users management
     - Create different roles for users
+- Private Registry
+    - View and pull docker images from private registry
 
 ### Network 
 
 - By default, the vortex cluster already installed [flannel](https://github.com/coreos/flannel) for all pods on cluster, however network 
   features can add extra multiple network interfaces for pods.
-- Custom underlay networking including Open vSwitch and DPDK integrations
-- Pod multiple network interfaces with static ip and custom route
+- Custom underlay networking including [Open vSwitch](https://www.openvswitch.org/) and [DPDK](https://www.dpdk.org/) integrations
+- Pods multiple network interfaces with static ip and custom route
 
 ## Frontend
 
