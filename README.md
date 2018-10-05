@@ -5,6 +5,33 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 ![overview](./images/overview.png)
 
+## Features
+
+### Kubernetes
+
+- Kubernetes resource data visualization. (network, cpu, memory etc.)
+    - Node
+    - Pod
+- Kubernetes resources deployment & management
+    - Namespaces
+    - Deployments, autoscale features provided
+    - Services
+    - PVs and PVCs with dynamic volume provisioning through NFS
+- Getting a shell to a container from web UI
+    - Open containers terminal
+- Debug and monitor applications on cluster from web UI 
+    - Open containers logs
+    - Download containers logs
+- Users management
+    - Create different roles for users
+
+### Network 
+
+- By default, the vortex cluster already installed [flannel](https://github.com/coreos/flannel) for all pods on cluster, however network 
+  features can add extra multiple network interfaces for pods.
+- Custom underlay networking including Open vSwitch and DPDK integrations
+- Pod multiple network interfaces with static ip and custom route
+
 ## Frontend
 
 - [UI Portal](https://github.com/linkernetworks/vortex-portal)
@@ -13,9 +40,11 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 - MongoDB
 - InfluxDB
-- Prometheus
+- [Prometheus](https://prometheus.io/)
 - [Metrics Server](https://github.com/kubernetes-incubator/metrics-server)
-- [Network Controller](https://github.com/linkernetworks/network-controller): Use Open vSwitch as a second bridge for underlay networking
+- [CNI Network Controller](https://github.com/linkernetworks/network-controller)
+  - Use Open vSwitch as a second bridge for underlay networking
+  - Enable Kubernetes Pods have multiple network interfaces and add default routes
 
 ## Deploy to bare metal servers (using helm)
 
@@ -29,6 +58,22 @@ $ vim config/k8s.json
 $ vim deploy/helm/config/production.yaml
 
 $ make apps.launch-prod
+```
+
+## Access web UI
+
+```
+http://<Kubernetes-Nodes-IP>:32767
+```
+
+Default account: admin@vortex.com
+
+Default password: password
+
+## Development and RESTful API endpoing
+
+```
+http://<Kubernetes-Nodes-IP>:32326
 ```
 
 ## Upgrade
