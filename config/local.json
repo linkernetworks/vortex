@@ -1,31 +1,30 @@
 {
-    "mongo": {
-        "url": "mongodb://localhost:27017/vortex_test"
+    "mongo":{
+        "url":"mongodb://localhost:27017/vortex_test"
     },
-    "prometheus": {
-        "url": "http://localhost:30003"
+    "prometheus":{
+        "url":"http://localhost:30003"
     },
-    "registry": {
-        "url": "https://dockerhub.pw"
+    "registry":{
+        "url":"https://dockerhub.pw"
     },
-    "kubernetes": {
-        "systemNamespace": "vortex"
+    "kubernetes":{
+        "systemNamespace":"vortex"
     },
-    "logger": {
-        "dir": "./logs",
-        "level": "debug",
-        "maxAge": "720h",
-        "suffixPattern": ".%Y%m%d",
-        "linkName": "access_log"
+    "logger":{
+        "dir":"./logs",
+        "level":"debug",
+        "maxAge":"720h",
+        "suffixPattern":".%Y%m%d",
+        "linkName":"access_log"
     },
-    "app": {
-        "brand": {
-            "name": "Vortex",
-            "identifier": "vortex",
-            "companyName": "Linker Networks Inc."
+    "app":{
+        "brand":{
+            "name":"Vortex",
+            "identifier":"vortex",
+            "companyName":"Linker Networks Inc."
         },
-        "dbVersion": "v1.0.0",
-        "version": "local",
-        "logFileName": "access_log"
+        "version":"local",
+        "logFileName":"access_log"
     }
 }
