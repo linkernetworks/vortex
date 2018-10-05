@@ -26,7 +26,7 @@ func New(serverAddress string) (*NetworkController, error) {
 		return nil, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 45*time.Second)
 
 	return &NetworkController{
 		ClientCtl: pb.NewNetworkControlClient(conn),
