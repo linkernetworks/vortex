@@ -9,6 +9,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// GRPC_TIMEOUT for the GRPC client
+const GRPC_TIMEOUT = 45
+
 // DEFAULT_CONTROLLER_PORT set the default port as 50051
 const DEFAULT_CONTROLLER_PORT = "50051"
 
@@ -26,7 +29,7 @@ func New(serverAddress string) (*NetworkController, error) {
 		return nil, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), GRPC_TIMEOUT*time.Second)
 
 	return &NetworkController{
 		ClientCtl: pb.NewNetworkControlClient(conn),
