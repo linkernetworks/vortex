@@ -61,9 +61,11 @@ func (suite *AppTestSuite) TestCreateApp() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)

@@ -7,14 +7,15 @@
             },
             "namespace":"default",
             "containers":[
-            {
-                "name":"first-container",
-                "image":"busybox",
-                "command":["sleep","3600"]
-            }
-            ],
-            "networks":[
-            ],
+		        {
+			        "name":"first-container",
+			        "image":"busybox",
+                    "command":["sleep","3600"],
+                    "resourceRequestCPU": 0,
+                    "resourceRequestMemory": 0
+                }
+	        ],
+            "networks":[],
             "volumes":[],
             "configMaps":[],
             "restartPolicy":"Always",

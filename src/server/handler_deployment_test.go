@@ -69,9 +69,11 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -133,9 +135,11 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFail() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -166,9 +170,11 @@ func (suite *DeploymentTestSuite) TestDeleteDeployment() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -223,9 +229,11 @@ func (suite *DeploymentTestSuite) TestGetDeployment() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -273,9 +281,11 @@ func (suite *DeploymentTestSuite) TestListDeployment() {
 	for i := 0; i < count; i++ {
 		containers := []entity.Container{
 			{
-				Name:    namesgenerator.GetRandomName(0),
-				Image:   "busybox",
-				Command: []string{"sleep", "3600"},
+				Name:                  namesgenerator.GetRandomName(0),
+				Image:                 "busybox",
+				Command:               []string{"sleep", "3600"},
+				ResourceRequestCPU:    0,
+				ResourceRequestMemory: 0,
 			},
 		}
 		deployments = append(deployments, entity.Deployment{
@@ -452,9 +462,11 @@ func (suite *DeploymentTestSuite) TestEnableDeploymentWithAutoscaler() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -515,7 +527,7 @@ func (suite *DeploymentTestSuite) TestEnableDeploymentWithAutoscaler() {
 	suite.NotEqual("", retDeployment.ID)
 	suite.Equal(deploy.Name, retDeployment.Name)
 	suite.Equal(len(deploy.Containers), len(retDeployment.Containers))
-	suite.True(retDeployment.IsAutoscaler)
+	suite.True(retDeployment.IsEnableAutoscale)
 	suite.NotNil(retDeployment.AutoscalerInfo)
 	defer p.DeleteAutoscaler(suite.sp, autoscaler)
 }
@@ -524,9 +536,11 @@ func (suite *DeploymentTestSuite) TestDisableDeploymentWithAutoscaler() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -610,6 +624,6 @@ func (suite *DeploymentTestSuite) TestDisableDeploymentWithAutoscaler() {
 	suite.NotEqual("", retDeployment.ID)
 	suite.Equal(deploy.Name, retDeployment.Name)
 	suite.Equal(len(deploy.Containers), len(retDeployment.Containers))
-	suite.False(retDeployment.IsAutoscaler)
+	suite.False(retDeployment.IsEnableAutoscale)
 	defer p.DeleteAutoscaler(suite.sp, autoscaler)
 }

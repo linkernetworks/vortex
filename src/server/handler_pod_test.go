@@ -63,9 +63,11 @@ func (suite *PodTestSuite) TestCreatePod() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -127,9 +129,11 @@ func (suite *PodTestSuite) TestCreatePodFail() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -161,9 +165,11 @@ func (suite *PodTestSuite) TestDeletePod() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -207,9 +213,11 @@ func (suite *PodTestSuite) TestDeletePodFromCluster() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -256,9 +264,11 @@ func (suite *PodTestSuite) TestGetPod() {
 	namespace := "default"
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 	tName := namesgenerator.GetRandomName(0)
@@ -307,9 +317,11 @@ func (suite *PodTestSuite) TestListPod() {
 	for i := 0; i < count; i++ {
 		containers := []entity.Container{
 			{
-				Name:    namesgenerator.GetRandomName(0),
-				Image:   "busybox",
-				Command: []string{"sleep", "3600"},
+				Name:                  namesgenerator.GetRandomName(0),
+				Image:                 "busybox",
+				Command:               []string{"sleep", "3600"},
+				ResourceRequestCPU:    0,
+				ResourceRequestMemory: 0,
 			},
 		}
 		pods = append(pods, entity.Pod{

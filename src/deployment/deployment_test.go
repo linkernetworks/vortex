@@ -168,9 +168,11 @@ func (suite *DeploymentTestSuite) TestGenerateConfigMap() {
 func (suite *DeploymentTestSuite) TestCreateDeployment() {
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    40,
+			ResourceRequestMemory: 0,
 		},
 	}
 
@@ -195,9 +197,11 @@ func (suite *DeploymentTestSuite) TestCreateDeployment() {
 func (suite *DeploymentTestSuite) TestCreateDeploymentFailWithoutVolume() {
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 0,
 		},
 	}
 
@@ -218,9 +222,11 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentFailWithoutVolume() {
 func (suite *DeploymentTestSuite) TestCreateDeploymentFailWithoutNetwork() {
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    30,
+			ResourceRequestMemory: 20,
 		},
 	}
 
@@ -482,9 +488,11 @@ func (suite *DeploymentTestSuite) TestCreateDeploymentWithNetworkTypes() {
 func (suite *DeploymentTestSuite) TestCreateDeploymentWithAutoscaler() {
 	containers := []entity.Container{
 		{
-			Name:    namesgenerator.GetRandomName(0),
-			Image:   "busybox",
-			Command: []string{"sleep", "3600"},
+			Name:                  namesgenerator.GetRandomName(0),
+			Image:                 "busybox",
+			Command:               []string{"sleep", "3600"},
+			ResourceRequestCPU:    0,
+			ResourceRequestMemory: 30,
 		},
 	}
 
