@@ -7,9 +7,9 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 ## Frontend
 
-- [Portal](https://github.com/linkernetworks/vortex-portal)
+- [UI Portal](https://github.com/linkernetworks/vortex-portal)
 
-## Backend service
+## Backend services
 
 - MongoDB
 - InfluxDB
@@ -17,10 +17,13 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 - [Metrics Server](https://github.com/kubernetes-incubator/metrics-server)
 - [Network Controller](https://github.com/linkernetworks/network-controller): Use Open vSwitch as a second bridge for underlay networking
 
-## Deploy to bare metal servers (Using helm)
+## Deploy to bare metal servers (using helm)
 
 ```shell
 $ make apps.init-helm
+
+# configure private registry url
+$ vim config/k8s.json
 
 # configure production yaml 
 $ vim deploy/helm/config/production.yaml
