@@ -281,10 +281,10 @@
 		{
 			"checksumSHA1": "QAOy7z8HT9JxBXbIhPjTjdLusVU=",
 			"path": "github.com/linkernetworks/network-controller/messages",
-			"revision": "76cb2946e17ea2ab9e92dce65c96f87e96e25302",
-			"revisionTime": "2018-09-01T07:38:16Z",
-			"version": "=v0.4.8",
-			"versionExact": "v0.4.8"
+			"revision": "48d3927f81876386dda34525c8d0985a1b482f09",
+			"revisionTime": "2018-10-05T09:33:17Z",
+			"version": "=v0.4.9",
+			"versionExact": "v0.4.9"
 		},
 		{
 			"checksumSHA1": "PKUmbmBhKwMo6Cj7j0KUZQ6Ecsk=",
