@@ -1,5 +1,22 @@
 # Change Log
 
+## [v0.3.1](https://github.com/linkernetworks/vortex/tree/v0.3.1) (2018-10-05)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.3.0...v0.3.1)
+
+**Merged pull requests:**
+
+- \[Task\] upgrade network controller 0.4.9 [\#342](https://github.com/linkernetworks/vortex/pull/342) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] grpc timeout for 45 seconds [\#341](https://github.com/linkernetworks/vortex/pull/341) ([John-Lin](https://github.com/John-Lin))
+
+## [v0.3.0](https://github.com/linkernetworks/vortex/tree/v0.3.0) (2018-10-05)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.9...v0.3.0)
+
+**Merged pull requests:**
+
+- \[Hot-fix\] config reformat [\#340](https://github.com/linkernetworks/vortex/pull/340) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] update golang version [\#339](https://github.com/linkernetworks/vortex/pull/339) ([John-Lin](https://github.com/John-Lin))
+- \[Task\] request resource for autoscale [\#338](https://github.com/linkernetworks/vortex/pull/338) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.2.9](https://github.com/linkernetworks/vortex/tree/v0.2.9) (2018-10-03)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.2.8...v0.2.9)
 
