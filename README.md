@@ -9,9 +9,9 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 ### Kubernetes
 
-- Kubernetes resource data visualization. (network, cpu, memory etc.)
-    - Node
-    - Pod
+- Kubernetes resource data visualization including network, cpu, memory etc.
+    - Nodes
+    - Pods
 - Kubernetes resources deployment & management
     - Namespaces
     - Deployments, autoscale features provided
@@ -30,7 +30,7 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 ### Network 
 
 - By default, the vortex cluster already installed [flannel](https://github.com/coreos/flannel) for all pods on cluster, however network 
-  features can add extra multiple network interfaces for pods.
+  features can add extra multiple network interfaces for pods
 - Custom underlay networking including [Open vSwitch](https://www.openvswitch.org/) and [DPDK](https://www.dpdk.org/) integrations
 - Pods multiple network interfaces with static ip and custom route
 
@@ -72,7 +72,7 @@ Default account: admin@vortex.com
 
 Default password: password
 
-## Development and RESTful API endpoing
+## Development and RESTful API endpoint
 
 ```
 http://<Kubernetes-Nodes-IP>:32326
