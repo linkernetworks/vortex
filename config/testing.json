@@ -13,7 +13,7 @@
     },
     "logger":{
         "dir":"./logs",
-        "level":"debug",
+        "level":"info",
         "maxAge":"720h",
         "suffixPattern":".%Y%m%d",
         "linkName":"access_log"
