@@ -347,7 +347,7 @@ data:
               <div class="footer">
                 <table width="100%">
                   <tr>
-                    <td class="aligncenter content-block">Sent by Vortex{{ "{{" }} template "__alertmanager" . {{ "}}" }}</td>
+                    <td class="aligncenter content-block">Sent by Vortex {{ "{{" }} template "__alertmanager" . {{ "}}" }}</td>
                   </tr>
                 </table>
               </div></div>
