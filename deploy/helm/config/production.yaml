@@ -4,8 +4,8 @@ apps:
   vortex:
     controller:
       replicaCount: 1
-      apiserverImageTag: v0.3.1
-      webappImageTag: v0.3.2
+      apiserverImageTag: v0.3.2
+      webappImageTag: v0.3.4
       portalCPU: 200m
       serverCPU: 100m
     service:
