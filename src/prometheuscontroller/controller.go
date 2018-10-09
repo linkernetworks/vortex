@@ -600,7 +600,7 @@ func GetController(sp *serviceprovider.Container, id string) (entity.ControllerM
 	// pods
 	expression = Expression{}
 	expression.Metrics = []string{"kube_pod_info"}
-	expression.QueryLabels = map[string]string{"created_by_kind": "ReplicaSet", "created_by_name": id + ".*"}
+	expression.QueryLabels = map[string]string{"created_by_kind": "ReplicaSet", "created_by_name": id + "-[^-]+"}
 
 	str = basicExpr(expression.Metrics)
 	str = queryExpr(str, expression.QueryLabels)
