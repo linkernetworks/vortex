@@ -1,5 +1,15 @@
 # Change Log
 
+## [v0.3.2](https://github.com/linkernetworks/vortex/tree/v0.3.2) (2018-10-09)
+[Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.3.1...v0.3.2)
+
+**Merged pull requests:**
+
+- \[Bug\] Find pod by prefix [\#346](https://github.com/linkernetworks/vortex/pull/346) ([WakeupTsai](https://github.com/WakeupTsai))
+- \[Hot-fix\] rename [\#345](https://github.com/linkernetworks/vortex/pull/345) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] typo rename [\#344](https://github.com/linkernetworks/vortex/pull/344) ([John-Lin](https://github.com/John-Lin))
+- \[Hot-fix\] log level to info when testing and local [\#343](https://github.com/linkernetworks/vortex/pull/343) ([John-Lin](https://github.com/John-Lin))
+
 ## [v0.3.1](https://github.com/linkernetworks/vortex/tree/v0.3.1) (2018-10-05)
 [Full Changelog](https://github.com/linkernetworks/vortex/compare/v0.3.0...v0.3.1)
 
