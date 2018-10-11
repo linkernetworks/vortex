@@ -144,7 +144,7 @@ func deletePodFromClusterHandler(ctx *web.Context) {
 func listPodHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	var pageSize = 10
+	var pageSize = 1024
 	query := query.New(req.Request.URL.Query())
 
 	page, err := query.Int("page", 1)
