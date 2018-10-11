@@ -123,7 +123,7 @@ func deleteConfigMapHandler(ctx *web.Context) {
 func listConfigMapHandler(ctx *web.Context) {
 	sp, req, resp := ctx.ServiceProvider, ctx.Request, ctx.Response
 
-	var pageSize = 10
+	var pageSize = 1024
 	query := query.New(req.Request.URL.Query())
 
 	page, err := query.Int("page", 1)
