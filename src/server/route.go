@@ -55,6 +55,8 @@ func newRegistryService(sp *serviceprovider.Container) *restful.WebService {
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
 
+	webService.Filter(validateTokenMiddleware)
+
 	webService.Route(webService.POST("/auth").
 		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, registryBasicAuthHandler)))
@@ -74,12 +76,15 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 
 	// TODO only root role can access
 	webService.Route(webService.GET("/").
+		Filter(validateTokenMiddleware).
 		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, listUserHandler)))
 	webService.Route(webService.POST("/").
+		Filter(validateTokenMiddleware).
 		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, createUserHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(validateTokenMiddleware).
 		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
 
@@ -175,7 +180,7 @@ func newContainerService(sp *serviceprovider.Container) *restful.WebService {
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
 
-	// webService.Filter(validateTokenMiddleware)
+	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.GET("/logs/{namespace}/{pod}/{container}").
 		Filter(guestRole).
@@ -215,11 +220,11 @@ func newPodService(sp *serviceprovider.Container) *restful.WebService {
 func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
 
-	webService.Filter(validateTokenMiddleware)
-
 	webService.Path("/v1/deployments").
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
+
+	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
 		Filter(userRole).

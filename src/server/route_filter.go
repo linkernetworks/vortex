@@ -51,11 +51,11 @@ func validateTokenMiddleware(req *restful.Request, resp *restful.Response, chain
 }
 
 func rootRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
-	role := req.Attribute("Role").(string)
-	if role == entity.RootRole {
+	role, ok := req.Attribute("Role").(string)
+	if ok && role == entity.RootRole {
 		chain.ProcessFilter(req, resp)
 	} else {
-		log.Printf("User has no root role: Forbidden")
+		log.Printf("User role: %s has no root role: Forbidden", role)
 		resp.WriteHeaderAndEntity(http.StatusForbidden,
 			response.ActionResponse{
 				Error:   true,
@@ -66,11 +66,11 @@ func rootRole(req *restful.Request, resp *restful.Response, chain *restful.Filte
 }
 
 func userRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
-	role := req.Attribute("Role").(string)
-	if role == entity.RootRole || role == entity.UserRole {
+	role, ok := req.Attribute("Role").(string)
+	if ok && role == entity.RootRole || role == entity.UserRole {
 		chain.ProcessFilter(req, resp)
 	} else {
-		log.Printf("User has no user role: Forbidden")
+		log.Printf("User role: %s has no root role: Forbidden", role)
 		resp.WriteHeaderAndEntity(http.StatusForbidden,
 			response.ActionResponse{
 				Error:   true,
@@ -81,11 +81,11 @@ func userRole(req *restful.Request, resp *restful.Response, chain *restful.Filte
 }
 
 func guestRole(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
-	role := req.Attribute("Role").(string)
-	if role == entity.RootRole || role == entity.UserRole || role == entity.GuestRole {
+	role, ok := req.Attribute("Role").(string)
+	if ok && role == entity.RootRole || role == entity.UserRole || role == entity.GuestRole {
 		chain.ProcessFilter(req, resp)
 	} else {
-		log.Printf("User has no guest role: Forbidden")
+		log.Printf("User role: %s has no root role: Forbidden", role)
 		resp.WriteHeaderAndEntity(http.StatusForbidden,
 			response.ActionResponse{
 				Error:   true,
