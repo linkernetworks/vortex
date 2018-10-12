@@ -43,6 +43,7 @@ func newVersionService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Path("/v1/version").
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
+
 	webService.Route(webService.GET("/").
 		To(handler.RESTfulServiceHandler(sp, versionHandler)))
 	return webService
@@ -53,7 +54,9 @@ func newRegistryService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Path("/v1/registry").
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
+
 	webService.Route(webService.POST("/auth").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, registryBasicAuthHandler)))
 	return webService
 }
@@ -71,21 +74,27 @@ func newUserService(sp *serviceprovider.Container) *restful.WebService {
 
 	// TODO only root role can access
 	webService.Route(webService.GET("/").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, listUserHandler)))
 	webService.Route(webService.POST("/").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, createUserHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, deleteUserHandler)))
 
 	// user role can access
 	webService.Route(webService.GET("/{id}").
 		Filter(validateTokenMiddleware).
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getUserHandler)))
 	webService.Route(webService.GET("/verify/auth").
 		Filter(validateTokenMiddleware).
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, verifyTokenHandler)))
 	webService.Route(webService.PUT("/password").
 		Filter(validateTokenMiddleware).
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, patchPasswordHandler)))
 	return webService
 }
@@ -99,16 +108,22 @@ func newNetworkService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listNetworkHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getNetworkHandler)))
 	webService.Route(webService.GET("/status/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getNetworkStatusHandler)))
 	webService.Route(webService.POST("/").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, createNetworkHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, deleteNetworkHandler)))
 	webService.Route(webService.GET("/{node}/shell").
+		Filter(rootRole).
 		To(handler.RESTfulServiceHandler(sp, getOVSShellInfoHandler)))
 	return webService
 }
@@ -122,10 +137,13 @@ func newStorageService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createStorage)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listStorage)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteStorage)))
 	return webService
 }
@@ -140,10 +158,13 @@ func newVolumeService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createVolumeHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteVolumeHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listVolumeHandler)))
 	return webService
 }
@@ -154,9 +175,13 @@ func newContainerService(sp *serviceprovider.Container) *restful.WebService {
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
 
+	// webService.Filter(validateTokenMiddleware)
+
 	webService.Route(webService.GET("/logs/{namespace}/{pod}/{container}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getContainerLogsHandler)))
 	webService.Route(webService.GET("/logs/file/{namespace}/{pod}/{container}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getContainerLogFileHandler)))
 	return webService
 }
@@ -170,14 +195,19 @@ func newPodService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createPodHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deletePodHandler)))
 	webService.Route(webService.DELETE("/{namespace}/{pod}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deletePodFromClusterHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listPodHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getPodHandler)))
 	return webService
 }
@@ -192,16 +222,22 @@ func newDeploymentService(sp *serviceprovider.Container) *restful.WebService {
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createDeploymentHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteDeploymentHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listDeploymentHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getDeploymentHandler)))
 	webService.Route(webService.POST("/upload/yaml").
+		Filter(userRole).
 		Consumes("multipart/form-data").To(handler.RESTfulServiceHandler(sp, uploadDeploymentYAMLHandler)))
 	webService.Route(webService.PUT("/autoscale").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, updateAutoscalerHandler)))
 	return webService
 }
@@ -215,6 +251,7 @@ func newAppService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createAppHandler)))
 	return webService
 }
@@ -229,14 +266,19 @@ func newServiceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createServiceHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteServiceHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listServiceHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getServiceHandler)))
 	webService.Route(webService.POST("/upload/yaml").
+		Filter(userRole).
 		Consumes("multipart/form-data").
 		To(handler.RESTfulServiceHandler(sp, uploadServiceYAMLHandler)))
 	return webService
@@ -251,14 +293,19 @@ func newNamespaceService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createNamespaceHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteNamespaceHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listNamespaceHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getNamespaceHandler)))
 	webService.Route(webService.POST("/upload/yaml").
+		Filter(userRole).
 		Consumes("multipart/form-data").
 		To(handler.RESTfulServiceHandler(sp, uploadNamespaceYAMLHandler)))
 	return webService
@@ -273,14 +320,19 @@ func newConfigMapService(sp *serviceprovider.Container) *restful.WebService {
 	webService.Filter(validateTokenMiddleware)
 
 	webService.Route(webService.POST("/").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, createConfigMapHandler)))
 	webService.Route(webService.DELETE("/{id}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, deleteConfigMapHandler)))
 	webService.Route(webService.GET("/").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, listConfigMapHandler)))
 	webService.Route(webService.GET("/{id}").
+		Filter(guestRole).
 		To(handler.RESTfulServiceHandler(sp, getConfigMapHandler)))
 	webService.Route(webService.POST("/upload/yaml").
+		Filter(userRole).
 		Consumes("multipart/form-data").
 		To(handler.RESTfulServiceHandler(sp, uploadConfigMapYAMLHandler)))
 	return webService
@@ -321,8 +373,14 @@ func newMonitoringService(sp *serviceprovider.Container) *restful.WebService {
 
 func newOVSService(sp *serviceprovider.Container) *restful.WebService {
 	webService := new(restful.WebService)
-	webService.Path("/v1/ovs").Consumes(restful.MIME_JSON, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_JSON)
-	webService.Route(webService.GET("/portinfos").To(handler.RESTfulServiceHandler(sp, getOVSPortInfoHandler)))
+	webService.Path("/v1/ovs").
+		Consumes(restful.MIME_JSON, restful.MIME_JSON).
+		Produces(restful.MIME_JSON, restful.MIME_JSON)
+
+	// webService.Filter(validateTokenMiddleware)
+
+	webService.Route(webService.GET("/portinfos").
+		To(handler.RESTfulServiceHandler(sp, getOVSPortInfoHandler)))
 	return webService
 }
 
