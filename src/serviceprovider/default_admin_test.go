@@ -6,7 +6,6 @@ import (
 	"github.com/linkernetworks/mongo"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/entity"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -21,7 +20,6 @@ func (suite *CreateDefaultUserSuite) SetupSuite() {
 	suite.cf = config.MustRead("../../config/testing.json")
 	sp := NewForTesting(suite.cf)
 	suite.service = sp.Mongo
-
 	suite.session = suite.service.NewSession()
 }
 
@@ -30,7 +28,11 @@ func (suite *CreateDefaultUserSuite) TearDownSuite() {
 	defer suite.session.Close()
 }
 
-func (suite *CreateDefaultUserSuite) TestDefaultUserCreate(t *testing.T) {
+func TestCreateDefaultUserSuite(t *testing.T) {
+	suite.Run(t, new(CreateDefaultUserSuite))
+}
+
+func (suite *CreateDefaultUserSuite) TestDefaultUserCreate() {
 	err := createDefaultUser(suite.service)
-	assert.NoError(t, err)
+	suite.NoError(err)
 }
