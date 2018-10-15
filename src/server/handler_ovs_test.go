@@ -1,11 +1,9 @@
 package server
 
 import (
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/mongo"
@@ -14,10 +12,6 @@ import (
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/stretchr/testify/suite"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type OVSTestSuite struct {
 	suite.Suite

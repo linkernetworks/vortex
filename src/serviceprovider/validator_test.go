@@ -1,9 +1,10 @@
 package serviceprovider
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/go-playground/validator.v9"
-	"testing"
 )
 
 var validate *validator.Validate
