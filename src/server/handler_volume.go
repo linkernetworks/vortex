@@ -151,9 +151,9 @@ func listVolumeHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, volume := range volumes {
+	for i, volume := range volumes {
 		// find owner in user entity
-		volume.CreatedBy, _ = backend.FindUserByID(session, volume.OwnerID)
+		volumes[i].CreatedBy, _ = backend.FindUserByID(session, volume.OwnerID)
 	}
 
 	count, err := session.Count(entity.VolumeCollectionName, bson.M{})

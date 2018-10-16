@@ -123,9 +123,9 @@ func listStorage(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, storage := range storages {
+	for i, storage := range storages {
 		// find owner in user entity
-		storage.CreatedBy, _ = backend.FindUserByID(session, storage.OwnerID)
+		storages[i].CreatedBy, _ = backend.FindUserByID(session, storage.OwnerID)
 	}
 	count, err := session.Count(entity.StorageCollectionName, bson.M{})
 	if err != nil {

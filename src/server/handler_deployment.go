@@ -197,9 +197,9 @@ func listDeploymentHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, deployment := range deployments {
+	for i, deployment := range deployments {
 		// find owner in user entity
-		deployment.CreatedBy, _ = backend.FindUserByID(session, deployment.OwnerID)
+		deployments[i].CreatedBy, _ = backend.FindUserByID(session, deployment.OwnerID)
 	}
 	count, err := session.Count(entity.DeploymentCollectionName, bson.M{})
 	if err != nil {

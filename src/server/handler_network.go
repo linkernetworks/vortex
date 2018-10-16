@@ -123,9 +123,9 @@ func listNetworkHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, network := range networks {
+	for i, network := range networks {
 		// find owner in user entity
-		network.CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
+		networks[i].CreatedBy, _ = backend.FindUserByID(session, network.OwnerID)
 	}
 
 	count, err := session.Count(entity.NetworkCollectionName, bson.M{})
