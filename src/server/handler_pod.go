@@ -180,9 +180,9 @@ func listPodHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, pod := range pods {
+	for i, pod := range pods {
 		// find owner in user entity
-		pod.CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
+		pods[i].CreatedBy, _ = backend.FindUserByID(session, pod.OwnerID)
 	}
 	count, err := session.Count(entity.PodCollectionName, bson.M{})
 	if err != nil {

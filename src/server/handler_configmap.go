@@ -159,9 +159,9 @@ func listConfigMapHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, configMap := range configMaps {
+	for i, configMap := range configMaps {
 		// find owner in user entity
-		configMap.CreatedBy, _ = backend.FindUserByID(session, configMap.OwnerID)
+		configMaps[i].CreatedBy, _ = backend.FindUserByID(session, configMap.OwnerID)
 	}
 	count, err := session.Count(entity.ConfigMapCollectionName, bson.M{})
 	if err != nil {
