@@ -395,7 +395,10 @@ func newShellService(sp *serviceprovider.Container) *restful.WebService {
 		Consumes(restful.MIME_JSON, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_JSON)
 
+	webService.Filter(validateTokenMiddleware)
+
 	webService.Route(webService.GET("/pod/{namespace}/{pod}/shell/{container}").
+		Filter(userRole).
 		To(handler.RESTfulServiceHandler(sp, handleExecShell)))
 	return webService
 }
