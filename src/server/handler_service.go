@@ -158,9 +158,9 @@ func listServiceHandler(ctx *web.Context) {
 	}
 
 	// insert users entity
-	for _, service := range services {
+	for i, service := range services {
 		// find owner in user entity
-		service.CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
+		services[i].CreatedBy, _ = backend.FindUserByID(session, service.OwnerID)
 	}
 
 	count, err := session.Count(entity.ServiceCollectionName, bson.M{})
