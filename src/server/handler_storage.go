@@ -49,7 +49,14 @@ func createStorage(ctx *web.Context) {
 		Unique: true,
 	})
 	defer session.Close()
+
 	// Check whether this name has been used
+	count, _ := session.Count(entity.StorageCollectionName, bson.M{"name": storage.Name})
+	if count > 0 {
+		response.Conflict(req.Request, resp.ResponseWriter, fmt.Errorf("Storage Provider Name: %s already existed", storage.Name))
+		return
+	}
+
 	storageProvider, err := storageprovider.GetStorageProvider(&storage)
 	if err != nil {
 		response.BadRequest(req.Request, resp.ResponseWriter, err)
