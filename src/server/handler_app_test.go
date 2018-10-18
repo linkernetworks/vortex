@@ -23,7 +23,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type AppTestSuite struct {
+type AppHandlerTestSuite struct {
 	suite.Suite
 	sp        *serviceprovider.Container
 	wc        *restful.Container
@@ -31,7 +31,7 @@ type AppTestSuite struct {
 	JWTBearer string
 }
 
-func (suite *AppTestSuite) SetupSuite() {
+func (suite *AppHandlerTestSuite) SetupSuite() {
 	cf := config.MustRead("../../config/testing.json")
 	sp := serviceprovider.NewForTesting(cf)
 
@@ -51,13 +51,13 @@ func (suite *AppTestSuite) SetupSuite() {
 	suite.JWTBearer = "Bearer " + token
 }
 
-func (suite *AppTestSuite) TearDownSuite() {}
+func (suite *AppHandlerTestSuite) TearDownSuite() {}
 
-func TestAppSuite(t *testing.T) {
-	suite.Run(t, new(AppTestSuite))
+func TestAppHandlerSuite(t *testing.T) {
+	suite.Run(t, new(AppHandlerTestSuite))
 }
 
-func (suite *AppTestSuite) TestCreateApp() {
+func (suite *AppHandlerTestSuite) TestCreateAppHandler() {
 	namespace := "default"
 	containers := []entity.Container{
 		{

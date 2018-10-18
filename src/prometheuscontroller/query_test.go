@@ -2,20 +2,14 @@ package prometheuscontroller
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/suite"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type PrometheusQueryTestSuite struct {
 	suite.Suite

@@ -1,21 +1,15 @@
 package server
 
 import (
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/linkernetworks/vortex/src/config"
 	"github.com/linkernetworks/vortex/src/serviceprovider"
 	"github.com/stretchr/testify/suite"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type LogTestSuite struct {
 	suite.Suite
