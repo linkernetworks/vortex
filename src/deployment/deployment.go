@@ -362,10 +362,11 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 			SecurityContext: securityContext,
 			Env:             envVars,
 		}
-		if deployContainer.ResourceRequestCPU != 0 {
+		if deployContainer.ResourceRequestCPU != 0 && deployContainer.ResourceRequestMemory != 0 {
 			c.Resources = corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
-					"cpu": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
+					"cpu":    resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
+					"memory": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestMemory) + "Mi"),
 				},
 			}
 		} else if deployContainer.ResourceRequestMemory != 0 {
@@ -374,11 +375,10 @@ func CreateDeployment(sp *serviceprovider.Container, deploy *entity.Deployment) 
 					"memory": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestMemory) + "Mi"),
 				},
 			}
-		} else if deployContainer.ResourceRequestMemory != 0 && deployContainer.ResourceRequestCPU != 0 {
+		} else if deployContainer.ResourceRequestCPU != 0 {
 			c.Resources = corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
-					"cpu":    resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
-					"memory": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestMemory) + "Mi"),
+					"cpu": resource.MustParse(strconv.Itoa(deployContainer.ResourceRequestCPU) + "m"),
 				},
 			}
 		}
