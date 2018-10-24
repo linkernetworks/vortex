@@ -725,7 +725,12 @@ func GetNode(sp *serviceprovider.Container, id string, rs RangeSetting) (entity.
 		return node, err
 	}
 
-	node.Detail.Status = string(results[0].Metric["condition"])
+	if len(results) == 0 {
+		// kube-state-metric not replies the condition of this node
+		node.Detail.Status = "NotReady"
+	} else {
+		node.Detail.Status = string(results[0].Metric["condition"])
+	}
 
 	// resource reported from kube-state-metrics
 	expression = Expression{}
