@@ -7,6 +7,10 @@ Vortex [![Build Status](https://travis-ci.org/linkernetworks/vortex.svg?branch=d
 
 ## Features
 
+## Installation
+
+See [vortex-installer](https://github.com/linkernetworks/vortex-installer)
+
 ### Kubernetes
 
 - Kubernetes resource data visualization including network, cpu, memory etc.
@@ -89,3 +93,12 @@ $ apps.upgrade-prod
 ```shell
 $ make apps.teardown-prod
 ```
+
+## Core Developers
+
+[@chenyunchen](https://github.com/chenyunchen)
+[@hwchiu](https://github.com/hwchiu)
+[@John-Lin](https://github.com/John-Lin)
+[@LucienLee](https://github.com/LucienLee)
+[@sufuf3](https://github.com/sufuf3)
+[@WakeupTsai](https://github.com/WakeupTsai)
