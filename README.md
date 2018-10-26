@@ -94,11 +94,16 @@ $ apps.upgrade-prod
 $ make apps.teardown-prod
 ```
 
-## Core Developers
+## Core developers
 
 [@chenyunchen](https://github.com/chenyunchen)
+
 [@hwchiu](https://github.com/hwchiu)
+
 [@John-Lin](https://github.com/John-Lin)
+
 [@LucienLee](https://github.com/LucienLee)
+
 [@sufuf3](https://github.com/sufuf3)
+
 [@WakeupTsai](https://github.com/WakeupTsai)
