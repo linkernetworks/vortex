@@ -98,6 +98,8 @@ $ make apps.teardown-prod
 
 [@chenyunchen](https://github.com/chenyunchen)
 
+[@chechiachang](https://github.com/chechiachang)
+
 [@hwchiu](https://github.com/hwchiu)
 
 [@John-Lin](https://github.com/John-Lin)
